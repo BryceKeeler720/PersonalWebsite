@@ -1,0 +1,165 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Dither from "../components/Dither.tsx";
+---
+
+<BaseLayout title="Home | Bryce Keeler">
+  <section class="hero">
+    <div class="hero-bg">
+      <Dither
+        client:load
+        waveSpeed={0.05}
+        waveFrequency={3}
+        waveAmplitude={0.3}
+        waveColor={[0.4, 0.4, 0.4]}
+        colorNum={4}
+        pixelSize={2}
+        disableAnimation={false}
+        enableMouseInteraction={true}
+        mouseRadius={0.1}
+      />
+    </div>
+
+    <!-- Top menu pill -->
+    <nav class="top-menu">
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/projects">Projects</a>
+      <a href="/blog">Blog</a>
+    </nav>
+
+    <!-- Foreground content -->
+    <div class="hero-content">
+      <h1 class="hero-title">
+        Local Host Demon
+      </h1>
+
+      <p class="hero-subtitle">
+        asdf;lkjasdf;lkjasd;lfkjas;ldkjf
+      </p>
+
+      <div class="hero-actions">
+        <a href="#projects" class="btn btn-primary">Get Started</a>
+        <a href="#learn-more" class="btn btn-secondary">Learn More</a>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 0 3rem;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .hero-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .hero-bg .dither-container {
+      pointer-events: auto;
+    }
+
+    .hero-bg .dither-container {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .top-menu {
+      position: fixed;
+      top: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      gap: 5rem;
+      padding: 0.75rem 1.5rem;
+      background: rgba(255, 255, 255, 0.123);
+      border: 1px solid rgba(255, 255, 255, 0);
+      border-radius: 999px;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .top-menu a {
+      color: #e5e7eb;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      transition: all 0.2s ease;
+    }
+
+    .top-menu a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 36rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .hero-title {
+      font-size: 2.6rem;
+      line-height: 1.1;
+      font-weight: 700;
+    }
+
+    .hero-subtitle {
+      font-size: 0.98rem;
+      color: #cbd5f5;
+      max-width: 32rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem 1.4rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: #f9fafb;
+      color: #020617;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.9);
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+    }
+
+    .btn-primary:hover,
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      transition: transform 0.2s ease;
+    }
+  </style>
+</BaseLayout>
