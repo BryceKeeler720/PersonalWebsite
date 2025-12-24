@@ -1,29 +1,278 @@
 ---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Dither from "../components/Dither.tsx";
+
+// Example projects data - you can replace this with your actual projects
+const projects = [
+  {
+    title: "Attention Economy Research and Apps",
+    description: "Research and 2 Mobile Apps Designed to Reduce Screen Time",
+    tech: ["JavaScript", "Mobile App", "Git", "Research"],
+    link: "/projects/attention-economy",
+    github: "https://github.com/BryceKeeler720/PhoneBricking",
+  },
+  {
+    title: "This Website!",
+    description: "Website Displaying Personal Projects and My Blog",
+    tech: ["Astro", "TypeScripts", "CSS", "JavaScript", "Web Dev", "Git"],
+    link: "/projects/personal-website",
+    github: "https://github.com/BryceKeeler720/PersonalWebsite",
+  },
+  {
+    title: "Home Lab and Networking",
+    description: "Personal Self-Hosting HomeLab",
+    tech: ["Networking", "Linux", "Virtualization", "Docker", "System Admin"],
+    link: "/projects/homeLab",
+    github: "#",
+  }
+];
 ---
 
-<html lang="en">
-  <head>
-    <title>Projects | Bryce Keeler</title>
-  </head>
-  <body>
-    <h1>Projects</h1>
-    <p>Click a project to view more details.</p>
+<BaseLayout title="Projects | Bryce Keeler">
+  <section class="projects-page">
+    <!-- Background -->
+    <div class="hero-bg no-fade">
+      <Dither
+        client:load
+        waveSpeed={0.05}
+        waveFrequency={3}
+        waveAmplitude={0.3}
+        waveColor={[0.4, 0.4, 0.4]}
+        colorNum={4}
+        pixelSize={2}
+        disableAnimation={false}
+        enableMouseInteraction={true}
+        mouseRadius={0.1}
+      />
+    </div>
 
-    <!-- This is our first interactive project “card” -->
-    <a href="/projects/example-project" style="
-      display: block;
-      max-width: 400px;
-      margin-top: 1rem;
-      padding: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      text-decoration: none;
-      color: inherit;
-    ">
-      <h2 style="margin: 0 0 0.5rem;">Example Project</h2>
-      <p style="margin: 0; font-size: 0.9rem; color: #555;">
-        Click to view this project's details.
+    <!-- Top menu pill -->
+    <nav class="top-menu">
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/projects">Projects</a>
+      <a href="/blog">Blog</a>
+    </nav>
+
+    <!-- Projects content -->
+    <div class="projects-container">
+      <h1 class="projects-title">My Projects</h1>
+      <p class="projects-subtitle">
+        A collection of things I've built and experimented with
       </p>
-    </a>
-  </body>
-</html>
+
+      <div class="projects-grid">
+        {projects.map((project) => (
+          <div class="project-card">
+            <h2 class="project-title">{project.title}</h2>
+            <p class="project-description">{project.description}</p>
+
+            <div class="project-tech">
+              {project.tech.map((tech) => (
+                <span class="tech-tag">{tech}</span>
+              ))}
+            </div>
+
+            <div class="project-links">
+              <a href={project.link} class="project-link">View Project →</a>
+              <a href={project.github} class="project-link secondary">GitHub</a>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .projects-page {
+      position: relative;
+      min-height: 100vh;
+      padding: 8rem 2rem 4rem;
+      overflow-x: hidden;
+    }
+
+    .hero-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .hero-bg .dither-container {
+      pointer-events: auto;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .hero-bg.no-fade .dither-container {
+      animation: none;
+      opacity: 1;
+    }
+
+    .top-menu {
+      position: fixed;
+      top: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      gap: 5rem;
+      padding: 0.75rem 1.5rem;
+      background: rgba(255, 255, 255, 0.123);
+      border: 1px solid rgba(255, 255, 255, 0);
+      border-radius: 999px;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .top-menu a {
+      color: #e5e7eb;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      transition: all 0.2s ease;
+    }
+
+    .top-menu a:hover {
+      background: rgba(253, 253, 253, 0.1);
+      color: #fff;
+    }
+
+    .projects-container {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .projects-title {
+      font-size: 3rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    .projects-subtitle {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #ffffff;
+      margin-bottom: 4rem;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    .project-card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 12px;
+      padding: 2rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .project-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+      border-color: rgba(148, 163, 184, 0.5);
+    }
+
+    .project-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #fff;
+      margin: 0;
+    }
+
+    .project-description {
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin: 0;
+      flex-grow: 1;
+    }
+
+    .project-tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .tech-tag {
+      background: rgba(255, 255, 255, 0.1);
+      color: #e5e7eb;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .project-links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .project-link {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.15);
+      transition: all 0.2s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .project-link:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .project-link.secondary {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .project-link.secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      .projects-page {
+        padding: 6rem 1rem 2rem;
+      }
+
+      .projects-title {
+        font-size: 2rem;
+      }
+
+      .projects-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+
+      .top-menu {
+        gap: 2rem;
+        padding: 0.5rem 1rem;
+      }
+
+      .top-menu a {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</BaseLayout>

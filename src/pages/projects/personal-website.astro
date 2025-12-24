@@ -1,0 +1,362 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Dither from "../../components/Dither.tsx";
+---
+
+<BaseLayout title="Personal Website | Bryce Keeler">
+  <section class="project-detail-page">
+    <!-- Background -->
+    <div class="hero-bg no-fade">
+      <Dither
+        client:load
+        waveSpeed={0.05}
+        waveFrequency={3}
+        waveAmplitude={0.3}
+        waveColor={[0.4, 0.4, 0.4]}
+        colorNum={4}
+        pixelSize={2}
+        disableAnimation={false}
+        enableMouseInteraction={true}
+        mouseRadius={0.1}
+      />
+    </div>
+
+    <!-- Top menu pill -->
+    <nav class="top-menu">
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/projects">Projects</a>
+      <a href="/blog">Blog</a>
+    </nav>
+
+    <!-- Project content -->
+    <div class="project-container">
+      <a href="/projects" class="back-link">← Back to Projects</a>
+
+      <h1 class="project-title">This Website!</h1>
+
+      <div class="project-meta">
+        <div class="tech-tags">
+          <span class="tech-tag">Astro</span>
+          <span class="tech-tag">TypeScript</span>
+          <span class="tech-tag">CSS</span>
+          <span class="tech-tag">JavaScript</span>
+          <span class="tech-tag">Web Dev</span>
+          <span class="tech-tag">Git</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/BryceKeeler720/PersonalWebsite" target="_blank" rel="noopener noreferrer" class="external-link">
+            View on GitHub →
+          </a>
+        </div>
+      </div>
+
+      <div class="project-content">
+        <section class="content-section">
+          <h2>Overview</h2>
+          <p>
+            A modern, performant personal portfolio website built with Astro and React. Features a custom WebGL
+            dithered wave background, glass morphism UI elements, and a clean, minimal design aesthetic.
+          </p>
+        </section>
+
+        <section class="content-section">
+          <h2>Design Philosophy</h2>
+          <p>
+            The design focuses on creating a memorable first impression while maintaining excellent performance
+            and accessibility. The animated background provides visual interest without overwhelming the content,
+            and the glass morphism navigation creates depth and hierarchy.
+          </p>
+        </section>
+
+        <section class="content-section">
+          <h2>Key Features</h2>
+          <ul>
+            <li><strong>WebGL Dithered Waves:</strong> Custom shader-based background animation using React Three Fiber</li>
+            <li><strong>Glass Morphism UI:</strong> Blurred, semi-transparent navigation with backdrop filters</li>
+            <li><strong>Dark Theme:</strong> Consistent dark color palette with neon green accents</li>
+            <li><strong>Responsive Design:</strong> Fully responsive across all device sizes</li>
+            <li><strong>Performance Optimized:</strong> Static site generation with selective hydration</li>
+            <li><strong>Blog System:</strong> MDX support for rich blog content</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2>Technical Stack</h2>
+          <p><strong>Frontend Framework:</strong></p>
+          <ul>
+            <li>Astro 5.16.2 - Static site generator with partial hydration</li>
+            <li>React 19 - For interactive components</li>
+            <li>TypeScript - Type-safe development</li>
+          </ul>
+
+          <p><strong>Styling:</strong></p>
+          <ul>
+            <li>Scoped CSS with Astro</li>
+            <li>Ubuntu font family from Google Fonts</li>
+            <li>Custom animations and transitions</li>
+          </ul>
+
+          <p><strong>3D Graphics:</strong></p>
+          <ul>
+            <li>React Three Fiber - React renderer for Three.js</li>
+            <li>@react-three/postprocessing - Post-processing effects</li>
+            <li>Custom GLSL shaders for wave patterns</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2>The Dithered Wave Background</h2>
+          <p>
+            The standout feature is the custom WebGL background using Perlin noise to generate organic wave patterns
+            with a retro dithering effect. The shader implements:
+          </p>
+          <ul>
+            <li>Fractal Brownian Motion (FBM) for natural-looking waves</li>
+            <li>Bayer matrix 8x8 dithering for retro aesthetic</li>
+            <li>Mouse interaction with smooth damping</li>
+            <li>Fade-in animation on page load</li>
+            <li>Responsive canvas resizing</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2>Performance Considerations</h2>
+          <p>
+            The site is built with performance in mind:
+          </p>
+          <ul>
+            <li>Zero-JS-by-default with Astro</li>
+            <li>Selective hydration for interactive components</li>
+            <li>Static HTML generation for fast initial loads</li>
+            <li>Font preloading and optimization</li>
+            <li>Efficient WebGL rendering at 60fps</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2>Development Process</h2>
+          <p>
+            Built collaboratively with Claude Code, this project showcases modern web development practices
+            including component-based architecture, type safety, and performance optimization. The codebase
+            is organized, well-documented, and follows best practices for maintainability.
+          </p>
+        </section>
+
+        <section class="content-section">
+          <h2>Future Enhancements</h2>
+          <ul>
+            <li>Additional project showcase pages</li>
+            <li>Blog content and writing</li>
+            <li>Dark/light mode toggle</li>
+            <li>More interactive WebGL effects</li>
+            <li>Portfolio case studies</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .project-detail-page {
+      position: relative;
+      min-height: 100vh;
+      padding: 8rem 2rem 4rem;
+    }
+
+    .hero-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .hero-bg .dither-container {
+      pointer-events: auto;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .hero-bg.no-fade .dither-container {
+      animation: none;
+      opacity: 1;
+    }
+
+    .top-menu {
+      position: fixed;
+      top: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      gap: 5rem;
+      padding: 0.75rem 1.5rem;
+      background: rgba(255, 255, 255, 0.123);
+      border: 1px solid rgba(255, 255, 255, 0);
+      border-radius: 999px;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .top-menu a {
+      color: #e5e7eb;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      transition: all 0.2s ease;
+    }
+
+    .top-menu a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .project-container {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      color: #e5e7eb;
+      text-decoration: none;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+      padding: 0.5rem 1rem;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 999px;
+      backdrop-filter: blur(16px);
+      transition: all 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: rgba(15, 23, 42, 0.9);
+      transform: translateX(-4px);
+    }
+
+    .project-title {
+      font-size: 3rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 2rem;
+      line-height: 1.2;
+    }
+
+    .project-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+      padding: 1.5rem;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 12px;
+      backdrop-filter: blur(16px);
+    }
+
+    .tech-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tech-tag {
+      background: rgba(255, 255, 255, 0.1);
+      color: #e5e7eb;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .external-link {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 1.25rem;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .external-link:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .project-content {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 12px;
+      padding: 3rem;
+      backdrop-filter: blur(16px);
+    }
+
+    .content-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .content-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .content-section h2 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+
+    .content-section p {
+      color: #cbd5e1;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+
+    .content-section ul {
+      color: #cbd5e1;
+      line-height: 1.8;
+      padding-left: 1.5rem;
+    }
+
+    .content-section li {
+      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .project-detail-page {
+        padding: 6rem 1rem 2rem;
+      }
+
+      .project-title {
+        font-size: 2rem;
+      }
+
+      .project-content {
+        padding: 1.5rem;
+      }
+
+      .top-menu {
+        gap: 2rem;
+        padding: 0.5rem 1rem;
+      }
+
+      .top-menu a {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</BaseLayout>

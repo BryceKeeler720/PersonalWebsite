@@ -1,0 +1,322 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Dither from "../../components/Dither.tsx";
+---
+
+<BaseLayout title="Attention Economy Research | Bryce Keeler">
+  <section class="project-detail-page">
+    <!-- Background -->
+    <div class="hero-bg no-fade">
+      <Dither
+        client:load
+        waveSpeed={0.05}
+        waveFrequency={3}
+        waveAmplitude={0.3}
+        waveColor={[0.4, 0.4, 0.4]}
+        colorNum={4}
+        pixelSize={2}
+        disableAnimation={false}
+        enableMouseInteraction={true}
+        mouseRadius={0.1}
+      />
+    </div>
+
+    <!-- Top menu pill -->
+    <nav class="top-menu">
+      <a href="/">Home</a>
+      <a href="/about">About</a>
+      <a href="/projects">Projects</a>
+      <a href="/blog">Blog</a>
+    </nav>
+
+    <!-- Project content -->
+    <div class="project-container">
+      <a href="/projects" class="back-link">← Back to Projects</a>
+
+      <h1 class="project-title">Attention Economy Research and Apps</h1>
+
+      <div class="project-meta">
+        <div class="tech-tags">
+          <span class="tech-tag">JavaScript</span>
+          <span class="tech-tag">Mobile App</span>
+          <span class="tech-tag">Git</span>
+          <span class="tech-tag">Research</span>
+        </div>
+        <div class="project-links">
+          <a href="https://github.com/BryceKeeler720/PhoneBricking" target="_blank" rel="noopener noreferrer" class="external-link">
+            View on GitHub →
+          </a>
+        </div>
+      </div>
+
+      <div class="project-content">
+        <section class="content-section">
+          <h2>Overview</h2>
+          <p>
+            Research and development of two mobile applications designed to reduce screen time and combat digital addiction.
+            This project explores the attention economy and its impact on mental health and productivity.
+          </p>
+        </section>
+
+        <section class="content-section">
+          <h2>The Problem</h2>
+          <p>
+            Modern smartphones and social media platforms are designed to maximize user engagement, often at the expense
+            of mental health and productivity. The attention economy has created a landscape where our focus is constantly
+            fragmented by notifications, infinite scroll, and addictive design patterns.
+          </p>
+        </section>
+
+        <section class="content-section">
+          <h2>The Solution</h2>
+          <p>
+            I developed two mobile applications that use behavioral psychology principles to help users regain control
+            of their digital habits:
+          </p>
+          <ul>
+            <li><strong>App 1:</strong> Progressive restriction system that gradually limits app usage</li>
+            <li><strong>App 2:</strong> Mindfulness-based intervention that promotes intentional phone use</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2>Key Features</h2>
+          <ul>
+            <li>Usage tracking and analytics</li>
+            <li>Customizable app blocking</li>
+            <li>Habit formation tools</li>
+            <li>Research-backed intervention strategies</li>
+          </ul>
+        </section>
+
+        <section class="content-section">
+          <h2>Technologies Used</h2>
+          <p>
+            Built with JavaScript and modern mobile development frameworks. Utilized Git for version control
+            and collaborative development.
+          </p>
+        </section>
+
+        <section class="content-section">
+          <h2>Research Component</h2>
+          <p>
+            This project includes a research component analyzing the effectiveness of different intervention
+            strategies for reducing screen time. The findings contribute to our understanding of digital wellness
+            and behavior change.
+          </p>
+        </section>
+
+        <section class="content-section">
+          <h2>Outcomes</h2>
+          <p>
+            The applications have been tested with users and show promising results in helping individuals
+            reduce their screen time and develop healthier digital habits.
+          </p>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .project-detail-page {
+      position: relative;
+      min-height: 100vh;
+      padding: 8rem 2rem 4rem;
+    }
+
+    .hero-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .hero-bg .dither-container {
+      pointer-events: auto;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .hero-bg.no-fade .dither-container {
+      animation: none;
+      opacity: 1;
+    }
+
+    .top-menu {
+      position: fixed;
+      top: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      gap: 5rem;
+      padding: 0.75rem 1.5rem;
+      background: rgba(255, 255, 255, 0.123);
+      border: 1px solid rgba(255, 255, 255, 0);
+      border-radius: 999px;
+      backdrop-filter: blur(5px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .top-menu a {
+      color: #e5e7eb;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      transition: all 0.2s ease;
+    }
+
+    .top-menu a:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+
+    .project-container {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      color: #e5e7eb;
+      text-decoration: none;
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+      padding: 0.5rem 1rem;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 999px;
+      backdrop-filter: blur(16px);
+      transition: all 0.2s ease;
+    }
+
+    .back-link:hover {
+      background: rgba(15, 23, 42, 0.9);
+      transform: translateX(-4px);
+    }
+
+    .project-title {
+      font-size: 3rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 2rem;
+      line-height: 1.2;
+    }
+
+    .project-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+      padding: 1.5rem;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 12px;
+      backdrop-filter: blur(16px);
+    }
+
+    .tech-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tech-tag {
+      background: rgba(255, 255, 255, 0.1);
+      color: #e5e7eb;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .external-link {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 1.25rem;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 999px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .external-link:hover {
+      background: rgba(255, 255, 255, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .project-content {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 12px;
+      padding: 3rem;
+      backdrop-filter: blur(16px);
+    }
+
+    .content-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .content-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .content-section h2 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+
+    .content-section p {
+      color: #cbd5e1;
+      line-height: 1.8;
+      margin-bottom: 1rem;
+    }
+
+    .content-section ul {
+      color: #cbd5e1;
+      line-height: 1.8;
+      padding-left: 1.5rem;
+    }
+
+    .content-section li {
+      margin-bottom: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .project-detail-page {
+        padding: 6rem 1rem 2rem;
+      }
+
+      .project-title {
+        font-size: 2rem;
+      }
+
+      .project-content {
+        padding: 1.5rem;
+      }
+
+      .top-menu {
+        gap: 2rem;
+        padding: 0.5rem 1rem;
+      }
+
+      .top-menu a {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</BaseLayout>
