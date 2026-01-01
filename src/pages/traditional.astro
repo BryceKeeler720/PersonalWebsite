@@ -1,0 +1,114 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Bryce Keeler - Portfolio">
+  <main class="traditional-layout">
+    <header>
+      <h1>Bryce Keeler</h1>
+      <p class="tagline">Digital Consulting Analyst | Workday Developer | Automation Enthusiast</p>
+      <nav>
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+        <a href="/">← Back to 3D Experience</a>
+      </nav>
+    </header>
+
+    <section id="about">
+      <h2>About Me</h2>
+      <p>
+        Digital Consulting Analyst at Huron Consulting Group, specializing in Workday systems 
+        integration and data transformation.
+      </p>
+    </section>
+
+    <section id="projects">
+      <h2>Featured Projects</h2>
+      
+      <div class="project-card">
+        <h3>Workday AI Recruiting Application</h3>
+        <p>Comprehensive AI recruiting application within the Workday Extend ecosystem.</p>
+      </div>
+
+      <div class="project-card">
+        <h3>Reddit Content Automation System</h3>
+        <p>Automated system for creating and uploading social media content.</p>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2>Let's Connect</h2>
+      <div class="contact-links">
+        <a href="mailto:your.email@example.com" class="contact-button">📧 Email</a>
+        <a href="https://linkedin.com/in/yourprofile" target="_blank" class="contact-button">💼 LinkedIn</a>
+        <a href="https://github.com/BryceKeeler720" target="_blank" class="contact-button">💻 GitHub</a>
+      </div>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .traditional-layout {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+
+  header {
+    text-align: center;
+    padding: 3rem 0;
+    border-bottom: 2px solid rgba(148, 163, 184, 0.2);
+    margin-bottom: 3rem;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .tagline {
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+  }
+
+  nav {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+  }
+
+  section {
+    margin-bottom: 4rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .project-card {
+    background: rgba(30, 41, 59, 0.5);
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+  }
+
+  .contact-links {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .contact-button {
+    background: rgba(99, 102, 241, 0.2);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    color: var(--text-primary);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+  }
+</style>

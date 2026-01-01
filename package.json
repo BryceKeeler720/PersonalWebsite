@@ -1,0 +1,23 @@
+{
+  "name": "3d-game-portfolio",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^4.3.12",
+    "@astrojs/react": "^4.4.2",
+    "@astrojs/rss": "^4.0.14",
+    "@astrojs/sitemap": "^3.6.0",
+    "@splinetool/react-spline": "^4.0.0",
+    "@splinetool/runtime": "^1.9.30",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "astro": "^5.16.2",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "sharp": "^0.34.3"
+  }
+}

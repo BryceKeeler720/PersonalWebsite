@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GameContainer from '../components/game/GameContainer';
+---
+
+<BaseLayout title="Bryce Keeler - Interactive Portfolio">
+  <GameContainer client:load />
+</BaseLayout>
+
+<style>
+  :global(body) {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+</style>
