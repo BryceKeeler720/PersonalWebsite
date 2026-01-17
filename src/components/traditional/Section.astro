@@ -1,0 +1,115 @@
+---
+interface Props {
+  id?: string;
+  title: string;
+  subtitle?: string;
+  class?: string;
+}
+
+const { id, title, subtitle, class: className = '' } = Astro.props;
+---
+
+<section id={id} class={`section ${className}`}>
+  <div class="section-container">
+    <div class="section-header">
+      <h2 class="section-title">{title}</h2>
+      {subtitle && <p class="section-subtitle">{subtitle}</p>}
+    </div>
+    <div class="section-content">
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .section {
+    padding: 6rem 2rem;
+    position: relative;
+  }
+
+  .section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      rgba(99, 102, 241, 0.2) 50%,
+      transparent
+    );
+    pointer-events: none;
+  }
+
+  .section-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+    animation: fadeInDown 0.8s ease-out;
+  }
+
+  .section-title {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    position: relative;
+    display: inline-block;
+  }
+
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -0.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+    border-radius: 2px;
+  }
+
+  .section-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    margin: 1.5rem auto 0;
+    line-height: 1.6;
+  }
+
+  .section-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .section {
+      padding: 4rem 1rem;
+    }
+
+    .section-header {
+      margin-bottom: 2.5rem;
+    }
+  }
+</style>
