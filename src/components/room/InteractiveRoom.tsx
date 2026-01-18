@@ -9,6 +9,7 @@ const InteractiveRoom: React.FC = () => {
   const [selectedHotspot, setSelectedHotspot] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hoveredObject, setHoveredObject] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const splineRef = useRef<Application | null>(null);
 
@@ -123,6 +124,13 @@ const InteractiveRoom: React.FC = () => {
     splineRef.current = spline;
     setIsLoaded(true);
 
+    // Detect if user is on mobile/touch device
+    const checkMobile = () => {
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        (navigator.maxTouchPoints ? navigator.maxTouchPoints > 0 : false);
+    };
+    setIsMobile(checkMobile());
+
     // Log all available object names to help you identify them
     const allObjects = spline.getAllObjects();
     console.log('Spline loaded. Available objects:', allObjects.map((obj: any) => obj.name));
@@ -213,8 +221,17 @@ const InteractiveRoom: React.FC = () => {
       {isLoaded && !selectedHotspot && !hoveredObject && (
         <div className="instructions">
           <p className="instruction-text">
-            <span className="click-icon">🖱️</span>
-            Move your mouse to explore • Click objects to learn more
+            {isMobile ? (
+              <>
+                <span className="click-icon">👆</span>
+                Pinch to zoom • Swipe to rotate • Tap objects to learn more
+              </>
+            ) : (
+              <>
+                <span className="click-icon">🖱️</span>
+                Move your mouse to explore • Click objects to learn more
+              </>
+            )}
           </p>
         </div>
       )}
