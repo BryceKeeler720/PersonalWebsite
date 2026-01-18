@@ -15,8 +15,8 @@ const InteractiveRoom: React.FC = () => {
   const splineRef = useRef<Application | null>(null);
 
   // Icon URLs - Update these with your own icon URLs or local paths
-  const MOUSE_ICON_URL = '/icons/mouse.svg'; // Replace with your mouse icon URL
-  const PINCH_ICON_URL = '/icons/pinch.svg'; // Replace with your pinch icon URL
+  const MOUSE_ICON_URL = '/icons/mouse.png';
+  const PINCH_ICON_URL = '/icons/pinch.png';
 
   // Map of Spline object names to hotspot IDs
   // UPDATE THESE to match your actual Spline object names
