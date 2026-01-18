@@ -186,7 +186,7 @@ const InteractiveRoom: React.FC = () => {
       {/* Spline 3D Scene */}
       <div className="spline-container">
         <Spline
-          scene="https://prod.spline.design/Q4QXKyGg8LbBaE8z/scene.splinecode"
+          scene={`https://prod.spline.design/Q4QXKyGg8LbBaE8z/scene.splinecode?v=${Date.now()}`}
           onLoad={onSplineLoad}
         />
       </div>
