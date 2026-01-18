@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Spline from '@splinetool/react-spline';
 import ContentPanel from './ContentPanel';
 import Navigation from './Navigation';
@@ -10,32 +10,47 @@ import type { Application } from '@splinetool/runtime';
 const InteractiveRoom: React.FC = () => {
   const [selectedHotspot, setSelectedHotspot] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(true);
   const [hoveredObject, setHoveredObject] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [hotspotPositions, setHotspotPositions] = useState<Record<string, { x: number; y: number; visible: boolean }>>({});
   const containerRef = useRef<HTMLDivElement>(null);
   const splineRef = useRef<Application | null>(null);
+  const animationFrameRef = useRef<number | undefined>(undefined);
 
-  // Icon URLs - Update these with your own icon URLs or local paths
   const MOUSE_ICON_URL = '/icons/mouse.png';
   const PINCH_ICON_URL = '/icons/pinch.png';
 
-  // Map of Spline object names to hotspot IDs
-  // UPDATE THESE to match your actual Spline object names
+  // mapping spline objects to hotspot ids
   const objectMapping: Record<string, string> = {
+    'Server Rack': 'server-rack',
     'Computer': 'computer',
-    'Monitor': 'computer',
-    'PC': 'computer',
-    'ServerRack': 'server-rack',
-    'Server': 'server-rack',
-    'Desk': 'desk',
-    'DeskArea': 'desk',
-    'Bookshelf': 'bookshelf',
-    'Books': 'bookshelf',
-    'Shelf': 'bookshelf'
+    'Books': 'books',
+    'Sticky Notes': 'sticky-notes'
   };
 
-  // Content for each hotspot
   const contentData: Record<string, ContentData> = {
+    'server-rack': {
+      title: 'Home Lab Infrastructure',
+      subtitle: 'Self-hosted services & virtualization',
+      items: [
+        {
+          title: 'Proxmox Virtualization',
+          description: 'Enterprise-grade hypervisor running multiple VMs and containers',
+          tags: ['Proxmox', 'LXC', 'KVM'],
+        },
+        {
+          title: 'Network Services',
+          description: 'Pi-hole ad blocking, Tailscale VPN, DNS management',
+          tags: ['Pi-hole', 'Tailscale', 'DNS'],
+        },
+        {
+          title: 'Automation Hub',
+          description: 'n8n workflows, FastAPI microservices, scheduled tasks',
+          tags: ['n8n', 'Docker', 'FastAPI'],
+        }
+      ]
+    },
     computer: {
       title: 'Projects & Development',
       subtitle: 'What I build and create',
@@ -60,61 +75,40 @@ const InteractiveRoom: React.FC = () => {
         }
       ]
     },
-    'server-rack': {
-      title: 'Home Lab Infrastructure',
-      subtitle: 'Self-hosted services & virtualization',
-      items: [
-        {
-          title: 'Proxmox Virtualization',
-          description: 'Enterprise-grade hypervisor running multiple VMs and containers',
-          tags: ['Proxmox', 'LXC', 'KVM'],
-        },
-        {
-          title: 'Network Services',
-          description: 'Pi-hole ad blocking, Tailscale VPN, DNS management',
-          tags: ['Pi-hole', 'Tailscale', 'DNS'],
-        },
-        {
-          title: 'Automation Hub',
-          description: 'n8n workflows, FastAPI microservices, scheduled tasks',
-          tags: ['n8n', 'Docker', 'FastAPI'],
-        }
-      ]
-    },
-    desk: {
-      title: 'About Bryce Keeler',
-      subtitle: 'Digital Consulting Analyst',
-      items: [
-        {
-          title: 'Huron Consulting Group',
-          description: 'Workday systems integration and data transformation specialist',
-          tags: ['Workday', 'Consulting', 'ERP'],
-        },
-        {
-          title: 'Core Skills',
-          description: 'Workday, React, TypeScript, Python, SQL, XSLT, n8n, Proxmox',
-          tags: ['Full Stack', 'DevOps', 'Enterprise'],
-        },
-        {
-          title: 'Approach',
-          description: 'Bridging technical complexity and business needs through automation',
-          tags: ['Problem Solving', 'Innovation'],
-        }
-      ]
-    },
-    bookshelf: {
-      title: 'Achievements & Interests',
+    books: {
+      title: 'Certifications & Learning',
       subtitle: 'Continuous learning and growth',
       items: [
         {
-          title: 'Workday Marketplace',
-          description: 'Published AI recruiting application available to enterprise clients',
-          tags: ['Published', 'Enterprise'],
+          title: 'Workday Certifications',
+          description: 'Certified in Workday integrations and system architecture',
+          tags: ['Workday', 'Certified'],
         },
         {
-          title: 'Tech Enthusiast',
-          description: 'Passionate about automation, infrastructure, and modern web technologies',
-          tags: ['Automation', 'Self-Hosting'],
+          title: 'Tech Learning',
+          description: 'Constantly expanding knowledge in cloud, DevOps, and modern frameworks',
+          tags: ['Cloud', 'DevOps', 'Web Dev'],
+        },
+        {
+          title: 'Problem Solving',
+          description: 'Applying technical knowledge to solve real business challenges',
+          tags: ['Enterprise', 'Solutions'],
+        }
+      ]
+    },
+    'sticky-notes': {
+      title: 'Interests & Passions',
+      subtitle: 'What drives me',
+      items: [
+        {
+          title: 'Automation Enthusiast',
+          description: 'Building workflows and tools to automate repetitive tasks',
+          tags: ['n8n', 'Python', 'Efficiency'],
+        },
+        {
+          title: 'Self-Hosting',
+          description: 'Running my own infrastructure and learning through hands-on experience',
+          tags: ['Homelab', 'Linux', 'Proxmox'],
         },
         {
           title: 'Always Building',
@@ -128,20 +122,31 @@ const InteractiveRoom: React.FC = () => {
 
   const onSplineLoad = (spline: Application) => {
     splineRef.current = spline;
-    setIsLoaded(true);
 
-    // Detect if user is on mobile/touch device
     const checkMobile = () => {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
         (navigator.maxTouchPoints ? navigator.maxTouchPoints > 0 : false);
     };
     setIsMobile(checkMobile());
 
-    // Log all available object names to help you identify them
     const allObjects = spline.getAllObjects();
     console.log('Spline loaded. Available objects:', allObjects.map((obj: any) => obj.name));
 
-    // Set up click events using Spline's event system
+    const splineInternal = spline as any;
+    if (splineInternal._camera) {
+      console.log('Camera position:', splineInternal._camera.position);
+      console.log('Camera rotation:', splineInternal._camera.rotation);
+    }
+
+    // wait for welcome screen animation
+    setTimeout(() => {
+      setIsLoaded(true);
+      setTimeout(() => {
+        setShowWelcome(false);
+      }, 1200);
+    }, 1000);
+
+    // click handling
     spline.addEventListener('mouseDown', (e: any) => {
       if (e.target && e.target.name) {
         const objectName = e.target.name;
@@ -154,7 +159,7 @@ const InteractiveRoom: React.FC = () => {
       }
     });
 
-    // Set up hover events
+    // hover stuff
     spline.addEventListener('mouseHover', (e: any) => {
       if (e.target && e.target.name) {
         const objectName = e.target.name;
@@ -169,7 +174,6 @@ const InteractiveRoom: React.FC = () => {
       }
     });
 
-    // Reset hover state when mouse moves away
     spline.addEventListener('mouseUp', () => {
       setHoveredObject(null);
       if (containerRef.current) {
@@ -186,10 +190,122 @@ const InteractiveRoom: React.FC = () => {
     setSelectedHotspot(null);
   };
 
+  // this tracks the 3d objects and converts them to 2d screen positions for the + buttons
+  useEffect(() => {
+    if (!isLoaded || !splineRef.current || !containerRef.current) return;
+
+    let lastPositions: Record<string, { x: number; y: number; visible: boolean }> = {};
+    let smoothedPositions: Record<string, { x: number; y: number }> = {};
+
+    const updateHotspotPositions = () => {
+      const spline = splineRef.current;
+      const container = containerRef.current;
+      if (!spline || !container) {
+        animationFrameRef.current = requestAnimationFrame(updateHotspotPositions);
+        return;
+      }
+
+      try {
+        const newPositions: Record<string, { x: number; y: number; visible: boolean }> = {};
+        const hotspotIds = Array.from(new Set(Object.values(objectMapping)));
+
+        hotspotIds.forEach((hotspotId) => {
+          const objectName = Object.keys(objectMapping).find(key => objectMapping[key] === hotspotId);
+          if (!objectName) return;
+
+          try {
+            const obj = spline.findObjectByName(objectName);
+            if (obj && obj.position) {
+              const splineInternal = spline as any;
+              const camera = splineInternal._camera;
+              if (!camera) return;
+
+              const objInternal = obj as any;
+
+              if (objInternal.updateMatrixWorld) {
+                objInternal.updateMatrixWorld();
+              }
+
+              let worldX = obj.position.x;
+              let worldY = obj.position.y;
+              let worldZ = obj.position.z;
+
+              if (objInternal.getWorldPosition) {
+                const Vector3 = objInternal.position.constructor;
+                const worldPos = objInternal.getWorldPosition(new Vector3());
+                worldX = worldPos.x;
+                worldY = worldPos.y;
+                worldZ = worldPos.z;
+              }
+
+              const Vector3 = objInternal.position.constructor;
+              const vector = new Vector3(worldX, worldY, worldZ);
+
+              if (vector.project) {
+                vector.project(camera);
+
+                // convert to screen coords
+                const containerRect = container.getBoundingClientRect();
+                const targetX = (vector.x * 0.5 + 0.5) * containerRect.width;
+                const targetY = (-(vector.y * 0.5) + 0.5) * containerRect.height;
+
+                if (!smoothedPositions[hotspotId]) {
+                  smoothedPositions[hotspotId] = { x: targetX, y: targetY };
+                }
+
+                // smooth out the movement with lerp
+                const lerpFactor = 0.15;
+                smoothedPositions[hotspotId].x += (targetX - smoothedPositions[hotspotId].x) * lerpFactor;
+                smoothedPositions[hotspotId].y += (targetY - smoothedPositions[hotspotId].y) * lerpFactor;
+
+                const visible = vector.z < 1 &&
+                              targetX >= 0 && targetX <= containerRect.width &&
+                              targetY >= 0 && targetY <= containerRect.height;
+
+                newPositions[hotspotId] = {
+                  x: Math.round(smoothedPositions[hotspotId].x),
+                  y: Math.round(smoothedPositions[hotspotId].y),
+                  visible
+                };
+              }
+            }
+          } catch (e) {
+            // skip if object not found
+          }
+        });
+
+        // only update if something actually changed (prevents unnecessary re-renders)
+        const hasChanged = Object.keys(newPositions).some(key => {
+          const last = lastPositions[key];
+          const current = newPositions[key];
+          if (!last || !current) return true;
+          return Math.abs(last.x - current.x) > 1 ||
+                 Math.abs(last.y - current.y) > 1 ||
+                 last.visible !== current.visible;
+        });
+
+        if (hasChanged) {
+          lastPositions = newPositions;
+          setHotspotPositions(newPositions);
+        }
+      } catch (e) {
+        // sometimes this errors out, just skip the frame
+      }
+
+      animationFrameRef.current = requestAnimationFrame(updateHotspotPositions);
+    };
+
+    animationFrameRef.current = requestAnimationFrame(updateHotspotPositions);
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [isLoaded]);
 
   return (
     <div className="interactive-room" ref={containerRef}>
-      {/* Galaxy Background */}
       <GalaxyBackground
         density={0.7}
         glowIntensity={0.2}
@@ -203,26 +319,50 @@ const InteractiveRoom: React.FC = () => {
         mouseInteraction={false}
       />
 
-      {/* Navigation */}
       <Navigation />
 
-      {/* Loading overlay */}
-      {!isLoaded && (
-        <div className="loading-overlay">
-          <div className="spinner"></div>
-          <p>Loading your workspace...</p>
+      {showWelcome && (
+        <div className={`welcome-screen ${!isLoaded ? 'active' : 'fade-out'}`}>
+          <div className="welcome-content">
+            <h1 className="welcome-title">
+              <span className="welcome-word">Welcome</span>
+              <span className="welcome-word">To</span>
+              <span className="welcome-word">My</span>
+              <span className="welcome-word">Room!</span>
+            </h1>
+            <div className="welcome-spinner">
+              <div className="spinner-ring"></div>
+              <div className="spinner-ring"></div>
+              <div className="spinner-ring"></div>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Spline 3D Scene */}
       <div className="spline-container">
         <Spline
-          scene={`https://prod.spline.design/Q4QXKyGg8LbBaE8z/scene.splinecode?v=${Date.now()}`}
+          scene="https://prod.spline.design/Q4QXKyGg8LbBaE8z/scene.splinecode"
           onLoad={onSplineLoad}
         />
       </div>
 
-      {/* Hover indicator */}
+      {isLoaded && !selectedHotspot && Object.entries(hotspotPositions).map(([hotspotId, pos]) => (
+        pos.visible && (
+          <button
+            key={hotspotId}
+            className="hotspot-button"
+            style={{
+              left: `${pos.x}px`,
+              top: `${pos.y}px`,
+            }}
+            onClick={() => handleHotspotClick(hotspotId)}
+            aria-label={`View ${contentData[hotspotId]?.title || hotspotId}`}
+          >
+            +
+          </button>
+        )
+      ))}
+
       {isLoaded && hoveredObject && !selectedHotspot && (
         <div className="hover-indicator">
           <span className="hover-text">
@@ -231,7 +371,6 @@ const InteractiveRoom: React.FC = () => {
         </div>
       )}
 
-      {/* Content panels */}
       {selectedHotspot && (
         <ContentPanel
           content={contentData[selectedHotspot]}
@@ -240,7 +379,6 @@ const InteractiveRoom: React.FC = () => {
         />
       )}
 
-      {/* Instructions overlay */}
       {isLoaded && !selectedHotspot && !hoveredObject && (
         <div className="instructions">
           <p className="instruction-text">

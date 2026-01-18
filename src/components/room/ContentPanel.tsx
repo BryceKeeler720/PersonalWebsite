@@ -12,22 +12,18 @@ const ContentPanel: React.FC<ContentPanelProps> = ({ content, onClose, hotspotId
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    // Trigger animation on mount
     setTimeout(() => setIsAnimating(true), 10);
   }, []);
 
   const handleClose = () => {
     setIsAnimating(false);
-    setTimeout(onClose, 300); // Wait for exit animation
+    setTimeout(onClose, 300);
   };
 
-  // Position the panel based on which hotspot was clicked
   const getPanelPosition = () => {
     const positions: Record<string, string> = {
       'computer': 'panel-right',
-      'server-rack': 'panel-left',
-      'desk': 'panel-bottom',
-      'bookshelf': 'panel-top-right'
+      'server-rack': 'panel-left'
     };
     return positions[hotspotId] || 'panel-right';
   };

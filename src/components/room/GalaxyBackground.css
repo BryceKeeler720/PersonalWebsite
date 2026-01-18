@@ -6,4 +6,15 @@
   height: 100%;
   pointer-events: none;
   z-index: 0;
+  opacity: 0;
+  animation: fadeInGalaxy 0.8s ease-out 0.5s forwards;
+}
+
+@keyframes fadeInGalaxy {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
