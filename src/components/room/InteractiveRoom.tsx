@@ -1,43 +1,32 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Spline from '@splinetool/react-spline';
-import Hotspot from './Hotspot';
 import ContentPanel from './ContentPanel';
-import type { HotspotData, ContentData } from './types';
+import type { ContentData } from './types';
 import './InteractiveRoom.css';
+import type { Application } from '@splinetool/runtime';
 
 const InteractiveRoom: React.FC = () => {
   const [selectedHotspot, setSelectedHotspot] = useState<string | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hoveredObject, setHoveredObject] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const splineRef = useRef<Application | null>(null);
 
-  // Hotspot positions (these will be positioned over the Spline scene)
-  const hotspots: HotspotData[] = [
-    {
-      id: 'computer',
-      label: 'Projects',
-      position: { x: 35, y: 45 }, // Percentage-based positioning
-      icon: '💻'
-    },
-    {
-      id: 'server-rack',
-      label: 'Infrastructure',
-      position: { x: 70, y: 50 },
-      icon: '🖥️'
-    },
-    {
-      id: 'desk',
-      label: 'About',
-      position: { x: 50, y: 65 },
-      icon: '📋'
-    },
-    {
-      id: 'bookshelf',
-      label: 'Achievements',
-      position: { x: 15, y: 40 },
-      icon: '📚'
-    }
-  ];
+  // Map of Spline object names to hotspot IDs
+  // UPDATE THESE to match your actual Spline object names
+  const objectMapping: Record<string, string> = {
+    'Computer': 'computer',
+    'Monitor': 'computer',
+    'PC': 'computer',
+    'ServerRack': 'server-rack',
+    'Server': 'server-rack',
+    'Desk': 'desk',
+    'DeskArea': 'desk',
+    'Bookshelf': 'bookshelf',
+    'Books': 'bookshelf',
+    'Shelf': 'bookshelf'
+  };
 
   // Content for each hotspot
   const contentData: Record<string, ContentData> = {
@@ -146,6 +135,51 @@ const InteractiveRoom: React.FC = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  const onSplineLoad = (spline: Application) => {
+    splineRef.current = spline;
+    setIsLoaded(true);
+
+    // Log all available object names to help you identify them
+    const allObjects = spline.getAllObjects();
+    console.log('Spline loaded. Available objects:', allObjects.map((obj: any) => obj.name));
+
+    // Set up click events using Spline's event system
+    spline.addEventListener('mouseDown', (e: any) => {
+      if (e.target && e.target.name) {
+        const objectName = e.target.name;
+        const hotspotId = objectMapping[objectName];
+
+        if (hotspotId) {
+          console.log(`Clicked on: ${objectName} -> ${hotspotId}`);
+          handleHotspotClick(hotspotId);
+        }
+      }
+    });
+
+    // Set up hover events
+    spline.addEventListener('mouseHover', (e: any) => {
+      if (e.target && e.target.name) {
+        const objectName = e.target.name;
+        const hotspotId = objectMapping[objectName];
+
+        if (hotspotId) {
+          setHoveredObject(hotspotId);
+          if (containerRef.current) {
+            containerRef.current.style.cursor = 'pointer';
+          }
+        }
+      }
+    });
+
+    // Reset hover state when mouse moves away
+    spline.addEventListener('mouseUp', () => {
+      setHoveredObject(null);
+      if (containerRef.current) {
+        containerRef.current.style.cursor = 'default';
+      }
+    });
+  };
+
   const handleHotspotClick = (hotspotId: string) => {
     setSelectedHotspot(selectedHotspot === hotspotId ? null : hotspotId);
   };
@@ -177,21 +211,16 @@ const InteractiveRoom: React.FC = () => {
       <div className="spline-container" style={parallaxTransform}>
         <Spline
           scene="https://prod.spline.design/Q4QXKyGg8LbBaE8z/scene.splinecode"
-          onLoad={() => setIsLoaded(true)}
+          onLoad={onSplineLoad}
         />
       </div>
 
-      {/* Hotspot indicators */}
-      {isLoaded && (
-        <div className="hotspots-layer">
-          {hotspots.map((hotspot) => (
-            <Hotspot
-              key={hotspot.id}
-              data={hotspot}
-              isActive={selectedHotspot === hotspot.id}
-              onClick={() => handleHotspotClick(hotspot.id)}
-            />
-          ))}
+      {/* Hover indicator */}
+      {isLoaded && hoveredObject && !selectedHotspot && (
+        <div className="hover-indicator">
+          <span className="hover-text">
+            Click to explore {contentData[hoveredObject]?.title || 'this area'}
+          </span>
         </div>
       )}
 
@@ -205,11 +234,11 @@ const InteractiveRoom: React.FC = () => {
       )}
 
       {/* Instructions overlay */}
-      {isLoaded && !selectedHotspot && (
+      {isLoaded && !selectedHotspot && !hoveredObject && (
         <div className="instructions">
           <p className="instruction-text">
-            <span className="plus-icon">+</span>
-            Move your mouse to explore • Click hotspots to learn more
+            <span className="click-icon">🖱️</span>
+            Move your mouse to explore • Click objects to learn more
           </p>
         </div>
       )}
