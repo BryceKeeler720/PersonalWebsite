@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import Spline from '@splinetool/react-spline';
 import ContentPanel from './ContentPanel';
 import Navigation from './Navigation';
+import GalaxyBackground from './GalaxyBackground';
 import type { ContentData } from './types';
 import './InteractiveRoom.css';
 import type { Application } from '@splinetool/runtime';
@@ -188,6 +189,20 @@ const InteractiveRoom: React.FC = () => {
 
   return (
     <div className="interactive-room" ref={containerRef}>
+      {/* Galaxy Background */}
+      <GalaxyBackground
+        density={0.7}
+        glowIntensity={0.2}
+        hueShift={360}
+        twinkleIntensity={0.2}
+        rotationSpeed={0}
+        repulsionStrength={0}
+        starSpeed={0.1}
+        speed={0.1}
+        mouseRepulsion={false}
+        mouseInteraction={false}
+      />
+
       {/* Navigation */}
       <Navigation />
 
