@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import Spline from '@splinetool/react-spline';
 import ContentPanel from './ContentPanel';
 import type { ContentData } from './types';
@@ -7,7 +7,6 @@ import type { Application } from '@splinetool/runtime';
 
 const InteractiveRoom: React.FC = () => {
   const [selectedHotspot, setSelectedHotspot] = useState<string | null>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isLoaded, setIsLoaded] = useState(false);
   const [hoveredObject, setHoveredObject] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -119,21 +118,6 @@ const InteractiveRoom: React.FC = () => {
     }
   };
 
-  // Mouse tracking for parallax effect
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!containerRef.current) return;
-
-      const rect = containerRef.current.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width;
-      const y = (e.clientY - rect.top) / rect.height;
-
-      setMousePosition({ x, y });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
   const onSplineLoad = (spline: Application) => {
     splineRef.current = spline;
@@ -188,14 +172,6 @@ const InteractiveRoom: React.FC = () => {
     setSelectedHotspot(null);
   };
 
-  // Calculate parallax transform based on mouse position
-  const parallaxTransform = {
-    transform: `
-      perspective(1000px)
-      rotateX(${(mousePosition.y - 0.5) * -5}deg)
-      rotateY(${(mousePosition.x - 0.5) * 5}deg)
-    `
-  };
 
   return (
     <div className="interactive-room" ref={containerRef}>
@@ -208,7 +184,7 @@ const InteractiveRoom: React.FC = () => {
       )}
 
       {/* Spline 3D Scene */}
-      <div className="spline-container" style={parallaxTransform}>
+      <div className="spline-container">
         <Spline
           scene="https://prod.spline.design/Q4QXKyGg8LbBaE8z/scene.splinecode"
           onLoad={onSplineLoad}
