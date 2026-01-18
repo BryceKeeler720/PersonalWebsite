@@ -1,0 +1,132 @@
+.room-navigation {
+  position: fixed;
+  top: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  animation: slideDown 0.6s ease-out;
+}
+
+.nav-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.nav-logo {
+  text-decoration: none;
+  font-size: 1.25rem;
+  font-weight: 800;
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.nav-logo:hover {
+  transform: scale(1.05);
+}
+
+.logo-text {
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  position: relative;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  opacity: 0.9;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+  color: white;
+  opacity: 1;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .room-navigation {
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    transform: none;
+  }
+
+  .nav-content {
+    padding: 0.625rem 1rem;
+    gap: 1rem;
+    justify-content: space-between;
+  }
+
+  .nav-links {
+    gap: 1rem;
+  }
+
+  .nav-link {
+    font-size: 0.875rem;
+  }
+
+  /* Hide link text on very small screens, keep only icons if needed */
+  @media (max-width: 480px) {
+    .nav-links {
+      gap: 0.75rem;
+    }
+
+    .nav-link {
+      font-size: 0.8125rem;
+    }
+  }
+}
+
+/* Ensure it doesn't interfere with hover indicator */
+.room-navigation {
+  pointer-events: all;
+}
+
+.nav-content > * {
+  pointer-events: all;
+}

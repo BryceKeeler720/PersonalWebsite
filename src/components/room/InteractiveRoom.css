@@ -102,11 +102,11 @@
   bottom: 2rem;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(15, 23, 42, 0.9);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
   padding: 1rem 2rem;
   border-radius: 50px;
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
   z-index: 10;
   animation: fadeInUp 0.8s ease-out 0.5s forwards;
@@ -125,7 +125,7 @@
 }
 
 .instruction-text {
-  color: var(--text-secondary);
+  color: white;
   font-size: 0.9375rem;
   font-weight: 500;
   margin: 0;
@@ -138,8 +138,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
   animation: pulse-plus 2s ease-in-out infinite;
+  width: 24px;
+  height: 24px;
+}
+
+.click-icon img {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1); /* Makes icons white */
 }
 
 @keyframes pulse-plus {

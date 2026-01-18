@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import Spline from '@splinetool/react-spline';
 import ContentPanel from './ContentPanel';
+import Navigation from './Navigation';
 import type { ContentData } from './types';
 import './InteractiveRoom.css';
 import type { Application } from '@splinetool/runtime';
@@ -12,6 +13,10 @@ const InteractiveRoom: React.FC = () => {
   const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const splineRef = useRef<Application | null>(null);
+
+  // Icon URLs - Update these with your own icon URLs or local paths
+  const MOUSE_ICON_URL = '/icons/mouse.svg'; // Replace with your mouse icon URL
+  const PINCH_ICON_URL = '/icons/pinch.svg'; // Replace with your pinch icon URL
 
   // Map of Spline object names to hotspot IDs
   // UPDATE THESE to match your actual Spline object names
@@ -183,6 +188,9 @@ const InteractiveRoom: React.FC = () => {
 
   return (
     <div className="interactive-room" ref={containerRef}>
+      {/* Navigation */}
+      <Navigation />
+
       {/* Loading overlay */}
       {!isLoaded && (
         <div className="loading-overlay">
@@ -223,12 +231,16 @@ const InteractiveRoom: React.FC = () => {
           <p className="instruction-text">
             {isMobile ? (
               <>
-                <span className="click-icon">👆</span>
-                Pinch to zoom • Swipe to rotate • Tap objects to learn more
+                <span className="click-icon">
+                  <img src={PINCH_ICON_URL} alt="Pinch gesture" />
+                </span>
+                Pinch to zoom and rotate • Tap objects to learn more
               </>
             ) : (
               <>
-                <span className="click-icon">🖱️</span>
+                <span className="click-icon">
+                  <img src={MOUSE_ICON_URL} alt="Mouse" />
+                </span>
                 Move your mouse to explore • Click objects to learn more
               </>
             )}
