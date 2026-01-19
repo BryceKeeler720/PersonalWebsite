@@ -1,0 +1,289 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Navbar from '../../components/traditional/Navbar.astro';
+import { calculateReadingTime } from '../../utils/readingTime';
+
+type BlogPost = CollectionEntry<'blog'>;
+
+export async function getStaticPaths() {
+  const posts: BlogPost[] = await getCollection('blog', ({ data }: BlogPost) => !data.draft);
+  return posts.map((post: BlogPost) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props as { post: BlogPost };
+const { Content } = await post.render();
+
+const readingTime = calculateReadingTime(post.body);
+const formattedDate = post.data.publishDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+});
+---
+
+<BaseLayout title={`${post.data.title} | Bryce Keeler`} description={post.data.description}>
+  <Navbar />
+
+  <article class="blog-post-page">
+    <header class="post-header">
+      <a href="/blog" class="back-link">Back to Blog</a>
+      <h1>{post.data.title}</h1>
+      <div class="post-meta">
+        <span class="post-date">{formattedDate}</span>
+        <span class="post-reading-time">{readingTime}</span>
+      </div>
+    </header>
+
+    <div class="post-content">
+      <Content />
+    </div>
+
+    <footer class="post-footer">
+      <div class="post-tags">
+        {post.data.tags.map((tag: string) => (
+          <span class="tag">{tag}</span>
+        ))}
+      </div>
+      <a href="/blog" class="back-to-blog">Back to all posts</a>
+    </footer>
+  </article>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <p>Bryce Keeler · 2026</p>
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <span>·</span>
+        <a href="/traditional">Traditional View</a>
+        <span>·</span>
+        <a href="/blog">Blog</a>
+      </div>
+    </div>
+  </footer>
+</BaseLayout>
+
+<style>
+  .blog-post-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 8rem 2rem 4rem;
+  }
+
+  .post-header {
+    margin-bottom: 3rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+    transition: color 0.2s ease;
+  }
+
+  .back-link:hover {
+    color: var(--text-primary);
+  }
+
+  .back-link::before {
+    content: '← ';
+  }
+
+  .post-header h1 {
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .post-meta {
+    display: flex;
+    gap: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+  }
+
+  .post-content {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+  }
+
+  .post-content :global(p:first-child) {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    line-height: 1.7;
+  }
+
+  .post-content :global(p) {
+    margin-bottom: 1.5rem;
+  }
+
+  .post-content :global(h2) {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .post-content :global(a) {
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: opacity 0.2s ease;
+  }
+
+  .post-content :global(a:hover) {
+    opacity: 0.8;
+  }
+
+  .post-content :global(ul),
+  .post-content :global(ol) {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  .post-content :global(li) {
+    margin-bottom: 0.75rem;
+  }
+
+  .post-content :global(strong) {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .post-content :global(pre) {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+  }
+
+  .post-content :global(code) {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+  }
+
+  .post-content :global(p code) {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+  }
+
+  .post-content :global(blockquote) {
+    border-left: 3px solid rgba(255, 255, 255, 0.3);
+    padding-left: 1.5rem;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: var(--text-secondary);
+  }
+
+  .post-footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .post-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  .post-tags .tag {
+    font-size: 0.8125rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: var(--text-secondary);
+  }
+
+  .back-to-blog {
+    display: inline-block;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    transition: color 0.2s ease;
+  }
+
+  .back-to-blog:hover {
+    color: var(--text-primary);
+  }
+
+  .back-to-blog::before {
+    content: '← ';
+  }
+
+  .site-footer {
+    padding: 3rem 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .footer-content {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .footer-content p {
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+  }
+
+  .footer-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .footer-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.3s ease;
+  }
+
+  .footer-links a:hover {
+    color: var(--primary-color);
+  }
+
+  .footer-links span {
+    color: rgba(255, 255, 255, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .blog-post-page {
+      padding: 6rem 1.5rem 3rem;
+    }
+
+    .post-meta {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .footer-links {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .footer-links span {
+      display: none;
+    }
+  }
+</style>

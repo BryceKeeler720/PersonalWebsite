@@ -1,0 +1,237 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navbar from '../components/traditional/Navbar.astro';
+import { calculateReadingTime } from '../utils/readingTime';
+
+type BlogPost = CollectionEntry<'blog'>;
+
+// Get all non-draft posts, sorted by date (newest first)
+const posts: BlogPost[] = (await getCollection('blog', ({ data }: BlogPost) => !data.draft))
+  .sort((a: BlogPost, b: BlogPost) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+---
+
+<BaseLayout title="Blog | Bryce Keeler" description="Thoughts on software engineering, ML, home labs, and other things I find interesting.">
+  <Navbar />
+
+  <main class="blog-page">
+    <header class="blog-header">
+      <h1>Blog</h1>
+      <p class="blog-subtitle">Thoughts on software, ML, home labs, and whatever else I find interesting</p>
+    </header>
+
+    <section class="blog-posts">
+      {posts.length === 0 ? (
+        <div class="blog-empty-state">
+          <p>No posts yet. Check back soon.</p>
+        </div>
+      ) : (
+        posts.map((post: BlogPost) => {
+          const readingTime = calculateReadingTime(post.body);
+          const formattedDate = post.data.publishDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+          });
+
+          return (
+            <a href={`/blog/${post.slug}`} class="blog-post-link">
+              <article class="blog-post">
+                <div class="post-meta-row">
+                  <span class="post-date">{formattedDate}</span>
+                  <span class="post-reading-time">{readingTime}</span>
+                </div>
+                <h2 class="post-title">{post.data.title}</h2>
+                <p class="post-excerpt">{post.data.description}</p>
+                <div class="post-tags">
+                  {post.data.tags.map((tag: string) => (
+                    <span class="post-tag">{tag}</span>
+                  ))}
+                </div>
+              </article>
+            </a>
+          );
+        })
+      )}
+    </section>
+  </main>
+
+  <footer class="blog-footer">
+    <div class="footer-content">
+      <p>Bryce Keeler · 2026</p>
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <span>·</span>
+        <a href="/traditional">Traditional View</a>
+        <span>·</span>
+        <a href="/traditional#contact">Contact</a>
+      </div>
+    </div>
+  </footer>
+</BaseLayout>
+
+<style>
+  .blog-page {
+    min-height: 100vh;
+    padding: 8rem 2rem 4rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .blog-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .blog-header h1 {
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+  }
+
+  .blog-subtitle {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .blog-posts {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .blog-post-link {
+    text-decoration: none;
+    display: block;
+  }
+
+  .blog-post {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  .blog-post:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .post-meta-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .post-date,
+  .post-reading-time {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .post-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+  }
+
+  .post-excerpt {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .post-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .post-tag {
+    font-size: 0.8125rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: var(--text-secondary);
+  }
+
+  .blog-empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text-secondary);
+  }
+
+  .blog-footer {
+    padding: 3rem 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .footer-content {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .footer-content p {
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+  }
+
+  .footer-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .footer-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: color 0.3s ease;
+  }
+
+  .footer-links a:hover {
+    color: var(--primary-color);
+  }
+
+  .footer-links span {
+    color: rgba(255, 255, 255, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .blog-page {
+      padding: 6rem 1.5rem 3rem;
+    }
+
+    .blog-post {
+      padding: 1.5rem;
+    }
+
+    .post-meta-row {
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .footer-links {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .footer-links span {
+      display: none;
+    }
+  }
+</style>
