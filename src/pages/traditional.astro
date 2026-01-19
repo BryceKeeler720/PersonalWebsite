@@ -93,6 +93,50 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
   </Section>
 
   <Section
+    id="education"
+    title="Education"
+    subtitle="the formal stuff"
+  >
+    <div class="education-grid">
+      <div class="education-card featured">
+        <div class="education-header">
+          <div>
+            <h3 class="education-degree">B.S. Computer Information Systems</h3>
+            <p class="education-school">University of Texas at Dallas</p>
+          </div>
+          <span class="education-date">Dec 2024</span>
+        </div>
+        <div class="education-details">
+          <ul>
+            <li>Collegium V Honors Program - interdisciplinary honors with smaller class sizes and research focus</li>
+            <li>EY Scholarship recipient - merit-based scholarship from Ernst & Young</li>
+            <li>Relevant coursework: Database Systems, Data Structures, Systems Analysis, Network Security</li>
+            <li>Senior project: Built a real-time collaborative document editor (like Google Docs) using WebSockets and CRDTs</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="education-card">
+        <div class="education-header">
+          <div>
+            <h3 class="education-degree">M.S. Data Science</h3>
+            <p class="education-school">University of Texas at Dallas</p>
+          </div>
+          <span class="education-date">In Progress</span>
+        </div>
+        <div class="education-details">
+          <ul>
+            <li>Part-time while working full-time at Huron</li>
+            <li>Focus area: Machine Learning Engineering</li>
+            <li>Goal: Transition from consulting to ML engineering roles</li>
+            <li>Currently taking: Statistical Machine Learning, Big Data Analytics</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </Section>
+
+  <Section
     id="skills"
     title="Tech"
     subtitle="things I use"
@@ -217,46 +261,97 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
     <div class="projects-grid">
       <Card
         title="NutriOne"
-        description="Nutrition tracking app. FastAPI backend, React frontend, PostgreSQL. The fun part was training a YOLOv8 model to detect food from photos - works better than I expected."
-        tags={["FastAPI", "React", "YOLOv8"]}
+        description="Full-stack nutrition tracking app with food recognition. PostgreSQL database with FastAPI backend handling user auth, meal logging, and macro calculations. React frontend with camera integration. Trained a custom YOLOv8 model on ~15k food images - runs inference on device and hits about 85% accuracy on common foods. The hardest part was getting consistent lighting in training data."
+        tags={["FastAPI", "PostgreSQL", "React", "YOLOv8", "Python"]}
         delay={0}
       />
 
       <Card
         title="Plant Monitor"
-        description="ESP32s with a bunch of sensors streaming data to TimescaleDB. Built an LSTM to predict when plants need water. They still die sometimes but less often now."
-        tags={["ESP32", "PyTorch", "TimescaleDB"]}
+        description="IoT system for monitoring houseplants. ESP32 microcontrollers with soil moisture, temperature, humidity, and light sensors streaming data via MQTT to a TimescaleDB instance. Built an LSTM model in PyTorch to predict watering needs based on historical patterns and environmental factors. Web dashboard shows real-time readings and predictions. Model retrains weekly on new data."
+        tags={["ESP32", "PyTorch", "TimescaleDB", "MQTT", "LSTM"]}
         delay={100}
       />
 
       <Card
         title="Workday Time Tracker"
-        description="Time tracking app that's actually on the Workday Marketplace. Enterprise software development is a whole different world."
-        tags={["Workday Extend"]}
+        description="Enterprise time tracking application published on the Workday Marketplace. Built with Workday Extend using their proprietary framework. Handles complex approval workflows, integrates with Workday's core HCM data, and supports multi-tenant deployment. Learned a lot about enterprise software patterns - audit logging, role-based access, data isolation between tenants."
+        tags={["Workday Extend", "Enterprise", "Full Stack"]}
         href="https://marketplace.workday.com"
         delay={200}
       />
 
       <Card
         title="LLM Reports"
-        description="Automated reporting using Claude. Pulls data from Smartsheet, does some ETL, generates summaries. Saved a lot of manual work at Huron."
-        tags={["Claude API", "Power Automate"]}
+        description="Automated report generation system at Huron. Power Automate flow pulls data from Smartsheet, runs it through ETL transformations, then uses Claude API with RAG to generate executive summaries. Managers used to spend hours writing these weekly - now it's automated. Includes human review step before distribution. Handles about 50 reports per week."
+        tags={["Claude API", "Power Automate", "RAG", "Smartsheet"]}
         delay={300}
       />
 
       <Card
-        title="Home Lab"
-        description="Proxmox server running Postgres, some FastAPI apps, Jellyfin, Pi-hole, the usual. Mostly an excuse to learn Linux stuff."
-        tags={["Proxmox", "Docker", "Linux"]}
+        title="Scheduling App"
+        description="University course scheduling system built during my Huron internship. Uses constraint satisfaction with backtracking to generate conflict-free schedules. Handles room capacity, professor availability, required gaps between classes, and prerequisite chains. Reduced manual scheduling time from weeks to hours. Two universities licensed it."
+        tags={["Algorithms", "Workday", "CSP", "Backtracking"]}
         delay={400}
       />
+    </div>
+  </Section>
 
-      <Card
-        title="Scheduling App"
-        description="Built at Huron - uses backtracking to generate course schedules. Two universities bought it which I wasn't expecting."
-        tags={["Algorithms", "Workday"]}
-        delay={500}
-      />
+  <Section
+    id="homelab"
+    title="Home Lab"
+    subtitle="where I break things on purpose"
+  >
+    <div class="homelab-content">
+      <div class="homelab-overview">
+        <p>
+          Running a Proxmox server at home with about 15 containers and VMs. Started as a way to learn
+          Linux and networking, turned into actually useful infrastructure. Most services run in LXC
+          containers for efficiency, with a few full VMs for things that need isolation.
+        </p>
+      </div>
+
+      <div class="homelab-grid">
+        <div class="homelab-card">
+          <h3>Compute & Storage</h3>
+          <ul>
+            <li><strong>Proxmox VE</strong> - Hypervisor managing everything</li>
+            <li><strong>TrueNAS</strong> - NAS with ZFS, handles backups and media storage</li>
+            <li><strong>PostgreSQL</strong> - Multiple instances for different projects</li>
+            <li><strong>Docker hosts</strong> - Running various containerized apps</li>
+          </ul>
+        </div>
+
+        <div class="homelab-card">
+          <h3>Networking</h3>
+          <ul>
+            <li><strong>Pi-hole</strong> - DNS-level ad blocking for the whole network</li>
+            <li><strong>Tailscale</strong> - VPN mesh so I can access everything remotely</li>
+            <li><strong>Nginx Proxy Manager</strong> - Reverse proxy with SSL termination</li>
+            <li><strong>VLANs</strong> - Separate networks for IoT, servers, and personal devices</li>
+          </ul>
+        </div>
+
+        <div class="homelab-card">
+          <h3>Applications</h3>
+          <ul>
+            <li><strong>Jellyfin</strong> - Media server for movies and music</li>
+            <li><strong>FastAPI apps</strong> - Personal projects and APIs</li>
+            <li><strong>Grafana + Prometheus</strong> - Monitoring and dashboards</li>
+            <li><strong>Uptime Kuma</strong> - Service health monitoring</li>
+          </ul>
+        </div>
+
+        <div class="homelab-card">
+          <h3>Automation</h3>
+          <ul>
+            <li><strong>Bash scripts</strong> - Backup automation, health checks</li>
+            <li><strong>Cron jobs</strong> - Scheduled maintenance tasks</li>
+            <li><strong>Ansible</strong> - Configuration management (learning)</li>
+            <li><strong>Watchtower</strong> - Automatic Docker image updates</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </Section>
 
@@ -423,6 +518,78 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
     margin-bottom: 0;
   }
 
+  .education-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .education-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  .education-card.featured {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .education-card:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .education-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .education-degree {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .education-school {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0.25rem 0 0 0;
+  }
+
+  .education-date {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    padding: 0.25rem 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+  }
+
+  .education-details ul {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: var(--text-secondary);
+  }
+
+  .education-details li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+  }
+
+  .education-details li:last-child {
+    margin-bottom: 0;
+  }
+
   .skills-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -480,6 +647,74 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 2rem;
+  }
+
+  .homelab-content {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .homelab-overview {
+    margin-bottom: 2rem;
+  }
+
+  .homelab-overview p {
+    font-size: 1.0625rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .homelab-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .homelab-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .homelab-card:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .homelab-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .homelab-card ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .homelab-card li {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .homelab-card li:last-child {
+    margin-bottom: 0;
+  }
+
+  .homelab-card strong {
+    color: var(--text-primary);
+    font-weight: 600;
   }
 
   .contact-grid {
@@ -645,6 +880,14 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
 
     .experience-header {
       flex-direction: column;
+    }
+
+    .education-header {
+      flex-direction: column;
+    }
+
+    .homelab-grid {
+      grid-template-columns: 1fr;
     }
 
     .footer-content {
