@@ -9,32 +9,26 @@ interface ContentPanelProps {
 }
 
 const ContentPanel: React.FC<ContentPanelProps> = ({ content, onClose, hotspotId }) => {
-  const [isAnimating, setIsAnimating] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => setIsAnimating(true), 10);
+    setTimeout(() => setVisible(true), 10);
   }, []);
 
-  const handleClose = () => {
-    setIsAnimating(false);
+  const close = () => {
+    setVisible(false);
     setTimeout(onClose, 300);
   };
 
-  const getPanelPosition = () => {
-    const positions: Record<string, string> = {
-      'computer': 'panel-right',
-      'server-rack': 'panel-left'
-    };
-    return positions[hotspotId] || 'panel-right';
-  };
+  const position = hotspotId === 'server-rack' ? 'panel-left' : 'panel-right';
 
   return (
     <>
       <div
-        className={`content-overlay ${isAnimating ? 'visible' : ''}`}
-        onClick={handleClose}
+        className={`content-overlay ${visible ? 'visible' : ''}`}
+        onClick={close}
       />
-      <div className={`content-panel ${getPanelPosition()} ${isAnimating ? 'visible' : ''}`}>
+      <div className={`content-panel ${position} ${visible ? 'visible' : ''}`}>
         <div className="panel-header">
           <div className="panel-title-section">
             <h2 className="panel-title">{content.title}</h2>
@@ -42,7 +36,7 @@ const ContentPanel: React.FC<ContentPanelProps> = ({ content, onClose, hotspotId
           </div>
           <button
             className="close-button"
-            onClick={handleClose}
+            onClick={close}
             aria-label="Close panel"
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -59,7 +53,7 @@ const ContentPanel: React.FC<ContentPanelProps> = ({ content, onClose, hotspotId
               style={{ animationDelay: `${index * 100}ms` }}
             >
               {item.link ? (
-                <a href={item.link} className="item-link">
+                <a href={item.link} target="_blank" rel="noopener noreferrer" className="item-link">
                   <div className="item-header">
                     <h3 className="item-title">{item.title}</h3>
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -91,7 +85,7 @@ const ContentPanel: React.FC<ContentPanelProps> = ({ content, onClose, hotspotId
         </div>
 
         <div className="panel-footer">
-          <button className="action-button" onClick={handleClose}>
+          <button className="action-button" onClick={close}>
             Back to Room
           </button>
         </div>

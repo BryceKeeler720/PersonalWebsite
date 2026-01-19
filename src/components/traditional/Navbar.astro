@@ -1,30 +1,25 @@
 ---
 ---
 
-<nav class="navbar">
+<nav class="navbar" aria-label="Main navigation">
   <div class="navbar-container">
-    <a href="/" class="navbar-logo">
+    <a href="/" class="navbar-logo" aria-label="Bryce Keeler - Home">
       <span class="logo-text">BK</span>
     </a>
 
-    <div class="navbar-links">
+    <div class="navbar-links" role="list">
       <a href="#about" class="nav-link">About</a>
       <a href="#skills" class="nav-link">Skills</a>
       <a href="#projects" class="nav-link">Projects</a>
       <a href="#contact" class="nav-link">Contact</a>
-      <a href="/" class="nav-link-special">
+      <a href="/" class="nav-link-special" aria-label="View 3D interactive version">
         <span>3D Experience</span>
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path d="M8 3V13M8 3L12 7M8 3L4 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>
     </div>
 
-    <button class="mobile-menu-toggle" aria-label="Toggle menu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
   </div>
 </nav>
 
@@ -130,35 +125,14 @@
     transform: translateY(-2px);
   }
 
-  .mobile-menu-toggle {
-    display: none;
-    flex-direction: column;
-    gap: 4px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.5rem;
-  }
-
-  .mobile-menu-toggle span {
-    width: 24px;
-    height: 2px;
-    background: var(--text-primary);
-    border-radius: 2px;
-    transition: all 0.3s ease;
-  }
-
   @media (max-width: 768px) {
     .navbar-container {
       padding: 1rem;
     }
 
     .navbar-links {
-      display: none;
-    }
-
-    .mobile-menu-toggle {
-      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
   }
 </style>
@@ -180,18 +154,13 @@
     });
   });
 
-  let lastScroll = 0;
   const navbar = document.querySelector('.navbar');
 
   window.addEventListener('scroll', () => {
-    const currentScroll = window.pageYOffset;
-
-    if (currentScroll > 100) {
+    if (window.pageYOffset > 100) {
       navbar?.classList.add('scrolled');
     } else {
       navbar?.classList.remove('scrolled');
     }
-
-    lastScroll = currentScroll;
   });
 </script>

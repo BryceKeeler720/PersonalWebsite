@@ -1,71 +1,44 @@
 ---
 interface Props {
   skill: string;
-  icon?: string;
   delay?: number;
 }
 
-const { skill, icon, delay = 0 } = Astro.props;
+const { skill, delay = 0 } = Astro.props;
 ---
 
-<div class="skill-badge" style={`animation-delay: ${delay}ms`}>
-  {icon && <span class="skill-icon">{icon}</span>}
-  <span class="skill-name">{skill}</span>
-</div>
+<span class="skill-badge" style={`animation-delay: ${delay}ms`}>
+  {skill}
+</span>
 
 <style>
   .skill-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.25rem;
+    display: inline-block;
+    padding: 0.5rem 0.875rem;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 50px;
-    font-size: 0.9375rem;
-    font-weight: 600;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 500;
     color: var(--text-primary);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(10px);
-    cursor: default;
-    animation: popIn 0.5s ease-out forwards;
+    transition: all 0.2s ease;
+    animation: fadeIn 0.4s ease-out forwards;
     opacity: 0;
-    transform: scale(0.8);
   }
 
   .skill-badge:hover {
     background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.3);
-    transform: translateY(-2px) scale(1.05);
+    border-color: rgba(255, 255, 255, 0.25);
   }
 
-  .skill-icon {
-    font-size: 1.25rem;
-    line-height: 1;
-  }
-
-  .skill-name {
-    line-height: 1;
-  }
-
-  @keyframes popIn {
-    0% {
+  @keyframes fadeIn {
+    from {
       opacity: 0;
-      transform: scale(0.8);
+      transform: translateY(8px);
     }
-    50% {
-      transform: scale(1.1);
-    }
-    100% {
+    to {
       opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  @media (max-width: 768px) {
-    .skill-badge {
-      padding: 0.625rem 1rem;
-      font-size: 0.875rem;
+      transform: translateY(0);
     }
   }
 </style>

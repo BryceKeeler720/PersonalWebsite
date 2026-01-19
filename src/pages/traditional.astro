@@ -7,87 +7,204 @@ import Card from '../components/traditional/Card.astro';
 import SkillBadge from '../components/traditional/SkillBadge.astro';
 ---
 
-<BaseLayout title="Bryce Keeler - Digital Consulting Analyst & Developer">
+<BaseLayout title="Bryce Keeler">
   <Navbar />
 
   <Hero
     name="Bryce Keeler"
-    tagline="Digital Consulting Analyst @ Huron | Workday Certified | Full-Stack Developer"
+    tagline="consultant · developer · UT Dallas '24"
   />
 
   <Section
     id="about"
-    title="About Me"
-    subtitle="Building enterprise solutions and personal projects"
+    title="About"
+    subtitle="the short version"
   >
     <div class="about-content">
       <div class="about-text">
         <p class="lead-paragraph">
-          Digital Consulting Analyst at <strong>Huron Consulting Group</strong>, building enterprise
-          applications with Workday Extend and designing data pipelines that process 560GB weekly
-          for university and healthcare clients.
+          I'm a consultant at <strong>Huron</strong> where I build Workday apps and data pipelines
+          for universities and healthcare companies. Recently got an app published on the Workday
+          Marketplace which was pretty cool.
         </p>
         <p>
-          I graduated from UT Dallas with a B.S. in Computer Information Systems (Davidson Honors Program).
-          At Huron, I've contributed to production apps on the Workday Marketplace and built LLM-powered
-          automation systems that save 1,500+ hours of manual work weekly.
+          Graduated from UT Dallas Dec 2024 with a CIS degree (honors program). Before Huron I
+          interned at PwC doing dashboards and data stuff.
         </p>
         <p>
-          Outside of work, I build full-stack applications with FastAPI and React, train ML models for
-          computer vision, and manage a home lab running containerized services on Proxmox.
+          Outside work I mess around with personal projects - usually involves FastAPI, React,
+          and training ML models. Also run a home server because I apparently enjoy debugging
+          networking issues at 2am.
         </p>
       </div>
     </div>
   </Section>
 
   <Section
+    id="experience"
+    title="Work"
+    subtitle="where I've been"
+  >
+    <div class="experience-grid">
+      <div class="experience-card">
+        <div class="experience-header">
+          <div>
+            <h3 class="experience-title">Analyst</h3>
+            <p class="experience-company">Huron Consulting</p>
+          </div>
+          <span class="experience-date">2025 - now</span>
+        </div>
+        <ul class="experience-list">
+          <li>Building Workday Extend apps for universities and healthcare clients</li>
+          <li>Data pipelines - lot of SQL, processing a few hundred GB weekly</li>
+          <li>Built some LLM automation that ended up saving a bunch of manual work</li>
+          <li>Got an app published on the Workday Marketplace</li>
+        </ul>
+      </div>
+
+      <div class="experience-card">
+        <div class="experience-header">
+          <div>
+            <h3 class="experience-title">Intern</h3>
+            <p class="experience-company">Huron Consulting</p>
+          </div>
+          <span class="experience-date">Summer 2024</span>
+        </div>
+        <ul class="experience-list">
+          <li>Built a student scheduling app using backtracking algorithms</li>
+          <li>Two universities ended up buying it which was neat</li>
+        </ul>
+      </div>
+
+      <div class="experience-card">
+        <div class="experience-header">
+          <div>
+            <h3 class="experience-title">Intern</h3>
+            <p class="experience-company">PwC</p>
+          </div>
+          <span class="experience-date">Summer 2023</span>
+        </div>
+        <ul class="experience-list">
+          <li>Tableau and PowerBI dashboards for nonprofits</li>
+          <li>Some ETL work, data analysis with SQL and Python</li>
+        </ul>
+      </div>
+    </div>
+  </Section>
+
+  <Section
     id="skills"
-    title="Skills & Technologies"
-    subtitle="Languages, frameworks, and platforms I work with"
+    title="Tech"
+    subtitle="things I use"
   >
     <div class="skills-grid">
       <div class="skill-category">
         <h3 class="category-title">Languages</h3>
         <div class="skills-list">
-          <SkillBadge skill="Python" icon="🐍" delay={0} />
-          <SkillBadge skill="TypeScript" icon="📘" delay={100} />
-          <SkillBadge skill="JavaScript" icon="⚡" delay={200} />
-          <SkillBadge skill="Java" icon="☕" delay={300} />
-          <SkillBadge skill="SQL" icon="🗄️" delay={400} />
+          <SkillBadge skill="Python" delay={0} />
+          <SkillBadge skill="TypeScript" delay={50} />
+          <SkillBadge skill="JavaScript" delay={100} />
+          <SkillBadge skill="Java" delay={150} />
+          <SkillBadge skill="SQL" delay={200} />
+          <SkillBadge skill="WQL" delay={250} />
+          <SkillBadge skill="XSLT" delay={300} />
+          <SkillBadge skill="HTML/CSS" delay={350} />
         </div>
       </div>
 
       <div class="skill-category">
-        <h3 class="category-title">Frontend & Backend</h3>
+        <h3 class="category-title">Frontend</h3>
         <div class="skills-list">
-          <SkillBadge skill="React" icon="⚛️" delay={0} />
-          <SkillBadge skill="FastAPI" icon="🚀" delay={100} />
-          <SkillBadge skill="Astro" icon="🚀" delay={200} />
-          <SkillBadge skill="PostgreSQL" icon="🐘" delay={300} />
-          <SkillBadge skill="Node.js" icon="💚" delay={400} />
+          <SkillBadge skill="React" delay={0} />
+          <SkillBadge skill="Astro" delay={50} />
+          <SkillBadge skill="Tailwind CSS" delay={100} />
+          <SkillBadge skill="WebSockets" delay={150} />
         </div>
       </div>
 
       <div class="skill-category">
-        <h3 class="category-title">AI/ML & Data</h3>
+        <h3 class="category-title">Backend</h3>
         <div class="skills-list">
-          <SkillBadge skill="PyTorch" icon="🔥" delay={0} />
-          <SkillBadge skill="YOLOv8" icon="👁️" delay={100} />
-          <SkillBadge skill="OpenCV" icon="📷" delay={200} />
-          <SkillBadge skill="Tableau" icon="📊" delay={300} />
-          <SkillBadge skill="Alteryx" icon="🔄" delay={400} />
+          <SkillBadge skill="FastAPI" delay={0} />
+          <SkillBadge skill="Django" delay={50} />
+          <SkillBadge skill="Flask" delay={100} />
+          <SkillBadge skill="Node.js" delay={150} />
+          <SkillBadge skill="REST APIs" delay={200} />
         </div>
       </div>
 
       <div class="skill-category">
-        <h3 class="category-title">DevOps & Platforms</h3>
+        <h3 class="category-title">Databases</h3>
         <div class="skills-list">
-          <SkillBadge skill="Docker" icon="🐳" delay={0} />
-          <SkillBadge skill="Proxmox" icon="🖥️" delay={100} />
-          <SkillBadge skill="Linux" icon="🐧" delay={200} />
-          <SkillBadge skill="Workday Extend" icon="💼" delay={300} />
-          <SkillBadge skill="Git" icon="📚" delay={400} />
+          <SkillBadge skill="PostgreSQL" delay={0} />
+          <SkillBadge skill="TimescaleDB" delay={50} />
+          <SkillBadge skill="SQL Server" delay={100} />
+          <SkillBadge skill="Supabase" delay={150} />
         </div>
+      </div>
+
+      <div class="skill-category">
+        <h3 class="category-title">AI/ML</h3>
+        <div class="skills-list">
+          <SkillBadge skill="PyTorch" delay={0} />
+          <SkillBadge skill="YOLOv8" delay={50} />
+          <SkillBadge skill="OpenCV" delay={100} />
+          <SkillBadge skill="LSTM" delay={150} />
+          <SkillBadge skill="Random Forest" delay={200} />
+          <SkillBadge skill="LLM Integration" delay={250} />
+        </div>
+      </div>
+
+      <div class="skill-category">
+        <h3 class="category-title">Data & Analytics</h3>
+        <div class="skills-list">
+          <SkillBadge skill="Tableau" delay={0} />
+          <SkillBadge skill="PowerBI" delay={50} />
+          <SkillBadge skill="Alteryx" delay={100} />
+          <SkillBadge skill="Excel" delay={150} />
+          <SkillBadge skill="ETL Pipelines" delay={200} />
+        </div>
+      </div>
+
+      <div class="skill-category">
+        <h3 class="category-title">DevOps & Infrastructure</h3>
+        <div class="skills-list">
+          <SkillBadge skill="Docker" delay={0} />
+          <SkillBadge skill="Proxmox" delay={50} />
+          <SkillBadge skill="LXC" delay={100} />
+          <SkillBadge skill="Linux" delay={150} />
+          <SkillBadge skill="Git" delay={200} />
+          <SkillBadge skill="Bash" delay={250} />
+        </div>
+      </div>
+
+      <div class="skill-category">
+        <h3 class="category-title">Enterprise Platforms</h3>
+        <div class="skills-list">
+          <SkillBadge skill="Workday Extend" delay={0} />
+          <SkillBadge skill="Workday Studio" delay={50} />
+          <SkillBadge skill="ServiceNow" delay={100} />
+          <SkillBadge skill="Power Automate" delay={150} />
+          <SkillBadge skill="Smartsheet" delay={200} />
+        </div>
+      </div>
+
+      <div class="skill-category">
+        <h3 class="category-title">IoT & Hardware</h3>
+        <div class="skills-list">
+          <SkillBadge skill="ESP32" delay={0} />
+          <SkillBadge skill="I2C" delay={50} />
+          <SkillBadge skill="Sensor Integration" delay={100} />
+        </div>
+      </div>
+    </div>
+
+    <div class="certifications">
+      <h3 class="cert-title">Certifications</h3>
+      <div class="cert-list">
+        <span class="cert-badge">Workday Integrations</span>
+        <span class="cert-badge">Workday Extend</span>
+        <span class="cert-badge">Workday Orchestrations</span>
       </div>
     </div>
   </Section>
@@ -95,44 +212,58 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
   <Section
     id="projects"
     title="Projects"
-    subtitle="Personal and professional work"
+    subtitle="stuff I've built"
   >
     <div class="projects-grid">
       <Card
-        title="NutriOne - Nutrition Tracking App"
-        description="Full-stack nutrition app with FastAPI, PostgreSQL, and React. Built custom YOLOv8 computer vision models trained on Food-101 dataset for automated food detection. 21 modular service components with RESTful API design."
-        tags={["FastAPI", "React", "PyTorch", "YOLOv8", "PostgreSQL"]}
+        title="NutriOne"
+        description="Nutrition tracking app. FastAPI backend, React frontend, PostgreSQL. The fun part was training a YOLOv8 model to detect food from photos - works better than I expected."
+        tags={["FastAPI", "React", "YOLOv8"]}
         delay={0}
       />
 
       <Card
-        title="Plant Health Monitoring System"
-        description="End-to-end IoT pipeline using ESP32 microcontrollers and 9 sensors, streaming 288+ daily readings to TimescaleDB. Computer vision with OpenCV for plant analysis, LSTM models for soil moisture forecasting, and React dashboard with WebSocket updates."
-        tags={["IoT", "OpenCV", "LSTM", "FastAPI", "TimescaleDB", "React"]}
+        title="Plant Monitor"
+        description="ESP32s with a bunch of sensors streaming data to TimescaleDB. Built an LSTM to predict when plants need water. They still die sometimes but less often now."
+        tags={["ESP32", "PyTorch", "TimescaleDB"]}
         delay={100}
       />
 
       <Card
-        title="Workday Time Tracking Solution"
-        description="Production-grade Workday Extend application published on Workday Marketplace. Built enterprise workflow automation with custom UI components, backend business logic, and database integrations."
-        tags={["Workday Extend", "Enterprise", "Published"]}
+        title="Workday Time Tracker"
+        description="Time tracking app that's actually on the Workday Marketplace. Enterprise software development is a whole different world."
+        tags={["Workday Extend"]}
         href="https://marketplace.workday.com"
         delay={200}
       />
 
       <Card
-        title="Home Lab Infrastructure"
-        description="Self-hosted infrastructure on Proxmox with 6 containerized services: PostgreSQL databases, FastAPI applications, Tailscale VPN, Pi-hole DNS, and Jellyfin media server. Docker and LXC container orchestration."
-        tags={["Proxmox", "Docker", "LXC", "Tailscale", "Pi-hole"]}
+        title="LLM Reports"
+        description="Automated reporting using Claude. Pulls data from Smartsheet, does some ETL, generates summaries. Saved a lot of manual work at Huron."
+        tags={["Claude API", "Power Automate"]}
         delay={300}
+      />
+
+      <Card
+        title="Home Lab"
+        description="Proxmox server running Postgres, some FastAPI apps, Jellyfin, Pi-hole, the usual. Mostly an excuse to learn Linux stuff."
+        tags={["Proxmox", "Docker", "Linux"]}
+        delay={400}
+      />
+
+      <Card
+        title="Scheduling App"
+        description="Built at Huron - uses backtracking to generate course schedules. Two universities bought it which I wasn't expecting."
+        tags={["Algorithms", "Workday"]}
+        delay={500}
       />
     </div>
   </Section>
 
   <Section
     id="contact"
-    title="Let's Connect"
-    subtitle="Open to opportunities and collaboration"
+    title="Contact"
+    subtitle="say hi"
   >
     <div class="contact-grid">
       <a href="mailto:Bryce@BryceKeeler.com" class="contact-card" target="_blank" rel="noopener noreferrer">
@@ -175,9 +306,9 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
     </div>
 
     <div class="cta-section">
-      <p class="cta-text">Interested in working together?</p>
+      <p class="cta-text">Want to chat?</p>
       <a href="mailto:Bryce@BryceKeeler.com" class="cta-button">
-        Get In Touch
+        Email me
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M7 13L13 7M13 7H7M13 7V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -187,15 +318,13 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
 
   <footer class="footer">
     <div class="footer-content">
-      <p>&copy; 2026 Bryce Keeler. Built with Astro and Spline.</p>
+      <p>Bryce Keeler · 2026</p>
       <div class="footer-links">
-        <a href="/">3D Experience</a>
-        <span>•</span>
+        <a href="/">3D version</a>
+        <span>·</span>
         <a href="#about">About</a>
-        <span>•</span>
+        <span>·</span>
         <a href="#projects">Projects</a>
-        <span>•</span>
-        <a href="#contact">Contact</a>
       </div>
     </div>
   </footer>
@@ -230,10 +359,74 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
     font-weight: 600;
   }
 
+  .experience-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .experience-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+  }
+
+  .experience-card:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .experience-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .experience-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .experience-company {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0.25rem 0 0 0;
+  }
+
+  .experience-date {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .experience-list {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: var(--text-secondary);
+  }
+
+  .experience-list li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+  }
+
+  .experience-list li:last-child {
+    margin-bottom: 0;
+  }
+
   .skills-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
   }
 
   .skill-category {
@@ -241,18 +434,46 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
   }
 
   .category-title {
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 1.25rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   }
 
   .skills-list {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .certifications {
+    margin-top: 3rem;
+    text-align: center;
+  }
+
+  .cert-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.25rem;
+  }
+
+  .cert-list {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .cert-badge {
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
   }
 
   .projects-grid {
@@ -410,8 +631,8 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
 
   @media (max-width: 768px) {
     .skills-grid {
-      grid-template-columns: 1fr;
-      gap: 2rem;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
     }
 
     .projects-grid {
@@ -420,6 +641,10 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
 
     .contact-grid {
       grid-template-columns: 1fr;
+    }
+
+    .experience-header {
+      flex-direction: column;
     }
 
     .footer-content {
@@ -433,6 +658,17 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
 
     .footer-links span {
       display: none;
+    }
+
+    .cert-list {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .skills-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>

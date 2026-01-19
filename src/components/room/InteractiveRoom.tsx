@@ -18,100 +18,114 @@ const InteractiveRoom: React.FC = () => {
   const splineRef = useRef<Application | null>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
 
-  const MOUSE_ICON_URL = '/icons/mouse.png';
-  const PINCH_ICON_URL = '/icons/pinch.png';
+  const MOUSE_ICON = '/icons/mouse.png';
+  const PINCH_ICON = '/icons/pinch.png';
 
-  // mapping spline objects to hotspot ids
-  const objectMapping: Record<string, string> = {
+  // spline object name -> hotspot id
+  const objects: Record<string, string> = {
     'Server Rack': 'server-rack',
     'Computer': 'computer',
     'Books': 'books',
     'Sticky Notes': 'sticky-notes'
   };
 
-  const contentData: Record<string, ContentData> = {
+  const content: Record<string, ContentData> = {
     'server-rack': {
-      title: 'Home Lab Infrastructure',
-      subtitle: 'Self-hosted services & container orchestration',
+      title: 'Home Lab',
+      subtitle: 'Where I self host and work on networking',
       items: [
         {
-          title: 'Proxmox Virtualization',
-          description: 'Managing 6 containerized services including PostgreSQL databases, FastAPI apps, and media servers',
-          tags: ['Proxmox', 'Docker', 'LXC'],
+          title: 'Proxmox',
+          description: 'Running 15 containers - couple postgres instances, some FastAPI apps, media server. NAS for Storage',
+          tags: ['Proxmox', 'Docker', 'LXC', 'Networks'],
         },
         {
-          title: 'Network Services',
-          description: 'Pi-hole DNS, Tailscale VPN, and Jellyfin media server with persistent storage',
+          title: 'Networking',
+          description: 'Pi-hole blocks ads, Tailscale so I can access my server remotely, Jellyfin for music/movies/etc',
           tags: ['Pi-hole', 'Tailscale', 'Jellyfin'],
         },
         {
-          title: 'Service Orchestration',
-          description: 'Docker containerization with managed networking, monitoring, and system administration on Linux',
-          tags: ['Docker', 'Linux', 'Bash'],
+          title: 'Dashboards',
+          description: 'Bash scripts for automation, Grafana dashboards to check performance',
+          tags: ['Bash', 'Linux', 'Grafana'],
         }
       ]
     },
     computer: {
       title: 'Projects',
-      subtitle: 'What I build',
+      subtitle: 'Personal and Work Projects at a high level',
       items: [
         {
-          title: 'NutriOne - Nutrition Tracking App',
-          description: 'Full-stack app with FastAPI, PostgreSQL, React. Custom YOLOv8 models for food detection trained on Food-101 dataset',
-          tags: ['FastAPI', 'React', 'PyTorch', 'YOLOv8'],
+          title: 'NutriOne',
+          description: 'Nutrition tracking app - PostgreSQL & FastAPI backend, React frontend. Trained a YOLOv8 model',
+          tags: ['FastAPI', 'PostgreSQL', 'React', 'YOLOv8'],
         },
         {
-          title: 'Plant Health Monitor',
-          description: 'IoT pipeline with ESP32 microcontrollers, 9 sensors, computer vision for plant analysis, and ML models for health prediction',
-          tags: ['IoT', 'OpenCV', 'TimescaleDB', 'LSTM'],
+          title: 'Plant Monitor',
+          description: 'ESP32s with sensors talking to a TimescaleDB. Built an LSTM to predict when my plants need water, more sun/humidity/soil quality/ etc',
+          tags: ['ESP32', 'TimescaleDB', 'PyTorch'],
         },
         {
-          title: 'Workday Time Tracking App',
-          description: 'Production-grade Workday Extend application published on Workday Marketplace',
-          tags: ['Workday Extend', 'Enterprise'],
-          link: 'https://marketplace.workday.com'
+          title: 'LLM Reports',
+          description: 'Created Power Automate Flow at work to process reports so managers don\'t',
+          tags: ['Automation', 'RAG', 'Power Automate'],
+        },
+        {
+          title: 'Workday App',
+          description: 'Time tracking app that\'s on the Workday Marketplace.',
+          tags: ['Workday Extend', 'Enterprise', 'Full Stack'],
         }
       ]
     },
     books: {
-      title: 'Experience & Certifications',
-      subtitle: 'Professional background',
+      title: 'Work',
+      subtitle: 'Professional Experience',
       items: [
         {
-          title: 'Huron Consulting Group - Analyst',
-          description: 'Building enterprise apps with Workday Extend, data pipelines processing 560GB weekly, and LLM-powered automation',
-          tags: ['Workday', 'SQL', 'Power Automate'],
+          title: 'Huron Consulting Group',
+          description: 'Analyst building Workday apps and data pipelines.',
+          tags: ['Workday', 'WQL', 'Studio', 'Extend', 'Integrations', 'Orchestrations', 'ServiceNow'],
         },
         {
-          title: 'Workday Certified',
-          description: 'Certified in Workday Integrations, Workday Extend, and Workday Orchestrations',
-          tags: ['Integrations', 'Extend', 'Orchestrations'],
+          title: 'Huron Consulting Group',
+          description: 'Intern - building Workday apps.',
+          tags: ['Workday', 'WQL', 'Extend', 'Orchestrations'],
         },
         {
-          title: 'UT Dallas - B.S. CIS',
-          description: 'Davidson Management Honors Program, EY Expedition Scholarship recipient',
-          tags: ['Dec 2024', 'Honors'],
+          title: 'PwC',
+          description: 'Intern - built dashboards and automated workflows.',
+          tags: ['Alteryx', 'Tableau'],
+        },
+        {
+          title: 'EY',
+          description: 'Non-Profit Consulting',
+          tags: ['Alteryx', 'Tableau'],
+        },
+        {
+          title: 'Education',
+          description: 'UTDallas \'24, CIS degree, honors program, EY Scholarship. Currently pursuing a masters in Data Science with intent to become an ML Engineer',
+          tags: ['UTDallas', 'Computer Information Systems', 'Masters in Data Science soon'],
         }
       ]
     },
     'sticky-notes': {
       title: 'Interests',
-      subtitle: 'Outside of code',
+      subtitle: 'Things I enjoy doing outside of work',
       items: [
         {
           title: 'Olympic Weightlifting',
-          description: 'Training and competing in snatch and clean & jerk',
-          tags: ['Fitness', 'Strength'],
+          description: 'Habit that keeps me healthy, Have competed at the national level for 3+ years',
+          tags: ['Fitness'],
         },
         {
           title: 'Rock Climbing',
-          description: 'Bouldering and sport climbing',
-          tags: ['Outdoors', 'Adventure'],
+          description: 'Mostly bouldering. It\'s like debugging but you fall sometimes',
+          tags: ['Bouldering'],
         },
         {
-          title: 'Always Building',
-          description: 'Chess, volleyball, basketball, and making music',
-          tags: ['Chess', 'Sports', 'Music'],
+          title: 'Others',
+          description: 'Chess, volleyball/basketball, Cello',
+          tags: ['Chess', 'Sports'],
         }
       ]
     }
@@ -127,41 +141,27 @@ const InteractiveRoom: React.FC = () => {
     };
     setIsMobile(checkMobile());
 
-    const allObjects = spline.getAllObjects();
-    console.log('Spline loaded. Available objects:', allObjects.map((obj: any) => obj.name));
-
-    const splineInternal = spline as any;
-    if (splineInternal._camera) {
-      console.log('Camera position:', splineInternal._camera.position);
-      console.log('Camera rotation:', splineInternal._camera.rotation);
-    }
-
-    // wait for welcome screen animation
+    // let the welcome screen do its thing
     setTimeout(() => {
       setIsLoaded(true);
-      setTimeout(() => {
-        setShowWelcome(false);
-      }, 1200);
+      setTimeout(() => setShowWelcome(false), 1200);
     }, 1000);
 
-    // click handling
     spline.addEventListener('mouseDown', (e: any) => {
       if (e.target && e.target.name) {
         const objectName = e.target.name;
-        const hotspotId = objectMapping[objectName];
+        const hotspotId = objects[objectName];
 
         if (hotspotId) {
-          console.log(`Clicked on: ${objectName} -> ${hotspotId}`);
           handleHotspotClick(hotspotId);
         }
       }
     });
 
-    // hover stuff
     spline.addEventListener('mouseHover', (e: any) => {
       if (e.target && e.target.name) {
         const objectName = e.target.name;
-        const hotspotId = objectMapping[objectName];
+        const hotspotId = objects[objectName];
 
         if (hotspotId) {
           setHoveredObject(hotspotId);
@@ -188,7 +188,7 @@ const InteractiveRoom: React.FC = () => {
     setSelectedHotspot(null);
   };
 
-  // this tracks the 3d objects and converts them to 2d screen positions for the + buttons
+  // 3d -> 2d projection for the hotspot buttons
   useEffect(() => {
     if (!isLoaded || !splineRef.current || !containerRef.current) return;
 
@@ -205,10 +205,10 @@ const InteractiveRoom: React.FC = () => {
 
       try {
         const newPositions: Record<string, { x: number; y: number; visible: boolean }> = {};
-        const hotspotIds = Array.from(new Set(Object.values(objectMapping)));
+        const hotspotIds = Array.from(new Set(Object.values(objects)));
 
         hotspotIds.forEach((hotspotId) => {
-          const objectName = Object.keys(objectMapping).find(key => objectMapping[key] === hotspotId);
+          const objectName = Object.keys(objects).find(key => objects[key] === hotspotId);
           if (!objectName) return;
 
           try {
@@ -242,7 +242,6 @@ const InteractiveRoom: React.FC = () => {
               if (vector.project) {
                 vector.project(camera);
 
-                // convert to screen coords
                 const containerRect = container.getBoundingClientRect();
                 const targetX = (vector.x * 0.5 + 0.5) * containerRect.width;
                 const targetY = (-(vector.y * 0.5) + 0.5) * containerRect.height;
@@ -251,10 +250,9 @@ const InteractiveRoom: React.FC = () => {
                   smoothedPositions[hotspotId] = { x: targetX, y: targetY };
                 }
 
-                // smooth out the movement with lerp
-                const lerpFactor = 0.15;
-                smoothedPositions[hotspotId].x += (targetX - smoothedPositions[hotspotId].x) * lerpFactor;
-                smoothedPositions[hotspotId].y += (targetY - smoothedPositions[hotspotId].y) * lerpFactor;
+                const lerp = 0.15;
+                smoothedPositions[hotspotId].x += (targetX - smoothedPositions[hotspotId].x) * lerp;
+                smoothedPositions[hotspotId].y += (targetY - smoothedPositions[hotspotId].y) * lerp;
 
                 const visible = vector.z < 1 &&
                               targetX >= 0 && targetX <= containerRect.width &&
@@ -267,12 +265,12 @@ const InteractiveRoom: React.FC = () => {
                 };
               }
             }
-          } catch (e) {
-            // skip if object not found
+          } catch {
+            // object not found
           }
         });
 
-        // only update if something actually changed (prevents unnecessary re-renders)
+        // only update state if positions actually moved
         const hasChanged = Object.keys(newPositions).some(key => {
           const last = lastPositions[key];
           const current = newPositions[key];
@@ -286,8 +284,8 @@ const InteractiveRoom: React.FC = () => {
           lastPositions = newPositions;
           setHotspotPositions(newPositions);
         }
-      } catch (e) {
-        // sometimes this errors out, just skip the frame
+      } catch {
+        // skip frame on error
       }
 
       animationFrameRef.current = requestAnimationFrame(updateHotspotPositions);
@@ -354,7 +352,7 @@ const InteractiveRoom: React.FC = () => {
               top: `${pos.y}px`,
             }}
             onClick={() => handleHotspotClick(hotspotId)}
-            aria-label={`View ${contentData[hotspotId]?.title || hotspotId}`}
+            aria-label={`View ${content[hotspotId]?.title || hotspotId}`}
           >
             +
           </button>
@@ -364,14 +362,14 @@ const InteractiveRoom: React.FC = () => {
       {isLoaded && hoveredObject && !selectedHotspot && (
         <div className="hover-indicator">
           <span className="hover-text">
-            Click to explore {contentData[hoveredObject]?.title || 'this area'}
+            Click to explore {content[hoveredObject]?.title || 'this area'}
           </span>
         </div>
       )}
 
       {selectedHotspot && (
         <ContentPanel
-          content={contentData[selectedHotspot]}
+          content={content[selectedHotspot]}
           onClose={handleCloseContent}
           hotspotId={selectedHotspot}
         />
@@ -383,14 +381,14 @@ const InteractiveRoom: React.FC = () => {
             {isMobile ? (
               <>
                 <span className="click-icon">
-                  <img src={PINCH_ICON_URL} alt="Pinch gesture" />
+                  <img src={PINCH_ICON} alt="Pinch gesture" />
                 </span>
                 Pinch to zoom and rotate • Tap objects to learn more
               </>
             ) : (
               <>
                 <span className="click-icon">
-                  <img src={MOUSE_ICON_URL} alt="Mouse" />
+                  <img src={MOUSE_ICON} alt="Mouse" />
                 </span>
                 Move your mouse to explore • Click objects to learn more
               </>
