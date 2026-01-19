@@ -35,23 +35,9 @@ const { name, tagline } = Astro.props;
     text-align: center;
     padding: 2rem;
     position: relative;
-    background: linear-gradient(
-      135deg,
-      rgba(15, 23, 42, 0.95) 0%,
-      rgba(30, 41, 59, 0.95) 50%,
-      rgba(15, 23, 42, 0.95) 100%
-    );
-  }
-
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
-    pointer-events: none;
+    background:
+      radial-gradient(ellipse 150% 150% at 50% 30%, rgba(40, 40, 40, 0.5) 0%, transparent 60%),
+      #000000;
   }
 
   .hero-content {
@@ -63,10 +49,7 @@ const { name, tagline } = Astro.props;
     font-size: clamp(2.5rem, 8vw, 5rem);
     font-weight: 800;
     margin-bottom: 1.5rem;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #ffffff;
     letter-spacing: -0.02em;
   }
 
@@ -99,26 +82,25 @@ const { name, tagline } = Astro.props;
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+    background: #ffffff;
+    color: #000000;
   }
 
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 8px 30px rgba(255, 255, 255, 0.2);
   }
 
   .btn-secondary {
-    background: rgba(99, 102, 241, 0.1);
-    border: 2px solid rgba(99, 102, 241, 0.3);
-    color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
     backdrop-filter: blur(10px);
   }
 
   .btn-secondary:hover {
-    background: rgba(99, 102, 241, 0.2);
-    border-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
     transform: translateY(-2px);
   }
 
@@ -132,8 +114,8 @@ const { name, tagline } = Astro.props;
   .scroll-arrow {
     width: 24px;
     height: 24px;
-    border-left: 2px solid var(--primary-color);
-    border-bottom: 2px solid var(--primary-color);
+    border-left: 1px solid rgba(255, 255, 255, 0.5);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
     transform: rotate(-45deg);
     animation: scroll-bounce 2s ease-in-out infinite;
   }

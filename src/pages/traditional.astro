@@ -12,30 +12,29 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
 
   <Hero
     name="Bryce Keeler"
-    tagline="Digital Consulting Analyst | Workday Developer | Automation Enthusiast"
+    tagline="Digital Consulting Analyst @ Huron | Workday Certified | Full-Stack Developer"
   />
 
   <Section
     id="about"
     title="About Me"
-    subtitle="Transforming business processes through technology and automation"
+    subtitle="Building enterprise solutions and personal projects"
   >
     <div class="about-content">
       <div class="about-text">
         <p class="lead-paragraph">
-          Digital Consulting Analyst at <strong>Huron Consulting Group</strong>, specializing in
-          Workday systems integration and data transformation. I bridge the gap between complex
-          technical requirements and business needs.
+          Digital Consulting Analyst at <strong>Huron Consulting Group</strong>, building enterprise
+          applications with Workday Extend and designing data pipelines that process 560GB weekly
+          for university and healthcare clients.
         </p>
         <p>
-          With a passion for automation and efficiency, I design and implement solutions that
-          streamline workflows, enhance data accuracy, and empower organizations to make
-          data-driven decisions. My experience spans enterprise resource planning, custom
-          application development, and infrastructure management.
+          I graduated from UT Dallas with a B.S. in Computer Information Systems (Davidson Honors Program).
+          At Huron, I've contributed to production apps on the Workday Marketplace and built LLM-powered
+          automation systems that save 1,500+ hours of manual work weekly.
         </p>
         <p>
-          When I'm not consulting, I'm building automation systems, managing my home lab
-          infrastructure, or exploring the latest in web technologies and AI integration.
+          Outside of work, I build full-stack applications with FastAPI and React, train ML models for
+          computer vision, and manage a home lab running containerized services on Proxmox.
         </p>
       </div>
     </div>
@@ -44,48 +43,50 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
   <Section
     id="skills"
     title="Skills & Technologies"
-    subtitle="A diverse toolkit for solving complex problems"
+    subtitle="Languages, frameworks, and platforms I work with"
   >
     <div class="skills-grid">
       <div class="skill-category">
-        <h3 class="category-title">Enterprise Systems</h3>
+        <h3 class="category-title">Languages</h3>
         <div class="skills-list">
-          <SkillBadge skill="Workday" icon="💼" delay={0} />
-          <SkillBadge skill="Workday Extend" icon="🔧" delay={100} />
-          <SkillBadge skill="XSLT" icon="📝" delay={200} />
-          <SkillBadge skill="EIB" icon="📊" delay={300} />
+          <SkillBadge skill="Python" icon="🐍" delay={0} />
+          <SkillBadge skill="TypeScript" icon="📘" delay={100} />
+          <SkillBadge skill="JavaScript" icon="⚡" delay={200} />
+          <SkillBadge skill="Java" icon="☕" delay={300} />
+          <SkillBadge skill="SQL" icon="🗄️" delay={400} />
         </div>
       </div>
 
       <div class="skill-category">
-        <h3 class="category-title">Development</h3>
+        <h3 class="category-title">Frontend & Backend</h3>
         <div class="skills-list">
           <SkillBadge skill="React" icon="⚛️" delay={0} />
-          <SkillBadge skill="TypeScript" icon="📘" delay={100} />
-          <SkillBadge skill="Python" icon="🐍" delay={200} />
-          <SkillBadge skill="SQL" icon="🗄️" delay={300} />
-          <SkillBadge skill="FastAPI" icon="⚡" delay={400} />
+          <SkillBadge skill="FastAPI" icon="🚀" delay={100} />
+          <SkillBadge skill="Astro" icon="🚀" delay={200} />
+          <SkillBadge skill="PostgreSQL" icon="🐘" delay={300} />
+          <SkillBadge skill="Node.js" icon="💚" delay={400} />
         </div>
       </div>
 
       <div class="skill-category">
-        <h3 class="category-title">DevOps & Infrastructure</h3>
+        <h3 class="category-title">AI/ML & Data</h3>
         <div class="skills-list">
-          <SkillBadge skill="Proxmox" icon="🖥️" delay={0} />
-          <SkillBadge skill="Docker" icon="🐳" delay={100} />
-          <SkillBadge skill="LXC" icon="📦" delay={200} />
-          <SkillBadge skill="Tailscale" icon="🔐" delay={300} />
-          <SkillBadge skill="Pi-hole" icon="🛡️" delay={400} />
+          <SkillBadge skill="PyTorch" icon="🔥" delay={0} />
+          <SkillBadge skill="YOLOv8" icon="👁️" delay={100} />
+          <SkillBadge skill="OpenCV" icon="📷" delay={200} />
+          <SkillBadge skill="Tableau" icon="📊" delay={300} />
+          <SkillBadge skill="Alteryx" icon="🔄" delay={400} />
         </div>
       </div>
 
       <div class="skill-category">
-        <h3 class="category-title">Automation & Integration</h3>
+        <h3 class="category-title">DevOps & Platforms</h3>
         <div class="skills-list">
-          <SkillBadge skill="n8n" icon="🔄" delay={0} />
-          <SkillBadge skill="REST APIs" icon="🌐" delay={100} />
-          <SkillBadge skill="AI Integration" icon="🤖" delay={200} />
-          <SkillBadge skill="Workflow Automation" icon="⚙️" delay={300} />
+          <SkillBadge skill="Docker" icon="🐳" delay={0} />
+          <SkillBadge skill="Proxmox" icon="🖥️" delay={100} />
+          <SkillBadge skill="Linux" icon="🐧" delay={200} />
+          <SkillBadge skill="Workday Extend" icon="💼" delay={300} />
+          <SkillBadge skill="Git" icon="📚" delay={400} />
         </div>
       </div>
     </div>
@@ -93,36 +94,36 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
 
   <Section
     id="projects"
-    title="Featured Projects"
-    subtitle="Innovative solutions across enterprise and personal domains"
+    title="Projects"
+    subtitle="Personal and professional work"
   >
     <div class="projects-grid">
       <Card
-        title="Workday AI Recruiting Application"
-        description="Comprehensive AI-powered recruiting application built within the Workday Extend ecosystem. Published on the Workday Marketplace, this solution streamlines candidate sourcing, screening, and engagement through intelligent automation."
-        tags={["Workday Extend", "XSLT", "AI Integration", "Enterprise"]}
+        title="NutriOne - Nutrition Tracking App"
+        description="Full-stack nutrition app with FastAPI, PostgreSQL, and React. Built custom YOLOv8 computer vision models trained on Food-101 dataset for automated food detection. 21 modular service components with RESTful API design."
+        tags={["FastAPI", "React", "PyTorch", "YOLOv8", "PostgreSQL"]}
         delay={0}
       />
 
       <Card
-        title="Reddit Content Automation System"
-        description="Sophisticated automation pipeline leveraging n8n workflows and FastAPI microservices. Automatically generates, curates, and publishes social media content, running on a self-hosted Proxmox infrastructure."
-        tags={["n8n", "FastAPI", "Proxmox", "Python", "Automation"]}
+        title="Plant Health Monitoring System"
+        description="End-to-end IoT pipeline using ESP32 microcontrollers and 9 sensors, streaming 288+ daily readings to TimescaleDB. Computer vision with OpenCV for plant analysis, LSTM models for soil moisture forecasting, and React dashboard with WebSocket updates."
+        tags={["IoT", "OpenCV", "LSTM", "FastAPI", "TimescaleDB", "React"]}
         delay={100}
       />
 
       <Card
-        title="Home Lab Infrastructure"
-        description="Enterprise-grade home lab built on Proxmox virtualization. Features include network-wide ad blocking with Pi-hole, secure remote access via Tailscale, containerized services with LXC, and automated backup systems."
-        tags={["Proxmox", "LXC", "Pi-hole", "Tailscale", "Docker", "Linux"]}
+        title="Workday Time Tracking Solution"
+        description="Production-grade Workday Extend application published on Workday Marketplace. Built enterprise workflow automation with custom UI components, backend business logic, and database integrations."
+        tags={["Workday Extend", "Enterprise", "Published"]}
+        href="https://marketplace.workday.com"
         delay={200}
       />
 
       <Card
-        title="Personal Portfolio (This Site!)"
-        description="Interactive 3D portfolio website built with Astro and Spline. Features an immersive game-like navigation experience with 3D visualizations, showcasing modern web technologies and creative UI/UX design."
-        tags={["Astro", "React", "Spline", "TypeScript", "3D Web"]}
-        href="/"
+        title="Home Lab Infrastructure"
+        description="Self-hosted infrastructure on Proxmox with 6 containerized services: PostgreSQL databases, FastAPI applications, Tailscale VPN, Pi-hole DNS, and Jellyfin media server. Docker and LXC container orchestration."
+        tags={["Proxmox", "Docker", "LXC", "Tailscale", "Pi-hole"]}
         delay={300}
       />
     </div>
@@ -131,10 +132,10 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
   <Section
     id="contact"
     title="Let's Connect"
-    subtitle="Always open to discussing new opportunities and collaborations"
+    subtitle="Open to opportunities and collaboration"
   >
     <div class="contact-grid">
-      <a href="mailto:bryce.keeler@example.com" class="contact-card" target="_blank" rel="noopener noreferrer">
+      <a href="mailto:Bryce@BryceKeeler.com" class="contact-card" target="_blank" rel="noopener noreferrer">
         <div class="contact-icon">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M3 8L10.89 13.26C11.21 13.47 11.59 13.59 12 13.59C12.41 13.59 12.79 13.47 13.11 13.26L21 8M5 19H19C20.1 19 21 18.1 21 17V7C21 5.9 20.1 5 19 5H5C3.9 5 3 5.9 3 7V17C3 18.1 3.9 19 5 19Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -142,11 +143,11 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
         </div>
         <div class="contact-info">
           <h3>Email</h3>
-          <p>bryce.keeler@example.com</p>
+          <p>Bryce@BryceKeeler.com</p>
         </div>
       </a>
 
-      <a href="https://linkedin.com/in/yourprofile" class="contact-card" target="_blank" rel="noopener noreferrer">
+      <a href="https://linkedin.com/in/bryce-keeler720" class="contact-card" target="_blank" rel="noopener noreferrer">
         <div class="contact-icon">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M16 8C17.5913 8 19.1174 8.63214 20.2426 9.75736C21.3679 10.8826 22 12.4087 22 14V21H18V14C18 13.4696 17.7893 12.9609 17.4142 12.5858C17.0391 12.2107 16.5304 12 16 12C15.4696 12 14.9609 12.2107 14.5858 12.5858C14.2107 12.9609 14 13.4696 14 14V21H10V14C10 12.4087 10.6321 10.8826 11.7574 9.75736C12.8826 8.63214 14.4087 8 16 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -156,7 +157,7 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
         </div>
         <div class="contact-info">
           <h3>LinkedIn</h3>
-          <p>Connect with me</p>
+          <p>bryce-keeler720</p>
         </div>
       </a>
 
@@ -168,14 +169,14 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
         </div>
         <div class="contact-info">
           <h3>GitHub</h3>
-          <p>Check out my work</p>
+          <p>BryceKeeler720</p>
         </div>
       </a>
     </div>
 
     <div class="cta-section">
-      <p class="cta-text">Interested in collaboration or have a project in mind?</p>
-      <a href="mailto:bryce.keeler@example.com" class="cta-button">
+      <p class="cta-text">Interested in working together?</p>
+      <a href="mailto:Bryce@BryceKeeler.com" class="cta-button">
         Get In Touch
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M7 13L13 7M13 7H7M13 7V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -201,7 +202,6 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
 </BaseLayout>
 
 <style>
-  /* About Section */
   .about-content {
     max-width: 800px;
     margin: 0 auto;
@@ -230,7 +230,6 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
     font-weight: 600;
   }
 
-  /* Skills Section */
   .skills-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -247,7 +246,7 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
     color: var(--text-primary);
     margin-bottom: 1.25rem;
     padding-bottom: 0.75rem;
-    border-bottom: 2px solid rgba(99, 102, 241, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .skills-list {
@@ -256,14 +255,12 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
     gap: 0.75rem;
   }
 
-  /* Projects Section */
   .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 2rem;
   }
 
-  /* Contact Section */
   .contact-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -276,8 +273,8 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
     align-items: center;
     gap: 1.5rem;
     padding: 2rem;
-    background: rgba(30, 41, 59, 0.5);
-    border: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     text-decoration: none;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -286,8 +283,8 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
 
   .contact-card:hover {
     transform: translateY(-4px);
-    border-color: rgba(99, 102, 241, 0.4);
-    box-shadow: 0 12px 40px rgba(99, 102, 241, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.05);
   }
 
   .contact-icon {
@@ -298,14 +295,13 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
     align-items: center;
     justify-content: center;
     border-radius: 12px;
-    background: rgba(99, 102, 241, 0.15);
+    background: rgba(255, 255, 255, 0.05);
     color: var(--primary-color);
     transition: all 0.3s ease;
   }
 
   .contact-card:hover .contact-icon {
-    background: var(--primary-color);
-    color: white;
+    background: rgba(255, 255, 255, 0.1);
     transform: scale(1.1);
   }
 
@@ -324,8 +320,8 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
   .cta-section {
     text-align: center;
     padding: 3rem 2rem;
-    background: rgba(99, 102, 241, 0.05);
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     margin-top: 3rem;
   }
@@ -342,26 +338,26 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
     align-items: center;
     gap: 0.75rem;
     padding: 1rem 2rem;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     color: white;
     text-decoration: none;
     border-radius: 12px;
     font-weight: 600;
     font-size: 1.0625rem;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
   }
 
   .cta-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.5);
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
   }
 
-  /* Footer */
   .footer {
     padding: 3rem 2rem;
-    border-top: 1px solid rgba(148, 163, 184, 0.1);
-    background: rgba(15, 23, 42, 0.5);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.5);
   }
 
   .footer-content {
@@ -398,7 +394,7 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
   }
 
   .footer-links span {
-    color: rgba(148, 163, 184, 0.3);
+    color: rgba(255, 255, 255, 0.2);
   }
 
   @keyframes fadeIn {

@@ -32,88 +32,86 @@ const InteractiveRoom: React.FC = () => {
   const contentData: Record<string, ContentData> = {
     'server-rack': {
       title: 'Home Lab Infrastructure',
-      subtitle: 'Self-hosted services & virtualization',
+      subtitle: 'Self-hosted services & container orchestration',
       items: [
         {
           title: 'Proxmox Virtualization',
-          description: 'Enterprise-grade hypervisor running multiple VMs and containers',
-          tags: ['Proxmox', 'LXC', 'KVM'],
+          description: 'Managing 6 containerized services including PostgreSQL databases, FastAPI apps, and media servers',
+          tags: ['Proxmox', 'Docker', 'LXC'],
         },
         {
           title: 'Network Services',
-          description: 'Pi-hole ad blocking, Tailscale VPN, DNS management',
-          tags: ['Pi-hole', 'Tailscale', 'DNS'],
+          description: 'Pi-hole DNS, Tailscale VPN, and Jellyfin media server with persistent storage',
+          tags: ['Pi-hole', 'Tailscale', 'Jellyfin'],
         },
         {
-          title: 'Automation Hub',
-          description: 'n8n workflows, FastAPI microservices, scheduled tasks',
-          tags: ['n8n', 'Docker', 'FastAPI'],
+          title: 'Service Orchestration',
+          description: 'Docker containerization with managed networking, monitoring, and system administration on Linux',
+          tags: ['Docker', 'Linux', 'Bash'],
         }
       ]
     },
     computer: {
-      title: 'Projects & Development',
-      subtitle: 'What I build and create',
+      title: 'Projects',
+      subtitle: 'What I build',
       items: [
         {
-          title: 'Workday AI Recruiting App',
-          description: 'Published on Workday Marketplace - AI-powered recruiting solution',
-          tags: ['Workday Extend', 'XSLT', 'AI', 'Enterprise'],
-          link: '#'
+          title: 'NutriOne - Nutrition Tracking App',
+          description: 'Full-stack app with FastAPI, PostgreSQL, React. Custom YOLOv8 models for food detection trained on Food-101 dataset',
+          tags: ['FastAPI', 'React', 'PyTorch', 'YOLOv8'],
         },
         {
-          title: 'Reddit Content Automation',
-          description: 'n8n workflows + FastAPI for automated social media content',
-          tags: ['n8n', 'FastAPI', 'Python', 'Automation'],
-          link: '#'
+          title: 'Plant Health Monitor',
+          description: 'IoT pipeline with ESP32 microcontrollers, 9 sensors, computer vision for plant analysis, and ML models for health prediction',
+          tags: ['IoT', 'OpenCV', 'TimescaleDB', 'LSTM'],
         },
         {
-          title: 'Personal Portfolio',
-          description: 'Interactive 3D portfolio with Astro and Spline',
-          tags: ['Astro', 'React', 'Spline', 'TypeScript'],
-          link: '/'
+          title: 'Workday Time Tracking App',
+          description: 'Production-grade Workday Extend application published on Workday Marketplace',
+          tags: ['Workday Extend', 'Enterprise'],
+          link: 'https://marketplace.workday.com'
         }
       ]
     },
     books: {
-      title: 'Certifications & Learning',
-      subtitle: 'Continuous learning and growth',
+      title: 'Experience & Certifications',
+      subtitle: 'Professional background',
       items: [
         {
-          title: 'Workday Certifications',
-          description: 'Certified in Workday integrations and system architecture',
-          tags: ['Workday', 'Certified'],
+          title: 'Huron Consulting Group - Analyst',
+          description: 'Building enterprise apps with Workday Extend, data pipelines processing 560GB weekly, and LLM-powered automation',
+          tags: ['Workday', 'SQL', 'Power Automate'],
         },
         {
-          title: 'Tech Learning',
-          description: 'Constantly expanding knowledge in cloud, DevOps, and modern frameworks',
-          tags: ['Cloud', 'DevOps', 'Web Dev'],
+          title: 'Workday Certified',
+          description: 'Certified in Workday Integrations, Workday Extend, and Workday Orchestrations',
+          tags: ['Integrations', 'Extend', 'Orchestrations'],
         },
         {
-          title: 'Problem Solving',
-          description: 'Applying technical knowledge to solve real business challenges',
-          tags: ['Enterprise', 'Solutions'],
+          title: 'UT Dallas - B.S. CIS',
+          description: 'Davidson Management Honors Program, EY Expedition Scholarship recipient',
+          tags: ['Dec 2024', 'Honors'],
         }
       ]
     },
     'sticky-notes': {
-      title: 'Interests & Passions',
-      subtitle: 'What drives me',
+      title: 'Interests',
+      subtitle: 'Outside of code',
       items: [
         {
-          title: 'Automation Enthusiast',
-          description: 'Building workflows and tools to automate repetitive tasks',
-          tags: ['n8n', 'Python', 'Efficiency'],
+          title: 'Olympic Weightlifting',
+          description: 'Training and competing in snatch and clean & jerk',
+          tags: ['Fitness', 'Strength'],
         },
         {
-          title: 'Self-Hosting',
-          description: 'Running my own infrastructure and learning through hands-on experience',
-          tags: ['Homelab', 'Linux', 'Proxmox'],
+          title: 'Rock Climbing',
+          description: 'Bouldering and sport climbing',
+          tags: ['Outdoors', 'Adventure'],
         },
         {
           title: 'Always Building',
-          description: 'Constantly experimenting with new tools, frameworks, and technologies',
-          tags: ['Innovation', 'Learning'],
+          description: 'Chess, volleyball, basketball, and making music',
+          tags: ['Chess', 'Sports', 'Music'],
         }
       ]
     }

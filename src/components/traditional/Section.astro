@@ -27,23 +27,6 @@ const { id, title, subtitle, class: className = '' } = Astro.props;
     position: relative;
   }
 
-  .section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1px;
-    height: 100%;
-    background: linear-gradient(
-      to bottom,
-      transparent,
-      rgba(99, 102, 241, 0.2) 50%,
-      transparent
-    );
-    pointer-events: none;
-  }
-
   .section-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -59,10 +42,7 @@ const { id, title, subtitle, class: className = '' } = Astro.props;
     font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 800;
     margin-bottom: 1rem;
-    background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #ffffff;
     position: relative;
     display: inline-block;
   }
@@ -74,9 +54,8 @@ const { id, title, subtitle, class: className = '' } = Astro.props;
     left: 50%;
     transform: translateX(-50%);
     width: 60px;
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
-    border-radius: 2px;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.5);
   }
 
   .section-subtitle {
