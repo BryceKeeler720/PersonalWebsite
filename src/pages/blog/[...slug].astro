@@ -1,7 +1,7 @@
 ---
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Navbar from '../../components/traditional/Navbar.astro';
+import BlogNavbar from '../../components/blog/BlogNavbar.astro';
 import { calculateReadingTime } from '../../utils/readingTime';
 
 type BlogPost = CollectionEntry<'blog'>;
@@ -25,7 +25,7 @@ const formattedDate = post.data.publishDate.toLocaleDateString('en-US', {
 ---
 
 <BaseLayout title={`${post.data.title} | Bryce Keeler`} description={post.data.description}>
-  <Navbar />
+  <BlogNavbar />
 
   <article class="blog-post-page">
     <header class="post-header">

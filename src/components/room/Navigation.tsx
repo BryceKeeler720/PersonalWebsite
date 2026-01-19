@@ -16,12 +16,6 @@ const Navigation: React.FC = () => {
           <a href="/blog" className="nav-link">
             Blog
           </a>
-          <a href="https://github.com/BryceKeeler720" target="_blank" rel="noopener noreferrer" className="nav-link">
-            GitHub
-          </a>
-          <a href="https://linkedin.com/in/bryce-keeler720" target="_blank" rel="noopener noreferrer" className="nav-link">
-            LinkedIn
-          </a>
         </div>
       </div>
     </nav>

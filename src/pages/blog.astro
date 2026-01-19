@@ -1,7 +1,7 @@
 ---
 import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Navbar from '../components/traditional/Navbar.astro';
+import BlogNavbar from '../components/blog/BlogNavbar.astro';
 import { calculateReadingTime } from '../utils/readingTime';
 
 type BlogPost = CollectionEntry<'blog'>;
@@ -12,7 +12,7 @@ const posts: BlogPost[] = (await getCollection('blog', ({ data }: BlogPost) => !
 ---
 
 <BaseLayout title="Blog | Bryce Keeler" description="Thoughts on software engineering, ML, home labs, and other things I find interesting.">
-  <Navbar />
+  <BlogNavbar />
 
   <main class="blog-page">
     <header class="blog-header">
@@ -73,7 +73,7 @@ const posts: BlogPost[] = (await getCollection('blog', ({ data }: BlogPost) => !
   .blog-page {
     min-height: 100vh;
     padding: 8rem 2rem 4rem;
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
   }
 
@@ -98,9 +98,9 @@ const posts: BlogPost[] = (await getCollection('blog', ({ data }: BlogPost) => !
   }
 
   .blog-posts {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
   }
 
   .blog-post-link {
@@ -211,9 +211,19 @@ const posts: BlogPost[] = (await getCollection('blog', ({ data }: BlogPost) => !
     color: rgba(255, 255, 255, 0.2);
   }
 
+  @media (max-width: 1024px) {
+    .blog-posts {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
   @media (max-width: 768px) {
     .blog-page {
       padding: 6rem 1.5rem 3rem;
+    }
+
+    .blog-posts {
+      grid-template-columns: 1fr;
     }
 
     .blog-post {

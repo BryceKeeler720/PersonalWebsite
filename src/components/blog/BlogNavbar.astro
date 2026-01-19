@@ -8,13 +8,13 @@
     </a>
 
     <div class="navbar-links" role="list">
-      <a href="#about" class="nav-link">About</a>
-      <a href="#experience" class="nav-link">Work</a>
-      <a href="#education" class="nav-link">Education</a>
-      <a href="#projects" class="nav-link">Projects</a>
-      <a href="#homelab" class="nav-link">Home Lab</a>
-      <a href="#contact" class="nav-link">Contact</a>
-      <a href="/blog" class="nav-link">Blog</a>
+      <a href="/traditional#about" class="nav-link">About</a>
+      <a href="/traditional#experience" class="nav-link">Work</a>
+      <a href="/traditional#education" class="nav-link">Education</a>
+      <a href="/traditional#projects" class="nav-link">Projects</a>
+      <a href="/traditional#homelab" class="nav-link">Home Lab</a>
+      <a href="/traditional#contact" class="nav-link">Contact</a>
+      <a href="/blog" class="nav-link nav-link-active">Blog</a>
       <a href="/" class="nav-link-special" aria-label="View 3D interactive version">
         <span>3D Experience</span>
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -107,6 +107,14 @@
     width: 100%;
   }
 
+  .nav-link-active {
+    color: var(--text-primary);
+  }
+
+  .nav-link-active::after {
+    width: 100%;
+  }
+
   .nav-link-special {
     display: flex;
     align-items: center;
@@ -139,31 +147,3 @@
     }
   }
 </style>
-
-<script>
-  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-    anchor.addEventListener('click', (e) => {
-      e.preventDefault();
-      const href = anchor.getAttribute('href');
-      if (href) {
-        const target = document.querySelector(href);
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-      }
-    });
-  });
-
-  const navbar = document.querySelector('.navbar');
-
-  window.addEventListener('scroll', () => {
-    if (window.pageYOffset > 100) {
-      navbar?.classList.add('scrolled');
-    } else {
-      navbar?.classList.remove('scrolled');
-    }
-  });
-</script>
