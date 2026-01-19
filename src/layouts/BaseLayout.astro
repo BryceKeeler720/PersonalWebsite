@@ -4,10 +4,13 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description?: string;
+  image?: string;
 }
 
-const { title, description = "Interactive 3D Portfolio" } = Astro.props;
+const { title, description = "Interactive 3D Portfolio", image = "/og-image.png" } = Astro.props;
 const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
+const siteUrl = "https://brycekeeler.com";
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
 ---
 
 <!doctype html>
@@ -17,7 +20,25 @@ const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
+    <link rel="canonical" href={canonicalUrl} />
     <title>{title}</title>
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={`${siteUrl}${image}`} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalUrl} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${siteUrl}${image}`} />
+
+    <!-- RSS Feed -->
+    <link rel="alternate" type="application/rss+xml" title="Bryce Keeler - Blog" href="/rss.xml" />
 
     <!-- Google Analytics -->
     {gaId && gaId !== 'G-XXXXXXXXXX' && (

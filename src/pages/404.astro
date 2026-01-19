@@ -1,0 +1,88 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="404 - Page Not Found | Bryce Keeler" description="The page you're looking for doesn't exist.">
+  <main class="error-page">
+    <div class="error-content">
+      <h1 class="error-code">404</h1>
+      <p class="error-message">Page not found</p>
+      <p class="error-description">The page you're looking for doesn't exist or has been moved.</p>
+      <div class="error-links">
+        <a href="/" class="error-link primary">Go Home</a>
+        <a href="/blog" class="error-link">Read the Blog</a>
+        <a href="/traditional" class="error-link">View Portfolio</a>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .error-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .error-content {
+    text-align: center;
+    max-width: 500px;
+  }
+
+  .error-code {
+    font-size: clamp(6rem, 20vw, 12rem);
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1;
+    margin-bottom: 1rem;
+    opacity: 0.1;
+  }
+
+  .error-message {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+  }
+
+  .error-description {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+
+  .error-links {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .error-link {
+    padding: 0.75rem 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    transition: all 0.3s ease;
+  }
+
+  .error-link:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .error-link.primary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+  }
+
+  .error-link.primary:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+</style>

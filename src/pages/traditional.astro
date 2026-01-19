@@ -89,6 +89,10 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
           <li>Some ETL work, data analysis with SQL and Python</li>
         </ul>
       </div>
+
+      <div class="resume-cta">
+        <a href="/resume" class="resume-link">View Full Resume</a>
+      </div>
     </div>
   </Section>
 
@@ -516,6 +520,33 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
 
   .experience-list li:last-child {
     margin-bottom: 0;
+  }
+
+  .resume-cta {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  .resume-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9375rem;
+    transition: all 0.3s ease;
+  }
+
+  .resume-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
   }
 
   .education-grid {

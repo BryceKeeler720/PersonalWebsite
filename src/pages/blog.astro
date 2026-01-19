@@ -53,6 +53,24 @@ const posts: BlogPost[] = (await getCollection('blog', ({ data }: BlogPost) => !
         })
       )}
     </section>
+
+    <section class="subscribe-section">
+      <h2>Stay Updated</h2>
+      <p>Get notified when I publish new posts. No spam, unsubscribe anytime.</p>
+      <form class="subscribe-form" action="#" method="POST">
+        <input
+          type="email"
+          name="email"
+          placeholder="your@email.com"
+          required
+          class="subscribe-input"
+        />
+        <button type="submit" class="subscribe-btn">Subscribe</button>
+      </form>
+      <p class="rss-link">
+        Or subscribe via <a href="/rss.xml">RSS feed</a>
+      </p>
+    </section>
   </main>
 
   <footer class="blog-footer">
@@ -211,6 +229,88 @@ const posts: BlogPost[] = (await getCollection('blog', ({ data }: BlogPost) => !
     color: rgba(255, 255, 255, 0.2);
   }
 
+  .subscribe-section {
+    margin-top: 4rem;
+    padding: 3rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    text-align: center;
+  }
+
+  .subscribe-section h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .subscribe-section > p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+  }
+
+  .subscribe-form {
+    display: flex;
+    gap: 0.75rem;
+    max-width: 400px;
+    margin: 0 auto 1rem;
+  }
+
+  .subscribe-input {
+    flex: 1;
+    padding: 0.875rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+    font-family: inherit;
+  }
+
+  .subscribe-input::placeholder {
+    color: var(--text-secondary);
+  }
+
+  .subscribe-input:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+
+  .subscribe-btn {
+    padding: 0.875rem 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .subscribe-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+
+  .rss-link {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+  }
+
+  .rss-link a {
+    color: var(--text-secondary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.2s ease;
+  }
+
+  .rss-link a:hover {
+    color: var(--text-primary);
+  }
+
   @media (max-width: 1024px) {
     .blog-posts {
       grid-template-columns: repeat(2, 1fr);
@@ -242,6 +342,18 @@ const posts: BlogPost[] = (await getCollection('blog', ({ data }: BlogPost) => !
 
     .footer-links span {
       display: none;
+    }
+
+    .subscribe-section {
+      padding: 2rem 1.5rem;
+    }
+
+    .subscribe-form {
+      flex-direction: column;
+    }
+
+    .subscribe-btn {
+      width: 100%;
     }
   }
 </style>
