@@ -12,7 +12,7 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
 
   <Hero
     name="Bryce Keeler"
-    tagline="consultant · developer · UT Dallas '24"
+    tagline="consultant · developer"
   />
 
   <Section
@@ -24,17 +24,8 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
       <div class="about-text">
         <p class="lead-paragraph">
           I'm a consultant at <strong>Huron</strong> where I build Workday apps and data pipelines
-          for universities and healthcare companies. Recently got an app published on the Workday
-          Marketplace which was pretty cool.
-        </p>
-        <p>
-          Graduated from UT Dallas Dec 2024 with a CIS degree (honors program). Before Huron I
-          interned at PwC doing dashboards and data stuff.
-        </p>
-        <p>
-          Outside work I mess around with personal projects - usually involves FastAPI, React,
-          and training ML models. Also run a home server because I apparently enjoy debugging
-          networking issues at 2am.
+          for universities and healthcare companies. I graduated from UT Dallas Dec 2024 with a CIS degree. Before Huron I
+          interned at PwC and EY.
         </p>
       </div>
     </div>
@@ -50,15 +41,15 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
         <div class="experience-header">
           <div>
             <h3 class="experience-title">Analyst</h3>
-            <p class="experience-company">Huron Consulting</p>
+            <p class="experience-company">Huron Consulting Group</p>
           </div>
-          <span class="experience-date">2025 - now</span>
+          <span class="experience-date">Jan 2025 - now</span>
         </div>
         <ul class="experience-list">
           <li>Building Workday Extend apps for universities and healthcare clients</li>
-          <li>Data pipelines - lot of SQL, processing a few hundred GB weekly</li>
-          <li>Built some LLM automation that ended up saving a bunch of manual work</li>
-          <li>Got an app published on the Workday Marketplace</li>
+          <li>Workday Studio work for data transformation and integrations</li>
+          <li>Orchestrations for client</li>
+          <li>Internal automation work</li>
         </ul>
       </div>
 
@@ -66,13 +57,13 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
         <div class="experience-header">
           <div>
             <h3 class="experience-title">Intern</h3>
-            <p class="experience-company">Huron Consulting</p>
+            <p class="experience-company">Huron Consulting Group</p>
           </div>
           <span class="experience-date">Summer 2024</span>
         </div>
         <ul class="experience-list">
-          <li>Built a student scheduling app using backtracking algorithms</li>
-          <li>Two universities ended up buying it which was neat</li>
+          <li>Workday extend, contributed to student scheduling app</li>
+          <li>Worked on integrations for two universities</li>
         </ul>
       </div>
 
@@ -90,6 +81,21 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
         </ul>
       </div>
 
+      <div class="experience-card">
+        <div class="experience-header">
+          <div>
+            <h3 class="experience-title">Intern</h3>
+            <p class="experience-company">EY</p>
+          </div>
+          <span class="experience-date">Summer 2022</span>
+        </div>
+        <ul class="experience-list">
+          <li>Nonprofit consulting</li>
+          <li>Data pipeline and visualization work</li>
+        </ul>
+      </div>
+      
+
       <div class="resume-cta">
         <a href="/resume" class="resume-link">View Full Resume</a>
       </div>
@@ -99,7 +105,6 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
   <Section
     id="education"
     title="Education"
-    subtitle="the formal stuff"
   >
     <div class="education-grid">
       <div class="education-card featured">
@@ -112,10 +117,7 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
         </div>
         <div class="education-details">
           <ul>
-            <li>Collegium V Honors Program - interdisciplinary honors with smaller class sizes and research focus</li>
             <li>EY Scholarship recipient - merit-based scholarship from Ernst & Young</li>
-            <li>Relevant coursework: Database Systems, Data Structures, Systems Analysis, Network Security</li>
-            <li>Senior project: Built a real-time collaborative document editor (like Google Docs) using WebSockets and CRDTs</li>
           </ul>
         </div>
       </div>
@@ -123,17 +125,17 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
       <div class="education-card">
         <div class="education-header">
           <div>
-            <h3 class="education-degree">M.S. Data Science</h3>
-            <p class="education-school">University of Texas at Dallas</p>
+            <h3 class="education-degree">Micromasters in Statistics and Data Science</h3>
+            <p class="education-school">MIT</p>
           </div>
           <span class="education-date">In Progress</span>
         </div>
         <div class="education-details">
           <ul>
             <li>Part-time while working full-time at Huron</li>
-            <li>Focus area: Machine Learning Engineering</li>
+            <li>Focus area: General Track</li>
             <li>Goal: Transition from consulting to ML engineering roles</li>
-            <li>Currently taking: Statistical Machine Learning, Big Data Analytics</li>
+            <li>Currently taking: Proabbility - The Science of Uncertainty and Data, Fundamentals of Statistics</li>
           </ul>
         </div>
       </div>
@@ -143,7 +145,7 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
   <Section
     id="skills"
     title="Tech"
-    subtitle="things I use"
+    subtitle="technology leveraged"
   >
     <div class="skills-grid">
       <div class="skill-category">
@@ -260,12 +262,12 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
   <Section
     id="projects"
     title="Projects"
-    subtitle="stuff I've built"
+    subtitle="projects for things I am passionate in"
   >
     <div class="projects-grid">
       <Card
         title="NutriOne"
-        description="Full-stack nutrition tracking app with food recognition. PostgreSQL database with FastAPI backend handling user auth, meal logging, and macro calculations. React frontend with camera integration. Trained a custom YOLOv8 model on ~15k food images - runs inference on device and hits about 85% accuracy on common foods. The hardest part was getting consistent lighting in training data."
+        description="Full-stack nutrition tracking app with food recognition. PostgreSQL database with FastAPI backend handling user auth, meal logging, and macro calculations. React frontend with camera integration. Trained a custom YOLOv8 model on ~101k food images - runs inference on device and hits about 90% accuracy on common foods."
         tags={["FastAPI", "PostgreSQL", "React", "YOLOv8", "Python"]}
         delay={0}
       />
@@ -280,22 +282,22 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
       <Card
         title="Workday Time Tracker"
         description="Enterprise time tracking application published on the Workday Marketplace. Built with Workday Extend using their proprietary framework. Handles complex approval workflows, integrates with Workday's core HCM data, and supports multi-tenant deployment. Learned a lot about enterprise software patterns - audit logging, role-based access, data isolation between tenants."
-        tags={["Workday Extend", "Enterprise", "Full Stack"]}
+        tags={["Workday Extend", "Orchestrations", "WQL"]}
         href="https://marketplace.workday.com"
         delay={200}
       />
 
       <Card
         title="LLM Reports"
-        description="Automated report generation system at Huron. Power Automate flow pulls data from Smartsheet, runs it through ETL transformations, then uses Claude API with RAG to generate executive summaries. Managers used to spend hours writing these weekly - now it's automated. Includes human review step before distribution. Handles about 50 reports per week."
-        tags={["Claude API", "Power Automate", "RAG", "Smartsheet"]}
+        description="Automated report generation system at Huron. Power Automate flow pulls data from Smartsheet, runs it through ETL transformations, then uses Claude API generate executive summaries. Managers used to spend hours writing these weekly - now it's automated. Includes human review step before distribution. Handles about 50 reports per week."
+        tags={["Power Automate", "Smartsheet"]}
         delay={300}
       />
 
       <Card
         title="Scheduling App"
         description="University course scheduling system built during my Huron internship. Uses constraint satisfaction with backtracking to generate conflict-free schedules. Handles room capacity, professor availability, required gaps between classes, and prerequisite chains. Reduced manual scheduling time from weeks to hours. Two universities licensed it."
-        tags={["Algorithms", "Workday", "CSP", "Backtracking"]}
+        tags={["Workday Extend", "Workday Orchestrations", "WQL"]}
         delay={400}
       />
     </div>
@@ -304,7 +306,7 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
   <Section
     id="homelab"
     title="Home Lab"
-    subtitle="where I break things on purpose"
+    subtitle="home networking projects"
   >
     <div class="homelab-content">
       <div class="homelab-overview">
@@ -403,16 +405,6 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
         </div>
       </a>
     </div>
-
-    <div class="cta-section">
-      <p class="cta-text">Want to chat?</p>
-      <a href="mailto:Bryce@BryceKeeler.com" class="cta-button">
-        Email me
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M7 13L13 7M13 7H7M13 7V13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </a>
-    </div>
   </Section>
 
   <footer class="footer">
@@ -420,10 +412,6 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
       <p>Bryce Keeler · 2026</p>
       <div class="footer-links">
         <a href="/">3D version</a>
-        <span>·</span>
-        <a href="#about">About</a>
-        <span>·</span>
-        <a href="#projects">Projects</a>
       </div>
     </div>
   </footer>
