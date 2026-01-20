@@ -17,70 +17,93 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Get new blog posts
-        id: get-posts
-        run: |
-          # Get list of added markdown files in this commit
-          NEW_FILES=$(git diff --name-only --diff-filter=A HEAD~1 HEAD -- 'src/content/blog/*.md' 'src/content/blog/*.mdx' 2>/dev/null || echo "")
+      - name: Install jq
+        run: sudo apt-get install -y jq
 
-          if [ -z "$NEW_FILES" ]; then
-            echo "No new blog posts found"
-            echo "has_new_posts=false" >> $GITHUB_OUTPUT
+      - name: Get new blog posts and send to Buttondown
+        env:
+          BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
+        run: |
+          # Check if API key is set
+          if [ -z "$BUTTONDOWN_API_KEY" ]; then
+            echo "ERROR: BUTTONDOWN_API_KEY secret is not set!"
+            echo "Go to Settings > Secrets > Actions > New repository secret"
+            exit 1
+          fi
+
+          # Get list of added markdown files in this commit
+          git diff --name-only --diff-filter=A HEAD~1 HEAD -- 'src/content/blog/*.md' 'src/content/blog/*.mdx' > /tmp/new_files.txt 2>/dev/null || true
+
+          if [ ! -s /tmp/new_files.txt ]; then
+            echo "No new blog posts found in this commit"
             exit 0
           fi
 
           echo "Found new blog posts:"
-          echo "$NEW_FILES"
-          echo "has_new_posts=true" >> $GITHUB_OUTPUT
-          echo "files<<EOF" >> $GITHUB_OUTPUT
-          echo "$NEW_FILES" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          cat /tmp/new_files.txt
 
-      - name: Send to Buttondown
-        if: steps.get-posts.outputs.has_new_posts == 'true'
-        env:
-          BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
-        run: |
-          for file in ${{ steps.get-posts.outputs.files }}; do
+          # Process each file (handles spaces in filenames)
+          while IFS= read -r file; do
+            echo ""
+            echo "=========================================="
             echo "Processing: $file"
+            echo "=========================================="
 
-            # Extract frontmatter and content
+            if [ ! -f "$file" ]; then
+              echo "File not found, skipping: $file"
+              continue
+            fi
+
+            # Read file content
             CONTENT=$(cat "$file")
 
-            # Extract title from frontmatter
-            TITLE=$(echo "$CONTENT" | sed -n '/^---$/,/^---$/p' | grep '^title:' | sed 's/title: *["'\'']*\([^"'\'']*\)["'\'']*$/\1/')
+            # Extract title from frontmatter (handles quotes)
+            TITLE=$(echo "$CONTENT" | sed -n '/^---$/,/^---$/p' | grep -E '^title:' | head -1 | sed 's/^title:[[:space:]]*//; s/^["'"'"']//; s/["'"'"']$//')
 
-            # Extract description from frontmatter
-            DESCRIPTION=$(echo "$CONTENT" | sed -n '/^---$/,/^---$/p' | grep '^description:' | sed 's/description: *["'\'']*\([^"'\'']*\)["'\'']*$/\1/')
+            if [ -z "$TITLE" ]; then
+              echo "Could not extract title, skipping"
+              continue
+            fi
 
-            # Get the slug from filename
-            SLUG=$(basename "$file" .md | sed 's/.mdx$//')
+            # Get the slug from filename (remove path and extension)
+            SLUG=$(basename "$file" | sed 's/\.mdx\?$//')
 
-            # Extract body (everything after second ---)
-            BODY=$(echo "$CONTENT" | sed '1,/^---$/d' | sed '1,/^---$/d')
+            # Extract body (everything after the second ---)
+            BODY=$(echo "$CONTENT" | awk '/^---$/{n++; next} n>=2{print}')
 
-            # Add link to full post
-            FULL_BODY="$BODY
+            # Create the email body with link
+            FULL_BODY=$(cat <<EOF
+$BODY
 
 ---
 
-[Read the full post on my website](https://brycekeeler.com/blog/$SLUG)"
+[Read the full post on my website](https://brycekeeler.com/blog/$SLUG)
+EOF
+)
 
             echo "Title: $TITLE"
+            echo "Slug: $SLUG"
             echo "Sending to Buttondown..."
 
             # Create draft email via Buttondown API
-            curl -X POST "https://api.buttondown.com/v1/emails" \
+            RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "https://api.buttondown.email/v1/emails" \
               -H "Authorization: Token $BUTTONDOWN_API_KEY" \
               -H "Content-Type: application/json" \
-              -d @- <<PAYLOAD
-            {
-              "subject": "$TITLE",
-              "body": $(echo "$FULL_BODY" | jq -Rs .),
-              "status": "draft"
-            }
-          PAYLOAD
+              -d "$(jq -n --arg subject "$TITLE" --arg body "$FULL_BODY" '{subject: $subject, body: $body, status: "draft"}')")
 
-            echo ""
-            echo "Draft created for: $TITLE"
-          done
+            HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+            BODY_RESPONSE=$(echo "$RESPONSE" | sed '$d')
+
+            echo "Response code: $HTTP_CODE"
+
+            if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+              echo "Draft created successfully for: $TITLE"
+            else
+              echo "ERROR: Failed to create draft"
+              echo "Response: $BODY_RESPONSE"
+            fi
+
+          done < /tmp/new_files.txt
+
+          echo ""
+          echo "Newsletter processing complete!"
