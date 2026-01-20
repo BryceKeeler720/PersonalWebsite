@@ -24,14 +24,11 @@ jobs:
         env:
           BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
         run: |
-          # Check if API key is set
           if [ -z "$BUTTONDOWN_API_KEY" ]; then
             echo "ERROR: BUTTONDOWN_API_KEY secret is not set!"
-            echo "Go to Settings > Secrets > Actions > New repository secret"
             exit 1
           fi
 
-          # Get list of added markdown files in this commit
           git diff --name-only --diff-filter=A HEAD~1 HEAD -- 'src/content/blog/*.md' 'src/content/blog/*.mdx' > /tmp/new_files.txt 2>/dev/null || true
 
           if [ ! -s /tmp/new_files.txt ]; then
@@ -42,68 +39,44 @@ jobs:
           echo "Found new blog posts:"
           cat /tmp/new_files.txt
 
-          # Process each file (handles spaces in filenames)
           while IFS= read -r file; do
-            echo ""
-            echo "=========================================="
             echo "Processing: $file"
-            echo "=========================================="
 
             if [ ! -f "$file" ]; then
-              echo "File not found, skipping: $file"
+              echo "File not found, skipping"
               continue
             fi
 
-            # Read file content
-            CONTENT=$(cat "$file")
-
-            # Extract title from frontmatter (handles quotes)
-            TITLE=$(echo "$CONTENT" | sed -n '/^---$/,/^---$/p' | grep -E '^title:' | head -1 | sed 's/^title:[[:space:]]*//; s/^["'"'"']//; s/["'"'"']$//')
+            TITLE=$(sed -n '/^---$/,/^---$/p' "$file" | grep -E '^title:' | head -1 | sed "s/^title:[[:space:]]*//; s/^[\"']//; s/[\"']$//")
 
             if [ -z "$TITLE" ]; then
               echo "Could not extract title, skipping"
               continue
             fi
 
-            # Get the slug from filename (remove path and extension)
             SLUG=$(basename "$file" | sed 's/\.mdx\?$//')
-
-            # Extract body (everything after the second ---)
-            BODY=$(echo "$CONTENT" | awk '/^---$/{n++; next} n>=2{print}')
-
-            # Create the email body with link
-            FULL_BODY=$(cat <<EOF
-$BODY
-
----
-
-[Read the full post on my website](https://brycekeeler.com/blog/$SLUG)
-EOF
-)
+            BODY=$(awk '/^---$/{n++; next} n>=2{print}' "$file")
+            LINK="[Read the full post on my website](https://brycekeeler.com/blog/$SLUG)"
+            FULL_BODY=$(printf "%s\n\n---\n\n%s" "$BODY" "$LINK")
 
             echo "Title: $TITLE"
             echo "Slug: $SLUG"
             echo "Sending to Buttondown..."
 
-            # Create draft email via Buttondown API
             RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "https://api.buttondown.email/v1/emails" \
               -H "Authorization: Token $BUTTONDOWN_API_KEY" \
               -H "Content-Type: application/json" \
               -d "$(jq -n --arg subject "$TITLE" --arg body "$FULL_BODY" '{subject: $subject, body: $body, status: "draft"}')")
 
             HTTP_CODE=$(echo "$RESPONSE" | tail -1)
-            BODY_RESPONSE=$(echo "$RESPONSE" | sed '$d')
-
-            echo "Response code: $HTTP_CODE"
 
             if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
               echo "Draft created successfully for: $TITLE"
             else
-              echo "ERROR: Failed to create draft"
-              echo "Response: $BODY_RESPONSE"
+              echo "ERROR: Failed to create draft (HTTP $HTTP_CODE)"
+              echo "$RESPONSE" | sed '$d'
             fi
 
           done < /tmp/new_files.txt
 
-          echo ""
           echo "Newsletter processing complete!"
