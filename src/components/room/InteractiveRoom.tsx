@@ -56,6 +56,12 @@ const InteractiveRoom: React.FC = () => {
       subtitle: 'Personal and Work Projects at a high level',
       items: [
         {
+          title: 'Paper Trading Bot',
+          description: 'ML-powered S&P 500 trading bot. Combines momentum, mean reversion, sentiment, and technical analysis strategies with weighted signals. Auto-executes trades with $10k paper money.',
+          tags: ['React', 'TypeScript', 'ML', 'Yahoo Finance'],
+          link: '/TradingBot',
+        },
+        {
           title: 'NutriOne',
           description: 'Nutrition tracking app - PostgreSQL & FastAPI backend, React frontend. Trained a YOLOv8 model',
           tags: ['FastAPI', 'PostgreSQL', 'React', 'YOLOv8'],

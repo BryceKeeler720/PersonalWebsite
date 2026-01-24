@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import TradingBot from '../components/trading/TradingBot';
+---
+
+<BaseLayout
+  title="Paper Trading Bot | Bryce Keeler"
+  description="ML-powered paper trading bot analyzing S&P 500 stocks with momentum, mean reversion, sentiment, and technical analysis strategies."
+>
+  <TradingBot client:load />
+</BaseLayout>
+
+<style is:global>
+  body {
+    overflow-x: hidden;
+  }
+</style>

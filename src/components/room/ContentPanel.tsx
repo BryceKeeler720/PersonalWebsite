@@ -53,7 +53,12 @@ const ContentPanel: React.FC<ContentPanelProps> = ({ content, onClose, hotspotId
               style={{ animationDelay: `${index * 100}ms` }}
             >
               {item.link ? (
-                <a href={item.link} target="_blank" rel="noopener noreferrer" className="item-link">
+                <a
+                  href={item.link}
+                  target={item.link.startsWith('/') ? '_self' : '_blank'}
+                  rel={item.link.startsWith('/') ? undefined : 'noopener noreferrer'}
+                  className="item-link"
+                >
                   <div className="item-header">
                     <h3 className="item-title">{item.title}</h3>
                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">

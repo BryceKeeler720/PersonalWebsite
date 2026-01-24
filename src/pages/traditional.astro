@@ -266,17 +266,25 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
   >
     <div class="projects-grid">
       <Card
+        title="Paper Trading Bot"
+        description="ML-powered S&P 500 trading bot combining 4 data science strategies: momentum (SMA crossovers, RSI), mean reversion (Bollinger Bands, Z-score), technical (MACD, volume), and sentiment analysis. Weighted signal combination with auto-execution scheduler. Paper trading with $10k starting capital and full trade logging."
+        tags={["React", "TypeScript", "ML", "Data Science", "Yahoo Finance"]}
+        href="/TradingBot"
+        delay={0}
+      />
+
+      <Card
         title="NutriOne"
         description="Full-stack nutrition tracking app with food recognition. PostgreSQL database with FastAPI backend handling user auth, meal logging, and macro calculations. React frontend with camera integration. Trained a custom YOLOv8 model on ~101k food images - runs inference on device and hits about 90% accuracy on common foods."
         tags={["FastAPI", "PostgreSQL", "React", "YOLOv8", "Python"]}
-        delay={0}
+        delay={100}
       />
 
       <Card
         title="Plant Monitor"
         description="IoT system for monitoring houseplants. ESP32 microcontrollers with soil moisture, temperature, humidity, and light sensors streaming data via MQTT to a TimescaleDB instance. Built an LSTM model in PyTorch to predict watering needs based on historical patterns and environmental factors. Web dashboard shows real-time readings and predictions. Model retrains weekly on new data."
         tags={["ESP32", "PyTorch", "TimescaleDB", "MQTT", "LSTM"]}
-        delay={100}
+        delay={200}
       />
 
       <Card
@@ -284,21 +292,21 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
         description="Enterprise time tracking application published on the Workday Marketplace. Built with Workday Extend using their proprietary framework. Handles complex approval workflows, integrates with Workday's core HCM data, and supports multi-tenant deployment. Learned a lot about enterprise software patterns - audit logging, role-based access, data isolation between tenants."
         tags={["Workday Extend", "Orchestrations", "WQL"]}
         href="https://marketplace.workday.com"
-        delay={200}
+        delay={300}
       />
 
       <Card
         title="LLM Reports"
         description="Automated report generation system at Huron. Power Automate flow pulls data from Smartsheet, runs it through ETL transformations, then uses Claude API generate executive summaries. Managers used to spend hours writing these weekly - now it's automated. Includes human review step before distribution. Handles about 50 reports per week."
         tags={["Power Automate", "Smartsheet"]}
-        delay={300}
+        delay={400}
       />
 
       <Card
         title="Scheduling App"
         description="University course scheduling system built during my Huron internship. Uses constraint satisfaction with backtracking to generate conflict-free schedules. Handles room capacity, professor availability, required gaps between classes, and prerequisite chains. Reduced manual scheduling time from weeks to hours. Two universities licensed it."
         tags={["Workday Extend", "Workday Orchestrations", "WQL"]}
-        delay={400}
+        delay={500}
       />
     </div>
   </Section>
