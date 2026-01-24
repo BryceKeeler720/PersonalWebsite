@@ -14,7 +14,7 @@ jobs:
         run: |
           response=$(curl -s -w "\n%{http_code}" -X GET \
             -H "User-Agent: GitHub-Actions-Trading-Bot" \
-            https://brycedev.vercel.app/api/trading/cron)
+            https://brycekeeler.com/api/trading/cron)
 
           http_code=$(echo "$response" | tail -n1)
           body=$(echo "$response" | head -n-1)
