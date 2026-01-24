@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 interface PortfolioSnapshot {
   timestamp: string;
@@ -10,13 +10,47 @@ interface PerformanceChartProps {
   initialCapital: number;
 }
 
+type TimeRange = '1W' | '1M' | 'YTD' | '1Y' | '5Y' | 'All';
+
 export default function PerformanceChart({ history, initialCapital }: PerformanceChartProps) {
+  const [timeRange, setTimeRange] = useState<TimeRange>('All');
+
+  const filteredHistory = useMemo(() => {
+    if (history.length === 0) return [];
+
+    const now = new Date();
+    const cutoffDate = new Date();
+
+    switch (timeRange) {
+      case '1W':
+        cutoffDate.setDate(now.getDate() - 7);
+        break;
+      case '1M':
+        cutoffDate.setMonth(now.getMonth() - 1);
+        break;
+      case 'YTD':
+        cutoffDate.setMonth(0, 1); // January 1st of current year
+        cutoffDate.setHours(0, 0, 0, 0);
+        break;
+      case '1Y':
+        cutoffDate.setFullYear(now.getFullYear() - 1);
+        break;
+      case '5Y':
+        cutoffDate.setFullYear(now.getFullYear() - 5);
+        break;
+      case 'All':
+        return history;
+    }
+
+    return history.filter(h => new Date(h.timestamp) >= cutoffDate);
+  }, [history, timeRange]);
+
   const chartData = useMemo(() => {
-    if (history.length === 0) {
+    if (filteredHistory.length === 0) {
       return null;
     }
 
-    const values = history.map(h => h.totalValue);
+    const values = filteredHistory.map(h => h.totalValue);
     const minValue = Math.min(...values, initialCapital) * 0.995;
     const maxValue = Math.max(...values, initialCapital) * 1.005;
     const range = maxValue - minValue;
@@ -27,8 +61,8 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
     const chartWidth = width - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
 
-    const points = history.map((h, i) => {
-      const x = padding.left + (i / (history.length - 1 || 1)) * chartWidth;
+    const points = filteredHistory.map((h, i) => {
+      const x = padding.left + (i / (filteredHistory.length - 1 || 1)) * chartWidth;
       const y = padding.top + chartHeight - ((h.totalValue - minValue) / range) * chartHeight;
       return { x, y, value: h.totalValue, timestamp: h.timestamp };
     });
@@ -39,7 +73,7 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
 
     const initialY = padding.top + chartHeight - ((initialCapital - minValue) / range) * chartHeight;
 
-    const currentValue = history[history.length - 1]?.totalValue || initialCapital;
+    const currentValue = filteredHistory[filteredHistory.length - 1]?.totalValue || initialCapital;
     const isPositive = currentValue >= initialCapital;
 
     return {
@@ -55,9 +89,9 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
       chartWidth,
       chartHeight,
     };
-  }, [history, initialCapital]);
+  }, [filteredHistory, initialCapital]);
 
-  if (!chartData || history.length < 2) {
+  if (!chartData || filteredHistory.length < 2) {
     return (
       <div className="performance-chart empty">
         <div className="chart-placeholder">
@@ -75,6 +109,8 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
   const { pathD, areaD, initialY, isPositive, currentValue, padding, chartWidth } = chartData;
   const changePercent = ((currentValue - initialCapital) / initialCapital) * 100;
 
+  const timeRanges: TimeRange[] = ['1W', '1M', 'YTD', '1Y', '5Y', 'All'];
+
   return (
     <div className="performance-chart">
       <div className="chart-header">
@@ -82,6 +118,17 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
         <div className={`chart-change ${isPositive ? 'positive' : 'negative'}`}>
           {isPositive ? '+' : ''}{changePercent.toFixed(2)}%
         </div>
+      </div>
+      <div className="chart-time-range">
+        {timeRanges.map((range) => (
+          <button
+            key={range}
+            className={`time-range-btn ${timeRange === range ? 'active' : ''}`}
+            onClick={() => setTimeRange(range)}
+          >
+            {range}
+          </button>
+        ))}
       </div>
       <div className="chart-container">
         <svg viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -116,22 +163,14 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
             strokeLinejoin="round"
             vectorEffect="non-scaling-stroke"
           />
-
-          {/* Current value dot */}
-          <circle
-            cx={chartData.points[chartData.points.length - 1].x}
-            cy={chartData.points[chartData.points.length - 1].y}
-            r="2"
-            fill={isPositive ? '#22c55e' : '#ef4444'}
-          />
         </svg>
       </div>
       <div className="chart-labels">
         <span className="chart-label-start">
-          {new Date(history[0].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {new Date(filteredHistory[0].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </span>
         <span className="chart-label-end">
-          {new Date(history[history.length - 1].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {new Date(filteredHistory[filteredHistory.length - 1].timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </span>
       </div>
     </div>
