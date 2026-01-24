@@ -107,7 +107,7 @@ export default function TradingBot() {
         </div>
         <div className="bot-status">
           <span className="status-dot running" />
-          <span className="status-text">Always Running</span>
+          <span className="status-text">Running</span>
           {data.lastRun && (
             <span className="last-run">
               Last analysis: {new Date(data.lastRun).toLocaleString()}
