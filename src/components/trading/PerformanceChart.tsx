@@ -17,12 +17,12 @@ interface ChartPoint {
   y: number;
   value: number;
   timestamp: string;
+  index: number;
 }
 
 export default function PerformanceChart({ history, initialCapital }: PerformanceChartProps) {
   const [timeRange, setTimeRange] = useState<TimeRange>('All');
-  const [hoveredPoint, setHoveredPoint] = useState<ChartPoint | null>(null);
-  const [mousePosition, setMousePosition] = useState<{ x: number; y: number } | null>(null);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const chartRef = useRef<HTMLDivElement>(null);
 
   const filteredHistory = useMemo(() => {
@@ -57,22 +57,24 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
       return null;
     }
 
-    const values = filteredHistory.map(h => h.totalValue);
-    const minValue = Math.min(...values, initialCapital) * 0.998;
-    const maxValue = Math.max(...values, initialCapital) * 1.002;
-    const range = maxValue - minValue;
+    // Fixed scale: ±$200 from initial capital
+    const minValue = initialCapital - 200;
+    const maxValue = initialCapital + 200;
+    const range = maxValue - minValue; // 400
 
-    // SVG viewBox dimensions
-    const width = 400;
-    const height = 200;
-    const padding = { top: 20, right: 20, bottom: 30, left: 60 };
+    // SVG viewBox dimensions - wider aspect ratio
+    const width = 800;
+    const height = 300;
+    const padding = { top: 20, right: 40, bottom: 35, left: 70 };
     const chartWidth = width - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
 
     const points: ChartPoint[] = filteredHistory.map((h, i) => {
       const x = padding.left + (i / (filteredHistory.length - 1 || 1)) * chartWidth;
-      const y = padding.top + chartHeight - ((h.totalValue - minValue) / range) * chartHeight;
-      return { x, y, value: h.totalValue, timestamp: h.timestamp };
+      // Clamp value to the visible range for rendering
+      const clampedValue = Math.max(minValue, Math.min(maxValue, h.totalValue));
+      const y = padding.top + chartHeight - ((clampedValue - minValue) / range) * chartHeight;
+      return { x, y, value: h.totalValue, timestamp: h.timestamp, index: i };
     });
 
     const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
@@ -84,19 +86,18 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
     const currentValue = filteredHistory[filteredHistory.length - 1]?.totalValue || initialCapital;
     const isPositive = currentValue >= initialCapital;
 
-    // Generate Y-axis labels (5 labels)
+    // Generate Y-axis labels: $50 increments from -200 to +200
     const yLabels = [];
-    const yStep = range / 4;
-    for (let i = 0; i <= 4; i++) {
-      const value = minValue + (yStep * i);
-      const y = padding.top + chartHeight - ((value - minValue) / range) * chartHeight;
-      yLabels.push({ value, y });
+    for (let val = minValue; val <= maxValue; val += 50) {
+      const y = padding.top + chartHeight - ((val - minValue) / range) * chartHeight;
+      yLabels.push({ value: val, y });
     }
 
-    // Generate X-axis labels (show start, middle, end times)
+    // Generate X-axis labels (5 evenly spaced)
     const xLabels = [];
-    const indices = [0, Math.floor(filteredHistory.length / 2), filteredHistory.length - 1];
-    for (const idx of indices) {
+    const numXLabels = 5;
+    for (let i = 0; i < numXLabels; i++) {
+      const idx = Math.floor((i / (numXLabels - 1)) * (filteredHistory.length - 1));
       if (filteredHistory[idx]) {
         const x = padding.left + (idx / (filteredHistory.length - 1 || 1)) * chartWidth;
         xLabels.push({ timestamp: filteredHistory[idx].timestamp, x });
@@ -127,35 +128,28 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
 
     const rect = chartRef.current.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
 
-    // Convert mouse position to SVG coordinates
-    const svgX = (mouseX / rect.width) * chartData.width;
+    // Calculate which data point index we're closest to
+    const { padding, chartWidth, points } = chartData;
 
-    // Find the closest point
-    let closestPoint: ChartPoint | null = null;
-    let closestDistance = Infinity;
+    // Convert mouse X to percentage across the chart area
+    const chartStartX = (padding.left / chartData.width) * rect.width;
+    const chartEndX = ((padding.left + chartWidth) / chartData.width) * rect.width;
 
-    for (const point of chartData.points) {
-      const distance = Math.abs(point.x - svgX);
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestPoint = point;
-      }
+    if (mouseX < chartStartX || mouseX > chartEndX) {
+      setHoveredIndex(null);
+      return;
     }
 
-    if (closestPoint && closestDistance < 30) {
-      setHoveredPoint(closestPoint);
-      setMousePosition({ x: mouseX, y: mouseY });
-    } else {
-      setHoveredPoint(null);
-      setMousePosition(null);
-    }
+    const percentX = (mouseX - chartStartX) / (chartEndX - chartStartX);
+    const index = Math.round(percentX * (points.length - 1));
+    const clampedIndex = Math.max(0, Math.min(points.length - 1, index));
+
+    setHoveredIndex(clampedIndex);
   };
 
   const handleMouseLeave = () => {
-    setHoveredPoint(null);
-    setMousePosition(null);
+    setHoveredIndex(null);
   };
 
   const formatCurrency = (value: number) => {
@@ -215,8 +209,9 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
     );
   }
 
-  const { pathD, areaD, initialY, isPositive, currentValue, padding, chartWidth, chartHeight, width, height, yLabels, xLabels, points } = chartData;
+  const { pathD, areaD, isPositive, currentValue, padding, chartWidth, chartHeight, width, height, yLabels, xLabels, points } = chartData;
   const changePercent = ((currentValue - initialCapital) / initialCapital) * 100;
+  const hoveredPoint = hoveredIndex !== null ? points[hoveredIndex] : null;
 
   const timeRanges: TimeRange[] = ['1D', '1W', '1M', 'YTD', 'All'];
 
@@ -248,7 +243,7 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
-        <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="xMidYMid meet">
+        <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
           <defs>
             <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={isPositive ? '#22c55e' : '#ef4444'} stopOpacity="0.3" />
@@ -264,14 +259,15 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
                 y1={label.y}
                 x2={padding.left + chartWidth}
                 y2={label.y}
-                stroke="rgba(255, 255, 255, 0.1)"
+                stroke={label.value === initialCapital ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0.08)'}
                 strokeWidth="1"
+                strokeDasharray={label.value === initialCapital ? '4 4' : undefined}
               />
               <text
-                x={padding.left - 8}
+                x={padding.left - 10}
                 y={label.y}
                 fill="rgba(255, 255, 255, 0.5)"
-                fontSize="10"
+                fontSize="11"
                 textAnchor="end"
                 dominantBaseline="middle"
               >
@@ -285,34 +281,14 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
             <text
               key={i}
               x={label.x}
-              y={height - 8}
+              y={height - 10}
               fill="rgba(255, 255, 255, 0.5)"
-              fontSize="10"
+              fontSize="11"
               textAnchor="middle"
             >
               {formatTime(label.timestamp)}
             </text>
           ))}
-
-          {/* Initial capital reference line */}
-          <line
-            x1={padding.left}
-            y1={initialY}
-            x2={padding.left + chartWidth}
-            y2={initialY}
-            stroke="rgba(255, 255, 255, 0.3)"
-            strokeDasharray="4 4"
-            strokeWidth="1"
-          />
-          <text
-            x={padding.left + chartWidth + 4}
-            y={initialY}
-            fill="rgba(255, 255, 255, 0.4)"
-            fontSize="9"
-            dominantBaseline="middle"
-          >
-            Start
-          </text>
 
           {/* Area fill */}
           <path d={areaD} fill="url(#chartGradient)" />
@@ -322,7 +298,7 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
             d={pathD}
             fill="none"
             stroke={isPositive ? '#22c55e' : '#ef4444'}
-            strokeWidth="2"
+            strokeWidth="2.5"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -336,16 +312,25 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
                 y1={padding.top}
                 x2={hoveredPoint.x}
                 y2={padding.top + chartHeight}
-                stroke="rgba(255, 255, 255, 0.3)"
+                stroke="rgba(255, 255, 255, 0.4)"
                 strokeWidth="1"
-                strokeDasharray="4 2"
+              />
+              {/* Horizontal line to Y-axis */}
+              <line
+                x1={padding.left}
+                y1={hoveredPoint.y}
+                x2={hoveredPoint.x}
+                y2={hoveredPoint.y}
+                stroke="rgba(255, 255, 255, 0.2)"
+                strokeWidth="1"
+                strokeDasharray="4 4"
               />
               {/* Point circle */}
               <circle
                 cx={hoveredPoint.x}
                 cy={hoveredPoint.y}
                 r="6"
-                fill={isPositive ? '#22c55e' : '#ef4444'}
+                fill={hoveredPoint.value >= initialCapital ? '#22c55e' : '#ef4444'}
                 stroke="white"
                 strokeWidth="2"
               />
@@ -354,21 +339,20 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
         </svg>
 
         {/* Tooltip */}
-        {hoveredPoint && mousePosition && (
+        {hoveredPoint && chartRef.current && (
           <div
             className="chart-tooltip"
             style={{
-              left: mousePosition.x < (chartRef.current?.clientWidth || 0) / 2
-                ? mousePosition.x + 15
-                : mousePosition.x - 130,
-              top: mousePosition.y - 60,
+              left: `${(hoveredPoint.x / width) * 100}%`,
+              top: '10px',
+              transform: hoveredPoint.x > width / 2 ? 'translateX(-110%)' : 'translateX(10%)',
             }}
           >
             <div className="tooltip-value">{formatCurrencyPrecise(hoveredPoint.value)}</div>
             <div className="tooltip-time">{formatTooltipTime(hoveredPoint.timestamp)}</div>
             <div className={`tooltip-change ${hoveredPoint.value >= initialCapital ? 'positive' : 'negative'}`}>
               {hoveredPoint.value >= initialCapital ? '+' : ''}
-              {((hoveredPoint.value - initialCapital) / initialCapital * 100).toFixed(2)}%
+              {formatCurrencyPrecise(hoveredPoint.value - initialCapital)} ({((hoveredPoint.value - initialCapital) / initialCapital * 100).toFixed(2)}%)
             </div>
           </div>
         )}
