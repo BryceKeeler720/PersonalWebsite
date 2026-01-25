@@ -25,18 +25,19 @@ const BATCH_DELAY_MS = 500; // Delay between batches to avoid rate limiting
 
 async function fetchYahooQuote(symbol: string): Promise<{ price: number } | null> {
   try {
+    // Use the chart endpoint which is more reliable than the quote endpoint
     const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/quote?symbols=${symbol}`,
+      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`,
       {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible)',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         },
       }
     );
     const data = await response.json();
-    const result = data?.quoteResponse?.result?.[0];
-    if (result) {
-      return { price: result.regularMarketPrice };
+    const result = data?.chart?.result?.[0];
+    if (result?.meta?.regularMarketPrice) {
+      return { price: result.meta.regularMarketPrice };
     }
     return null;
   } catch (error) {
