@@ -104,9 +104,9 @@ export interface SchedulerState {
 // Default configuration
 export const DEFAULT_CONFIG: TradingConfig = {
   initialCapital: 10000,
-  maxPositionSize: 0.20, // 20% max per position
-  maxPositions: 10,
-  minTradeValue: 100,
+  maxPositionSize: 0.10, // 10% max per position
+  maxPositions: 40,
+  minTradeValue: 50, // Lower minimum to allow more positions
   strategyWeights: {
     momentum: 0.30,
     meanReversion: 0.25,

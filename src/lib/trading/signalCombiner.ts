@@ -76,10 +76,10 @@ export function combineSignals(
 export function getRecommendation(
   score: number
 ): 'STRONG_BUY' | 'BUY' | 'HOLD' | 'SELL' | 'STRONG_SELL' {
-  if (score > 0.6) return 'STRONG_BUY';
-  if (score > 0.25) return 'BUY';
-  if (score < -0.6) return 'STRONG_SELL';
-  if (score < -0.25) return 'SELL';
+  if (score > 0.5) return 'STRONG_BUY';
+  if (score > 0.15) return 'BUY';
+  if (score < -0.5) return 'STRONG_SELL';
+  if (score < -0.15) return 'SELL';
   return 'HOLD';
 }
 
