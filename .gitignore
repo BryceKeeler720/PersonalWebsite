@@ -1,6 +1,7 @@
 dist/
 .output/
 .astro/
+.vercel/
 node_modules/
 .env
 .DS_Store
