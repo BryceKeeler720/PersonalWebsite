@@ -103,12 +103,12 @@ export interface SchedulerState {
   lastRun: string | null;
 }
 
-// Default configuration
+// Default configuration - optimized for high-frequency trading
 export const DEFAULT_CONFIG: TradingConfig = {
   initialCapital: 10000,
-  maxPositionSize: 0.10, // 10% max per position
-  maxPositions: 40,
-  minTradeValue: 50, // Lower minimum to allow more positions
+  maxPositionSize: 0.05, // 5% max per position for more diversification
+  maxPositions: 50, // Allow more simultaneous positions
+  minTradeValue: 25, // Lower minimum for more frequent smaller trades
   strategyWeights: {
     momentum: 0.30,
     meanReversion: 0.25,

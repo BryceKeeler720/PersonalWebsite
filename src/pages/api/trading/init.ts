@@ -250,8 +250,9 @@ export const GET: APIRoute = async ({ request }) => {
         continue;
       }
 
-      const shares = Math.floor(targetSize / quote.price);
-      if (shares <= 0) {
+      // Use fractional shares - round to 4 decimal places for precision
+      const shares = Math.round((targetSize / quote.price) * 10000) / 10000;
+      if (shares < 0.0001) {
         console.log(`Skipping ${signal.symbol} - cannot afford any shares at $${quote.price}`);
         continue;
       }

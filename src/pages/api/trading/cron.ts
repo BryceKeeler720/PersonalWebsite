@@ -231,13 +231,13 @@ export const GET: APIRoute = async ({ request }) => {
         sellPercent = 1.0;
         sellReason = `STRONG_SELL signal: score ${signal.combined.toFixed(2)}`;
       }
-      // Priority 2: Stop loss at -5% - sell all to limit losses
-      else if (holding.gainLossPercent <= -5) {
+      // Priority 2: Stop loss at -3% - sell all to limit losses (tighter)
+      else if (holding.gainLossPercent <= -3) {
         sellPercent = 1.0;
         sellReason = `Stop loss triggered at ${holding.gainLossPercent.toFixed(1)}%`;
       }
-      // Priority 3: Take profit at +8% - sell half to lock in gains
-      else if (holding.gainLossPercent >= 8) {
+      // Priority 3: Take profit at +4% - sell half to lock in gains (more frequent)
+      else if (holding.gainLossPercent >= 4) {
         sellPercent = 0.5;
         sellReason = `Taking profits at ${holding.gainLossPercent.toFixed(1)}%`;
       }
@@ -246,9 +246,15 @@ export const GET: APIRoute = async ({ request }) => {
         sellPercent = 0.5;
         sellReason = `SELL signal: score ${signal.combined.toFixed(2)}`;
       }
+      // Priority 5: Position rotation - sell 25% of positions with negative combined score
+      else if (signal && signal.combined < 0) {
+        sellPercent = 0.25;
+        sellReason = `Position rotation: negative score ${signal.combined.toFixed(2)}`;
+      }
 
       if (sellPercent > 0) {
-        const sharesToSell = Math.max(1, Math.floor(holding.shares * sellPercent));
+        // Support fractional shares - round to 4 decimal places
+        const sharesToSell = Math.round(holding.shares * sellPercent * 10000) / 10000 || holding.shares;
 
         // Create a placeholder signal for non-signal-based sells
         const tradeSignal: SignalSnapshot = signal || {
@@ -293,11 +299,12 @@ export const GET: APIRoute = async ({ request }) => {
       }
     }
 
-    // Check for buy signals - consider more candidates for higher frequency
+    // Check for buy signals - consider many candidates for high-frequency trading
+    // Include any stock with positive combined score (not just BUY/STRONG_BUY)
     const buyCandidates = Object.values(allSignals)
-      .filter(s => s.recommendation === 'BUY' || s.recommendation === 'STRONG_BUY')
+      .filter(s => s.combined > 0.02) // Very low threshold - any slightly positive signal
       .sort((a, b) => b.combined - a.combined)
-      .slice(0, 10); // Increased from 3 to 10 for more activity
+      .slice(0, 20); // Consider up to 20 candidates per run
 
     for (const signal of buyCandidates) {
       // Skip if already holding
@@ -318,8 +325,9 @@ export const GET: APIRoute = async ({ request }) => {
 
       const quote = await fetchYahooQuote(signal.symbol);
       if (quote) {
-        const shares = Math.floor(positionSize / quote.price);
-        if (shares > 0) {
+        // Use fractional shares - round to 4 decimal places for precision
+        const shares = Math.round((positionSize / quote.price) * 10000) / 10000;
+        if (shares >= 0.0001) {
           const total = shares * quote.price;
 
           const trade: Trade = {
