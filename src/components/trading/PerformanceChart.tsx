@@ -57,23 +57,36 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
       return null;
     }
 
-    // Fixed scale: ±$200 from initial capital
-    const minValue = initialCapital - 200;
-    const maxValue = initialCapital + 200;
-    const range = maxValue - minValue; // 400
+    // Dynamic scale based on actual data
+    const values = filteredHistory.map(h => h.totalValue);
+    const dataMin = Math.min(...values);
+    const dataMax = Math.max(...values);
+    const dataRange = dataMax - dataMin;
 
-    // SVG viewBox dimensions - wider aspect ratio
+    // Calculate appropriate tick increment based on range
+    let tickIncrement: number;
+    if (dataRange < 50) tickIncrement = 10;
+    else if (dataRange < 200) tickIncrement = 50;
+    else if (dataRange < 1000) tickIncrement = 100;
+    else if (dataRange < 5000) tickIncrement = 500;
+    else tickIncrement = 1000;
+
+    // Add padding and round to nice tick values
+    const padding_amount = Math.max(tickIncrement, dataRange * 0.1);
+    const minValue = Math.floor((dataMin - padding_amount) / tickIncrement) * tickIncrement;
+    const maxValue = Math.ceil((dataMax + padding_amount) / tickIncrement) * tickIncrement;
+    const range = maxValue - minValue;
+
+    // SVG viewBox dimensions - compact
     const width = 800;
-    const height = 300;
-    const padding = { top: 20, right: 40, bottom: 35, left: 70 };
+    const height = 200;
+    const padding = { top: 15, right: 35, bottom: 25, left: 55 };
     const chartWidth = width - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
 
     const points: ChartPoint[] = filteredHistory.map((h, i) => {
       const x = padding.left + (i / (filteredHistory.length - 1 || 1)) * chartWidth;
-      // Clamp value to the visible range for rendering
-      const clampedValue = Math.max(minValue, Math.min(maxValue, h.totalValue));
-      const y = padding.top + chartHeight - ((clampedValue - minValue) / range) * chartHeight;
+      const y = padding.top + chartHeight - ((h.totalValue - minValue) / range) * chartHeight;
       return { x, y, value: h.totalValue, timestamp: h.timestamp, index: i };
     });
 
@@ -86,9 +99,9 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
     const currentValue = filteredHistory[filteredHistory.length - 1]?.totalValue || initialCapital;
     const isPositive = currentValue >= initialCapital;
 
-    // Generate Y-axis labels: $50 increments from -200 to +200
+    // Generate Y-axis labels with dynamic tick increment
     const yLabels = [];
-    for (let val = minValue; val <= maxValue; val += 50) {
+    for (let val = minValue; val <= maxValue; val += tickIncrement) {
       const y = padding.top + chartHeight - ((val - minValue) / range) * chartHeight;
       yLabels.push({ value: val, y });
     }
@@ -264,10 +277,10 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
                 strokeDasharray={label.value === initialCapital ? '4 4' : undefined}
               />
               <text
-                x={padding.left - 10}
+                x={padding.left - 8}
                 y={label.y}
                 fill="rgba(255, 255, 255, 0.5)"
-                fontSize="11"
+                fontSize="9"
                 textAnchor="end"
                 dominantBaseline="middle"
               >
@@ -281,9 +294,9 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
             <text
               key={i}
               x={label.x}
-              y={height - 10}
+              y={height - 6}
               fill="rgba(255, 255, 255, 0.5)"
-              fontSize="11"
+              fontSize="9"
               textAnchor="middle"
             >
               {formatTime(label.timestamp)}
@@ -298,7 +311,7 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
             d={pathD}
             fill="none"
             stroke={isPositive ? '#22c55e' : '#ef4444'}
-            strokeWidth="2.5"
+            strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
           />
@@ -329,10 +342,10 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
               <circle
                 cx={hoveredPoint.x}
                 cy={hoveredPoint.y}
-                r="6"
+                r="4"
                 fill={hoveredPoint.value >= initialCapital ? '#22c55e' : '#ef4444'}
                 stroke="white"
-                strokeWidth="2"
+                strokeWidth="1.5"
               />
             </>
           )}

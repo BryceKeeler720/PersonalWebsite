@@ -749,7 +749,7 @@
 .chart-container {
   position: relative;
   width: 100%;
-  aspect-ratio: 800 / 300;
+  aspect-ratio: 800 / 200;
   cursor: crosshair;
 }
 
