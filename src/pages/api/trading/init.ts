@@ -297,6 +297,11 @@ export const GET: APIRoute = async ({ request }) => {
         })),
         signalsAnalyzed: Object.keys(allSignals).length,
         buySignalsFound: buySignals.length,
+        topBuySignals: buySignals.slice(0, 15).map(s => ({
+          symbol: s.symbol,
+          score: s.combined,
+          recommendation: s.recommendation,
+        })),
         timestamp: new Date().toISOString(),
       }),
       {
