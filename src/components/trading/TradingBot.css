@@ -76,6 +76,42 @@
   border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Rebalance Button */
+.rebalance-btn {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.8), rgba(139, 92, 246, 0.8));
+  border: none;
+  border-radius: 6px;
+  color: #ffffff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.rebalance-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 1), rgba(139, 92, 246, 1));
+  transform: translateY(-1px);
+}
+
+.rebalance-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.rebalance-btn.loading {
+  animation: pulse 1s infinite;
+}
+
+.rebalance-result {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.25rem 0.5rem;
+  background: rgba(34, 197, 94, 0.2);
+  border-radius: 4px;
+}
+
 /* Main Grid Layout */
 .trading-grid {
   display: grid;
