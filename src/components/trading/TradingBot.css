@@ -193,6 +193,25 @@
 .holdings-list {
   max-height: 300px;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.holdings-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.holdings-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.holdings-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.holdings-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .holding-item {
@@ -244,6 +263,25 @@
 .trade-log {
   max-height: 500px;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.trade-log::-webkit-scrollbar {
+  width: 6px;
+}
+
+.trade-log::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.trade-log::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.trade-log::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .trade-item {
@@ -369,17 +407,26 @@
   overflow-y: auto;
 }
 
+.stock-dropdown-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
 .stock-dropdown-list::-webkit-scrollbar {
   width: 6px;
 }
 
 .stock-dropdown-list::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  background: transparent;
 }
 
 .stock-dropdown-list::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 3px;
+}
+
+.stock-dropdown-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .stock-dropdown-item {
