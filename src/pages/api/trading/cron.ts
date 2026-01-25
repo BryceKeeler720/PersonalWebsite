@@ -211,54 +211,93 @@ export const GET: APIRoute = async ({ request }) => {
       }
     }
 
-    // Check for sell signals on holdings
+    // Check for sell signals on holdings (signal-based + profit-taking + stop-loss)
     for (const holding of portfolio.holdings) {
       const signal = allSignals[holding.symbol];
-      if (signal && (signal.recommendation === 'SELL' || signal.recommendation === 'STRONG_SELL')) {
-        const quote = await fetchYahooQuote(holding.symbol);
-        if (quote) {
-          // Determine sell percentage based on signal strength
-          // STRONG_SELL: sell 100%, SELL: sell 50%
-          const sellPercent = signal.recommendation === 'STRONG_SELL' ? 1.0 : 0.5;
-          const sharesToSell = Math.max(1, Math.floor(holding.shares * sellPercent));
+      const quote = await fetchYahooQuote(holding.symbol);
+      if (!quote) continue;
 
-          const trade: Trade = {
-            id: crypto.randomUUID(),
-            timestamp: new Date().toISOString(),
-            symbol: holding.symbol,
-            action: 'SELL',
-            shares: sharesToSell,
-            price: quote.price,
-            total: sharesToSell * quote.price,
-            reason: `${signal.recommendation}: Combined score ${signal.combined.toFixed(2)} (selling ${Math.round(sellPercent * 100)}%)`,
-            signals: signal,
-          };
+      // Update holding with latest price
+      holding.currentPrice = quote.price;
+      holding.marketValue = holding.shares * quote.price;
+      holding.gainLoss = (quote.price - holding.avgCost) * holding.shares;
+      holding.gainLossPercent = ((quote.price - holding.avgCost) / holding.avgCost) * 100;
 
-          portfolio.cash += trade.total;
+      let sellPercent = 0;
+      let sellReason = '';
 
-          // Update or remove holding
-          if (sharesToSell >= holding.shares) {
-            // Sold all shares, remove holding
-            portfolio.holdings = portfolio.holdings.filter(h => h.symbol !== holding.symbol);
-          } else {
-            // Partial sell, update holding
-            holding.shares -= sharesToSell;
-            holding.marketValue = holding.shares * quote.price;
-            holding.gainLoss = (quote.price - holding.avgCost) * holding.shares;
-            holding.gainLossPercent = ((quote.price - holding.avgCost) / holding.avgCost) * 100;
-          }
+      // Priority 1: Strong sell signal - sell all
+      if (signal && signal.recommendation === 'STRONG_SELL') {
+        sellPercent = 1.0;
+        sellReason = `STRONG_SELL signal: score ${signal.combined.toFixed(2)}`;
+      }
+      // Priority 2: Stop loss at -5% - sell all to limit losses
+      else if (holding.gainLossPercent <= -5) {
+        sellPercent = 1.0;
+        sellReason = `Stop loss triggered at ${holding.gainLossPercent.toFixed(1)}%`;
+      }
+      // Priority 3: Take profit at +8% - sell half to lock in gains
+      else if (holding.gainLossPercent >= 8) {
+        sellPercent = 0.5;
+        sellReason = `Taking profits at ${holding.gainLossPercent.toFixed(1)}%`;
+      }
+      // Priority 4: Regular sell signal - sell half
+      else if (signal && signal.recommendation === 'SELL') {
+        sellPercent = 0.5;
+        sellReason = `SELL signal: score ${signal.combined.toFixed(2)}`;
+      }
 
-          await addTrade(trade);
-          console.log(`Sold ${trade.shares} shares of ${trade.symbol} at $${trade.price} (${Math.round(sellPercent * 100)}% of position)`);
+      if (sellPercent > 0) {
+        const sharesToSell = Math.max(1, Math.floor(holding.shares * sellPercent));
+
+        // Create a placeholder signal for non-signal-based sells
+        const tradeSignal: SignalSnapshot = signal || {
+          symbol: holding.symbol,
+          timestamp: new Date().toISOString(),
+          momentum: { name: 'momentum', score: 0, confidence: 0, reason: 'N/A' },
+          meanReversion: { name: 'meanReversion', score: 0, confidence: 0, reason: 'N/A' },
+          sentiment: { name: 'sentiment', score: 0, confidence: 0, reason: 'N/A' },
+          technical: { name: 'technical', score: 0, confidence: 0, reason: 'N/A' },
+          combined: 0,
+          recommendation: 'HOLD',
+        };
+
+        const trade: Trade = {
+          id: crypto.randomUUID(),
+          timestamp: new Date().toISOString(),
+          symbol: holding.symbol,
+          action: 'SELL',
+          shares: sharesToSell,
+          price: quote.price,
+          total: sharesToSell * quote.price,
+          reason: sellReason,
+          signals: tradeSignal,
+        };
+
+        portfolio.cash += trade.total;
+
+        // Update or remove holding
+        if (sharesToSell >= holding.shares) {
+          // Sold all shares, remove holding
+          portfolio.holdings = portfolio.holdings.filter(h => h.symbol !== holding.symbol);
+        } else {
+          // Partial sell, update holding
+          holding.shares -= sharesToSell;
+          holding.marketValue = holding.shares * quote.price;
+          holding.gainLoss = (quote.price - holding.avgCost) * holding.shares;
+          holding.gainLossPercent = ((quote.price - holding.avgCost) / holding.avgCost) * 100;
         }
+
+        await addTrade(trade);
+        console.log(`Sold ${trade.shares} shares of ${trade.symbol} at $${trade.price}: ${sellReason}`);
       }
     }
 
-    // Check for buy signals
+    // Check for buy signals - consider more candidates for higher frequency
     const buyCandidates = Object.values(allSignals)
       .filter(s => s.recommendation === 'BUY' || s.recommendation === 'STRONG_BUY')
       .sort((a, b) => b.combined - a.combined)
-      .slice(0, 3);
+      .slice(0, 10); // Increased from 3 to 10 for more activity
 
     for (const signal of buyCandidates) {
       // Skip if already holding
