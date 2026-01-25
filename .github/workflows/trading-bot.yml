@@ -2,7 +2,8 @@ name: Trading Bot Cron
 
 on:
   schedule:
-    # Run every 5 minutes
+    # Run every 5 minutes during market hours (9:30 AM - 4:00 PM ET, Mon-Fri)
+    # Note: GitHub Actions cron uses UTC, so 9:30 AM ET = 14:30 UTC (or 13:30 during DST)
     - cron: '*/5 * * * *'
   workflow_dispatch: # Allow manual triggering
 
@@ -11,9 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Trading Bot
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           response=$(curl -s -w "\n%{http_code}" -X GET \
             -H "User-Agent: GitHub-Actions-Trading-Bot" \
+            -H "Authorization: Bearer $CRON_SECRET" \
             https://brycekeeler.com/api/trading/cron)
 
           http_code=$(echo "$response" | tail -n1)

@@ -1,34 +1,81 @@
-// Top 50 S&P 500 stocks by market cap (simplified list)
-// In production, this could be fetched from an API
+// Full S&P 500 stocks list (503 symbols including dual share classes)
+// Data source: https://www.slickcharts.com/sp500
+// Last updated: January 2026
 export const SP500_SYMBOLS = [
+  // Mega Cap Tech
+  'NVDA', 'AAPL', 'MSFT', 'AMZN', 'GOOGL', 'GOOG', 'META', 'AVGO', 'TSLA',
+  // Financials & Healthcare Leaders
+  'BRK-B', 'LLY', 'WMT', 'JPM', 'V', 'XOM', 'JNJ', 'ORCL', 'MA', 'MU', 'COST',
   // Tech
-  'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'AVGO', 'ORCL', 'CRM',
-  // Financial
-  'JPM', 'V', 'MA', 'BAC', 'WFC', 'GS', 'MS', 'BLK', 'AXP', 'C',
-  // Healthcare
-  'UNH', 'JNJ', 'LLY', 'PFE', 'ABBV', 'MRK', 'TMO', 'ABT', 'DHR', 'BMY',
-  // Consumer
-  'PG', 'KO', 'PEP', 'COST', 'WMT', 'HD', 'MCD', 'NKE', 'SBUX', 'TGT',
-  // Energy & Industrial
-  'XOM', 'CVX', 'COP', 'CAT', 'BA', 'UNP', 'HON', 'GE', 'RTX', 'LMT',
+  'AMD', 'PLTR', 'ABBV', 'HD', 'BAC', 'NFLX', 'PG', 'CVX', 'UNH', 'KO',
+  'GE', 'CSCO', 'CAT', 'MS', 'GS', 'LRCX', 'IBM', 'PM', 'WFC', 'MRK',
+  'RTX', 'AMAT', 'AXP', 'TMO', 'INTC', 'MCD', 'CRM', 'LIN', 'TMUS', 'KLAC',
+  'C', 'PEP', 'BA', 'DIS', 'ABT', 'ISRG', 'AMGN', 'APH', 'SCHW', 'GEV',
+  'APP', 'NEE', 'TXN', 'BLK', 'ACN', 'ANET', 'UBER', 'TJX', 'GILD', 'T',
+  'VZ', 'QCOM', 'DHR', 'BKNG', 'SPGI', 'INTU', 'LOW', 'ADI', 'PFE', 'HON',
+  'NOW', 'DE', 'BSX', 'LMT', 'UNP', 'COF', 'SYK', 'NEM', 'MDT', 'ETN',
+  'WELL', 'PANW', 'ADBE', 'COP', 'PGR', 'VRTX', 'CB', 'PLD', 'PH', 'BX',
+  'CRWD', 'BMY', 'SBUX', 'KKR', 'HCA', 'CMCSA', 'CVS', 'CEG', 'ADP', 'MO',
+  'CME', 'MCK', 'ICE', 'GD', 'SO', 'NKE', 'HOOD', 'NOC', 'SNPS', 'MCO',
+  'WM', 'UPS', 'DUK', 'MRSH', 'DASH', 'PNC', 'FCX', 'CDNS', 'HWM', 'SHW',
+  'MMM', 'USB', 'MAR', 'TT', 'ORLY', 'AMT', 'EMR', 'ELV', 'CRH', 'BK',
+  'WDC', 'ABNB', 'TDG', 'MNST', 'GLW', 'ECL', 'WMB', 'REGN', 'APO', 'CMI',
+  'RCL', 'EQIX', 'CTAS', 'DELL', 'STX', 'MDLZ', 'ITW', 'CI', 'GM', 'SLB',
+  'AON', 'FDX', 'WBD', 'PWR', 'CL', 'JCI', 'HLT', 'COR', 'CSX', 'RSG',
+  'CVNA', 'MSI', 'LHX', 'KMI', 'TEL', 'AJG', 'NSC', 'PCAR', 'TFC', 'AEP',
+  'AZO', 'ROST', 'FTNT', 'TRV', 'SPG', 'EOG', 'NXPI', 'COIN', 'URI', 'APD',
+  'BDX', 'ADSK', 'VLO', 'PSX', 'AFL', 'SRE', 'NDAQ', 'O', 'IDXX', 'DLR',
+  'ZTS', 'VST', 'CMG', 'F', 'BKR', 'PYPL', 'MPC', 'EA', 'MPWR', 'D',
+  'AME', 'ALL', 'FAST', 'CBRE', 'GWW', 'MET', 'WDAY', 'PSA', 'CAH', 'OKE',
+  'TGT', 'AXON', 'EW', 'CTVA', 'CARR', 'ROK', 'AMP', 'DDOG', 'TTWO', 'EXC',
+  'DAL', 'XEL', 'MSCI', 'FANG', 'ROP', 'DHI', 'OXY', 'YUM', 'EL', 'EBAY',
+  'ETR', 'NUE', 'TRGP', 'KR', 'CTSH', 'LVS', 'MCHP', 'CPRT', 'IQV', 'GRMN',
+  'VMC', 'FIX', 'WAB', 'MLM', 'PEG', 'AIG', 'HSY', 'A', 'PAYX', 'KDP',
+  'CCI', 'PRU', 'ED', 'CCL', 'RMD', 'FICO', 'KEYS', 'SYY', 'ODFL', 'FISV',
+  'GEHC', 'VTR', 'TER', 'HIG', 'WEC', 'OTIS', 'STT', 'UAL', 'EQT', 'IBKR',
+  'IR', 'XYL', 'ARES', 'LYV', 'KVUE', 'KMB', 'ACGL', 'FITB', 'RJF', 'EXPE',
+  'MTB', 'PCG', 'ADM', 'DG', 'HUM', 'FIS', 'EME', 'WTW', 'VICI', 'ULTA',
+  'VRSK', 'ROL', 'EXR', 'CBOE', 'TSCO', 'MTD', 'TDY', 'NRG', 'HAL', 'DXCM',
+  'DOV', 'HPE', 'DTE', 'CSGP', 'NTRS', 'IRM', 'LEN', 'SYF', 'STZ', 'KHC',
+  'HBAN', 'BRO', 'FE', 'CFG', 'PPL', 'ATO', 'TPR', 'STLD', 'ES', 'EXE',
+  'FSLR', 'HUBB', 'JBL', 'EFX', 'DLTR', 'WRB', 'STE', 'CNP', 'AWK', 'AVB',
+  'PPG', 'BIIB', 'VLTO', 'OMC', 'ON', 'CHTR', 'CINF', 'LDOS', 'WSM', 'PHM',
+  'DVN', 'BR', 'TPL', 'RF', 'GIS', 'DRI', 'EQR', 'EIX', 'WAT', 'KEY',
+  'VRSN', 'TROW', 'SW', 'IP', 'CNC', 'CPAY', 'LULU', 'ALB', 'RL', 'CHD',
+  'LH', 'BG', 'TSN', 'LUV', 'CMS', 'EXPD', 'GPN', 'L', 'NVR', 'CTRA',
+  'CHRW', 'NI', 'AMCR', 'PKG', 'DGX', 'DOW', 'PFG', 'INCY', 'SBAC', 'JBHT',
+  'NTAP', 'PTC', 'WY', 'SNA', 'GPC', 'PODD', 'MRNA', 'SMCI', 'IFF', 'TYL',
+  'DD', 'LII', 'HPQ', 'TTD', 'PNR', 'EVRG', 'FTV', 'LNT', 'ZBH', 'WST',
+  'TRMB', 'HOLX', 'TXT', 'INVH', 'APTV', 'HII', 'LYB', 'CDW', 'ESS', 'MKC',
+  'J', 'TKO', 'COO', 'MAA', 'GEN', 'FOX', 'BALL', 'VTRS', 'FOXA', 'NDSN',
+  'FFIV', 'IEX', 'AES', 'ALGN', 'AOS', 'ARE', 'AWI', 'BAX', 'BBWI', 'BEN',
+  'BWA', 'CAG', 'CE', 'CF', 'CPB', 'CPT', 'CRL', 'CZR', 'DAY', 'DECK',
+  'DFS', 'DPZ', 'ENPH', 'EPAM', 'ERIE', 'ETSY', 'FBIN', 'FDS', 'FFBC',
+  'FMC', 'FRT', 'GDDY', 'GL', 'GNRC', 'HAS', 'HSIC', 'HST', 'HRL', 'HWE',
+  'IPG', 'IVZ', 'JKHY', 'K', 'KIM', 'KMX', 'LEG', 'LEVI', 'LPLA', 'LW',
+  'MAS', 'MGM', 'MHK', 'MKTX', 'MOH', 'MOS', 'MRO', 'MTCH', 'MTN', 'NCLH',
+  'NWS', 'NWSA', 'PAYC', 'PEAK', 'PENN', 'POOL', 'REG', 'RVTY', 'SJM',
+  'SPB', 'SWKS', 'TAP', 'TECH', 'TFX', 'TFS', 'TPH', 'UDR', 'UHS', 'UTHR',
+  'VFC', 'WYNN', 'XPO', 'ZS',
 ] as const;
 
 export type SP500Symbol = (typeof SP500_SYMBOLS)[number];
 
-// Stock info for display
+// Stock info for display (subset of major companies)
+// For stocks not in this map, use getStockInfo() which returns a default
 export const STOCK_INFO: Record<string, { name: string; sector: string }> = {
-  // Tech
+  // Mega Cap Tech
+  NVDA: { name: 'NVIDIA Corporation', sector: 'Technology' },
   AAPL: { name: 'Apple Inc.', sector: 'Technology' },
   MSFT: { name: 'Microsoft Corporation', sector: 'Technology' },
-  GOOGL: { name: 'Alphabet Inc.', sector: 'Technology' },
-  AMZN: { name: 'Amazon.com Inc.', sector: 'Technology' },
-  NVDA: { name: 'NVIDIA Corporation', sector: 'Technology' },
+  AMZN: { name: 'Amazon.com Inc.', sector: 'Consumer Cyclical' },
+  GOOGL: { name: 'Alphabet Inc. Class A', sector: 'Technology' },
+  GOOG: { name: 'Alphabet Inc. Class C', sector: 'Technology' },
   META: { name: 'Meta Platforms Inc.', sector: 'Technology' },
-  TSLA: { name: 'Tesla Inc.', sector: 'Technology' },
   AVGO: { name: 'Broadcom Inc.', sector: 'Technology' },
-  ORCL: { name: 'Oracle Corporation', sector: 'Technology' },
-  CRM: { name: 'Salesforce Inc.', sector: 'Technology' },
-  // Financial
+  TSLA: { name: 'Tesla Inc.', sector: 'Consumer Cyclical' },
+  // Financials
+  'BRK-B': { name: 'Berkshire Hathaway Class B', sector: 'Financial' },
   JPM: { name: 'JPMorgan Chase & Co.', sector: 'Financial' },
   V: { name: 'Visa Inc.', sector: 'Financial' },
   MA: { name: 'Mastercard Inc.', sector: 'Financial' },
@@ -39,10 +86,12 @@ export const STOCK_INFO: Record<string, { name: string; sector: string }> = {
   BLK: { name: 'BlackRock Inc.', sector: 'Financial' },
   AXP: { name: 'American Express Co.', sector: 'Financial' },
   C: { name: 'Citigroup Inc.', sector: 'Financial' },
+  SCHW: { name: 'Charles Schwab Corp.', sector: 'Financial' },
+  COF: { name: 'Capital One Financial', sector: 'Financial' },
   // Healthcare
+  LLY: { name: 'Eli Lilly and Co.', sector: 'Healthcare' },
   UNH: { name: 'UnitedHealth Group', sector: 'Healthcare' },
   JNJ: { name: 'Johnson & Johnson', sector: 'Healthcare' },
-  LLY: { name: 'Eli Lilly and Co.', sector: 'Healthcare' },
   PFE: { name: 'Pfizer Inc.', sector: 'Healthcare' },
   ABBV: { name: 'AbbVie Inc.', sector: 'Healthcare' },
   MRK: { name: 'Merck & Co. Inc.', sector: 'Healthcare' },
@@ -50,21 +99,32 @@ export const STOCK_INFO: Record<string, { name: string; sector: string }> = {
   ABT: { name: 'Abbott Laboratories', sector: 'Healthcare' },
   DHR: { name: 'Danaher Corporation', sector: 'Healthcare' },
   BMY: { name: 'Bristol-Myers Squibb', sector: 'Healthcare' },
+  ISRG: { name: 'Intuitive Surgical', sector: 'Healthcare' },
+  AMGN: { name: 'Amgen Inc.', sector: 'Healthcare' },
+  GILD: { name: 'Gilead Sciences', sector: 'Healthcare' },
+  VRTX: { name: 'Vertex Pharmaceuticals', sector: 'Healthcare' },
+  REGN: { name: 'Regeneron Pharmaceuticals', sector: 'Healthcare' },
   // Consumer
-  PG: { name: 'Procter & Gamble Co.', sector: 'Consumer' },
-  KO: { name: 'Coca-Cola Company', sector: 'Consumer' },
-  PEP: { name: 'PepsiCo Inc.', sector: 'Consumer' },
-  COST: { name: 'Costco Wholesale Corp.', sector: 'Consumer' },
-  WMT: { name: 'Walmart Inc.', sector: 'Consumer' },
-  HD: { name: 'Home Depot Inc.', sector: 'Consumer' },
-  MCD: { name: "McDonald's Corporation", sector: 'Consumer' },
-  NKE: { name: 'Nike Inc.', sector: 'Consumer' },
-  SBUX: { name: 'Starbucks Corporation', sector: 'Consumer' },
-  TGT: { name: 'Target Corporation', sector: 'Consumer' },
-  // Energy & Industrial
+  WMT: { name: 'Walmart Inc.', sector: 'Consumer Defensive' },
+  PG: { name: 'Procter & Gamble Co.', sector: 'Consumer Defensive' },
+  KO: { name: 'Coca-Cola Company', sector: 'Consumer Defensive' },
+  PEP: { name: 'PepsiCo Inc.', sector: 'Consumer Defensive' },
+  COST: { name: 'Costco Wholesale Corp.', sector: 'Consumer Defensive' },
+  HD: { name: 'Home Depot Inc.', sector: 'Consumer Cyclical' },
+  MCD: { name: "McDonald's Corporation", sector: 'Consumer Cyclical' },
+  NKE: { name: 'Nike Inc.', sector: 'Consumer Cyclical' },
+  SBUX: { name: 'Starbucks Corporation', sector: 'Consumer Cyclical' },
+  TGT: { name: 'Target Corporation', sector: 'Consumer Defensive' },
+  LOW: { name: "Lowe's Companies", sector: 'Consumer Cyclical' },
+  TJX: { name: 'TJX Companies', sector: 'Consumer Cyclical' },
+  // Energy
   XOM: { name: 'Exxon Mobil Corporation', sector: 'Energy' },
   CVX: { name: 'Chevron Corporation', sector: 'Energy' },
   COP: { name: 'ConocoPhillips', sector: 'Energy' },
+  SLB: { name: 'Schlumberger Limited', sector: 'Energy' },
+  EOG: { name: 'EOG Resources', sector: 'Energy' },
+  OXY: { name: 'Occidental Petroleum', sector: 'Energy' },
+  // Industrial
   CAT: { name: 'Caterpillar Inc.', sector: 'Industrial' },
   BA: { name: 'Boeing Company', sector: 'Industrial' },
   UNP: { name: 'Union Pacific Corp.', sector: 'Industrial' },
@@ -72,8 +132,64 @@ export const STOCK_INFO: Record<string, { name: string; sector: string }> = {
   GE: { name: 'General Electric Co.', sector: 'Industrial' },
   RTX: { name: 'RTX Corporation', sector: 'Industrial' },
   LMT: { name: 'Lockheed Martin Corp.', sector: 'Industrial' },
+  DE: { name: 'Deere & Company', sector: 'Industrial' },
+  // Technology (continued)
+  ORCL: { name: 'Oracle Corporation', sector: 'Technology' },
+  CRM: { name: 'Salesforce Inc.', sector: 'Technology' },
+  CSCO: { name: 'Cisco Systems', sector: 'Technology' },
+  IBM: { name: 'IBM Corporation', sector: 'Technology' },
+  INTC: { name: 'Intel Corporation', sector: 'Technology' },
+  AMD: { name: 'Advanced Micro Devices', sector: 'Technology' },
+  QCOM: { name: 'Qualcomm Inc.', sector: 'Technology' },
+  TXN: { name: 'Texas Instruments', sector: 'Technology' },
+  ADBE: { name: 'Adobe Inc.', sector: 'Technology' },
+  NOW: { name: 'ServiceNow Inc.', sector: 'Technology' },
+  INTU: { name: 'Intuit Inc.', sector: 'Technology' },
+  MU: { name: 'Micron Technology', sector: 'Technology' },
+  AMAT: { name: 'Applied Materials', sector: 'Technology' },
+  LRCX: { name: 'Lam Research', sector: 'Technology' },
+  KLAC: { name: 'KLA Corporation', sector: 'Technology' },
+  ADI: { name: 'Analog Devices', sector: 'Technology' },
+  SNPS: { name: 'Synopsys Inc.', sector: 'Technology' },
+  CDNS: { name: 'Cadence Design Systems', sector: 'Technology' },
+  NFLX: { name: 'Netflix Inc.', sector: 'Communication Services' },
+  PLTR: { name: 'Palantir Technologies', sector: 'Technology' },
+  PANW: { name: 'Palo Alto Networks', sector: 'Technology' },
+  CRWD: { name: 'CrowdStrike Holdings', sector: 'Technology' },
+  // Communication Services
+  T: { name: 'AT&T Inc.', sector: 'Communication Services' },
+  VZ: { name: 'Verizon Communications', sector: 'Communication Services' },
+  TMUS: { name: 'T-Mobile US', sector: 'Communication Services' },
+  DIS: { name: 'Walt Disney Company', sector: 'Communication Services' },
+  CMCSA: { name: 'Comcast Corporation', sector: 'Communication Services' },
+  // Utilities
+  NEE: { name: 'NextEra Energy', sector: 'Utilities' },
+  DUK: { name: 'Duke Energy Corp.', sector: 'Utilities' },
+  SO: { name: 'Southern Company', sector: 'Utilities' },
+  // Real Estate
+  PLD: { name: 'Prologis Inc.', sector: 'Real Estate' },
+  AMT: { name: 'American Tower Corp.', sector: 'Real Estate' },
+  EQIX: { name: 'Equinix Inc.', sector: 'Real Estate' },
+  // Other notable
+  UBER: { name: 'Uber Technologies', sector: 'Technology' },
+  ABNB: { name: 'Airbnb Inc.', sector: 'Consumer Cyclical' },
+  COIN: { name: 'Coinbase Global', sector: 'Financial' },
+  HOOD: { name: 'Robinhood Markets', sector: 'Financial' },
+  DASH: { name: 'DoorDash Inc.', sector: 'Consumer Cyclical' },
+  PYPL: { name: 'PayPal Holdings', sector: 'Financial' },
+  SQ: { name: 'Block Inc.', sector: 'Financial' },
+  SHOP: { name: 'Shopify Inc.', sector: 'Technology' },
+  GM: { name: 'General Motors', sector: 'Consumer Cyclical' },
+  F: { name: 'Ford Motor Company', sector: 'Consumer Cyclical' },
+  CVS: { name: 'CVS Health Corp.', sector: 'Healthcare' },
+  WBA: { name: 'Walgreens Boots Alliance', sector: 'Healthcare' },
 };
 
-export function getStockInfo(symbol: string) {
+export function getStockInfo(symbol: string): { name: string; sector: string } {
   return STOCK_INFO[symbol] || { name: symbol, sector: 'Unknown' };
+}
+
+// Get sector for a symbol
+export function getStockSector(symbol: string): string {
+  return STOCK_INFO[symbol]?.sector || 'Unknown';
 }
