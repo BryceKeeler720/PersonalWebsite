@@ -243,7 +243,7 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
-        <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
+        <svg viewBox={`0 0 ${width} ${height}`}>
           <defs>
             <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={isPositive ? '#22c55e' : '#ef4444'} stopOpacity="0.3" />
