@@ -181,23 +181,39 @@ export const GET: APIRoute = async ({ request }) => {
       if (signal && (signal.recommendation === 'SELL' || signal.recommendation === 'STRONG_SELL')) {
         const quote = await fetchYahooQuote(holding.symbol);
         if (quote) {
-          // Sell entire position
+          // Determine sell percentage based on signal strength
+          // STRONG_SELL: sell 100%, SELL: sell 50%
+          const sellPercent = signal.recommendation === 'STRONG_SELL' ? 1.0 : 0.5;
+          const sharesToSell = Math.max(1, Math.floor(holding.shares * sellPercent));
+
           const trade: Trade = {
             id: crypto.randomUUID(),
             timestamp: new Date().toISOString(),
             symbol: holding.symbol,
             action: 'SELL',
-            shares: holding.shares,
+            shares: sharesToSell,
             price: quote.price,
-            total: holding.shares * quote.price,
-            reason: `${signal.recommendation}: Combined score ${signal.combined.toFixed(2)}`,
+            total: sharesToSell * quote.price,
+            reason: `${signal.recommendation}: Combined score ${signal.combined.toFixed(2)} (selling ${Math.round(sellPercent * 100)}%)`,
             signals: signal,
           };
 
           portfolio.cash += trade.total;
-          portfolio.holdings = portfolio.holdings.filter(h => h.symbol !== holding.symbol);
+
+          // Update or remove holding
+          if (sharesToSell >= holding.shares) {
+            // Sold all shares, remove holding
+            portfolio.holdings = portfolio.holdings.filter(h => h.symbol !== holding.symbol);
+          } else {
+            // Partial sell, update holding
+            holding.shares -= sharesToSell;
+            holding.marketValue = holding.shares * quote.price;
+            holding.gainLoss = (quote.price - holding.avgCost) * holding.shares;
+            holding.gainLossPercent = ((quote.price - holding.avgCost) / holding.avgCost) * 100;
+          }
+
           await addTrade(trade);
-          console.log(`Sold ${trade.shares} shares of ${trade.symbol} at $${trade.price}`);
+          console.log(`Sold ${trade.shares} shares of ${trade.symbol} at $${trade.price} (${Math.round(sellPercent * 100)}% of position)`);
         }
       }
     }
