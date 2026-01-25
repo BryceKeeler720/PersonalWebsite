@@ -314,14 +314,25 @@
 
 .signal-selector select {
   width: 100%;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 0.75rem 2.5rem 0.75rem 0.75rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' fill-opacity='0.6' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   color: #ffffff;
-  font-family: inherit;
-  font-size: 0.875rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.signal-selector select:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .signal-selector select:focus {
@@ -332,6 +343,9 @@
 .signal-selector select option {
   background: #1a1a1a;
   color: #ffffff;
+  padding: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
 }
 
 .signals-grid {

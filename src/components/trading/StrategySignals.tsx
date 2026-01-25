@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type { SignalSnapshot, StrategySignal } from './types';
 import { SP500_SYMBOLS, getStockInfo } from '../../lib/trading/sp500';
 
@@ -80,8 +80,12 @@ export default function StrategySignals({
 
       {/* Stock Selector */}
       <div className="signal-selector">
-        <select value={localSelected} onChange={e => handleSelect(e.target.value)}>
-          {SP500_SYMBOLS.map(symbol => {
+        <select
+          className="stock-select"
+          value={localSelected}
+          onChange={e => handleSelect(e.target.value)}
+        >
+          {[...SP500_SYMBOLS].sort().map(symbol => {
             const info = getStockInfo(symbol);
             return (
               <option key={symbol} value={symbol}>
