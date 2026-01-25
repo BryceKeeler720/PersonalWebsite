@@ -7,7 +7,13 @@ import {
   setLastRun,
   addPortfolioSnapshot,
 } from '../../../lib/trading/serverStorage';
-import { SP500_SYMBOLS } from '../../../lib/trading/sp500';
+import {
+  CRYPTO_SYMBOLS,
+  FOREX_SYMBOLS,
+  FUTURES_SYMBOLS,
+  SP500_SYMBOLS,
+  NASDAQ_ADDITIONAL,
+} from '../../../lib/trading/assets';
 import { calculateMomentumSignal } from '../../../lib/trading/strategies/momentum';
 import { calculateMeanReversionSignal } from '../../../lib/trading/strategies/meanReversion';
 import { calculateTechnicalSignal } from '../../../lib/trading/strategies/technical';
@@ -158,15 +164,33 @@ export const GET: APIRoute = async ({ request }) => {
     let portfolio = await getPortfolio();
     const allSignals: Record<string, SignalSnapshot> = {};
 
-    // Analyze all S&P 500 stocks in parallel batches
-    const stocksToAnalyze = [...SP500_SYMBOLS];
-    console.log(`Analyzing ${stocksToAnalyze.length} stocks in batches of ${BATCH_SIZE}...`);
+    // Determine which assets to analyze based on current time
+    const now = new Date();
+    const dayOfWeek = now.getUTCDay(); // 0 = Sunday, 6 = Saturday
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
+    // Build list of assets to analyze
+    let assetsToAnalyze: string[] = [];
+
+    // Crypto trades 24/7 - always include
+    assetsToAnalyze.push(...CRYPTO_SYMBOLS);
+
+    // Stocks, forex, and futures only trade on weekdays
+    if (!isWeekend) {
+      assetsToAnalyze.push(...SP500_SYMBOLS);
+      assetsToAnalyze.push(...NASDAQ_ADDITIONAL);
+      assetsToAnalyze.push(...FOREX_SYMBOLS);
+      assetsToAnalyze.push(...FUTURES_SYMBOLS);
+    }
+
+    console.log(`Analyzing ${assetsToAnalyze.length} assets in batches of ${BATCH_SIZE}...`);
+    console.log(`Weekend: ${isWeekend}, Crypto: ${CRYPTO_SYMBOLS.length}, Stocks: ${isWeekend ? 0 : SP500_SYMBOLS.length + NASDAQ_ADDITIONAL.length}`);
 
     // Process stocks in parallel batches
-    for (let i = 0; i < stocksToAnalyze.length; i += BATCH_SIZE) {
-      const batch = stocksToAnalyze.slice(i, i + BATCH_SIZE);
+    for (let i = 0; i < assetsToAnalyze.length; i += BATCH_SIZE) {
+      const batch = assetsToAnalyze.slice(i, i + BATCH_SIZE);
       const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
-      const totalBatches = Math.ceil(stocksToAnalyze.length / BATCH_SIZE);
+      const totalBatches = Math.ceil(assetsToAnalyze.length / BATCH_SIZE);
 
       console.log(`Processing batch ${batchNumber}/${totalBatches}: ${batch.join(', ')}`);
 
@@ -191,7 +215,7 @@ export const GET: APIRoute = async ({ request }) => {
       }
 
       // Delay between batches to avoid rate limiting (skip delay on last batch)
-      if (i + BATCH_SIZE < stocksToAnalyze.length) {
+      if (i + BATCH_SIZE < assetsToAnalyze.length) {
         await new Promise(resolve => setTimeout(resolve, BATCH_DELAY_MS));
       }
     }

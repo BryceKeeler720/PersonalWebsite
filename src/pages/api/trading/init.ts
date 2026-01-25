@@ -7,7 +7,13 @@ import {
   setLastRun,
   addPortfolioSnapshot,
 } from '../../../lib/trading/serverStorage';
-import { SP500_SYMBOLS } from '../../../lib/trading/sp500';
+import {
+  CRYPTO_SYMBOLS,
+  FOREX_SYMBOLS,
+  FUTURES_SYMBOLS,
+  SP500_SYMBOLS,
+  NASDAQ_ADDITIONAL,
+} from '../../../lib/trading/assets';
 import { calculateMomentumSignal } from '../../../lib/trading/strategies/momentum';
 import { calculateMeanReversionSignal } from '../../../lib/trading/strategies/meanReversion';
 import { calculateTechnicalSignal } from '../../../lib/trading/strategies/technical';
@@ -155,15 +161,21 @@ export const GET: APIRoute = async ({ request }) => {
     let portfolio = await getPortfolio();
     const allSignals: Record<string, SignalSnapshot> = {};
 
-    // Analyze all S&P 500 stocks in parallel batches
-    const stocksToAnalyze = [...SP500_SYMBOLS];
-    console.log(`Analyzing ${stocksToAnalyze.length} stocks for initialization...`);
+    // Analyze all assets in parallel batches (crypto + stocks for diversification)
+    const assetsToAnalyze = [
+      ...CRYPTO_SYMBOLS,    // Crypto for 24/7 trading
+      ...SP500_SYMBOLS,     // S&P 500 stocks
+      ...NASDAQ_ADDITIONAL, // Additional NASDAQ stocks
+      ...FOREX_SYMBOLS,     // Forex pairs
+      ...FUTURES_SYMBOLS,   // Futures contracts
+    ];
+    console.log(`Analyzing ${assetsToAnalyze.length} assets for initialization...`);
 
     // Process stocks in parallel batches
-    for (let i = 0; i < stocksToAnalyze.length; i += BATCH_SIZE) {
-      const batch = stocksToAnalyze.slice(i, i + BATCH_SIZE);
+    for (let i = 0; i < assetsToAnalyze.length; i += BATCH_SIZE) {
+      const batch = assetsToAnalyze.slice(i, i + BATCH_SIZE);
       const batchNumber = Math.floor(i / BATCH_SIZE) + 1;
-      const totalBatches = Math.ceil(stocksToAnalyze.length / BATCH_SIZE);
+      const totalBatches = Math.ceil(assetsToAnalyze.length / BATCH_SIZE);
 
       console.log(`Processing batch ${batchNumber}/${totalBatches}`);
 
@@ -185,7 +197,7 @@ export const GET: APIRoute = async ({ request }) => {
         }
       }
 
-      if (i + BATCH_SIZE < stocksToAnalyze.length) {
+      if (i + BATCH_SIZE < assetsToAnalyze.length) {
         await new Promise(resolve => setTimeout(resolve, BATCH_DELAY_MS));
       }
     }

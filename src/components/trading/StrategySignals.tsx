@@ -1,8 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
 import type { SignalSnapshot, StrategySignal } from './types';
-import { SP500_SYMBOLS, getStockInfo } from '../../lib/trading/sp500';
+import {
+  CRYPTO_SYMBOLS,
+  FOREX_SYMBOLS,
+  FUTURES_SYMBOLS,
+  SP500_SYMBOLS,
+  NASDAQ_ADDITIONAL,
+  getAssetInfo,
+} from '../../lib/trading/assets';
 
-const sortedSymbols = [...SP500_SYMBOLS].sort();
+// Group assets by category for the dropdown
+const assetCategories = [
+  { label: 'Crypto (24/7)', symbols: [...CRYPTO_SYMBOLS].sort() },
+  { label: 'Forex', symbols: [...FOREX_SYMBOLS].sort() },
+  { label: 'Futures', symbols: [...FUTURES_SYMBOLS].sort() },
+  { label: 'S&P 500', symbols: [...SP500_SYMBOLS].sort() },
+  { label: 'NASDAQ', symbols: [...NASDAQ_ADDITIONAL].sort() },
+];
 
 interface StrategySignalsProps {
   signals: Map<string, SignalSnapshot>;
@@ -60,7 +74,7 @@ export default function StrategySignals({
   onStockSelect,
   isAnalyzing,
 }: StrategySignalsProps) {
-  const [localSelected, setLocalSelected] = useState(selectedStock || sortedSymbols[0]);
+  const [localSelected, setLocalSelected] = useState(selectedStock || 'BTC-USD');
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -90,20 +104,24 @@ export default function StrategySignals({
     setSearchTerm('');
   };
 
-  const filteredSymbols = sortedSymbols.filter(symbol => {
-    const info = getStockInfo(symbol);
-    const search = searchTerm.toLowerCase();
-    return symbol.toLowerCase().includes(search) || info.name.toLowerCase().includes(search);
-  });
+  // Filter categories and symbols based on search
+  const filteredCategories = assetCategories.map(category => ({
+    ...category,
+    symbols: category.symbols.filter((symbol: string) => {
+      const info = getAssetInfo(symbol);
+      const search = searchTerm.toLowerCase();
+      return symbol.toLowerCase().includes(search) || info.name.toLowerCase().includes(search);
+    }),
+  })).filter(category => category.symbols.length > 0);
 
   const currentSignal = signals.get(localSelected);
-  const stockInfo = getStockInfo(localSelected);
+  const assetInfo = getAssetInfo(localSelected);
 
   return (
     <div className="trading-card">
       <h2>Strategy Signals</h2>
 
-      {/* Stock Selector */}
+      {/* Asset Selector */}
       <div className="signal-selector" ref={dropdownRef}>
         <button
           className="stock-dropdown-trigger"
@@ -114,7 +132,7 @@ export default function StrategySignals({
             }
           }}
         >
-          <span>{localSelected} - {stockInfo.name}</span>
+          <span>{localSelected} - {assetInfo.name}</span>
           <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" opacity="0.6">
             <path d="M6 8L1 3h10z" />
           </svg>
@@ -125,26 +143,31 @@ export default function StrategySignals({
               ref={inputRef}
               type="text"
               className="stock-dropdown-search"
-              placeholder="Search stocks..."
+              placeholder="Search assets..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
             <div className="stock-dropdown-list">
-              {filteredSymbols.map(symbol => {
-                const info = getStockInfo(symbol);
-                return (
-                  <button
-                    key={symbol}
-                    className={`stock-dropdown-item ${symbol === localSelected ? 'selected' : ''}`}
-                    onClick={() => handleSelect(symbol)}
-                  >
-                    <span className="stock-symbol">{symbol}</span>
-                    <span className="stock-name">{info.name}</span>
-                  </button>
-                );
-              })}
-              {filteredSymbols.length === 0 && (
-                <div className="stock-dropdown-empty">No stocks found</div>
+              {filteredCategories.map(category => (
+                <div key={category.label} className="stock-dropdown-category">
+                  <div className="stock-dropdown-category-label">{category.label}</div>
+                  {category.symbols.map((symbol: string) => {
+                    const info = getAssetInfo(symbol);
+                    return (
+                      <button
+                        key={symbol}
+                        className={`stock-dropdown-item ${symbol === localSelected ? 'selected' : ''}`}
+                        onClick={() => handleSelect(symbol)}
+                      >
+                        <span className="stock-symbol">{symbol}</span>
+                        <span className="stock-name">{info.name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              ))}
+              {filteredCategories.length === 0 && (
+                <div className="stock-dropdown-empty">No assets found</div>
               )}
             </div>
           </div>
@@ -165,10 +188,10 @@ export default function StrategySignals({
         </div>
       ) : (
         <>
-          {/* Stock Info */}
+          {/* Asset Info */}
           <div style={{ marginBottom: '1rem', color: 'rgba(255, 255, 255, 0.6)' }}>
-            <div style={{ fontSize: '0.875rem' }}>{stockInfo.name}</div>
-            <div style={{ fontSize: '0.75rem' }}>Sector: {stockInfo.sector}</div>
+            <div style={{ fontSize: '0.875rem' }}>{assetInfo.name}</div>
+            <div style={{ fontSize: '0.75rem' }}>Category: {assetInfo.category}</div>
           </div>
 
           {/* Strategy Signals */}
