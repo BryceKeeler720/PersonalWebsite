@@ -23,11 +23,11 @@ const CRON_SECRET = process.env.CRON_SECRET;
 const BATCH_SIZE = 15; // Number of stocks to analyze in parallel
 const BATCH_DELAY_MS = 500; // Delay between batches to avoid rate limiting
 
-async function fetchYahooQuote(symbol: string): Promise<{ price: number } | null> {
+async function fetchYahooQuote(symbol: string): Promise<{ price: number; isExtendedHours: boolean } | null> {
   try {
-    // Use the chart endpoint which is more reliable than the quote endpoint
+    // Use the chart endpoint with pre/post market data included
     const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`,
+      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1m&range=1d&includePrePost=true`,
       {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -36,9 +36,43 @@ async function fetchYahooQuote(symbol: string): Promise<{ price: number } | null
     );
     const data = await response.json();
     const result = data?.chart?.result?.[0];
-    if (result?.meta?.regularMarketPrice) {
-      return { price: result.meta.regularMarketPrice };
+
+    if (!result?.meta) return null;
+
+    const meta = result.meta;
+    const quotes = result.indicators?.quote?.[0];
+    const timestamps = result.timestamp;
+
+    // Try to get the most recent price from the data
+    // Check if we have intraday data with pre/post market
+    if (quotes?.close && timestamps && timestamps.length > 0) {
+      // Find the last valid close price
+      for (let i = quotes.close.length - 1; i >= 0; i--) {
+        if (quotes.close[i] !== null) {
+          const lastTimestamp = timestamps[i];
+          const tradingPeriod = meta.currentTradingPeriod;
+
+          // Determine if this is extended hours
+          const isPreMarket = tradingPeriod?.pre &&
+            lastTimestamp >= tradingPeriod.pre.start &&
+            lastTimestamp < tradingPeriod.pre.end;
+          const isPostMarket = tradingPeriod?.post &&
+            lastTimestamp >= tradingPeriod.post.start &&
+            lastTimestamp < tradingPeriod.post.end;
+
+          return {
+            price: quotes.close[i],
+            isExtendedHours: isPreMarket || isPostMarket
+          };
+        }
+      }
     }
+
+    // Fallback to regular market price
+    if (meta.regularMarketPrice) {
+      return { price: meta.regularMarketPrice, isExtendedHours: false };
+    }
+
     return null;
   } catch (error) {
     console.error(`Error fetching quote for ${symbol}:`, error);
