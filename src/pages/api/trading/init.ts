@@ -278,6 +278,8 @@ export const GET: APIRoute = async ({ request }) => {
         marketValue: total,
         gainLoss: 0,
         gainLossPercent: 0,
+        isExtendedHours: quote.isExtendedHours,
+        priceUpdatedAt: new Date().toISOString(),
       };
 
       portfolio.cash -= total;

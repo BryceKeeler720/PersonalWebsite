@@ -15,6 +15,8 @@ export interface Holding {
   marketValue: number;
   gainLoss: number;
   gainLossPercent: number;
+  isExtendedHours?: boolean; // True if currentPrice is from pre/post market
+  priceUpdatedAt?: string; // ISO timestamp of last price update
 }
 
 // Trade records

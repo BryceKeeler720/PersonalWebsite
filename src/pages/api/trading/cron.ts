@@ -14,7 +14,7 @@ import { calculateTechnicalSignal } from '../../../lib/trading/strategies/techni
 import { calculateSentimentSignal, generateMockNews } from '../../../lib/trading/strategies/sentiment';
 import { combineSignals, calculatePositionSize } from '../../../lib/trading/signalCombiner';
 import { DEFAULT_CONFIG } from '../../../components/trading/types';
-import type { Portfolio, Trade, SignalSnapshot, OHLCV, Holding } from '../../../components/trading/types';
+import type { Trade, SignalSnapshot, OHLCV, Holding } from '../../../components/trading/types';
 
 // Verify cron secret to prevent unauthorized access
 const CRON_SECRET = process.env.CRON_SECRET;
@@ -206,6 +206,8 @@ export const GET: APIRoute = async ({ request }) => {
         holding.marketValue = holding.shares * quote.price;
         holding.gainLoss = (quote.price - holding.avgCost) * holding.shares;
         holding.gainLossPercent = ((quote.price - holding.avgCost) / holding.avgCost) * 100;
+        holding.isExtendedHours = quote.isExtendedHours;
+        holding.priceUpdatedAt = new Date().toISOString();
       }
     }
 
@@ -301,6 +303,8 @@ export const GET: APIRoute = async ({ request }) => {
             marketValue: total,
             gainLoss: 0,
             gainLossPercent: 0,
+            isExtendedHours: quote.isExtendedHours,
+            priceUpdatedAt: new Date().toISOString(),
           };
 
           portfolio.cash -= total;
