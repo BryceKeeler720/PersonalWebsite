@@ -1,10 +1,10 @@
 name: Trading Bot Cron
 
+# Disabled - using cron-job.org for more reliable scheduling
+# To re-enable, uncomment the schedule below
 on:
-  schedule:
-    # Run every 5 minutes during market hours (9:30 AM - 4:00 PM ET, Mon-Fri)
-    # Note: GitHub Actions cron uses UTC, so 9:30 AM ET = 14:30 UTC (or 13:30 during DST)
-    - cron: '*/5 * * * *'
+  # schedule:
+  #   - cron: '*/5 * * * *'
   workflow_dispatch: # Allow manual triggering
 
 jobs:
