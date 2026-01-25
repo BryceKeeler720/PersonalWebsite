@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { SignalSnapshot, StrategySignal } from './types';
 import { SP500_SYMBOLS, getStockInfo } from '../../lib/trading/sp500';
+
+const sortedSymbols = [...SP500_SYMBOLS].sort();
 
 interface StrategySignalsProps {
   signals: Map<string, SignalSnapshot>;
@@ -58,7 +60,11 @@ export default function StrategySignals({
   onStockSelect,
   isAnalyzing,
 }: StrategySignalsProps) {
-  const [localSelected, setLocalSelected] = useState(selectedStock || SP500_SYMBOLS[0]);
+  const [localSelected, setLocalSelected] = useState(selectedStock || sortedSymbols[0]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (selectedStock) {
@@ -66,10 +72,29 @@ export default function StrategySignals({
     }
   }, [selectedStock]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+        setSearchTerm('');
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleSelect = (symbol: string) => {
     setLocalSelected(symbol);
     onStockSelect(symbol);
+    setIsOpen(false);
+    setSearchTerm('');
   };
+
+  const filteredSymbols = sortedSymbols.filter(symbol => {
+    const info = getStockInfo(symbol);
+    const search = searchTerm.toLowerCase();
+    return symbol.toLowerCase().includes(search) || info.name.toLowerCase().includes(search);
+  });
 
   const currentSignal = signals.get(localSelected);
   const stockInfo = getStockInfo(localSelected);
@@ -79,21 +104,51 @@ export default function StrategySignals({
       <h2>Strategy Signals</h2>
 
       {/* Stock Selector */}
-      <div className="signal-selector">
-        <select
-          className="stock-select"
-          value={localSelected}
-          onChange={e => handleSelect(e.target.value)}
+      <div className="signal-selector" ref={dropdownRef}>
+        <button
+          className="stock-dropdown-trigger"
+          onClick={() => {
+            setIsOpen(!isOpen);
+            if (!isOpen) {
+              setTimeout(() => inputRef.current?.focus(), 0);
+            }
+          }}
         >
-          {[...SP500_SYMBOLS].sort().map(symbol => {
-            const info = getStockInfo(symbol);
-            return (
-              <option key={symbol} value={symbol}>
-                {symbol} - {info.name}
-              </option>
-            );
-          })}
-        </select>
+          <span>{localSelected} - {stockInfo.name}</span>
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" opacity="0.6">
+            <path d="M6 8L1 3h10z" />
+          </svg>
+        </button>
+        {isOpen && (
+          <div className="stock-dropdown-menu">
+            <input
+              ref={inputRef}
+              type="text"
+              className="stock-dropdown-search"
+              placeholder="Search stocks..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+            />
+            <div className="stock-dropdown-list">
+              {filteredSymbols.map(symbol => {
+                const info = getStockInfo(symbol);
+                return (
+                  <button
+                    key={symbol}
+                    className={`stock-dropdown-item ${symbol === localSelected ? 'selected' : ''}`}
+                    onClick={() => handleSelect(symbol)}
+                  >
+                    <span className="stock-symbol">{symbol}</span>
+                    <span className="stock-name">{info.name}</span>
+                  </button>
+                );
+              })}
+              {filteredSymbols.length === 0 && (
+                <div className="stock-dropdown-empty">No stocks found</div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {isAnalyzing ? (
