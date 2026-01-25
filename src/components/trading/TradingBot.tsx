@@ -41,8 +41,6 @@ export default function TradingBot() {
     history: [],
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [isRebalancing, setIsRebalancing] = useState(false);
-  const [rebalanceResult, setRebalanceResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch data from server
@@ -69,33 +67,6 @@ export default function TradingBot() {
     const interval = setInterval(fetchData, 60 * 1000);
     return () => clearInterval(interval);
   }, []);
-
-  // Rebalance portfolio
-  const handleRebalance = async () => {
-    if (isRebalancing) return;
-
-    setIsRebalancing(true);
-    setRebalanceResult(null);
-
-    try {
-      const response = await fetch('/api/trading/rebalance');
-      const result = await response.json();
-
-      if (result.success) {
-        setRebalanceResult(`Sold ${result.sold.length}, Bought ${result.bought.length}`);
-        // Refresh data after rebalance
-        await fetchData();
-      } else {
-        setRebalanceResult(`Error: ${result.message || result.error}`);
-      }
-    } catch (err) {
-      setRebalanceResult(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    } finally {
-      setIsRebalancing(false);
-      // Clear result after 5 seconds
-      setTimeout(() => setRebalanceResult(null), 5000);
-    }
-  };
 
   // Convert signals object to Map for compatibility with existing components
   const signalsMap = new Map(Object.entries(data.signals));
@@ -135,16 +106,6 @@ export default function TradingBot() {
           <p>Multi-asset analysis: Crypto, Forex, Futures, Stocks</p>
         </div>
         <div className="bot-status">
-          <button
-            className={`rebalance-btn ${isRebalancing ? 'loading' : ''}`}
-            onClick={handleRebalance}
-            disabled={isRebalancing}
-          >
-            {isRebalancing ? 'Rebalancing...' : 'Rebalance Portfolio'}
-          </button>
-          {rebalanceResult && (
-            <span className="rebalance-result">{rebalanceResult}</span>
-          )}
           <span className="status-dot running" />
           <span className="status-text">Running</span>
           {data.lastRun && (

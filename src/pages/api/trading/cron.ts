@@ -250,30 +250,35 @@ export const GET: APIRoute = async ({ request }) => {
       let sellPercent = 0;
       let sellReason = '';
 
-      // Priority 1: Strong sell signal - sell all
-      if (signal && signal.recommendation === 'STRONG_SELL') {
+      // Priority 1: No signal data - sell all (asset not in current analysis set)
+      if (!signal) {
+        sellPercent = 1.0;
+        sellReason = `No signal data - rotating out`;
+      }
+      // Priority 2: Strong sell signal - sell all
+      else if (signal.recommendation === 'STRONG_SELL') {
         sellPercent = 1.0;
         sellReason = `STRONG_SELL signal: score ${signal.combined.toFixed(2)}`;
       }
-      // Priority 2: Stop loss at -3% - sell all to limit losses (tighter)
+      // Priority 3: Stop loss at -3% - sell all to limit losses
       else if (holding.gainLossPercent <= -3) {
         sellPercent = 1.0;
         sellReason = `Stop loss triggered at ${holding.gainLossPercent.toFixed(1)}%`;
       }
-      // Priority 3: Take profit at +4% - sell half to lock in gains (more frequent)
+      // Priority 4: Weak signal below buy threshold - sell all to free capital
+      else if (signal.combined < 0.02) {
+        sellPercent = 1.0;
+        sellReason = `Weak signal (${signal.combined.toFixed(3)}) - rotating to stronger positions`;
+      }
+      // Priority 5: Take profit at +4% - sell half to lock in gains
       else if (holding.gainLossPercent >= 4) {
         sellPercent = 0.5;
         sellReason = `Taking profits at ${holding.gainLossPercent.toFixed(1)}%`;
       }
-      // Priority 4: Regular sell signal - sell half
-      else if (signal && signal.recommendation === 'SELL') {
+      // Priority 6: Regular sell signal - sell half
+      else if (signal.recommendation === 'SELL') {
         sellPercent = 0.5;
         sellReason = `SELL signal: score ${signal.combined.toFixed(2)}`;
-      }
-      // Priority 5: Position rotation - sell 25% of positions with negative combined score
-      else if (signal && signal.combined < 0) {
-        sellPercent = 0.25;
-        sellReason = `Position rotation: negative score ${signal.combined.toFixed(2)}`;
       }
 
       if (sellPercent > 0) {
