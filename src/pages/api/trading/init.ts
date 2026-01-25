@@ -186,10 +186,11 @@ export const GET: APIRoute = async ({ request }) => {
     const signalsToInvest = buySignals.slice(0, Math.min(availableSlots, buySignals.length));
 
     console.log(`Will invest in top ${signalsToInvest.length} signals`);
+    console.log(`Top signals: ${signalsToInvest.map(s => `${s.symbol}(${s.combined.toFixed(3)})`).join(', ')}`);
 
-    // Calculate weighted position sizes based on signal strength
-    // Stronger signals get proportionally more investment
-    const totalScore = signalsToInvest.reduce((sum, s) => sum + s.combined, 0);
+    // Use equal-weight allocation with slight boost for stronger signals
+    // Each position gets roughly equal share, with stronger signals getting up to 1.5x
+    const baseAllocation = (portfolio.cash * 0.95) / signalsToInvest.length; // Use 95% of cash, split equally
     const trades: Trade[] = [];
 
     for (const signal of signalsToInvest) {
@@ -199,17 +200,15 @@ export const GET: APIRoute = async ({ request }) => {
         continue;
       }
 
-      // Calculate weighted position size
-      // Each signal gets a portion of available cash proportional to its score
-      const scoreWeight = signal.combined / totalScore;
+      // Calculate position size: base allocation * signal strength multiplier (1.0 to 1.5)
+      const strengthMultiplier = 1.0 + (signal.combined * 0.5); // score of 0.3 = 1.15x, score of 1.0 = 1.5x
       const maxPerPosition = portfolio.cash * DEFAULT_CONFIG.maxPositionSize;
-      const weightedSize = Math.min(
-        portfolio.cash * scoreWeight * 0.9, // Use 90% of weighted allocation (leave some buffer)
-        maxPerPosition
-      );
+      const targetSize = Math.min(baseAllocation * strengthMultiplier, maxPerPosition, portfolio.cash * 0.95);
 
-      if (weightedSize < DEFAULT_CONFIG.minTradeValue) {
-        console.log(`Skipping ${signal.symbol} - position size too small: $${weightedSize.toFixed(2)}`);
+      console.log(`${signal.symbol}: score=${signal.combined.toFixed(3)}, targetSize=$${targetSize.toFixed(2)}`);
+
+      if (targetSize < DEFAULT_CONFIG.minTradeValue) {
+        console.log(`Skipping ${signal.symbol} - position size too small: $${targetSize.toFixed(2)}`);
         continue;
       }
 
@@ -219,7 +218,7 @@ export const GET: APIRoute = async ({ request }) => {
         continue;
       }
 
-      const shares = Math.floor(weightedSize / quote.price);
+      const shares = Math.floor(targetSize / quote.price);
       if (shares <= 0) {
         console.log(`Skipping ${signal.symbol} - cannot afford any shares at $${quote.price}`);
         continue;
