@@ -76,6 +76,7 @@ export default function StrategySignals({
 }: StrategySignalsProps) {
   const [localSelected, setLocalSelected] = useState(selectedStock || 'BTC-USD');
   const [isOpen, setIsOpen] = useState(false);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -90,6 +91,7 @@ export default function StrategySignals({
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setExpandedCategory(null);
         setSearchTerm('');
       }
     };
@@ -101,7 +103,16 @@ export default function StrategySignals({
     setLocalSelected(symbol);
     onStockSelect(symbol);
     setIsOpen(false);
+    setExpandedCategory(null);
     setSearchTerm('');
+  };
+
+  const handleCategoryClick = (categoryLabel: string) => {
+    setExpandedCategory(expandedCategory === categoryLabel ? null : categoryLabel);
+  };
+
+  const handleBack = () => {
+    setExpandedCategory(null);
   };
 
   // Filter categories and symbols based on search
@@ -113,6 +124,11 @@ export default function StrategySignals({
       return symbol.toLowerCase().includes(search) || info.name.toLowerCase().includes(search);
     }),
   })).filter(category => category.symbols.length > 0);
+
+  // Get the currently expanded category's filtered symbols
+  const expandedCategoryData = expandedCategory
+    ? filteredCategories.find(c => c.label === expandedCategory)
+    : null;
 
   const currentSignal = signals.get(localSelected);
   const assetInfo = getAssetInfo(localSelected);
@@ -148,10 +164,19 @@ export default function StrategySignals({
               onChange={e => setSearchTerm(e.target.value)}
             />
             <div className="stock-dropdown-list">
-              {filteredCategories.map(category => (
-                <div key={category.label} className="stock-dropdown-category">
-                  <div className="stock-dropdown-category-label">{category.label}</div>
-                  {category.symbols.map((symbol: string) => {
+              {/* Show back button and items when a category is expanded */}
+              {expandedCategory && expandedCategoryData ? (
+                <>
+                  <button
+                    className="stock-dropdown-back"
+                    onClick={handleBack}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                      <path d="M8 1L3 6l5 5" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                    </svg>
+                    <span>{expandedCategoryData.label}</span>
+                  </button>
+                  {expandedCategoryData.symbols.map((symbol: string) => {
                     const info = getAssetInfo(symbol);
                     return (
                       <button
@@ -164,10 +189,30 @@ export default function StrategySignals({
                       </button>
                     );
                   })}
-                </div>
-              ))}
-              {filteredCategories.length === 0 && (
-                <div className="stock-dropdown-empty">No assets found</div>
+                  {expandedCategoryData.symbols.length === 0 && (
+                    <div className="stock-dropdown-empty">No assets found</div>
+                  )}
+                </>
+              ) : (
+                /* Show category list */
+                <>
+                  {filteredCategories.map(category => (
+                    <button
+                      key={category.label}
+                      className="stock-dropdown-category-btn"
+                      onClick={() => handleCategoryClick(category.label)}
+                    >
+                      <span className="category-name">{category.label}</span>
+                      <span className="category-count">{category.symbols.length}</span>
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" opacity="0.5">
+                        <path d="M4 1l5 5-5 5" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                      </svg>
+                    </button>
+                  ))}
+                  {filteredCategories.length === 0 && (
+                    <div className="stock-dropdown-empty">No categories found</div>
+                  )}
+                </>
               )}
             </div>
           </div>
