@@ -183,12 +183,13 @@ async function addPortfolioSnapshot(snapshot) {
 // SPY Benchmark caching (runs from LXC to avoid Vercel IP blocks)
 async function updateSPYBenchmark() {
   try {
+    // Always fetch at least 90 days to ensure we have enough data points
+    const minStartDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
     const history = await getPortfolioHistory();
-    const startDate = history.length > 0
-      ? history[0].timestamp
-      : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const historyStart = history.length > 0 ? new Date(history[0].timestamp) : minStartDate;
+    const startDate = historyStart < minStartDate ? historyStart : minStartDate;
 
-    const start = Math.floor(new Date(startDate).getTime() / 1000);
+    const start = Math.floor(startDate.getTime() / 1000);
     const end = Math.floor(Date.now() / 1000);
 
     const response = await fetch(
@@ -218,15 +219,20 @@ async function updateSPYBenchmark() {
     const closes = result.indicators.quote[0].close;
     const firstValidClose = closes.find(c => c !== null) || closes[0];
 
+    // Normalize to $10,000 starting value to match portfolio initial capital
     const benchmark = timestamps
       .map((ts, i) => ({
         timestamp: new Date(ts * 1000).toISOString(),
-        value: closes[i] !== null ? (closes[i] / firstValidClose) * 10000 : null,
+        value: closes[i] !== null ? (closes[i] / firstValidClose) * DEFAULT_CONFIG.initialCapital : null,
       }))
       .filter(p => p.value !== null);
 
-    await redis.set(KEYS.SPY_BENCHMARK, benchmark);
-    console.log(`SPY benchmark cached: ${benchmark.length} data points`);
+    if (benchmark.length > 0) {
+      await redis.set(KEYS.SPY_BENCHMARK, benchmark);
+      console.log(`SPY benchmark cached: ${benchmark.length} data points`);
+    } else {
+      console.log('SPY benchmark: no valid data points');
+    }
   } catch (error) {
     console.log(`SPY benchmark error: ${error.message}`);
   }
