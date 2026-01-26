@@ -15,7 +15,7 @@ let currentRunPromise = null;
 
 // Configuration
 const BATCH_SIZE = 50; // Alpaca supports multi-symbol batch requests
-const BATCH_DELAY_MS = 200;
+const BATCH_DELAY_MS = 350; // Free tier: 200 req/min → ~300ms minimum between requests
 const DEFAULT_CONFIG = {
   initialCapital: 10199.52,
   maxPositionSize: 0.04,
@@ -543,12 +543,25 @@ async function fetchAlpacaBars(symbols, timeframe, days, isCrypto = false) {
         url.searchParams.set('limit', '10000');
         if (pageToken) url.searchParams.set('page_token', pageToken);
 
-        const response = await fetch(url.toString(), {
-          headers: {
-            'APCA-API-KEY-ID': ALPACA_API_KEY,
-            'APCA-API-SECRET-KEY': ALPACA_SECRET_KEY,
-          },
-        });
+        let response;
+        let retries = 0;
+        const maxRetries = 3;
+        while (retries <= maxRetries) {
+          response = await fetch(url.toString(), {
+            headers: {
+              'APCA-API-KEY-ID': ALPACA_API_KEY,
+              'APCA-API-SECRET-KEY': ALPACA_SECRET_KEY,
+            },
+          });
+          if (response.status === 429 && retries < maxRetries) {
+            const backoff = Math.pow(2, retries + 1) * 1000; // 2s, 4s, 8s
+            console.log(`Rate limited, waiting ${backoff / 1000}s before retry...`);
+            await new Promise(r => setTimeout(r, backoff));
+            retries++;
+          } else {
+            break;
+          }
+        }
 
         if (!response.ok) {
           console.error(`Alpaca bars fetch failed (${response.status}): ${await response.text()}`);
@@ -597,13 +610,11 @@ async function fetchAllMarketData(symbols) {
 
   console.log(`Fetching Alpaca data: ${stockSymbols.length} stocks, ${cryptoSymbols.length} crypto`);
 
-  // Fetch 5-min bars (5 days) and daily bars (10 days) in parallel for both stocks and crypto
-  const [stockIntraday, stockDaily, cryptoIntraday, cryptoDaily] = await Promise.all([
-    stockSymbols.length > 0 ? fetchAlpacaBars(stockSymbols, '5Min', 5, false) : {},
-    stockSymbols.length > 0 ? fetchAlpacaBars(stockSymbols, '1Day', 10, false) : {},
-    cryptoSymbols.length > 0 ? fetchAlpacaBars(cryptoSymbols, '5Min', 5, true) : {},
-    cryptoSymbols.length > 0 ? fetchAlpacaBars(cryptoSymbols, '1Day', 10, true) : {},
-  ]);
+  // Fetch sequentially to avoid 429 rate limits (free tier: 200 req/min)
+  const stockIntraday = stockSymbols.length > 0 ? await fetchAlpacaBars(stockSymbols, '5Min', 5, false) : {};
+  const stockDaily = stockSymbols.length > 0 ? await fetchAlpacaBars(stockSymbols, '1Day', 10, false) : {};
+  const cryptoIntraday = cryptoSymbols.length > 0 ? await fetchAlpacaBars(cryptoSymbols, '5Min', 5, true) : {};
+  const cryptoDaily = cryptoSymbols.length > 0 ? await fetchAlpacaBars(cryptoSymbols, '1Day', 10, true) : {};
 
   return {
     intraday: { ...stockIntraday, ...cryptoIntraday },
@@ -617,7 +628,37 @@ function toAlpacaOrderSymbol(symbol) {
   return toAlpacaStockSymbol(symbol); // BRK-B → BRK.B
 }
 
+// Track Alpaca paper positions so we don't try to sell what we don't hold
+let alpacaPositions = new Set();
+
+async function syncAlpacaPositions() {
+  try {
+    const response = await fetch(`${ALPACA_PAPER_URL}/v2/positions`, {
+      headers: {
+        'APCA-API-KEY-ID': ALPACA_API_KEY,
+        'APCA-API-SECRET-KEY': ALPACA_SECRET_KEY,
+      },
+    });
+    if (!response.ok) {
+      console.log(`Alpaca positions fetch failed: ${response.status}`);
+      return;
+    }
+    const positions = await response.json();
+    alpacaPositions = new Set(positions.map(p => {
+      // Convert Alpaca symbols back to our format
+      if (p.asset_class === 'crypto') return fromAlpacaCryptoSymbol(p.symbol);
+      return fromAlpacaStockSymbol(p.symbol);
+    }));
+    console.log(`Alpaca paper positions synced: ${alpacaPositions.size} holdings`);
+  } catch (error) {
+    console.log(`Alpaca positions sync error: ${error.message}`);
+  }
+}
+
 async function submitAlpacaOrder(symbol, qty, side) {
+  // Don't sell what we don't hold on Alpaca (avoids short sell errors)
+  if (side === 'sell' && !alpacaPositions.has(symbol)) return null;
+
   try {
     const alpacaSymbol = toAlpacaOrderSymbol(symbol);
     const isCrypto = isCryptoSymbol(symbol);
@@ -645,6 +686,11 @@ async function submitAlpacaOrder(symbol, qty, side) {
 
     const order = await response.json();
     console.log(`  Alpaca paper ${side.toUpperCase()} ${qty.toFixed(4)} ${symbol} → ${order.status}`);
+
+    // Update local position tracking
+    if (side === 'buy') alpacaPositions.add(symbol);
+    if (side === 'sell') alpacaPositions.delete(symbol);
+
     return order;
   } catch (error) {
     console.log(`  Alpaca order error (${symbol}): ${error.message}`);
@@ -993,6 +1039,7 @@ async function main() {
   }
 
   let portfolio = await getPortfolio();
+  await syncAlpacaPositions();
   const allSignals = {};
   const priceCache = {};
 
