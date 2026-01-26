@@ -90,9 +90,9 @@ const BACKTEST_SYMBOLS = loadAllSymbols();
 
 async function fetchHistoricalDaily(symbol) {
   try {
-    // Fetch 6 months of daily data (need 50+ candles warmup + backtest period)
+    // Fetch 2 years of daily data (need 252+ candles warmup for long-term momentum + backtest period)
     const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=6mo&interval=1d`,
+      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=2y&interval=1d`,
       { headers: { 'User-Agent': 'Mozilla/5.0 (compatible)' } }
     );
     const data = await response.json();
@@ -122,22 +122,6 @@ async function fetchHistoricalDaily(symbol) {
 // Strategy calculations (identical to live bot)
 // ────────────────────────────────────────────
 
-function calculateSMA(data, period) {
-  if (data.length < period) return null;
-  const slice = data.slice(-period);
-  return slice.reduce((sum, d) => sum + d.close, 0) / period;
-}
-
-function calculateEMA(data, period) {
-  if (data.length < period) return null;
-  const k = 2 / (period + 1);
-  let ema = data.slice(0, period).reduce((sum, d) => sum + d.close, 0) / period;
-  for (let i = period; i < data.length; i++) {
-    ema = data[i].close * k + ema * (1 - k);
-  }
-  return ema;
-}
-
 function calculateRSI(data, period = 14) {
   if (data.length < period + 1) return 50;
   const changes = [];
@@ -154,68 +138,67 @@ function calculateRSI(data, period = 14) {
   return 100 - (100 / (1 + rs));
 }
 
-function calculateMomentumSignal(data) {
-  if (data.length < 50) return { name: 'Momentum', score: 0, confidence: 0, reason: 'Insufficient data' };
-  const currentPrice = data[data.length - 1].close;
-  const sma20 = calculateSMA(data, 20);
-  const sma50 = calculateSMA(data, 50);
-  const ema12 = calculateEMA(data, 12);
-  const ema26 = calculateEMA(data, 26);
+function calculateMomentumSignal(dailyData) {
+  // Long-term momentum using daily candles (academic standard)
+  // Need at least 252 trading days (1 year) for 12-1 momentum factor
+  if (!dailyData || dailyData.length < 252) {
+    return { name: 'Momentum', score: 0, confidence: 0, reason: 'Insufficient daily data (need 1y)' };
+  }
 
-  let score = 0;
+  const currentPrice = dailyData[dailyData.length - 1].close;
   const reasons = [];
+  let score = 0;
 
-  // Price vs SMA-20: graded by distance
-  if (sma20) {
-    const pctAbove = ((currentPrice - sma20) / sma20) * 100;
-    if (pctAbove > 2.0) { score += 0.25; reasons.push(`+${pctAbove.toFixed(1)}% vs SMA20`); }
-    else if (pctAbove > 0.5) { score += 0.15; reasons.push('Above SMA20'); }
-    else if (pctAbove > -0.5) { score += 0; reasons.push('Near SMA20'); }
-    else if (pctAbove > -2.0) { score -= 0.15; reasons.push('Below SMA20'); }
-    else { score -= 0.25; reasons.push(`${pctAbove.toFixed(1)}% vs SMA20`); }
-  }
+  // 12-1 Momentum (Jegadeesh-Titman): return from 12 months ago to 1 month ago
+  // Skips last month to avoid short-term reversal effect
+  const price12moAgo = dailyData[dailyData.length - 252].close;
+  const price1moAgo = dailyData[dailyData.length - 21].close;
+  const mom12_1 = ((price1moAgo - price12moAgo) / price12moAgo) * 100;
 
-  // Price vs SMA-50: graded by distance
-  if (sma50) {
-    const pctAbove = ((currentPrice - sma50) / sma50) * 100;
-    if (pctAbove > 3.0) { score += 0.25; reasons.push(`+${pctAbove.toFixed(1)}% vs SMA50`); }
-    else if (pctAbove > 1.0) { score += 0.15; reasons.push('Above SMA50'); }
-    else if (pctAbove > -1.0) { score += 0; }
-    else if (pctAbove > -3.0) { score -= 0.15; reasons.push('Below SMA50'); }
-    else { score -= 0.25; reasons.push(`${pctAbove.toFixed(1)}% vs SMA50`); }
-  }
+  // 6-month return
+  const price6moAgo = dailyData[dailyData.length - 126].close;
+  const mom6m = ((currentPrice - price6moAgo) / price6moAgo) * 100;
 
-  // Golden/death cross
-  if (sma20 && sma50) {
-    const crossPct = ((sma20 - sma50) / sma50) * 100;
-    if (crossPct > 1.0) { score += 0.2; reasons.push('Bullish MA cross'); }
-    else if (crossPct > 0) { score += 0.1; }
-    else if (crossPct > -1.0) { score -= 0.1; }
-    else { score -= 0.2; reasons.push('Bearish MA cross'); }
-  }
+  // 3-month return
+  const price3moAgo = dailyData[dailyData.length - 63].close;
+  const mom3m = ((currentPrice - price3moAgo) / price3moAgo) * 100;
 
-  // MACD
-  if (ema12 && ema26) {
-    const macdPct = ((ema12 - ema26) / ema26) * 100;
-    if (macdPct > 1.0) { score += 0.2; reasons.push('Strong MACD bullish'); }
-    else if (macdPct > 0) { score += 0.1; reasons.push('MACD bullish'); }
-    else if (macdPct > -1.0) { score -= 0.1; reasons.push('MACD bearish'); }
-    else { score -= 0.2; reasons.push('Strong MACD bearish'); }
-  }
+  // 12-1 momentum scoring (~40% of total signal — the classic academic factor)
+  if (mom12_1 > 30) { score += 0.4; }
+  else if (mom12_1 > 15) { score += 0.3; }
+  else if (mom12_1 > 5) { score += 0.15; }
+  else if (mom12_1 > -5) { score += 0; }
+  else if (mom12_1 > -15) { score -= 0.15; }
+  else if (mom12_1 > -30) { score -= 0.3; }
+  else { score -= 0.4; }
+  reasons.push(`12-1: ${mom12_1 >= 0 ? '+' : ''}${mom12_1.toFixed(0)}%`);
 
-  // Rate of change: 5 days and 20 days
-  if (data.length > 5) {
-    const roc5 = ((currentPrice - data[data.length - 5].close) / data[data.length - 5].close) * 100;
-    if (roc5 > 2.0) score += 0.05;
-    else if (roc5 < -2.0) score -= 0.05;
-  }
-  if (data.length > 20) {
-    const roc20 = ((currentPrice - data[data.length - 20].close) / data[data.length - 20].close) * 100;
-    if (roc20 > 5.0) score += 0.05;
-    else if (roc20 < -5.0) score -= 0.05;
-  }
+  // 6-month momentum scoring (~35%)
+  if (mom6m > 20) { score += 0.35; }
+  else if (mom6m > 10) { score += 0.2; }
+  else if (mom6m > 3) { score += 0.1; }
+  else if (mom6m > -3) { score += 0; }
+  else if (mom6m > -10) { score -= 0.1; }
+  else if (mom6m > -20) { score -= 0.2; }
+  else { score -= 0.35; }
+  reasons.push(`6mo: ${mom6m >= 0 ? '+' : ''}${mom6m.toFixed(0)}%`);
 
-  return { name: 'Momentum', score: Math.max(-1, Math.min(1, score)), confidence: 0.7, reason: reasons.slice(0, 3).join(', ') };
+  // 3-month momentum scoring (~25%)
+  if (mom3m > 15) { score += 0.25; }
+  else if (mom3m > 7) { score += 0.15; }
+  else if (mom3m > 2) { score += 0.05; }
+  else if (mom3m > -2) { score += 0; }
+  else if (mom3m > -7) { score -= 0.05; }
+  else if (mom3m > -15) { score -= 0.15; }
+  else { score -= 0.25; }
+  reasons.push(`3mo: ${mom3m >= 0 ? '+' : ''}${mom3m.toFixed(0)}%`);
+
+  return {
+    name: 'Momentum',
+    score: Math.max(-1, Math.min(1, score)),
+    confidence: 0.75,
+    reason: reasons.join(', '),
+  };
 }
 
 function calculateMeanReversionSignal(data) {
@@ -699,7 +682,7 @@ async function runBacktest() {
   const allDates = spyData.map(d => d.date);
 
   // Determine backtest window: need warmup + train + test
-  const warmupDays = 50;
+  const warmupDays = 252;
   let allBacktestDates, trainDates, testDates;
 
   if (OPTIMIZE && TEST_START) {

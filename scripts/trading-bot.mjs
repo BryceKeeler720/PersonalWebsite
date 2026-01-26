@@ -16,16 +16,16 @@ let currentRunPromise = null;
 const BATCH_SIZE = 20;
 const BATCH_DELAY_MS = 400;
 const DEFAULT_CONFIG = {
-  initialCapital: 10190.65,
+  initialCapital: 10199.33,
   maxPositionSize: 0.04,
   maxPositions: 50,
   minTradeValue: 15,
   targetCashRatio: 0,
   strategyWeights: {
-    momentum: 0.00,
-    meanReversion: 0.34,
-    sentiment: 0.14,
-    technical: 0.52,
+    momentum: 0.08,
+    meanReversion: 0.41,
+    sentiment: 0.15,
+    technical: 0.36,
   },
 };
 
@@ -498,23 +498,37 @@ async function fetchYahooHistorical(symbol) {
   }
 }
 
-// Strategy calculations
-function calculateSMA(data, period) {
-  if (data.length < period) return null;
-  const slice = data.slice(-period);
-  return slice.reduce((sum, d) => sum + d.close, 0) / period;
-}
+async function fetchYahooDaily(symbol) {
+  try {
+    // 1 year of daily candles for long-term momentum calculation
+    const response = await fetch(
+      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1y&interval=1d`,
+      { headers: { 'User-Agent': 'Mozilla/5.0 (compatible)' } }
+    );
+    const data = await response.json();
+    const result = data?.chart?.result?.[0];
+    if (!result?.timestamp || !result?.indicators?.quote?.[0]) return null;
 
-function calculateEMA(data, period) {
-  if (data.length < period) return null;
-  const k = 2 / (period + 1);
-  let ema = data.slice(0, period).reduce((sum, d) => sum + d.close, 0) / period;
-  for (let i = period; i < data.length; i++) {
-    ema = data[i].close * k + ema * (1 - k);
+    const { timestamp, indicators } = result;
+    const quote = indicators.quote[0];
+
+    return timestamp
+      .map((ts, i) => ({
+        date: new Date(ts * 1000).toISOString(),
+        open: quote.open[i],
+        high: quote.high[i],
+        low: quote.low[i],
+        close: quote.close[i],
+        volume: quote.volume[i],
+      }))
+      .filter(d => d.open !== null && d.high !== null && d.low !== null && d.close !== null);
+  } catch (error) {
+    console.error(`Error fetching daily data for ${symbol}:`, error.message);
+    return null;
   }
-  return ema;
 }
 
+// Strategy calculations
 function calculateRSI(data, period = 14) {
   if (data.length < period + 1) return 50;
   const changes = [];
@@ -531,75 +545,67 @@ function calculateRSI(data, period = 14) {
   return 100 - (100 / (1 + rs));
 }
 
-function calculateMomentumSignal(data) {
-  // With hourly candles: need 50 bars = ~8 trading days minimum
-  if (data.length < 50) return { name: 'Momentum', score: 0, confidence: 0, reason: 'Insufficient data' };
+function calculateMomentumSignal(dailyData) {
+  // Long-term momentum using daily candles (academic standard)
+  // Need at least 252 trading days (1 year) for 12-1 momentum factor
+  if (!dailyData || dailyData.length < 252) {
+    return { name: 'Momentum', score: 0, confidence: 0, reason: 'Insufficient daily data (need 1y)' };
+  }
 
-  const currentPrice = data[data.length - 1].close;
-
-  // Standard periods now meaningful with hourly candles:
-  // SMA-20 = 20 hours ≈ 3 trading days, SMA-50 = 50 hours ≈ 8 trading days
-  const sma20 = calculateSMA(data, 20);
-  const sma50 = calculateSMA(data, 50);
-  // EMA-12/26 = standard MACD timeframes (12h ≈ 2 days, 26h ≈ 4 days)
-  const ema12 = calculateEMA(data, 12);
-  const ema26 = calculateEMA(data, 26);
-
-  let score = 0;
+  const currentPrice = dailyData[dailyData.length - 1].close;
   const reasons = [];
+  let score = 0;
 
-  // Price vs SMA-20 (short-term trend): graded by distance
-  if (sma20) {
-    const pctAbove = ((currentPrice - sma20) / sma20) * 100;
-    if (pctAbove > 2.0) { score += 0.25; reasons.push(`+${pctAbove.toFixed(1)}% vs SMA20`); }
-    else if (pctAbove > 0.5) { score += 0.15; reasons.push('Above SMA20'); }
-    else if (pctAbove > -0.5) { score += 0; reasons.push('Near SMA20'); }
-    else if (pctAbove > -2.0) { score -= 0.15; reasons.push('Below SMA20'); }
-    else { score -= 0.25; reasons.push(`${pctAbove.toFixed(1)}% vs SMA20`); }
-  }
+  // 12-1 Momentum (Jegadeesh-Titman): return from 12 months ago to 1 month ago
+  // Skips last month to avoid short-term reversal effect
+  const price12moAgo = dailyData[dailyData.length - 252].close;
+  const price1moAgo = dailyData[dailyData.length - 21].close;
+  const mom12_1 = ((price1moAgo - price12moAgo) / price12moAgo) * 100;
 
-  // Price vs SMA-50 (medium-term trend): graded by distance
-  if (sma50) {
-    const pctAbove = ((currentPrice - sma50) / sma50) * 100;
-    if (pctAbove > 3.0) { score += 0.25; reasons.push(`+${pctAbove.toFixed(1)}% vs SMA50`); }
-    else if (pctAbove > 1.0) { score += 0.15; reasons.push('Above SMA50'); }
-    else if (pctAbove > -1.0) { score += 0; }
-    else if (pctAbove > -3.0) { score -= 0.15; reasons.push('Below SMA50'); }
-    else { score -= 0.25; reasons.push(`${pctAbove.toFixed(1)}% vs SMA50`); }
-  }
+  // 6-month return
+  const price6moAgo = dailyData[dailyData.length - 126].close;
+  const mom6m = ((currentPrice - price6moAgo) / price6moAgo) * 100;
 
-  // Golden/death cross: SMA-20 vs SMA-50
-  if (sma20 && sma50) {
-    const crossPct = ((sma20 - sma50) / sma50) * 100;
-    if (crossPct > 1.0) { score += 0.2; reasons.push('Bullish MA cross'); }
-    else if (crossPct > 0) { score += 0.1; }
-    else if (crossPct > -1.0) { score -= 0.1; }
-    else { score -= 0.2; reasons.push('Bearish MA cross'); }
-  }
+  // 3-month return
+  const price3moAgo = dailyData[dailyData.length - 63].close;
+  const mom3m = ((currentPrice - price3moAgo) / price3moAgo) * 100;
 
-  // MACD (EMA-12 vs EMA-26) with graded scoring
-  if (ema12 && ema26) {
-    const macdPct = ((ema12 - ema26) / ema26) * 100;
-    if (macdPct > 1.0) { score += 0.2; reasons.push('Strong MACD bullish'); }
-    else if (macdPct > 0) { score += 0.1; reasons.push('MACD bullish'); }
-    else if (macdPct > -1.0) { score -= 0.1; reasons.push('MACD bearish'); }
-    else { score -= 0.2; reasons.push('Strong MACD bearish'); }
-  }
+  // 12-1 momentum scoring (~40% of total signal — the classic academic factor)
+  if (mom12_1 > 30) { score += 0.4; }
+  else if (mom12_1 > 15) { score += 0.3; }
+  else if (mom12_1 > 5) { score += 0.15; }
+  else if (mom12_1 > -5) { score += 0; }
+  else if (mom12_1 > -15) { score -= 0.15; }
+  else if (mom12_1 > -30) { score -= 0.3; }
+  else { score -= 0.4; }
+  reasons.push(`12-1: ${mom12_1 >= 0 ? '+' : ''}${mom12_1.toFixed(0)}%`);
 
-  // Rate of change: 5 bars = 5 hours (intraday), 20 bars = ~3 days (short-term trend)
-  if (data.length > 5) {
-    const roc5 = ((currentPrice - data[data.length - 5].close) / data[data.length - 5].close) * 100;
-    if (roc5 > 1.0) { score += 0.05; }
-    else if (roc5 < -1.0) { score -= 0.05; }
-  }
-  if (data.length > 20) {
-    const roc20 = ((currentPrice - data[data.length - 20].close) / data[data.length - 20].close) * 100;
-    if (roc20 > 3.0) { score += 0.05; }
-    else if (roc20 < -3.0) { score -= 0.05; }
-  }
+  // 6-month momentum scoring (~35%)
+  if (mom6m > 20) { score += 0.35; }
+  else if (mom6m > 10) { score += 0.2; }
+  else if (mom6m > 3) { score += 0.1; }
+  else if (mom6m > -3) { score += 0; }
+  else if (mom6m > -10) { score -= 0.1; }
+  else if (mom6m > -20) { score -= 0.2; }
+  else { score -= 0.35; }
+  reasons.push(`6mo: ${mom6m >= 0 ? '+' : ''}${mom6m.toFixed(0)}%`);
 
-  const confidence = data.length >= 200 ? 0.7 : 0.5;
-  return { name: 'Momentum', score: Math.max(-1, Math.min(1, score)), confidence, reason: reasons.slice(0, 3).join(', ') };
+  // 3-month momentum scoring (~25%)
+  if (mom3m > 15) { score += 0.25; }
+  else if (mom3m > 7) { score += 0.15; }
+  else if (mom3m > 2) { score += 0.05; }
+  else if (mom3m > -2) { score += 0; }
+  else if (mom3m > -7) { score -= 0.05; }
+  else if (mom3m > -15) { score -= 0.15; }
+  else { score -= 0.25; }
+  reasons.push(`3mo: ${mom3m >= 0 ? '+' : ''}${mom3m.toFixed(0)}%`);
+
+  return {
+    name: 'Momentum',
+    score: Math.max(-1, Math.min(1, score)),
+    confidence: 0.75,
+    reason: reasons.join(', '),
+  };
 }
 
 function calculateMeanReversionSignal(data) {
@@ -702,10 +708,14 @@ function combineSignals(symbol, momentum, meanReversion, sentiment, technical, w
 
 
 async function analyzeStock(symbol) {
-  const historicalData = await fetchYahooHistorical(symbol);
+  // Fetch hourly (for mean reversion, technical) and daily (for momentum) in parallel
+  const [historicalData, dailyData] = await Promise.all([
+    fetchYahooHistorical(symbol),
+    fetchYahooDaily(symbol),
+  ]);
   if (!historicalData || historicalData.length < 50) return { signal: null, lastPrice: null };
 
-  const momentum = calculateMomentumSignal(historicalData);
+  const momentum = calculateMomentumSignal(dailyData);
   const meanReversion = calculateMeanReversionSignal(historicalData);
   const technical = calculateTechnicalSignal(historicalData);
   const sentiment = calculateSentimentSignal();
