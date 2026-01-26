@@ -98,58 +98,199 @@ export const FUTURES_SYMBOLS = [
 ] as const;
 
 // ============================================================
-// NASDAQ-100 (Additional stocks not in S&P 500)
+// NASDAQ Stocks (Comprehensive list - ~400 stocks)
+// Includes NASDAQ-100, growth stocks, biotech, tech, and more
 // ============================================================
 export const NASDAQ_ADDITIONAL = [
-  // These are NASDAQ-100 stocks not already in S&P 500
-  'MELI', // MercadoLibre
-  'WDAY', // Workday
-  'ZS', // Zscaler
-  'DXCM', // DexCom
-  'TEAM', // Atlassian
-  'SIRI', // Sirius XM
-  'PCAR', // PACCAR
-  'LCID', // Lucid Group
-  'RIVN', // Rivian
-  'OKTA', // Okta
-  'ZM', // Zoom Video
-  'DOCU', // DocuSign
-  'SPLK', // Splunk
-  'ROKU', // Roku
-  'NET', // Cloudflare
-  'CRSP', // CRISPR Therapeutics
-  'ILMN', // Illumina
-  'ALGN', // Align Technology
-  'ENPH', // Enphase Energy
-  'ANSS', // ANSYS
-  'CPRT', // Copart
-  'CSGP', // CoStar Group
-  'VRSK', // Verisk Analytics
-  'FAST', // Fastenal
-  'ODFL', // Old Dominion Freight
-  'DLTR', // Dollar Tree
-  'EBAY', // eBay
-  'TTWO', // Take-Two Interactive
-  'EA', // Electronic Arts
-  'WBD', // Warner Bros Discovery
-  'SGEN', // Seagen
-  'BIIB', // Biogen
-  'IDXX', // IDEXX Laboratories
-  'MNST', // Monster Beverage
-  'KHC', // Kraft Heinz
-  'KDP', // Keurig Dr Pepper
-  'MDLZ', // Mondelez
-  'PDD', // PDD Holdings (Pinduoduo)
-  'JD', // JD.com
-  'BIDU', // Baidu
-  'NTES', // NetEase
-  'TCOM', // Trip.com
-  'VRSN', // VeriSign
-  'ASML', // ASML Holding
-  'MRVL', // Marvell Technology
-  'FTNT', // Fortinet
-  'PAYX', // Paychex
-  'CTAS', // Cintas
+  // === NASDAQ-100 Core (not in S&P 500) ===
+  'MELI', 'TEAM', 'LCID', 'RIVN', 'OKTA', 'ZM', 'DOCU', 'ROKU', 'NET',
+  'CRSP', 'ASML', 'MRVL', 'PDD', 'JD', 'BIDU', 'NTES', 'TCOM',
+
+  // === Growth & Momentum Stocks ===
+  'SOFI', 'UPST', 'AFRM', 'PATH', 'SNOW', 'DKNG', 'RBLX', 'U', 'BILL',
+  'HUBS', 'TWLO', 'MDB', 'CFLT', 'GTLB', 'S', 'DUOL', 'PINS', 'SNAP',
+  'SPOT', 'LYFT', 'GRAB', 'SE', 'SHOP', 'SQ', 'FUBO',
+
+  // === Biotech & Pharma ===
+  'BNTX', 'NVAX', 'SGEN', 'EXAS', 'ALNY', 'SRPT', 'RARE', 'BMRN',
+  'NBIX', 'IONS', 'HALO', 'LEGN', 'PCVX', 'KRYS', 'ARWR', 'BGNE',
+  'VXRT', 'INO', 'SAVA', 'MGNX', 'NTLA', 'EDIT', 'BEAM', 'PRTA',
+  'VCNX', 'IMVT', 'CCCC', 'RCKT', 'RVNC', 'FATE', 'GTHX', 'FOLD',
+  'APLS', 'DCPH', 'ROIV', 'XNCR', 'ARQT', 'KROS', 'ARVN', 'CYTK',
+  'DAWN', 'EWTX', 'HLVX', 'IMCR', 'INSM', 'ITCI', 'LGND', 'MDGL',
+  'MIRM', 'NUVB', 'PTCT', 'RGNX', 'RCUS', 'SRRK', 'VCEL', 'VKTX',
+  'VRNA', 'XENE', 'ZLAB', 'ACAD', 'AGEN', 'AKRO', 'ANAB', 'ARDX',
+  'AUPH', 'BBIO', 'CLDX', 'CPRX', 'DVAX', 'ENTA', 'EXEL', 'FGEN',
+  'GERN', 'HRTX', 'IMGN', 'IOVA', 'IRWD', 'JAZZ', 'KURA', 'MCRB',
+  'NKTX', 'OLINK', 'PRAX', 'SAGE', 'TGTX', 'TVTX', 'VCYT', 'XERS',
+
+  // === Tech & AI/ML ===
+  'ARM', 'IONQ', 'RGTI', 'AI', 'SOUN', 'BBAI', 'UPWK', 'FVRR', 'WIX',
+  'ZI', 'ESTC', 'NEWR', 'ASAN', 'MNDY', 'DOCN', 'FSLY', 'AKAM', 'DBX',
+  'BOX', 'SPLK', 'DOMO', 'YEXT', 'ZUO', 'APPN', 'BIGC', 'COUP',
+  'FROG', 'NCNO', 'QLYS', 'TENB', 'VRNS', 'ZEN', 'CRDO', 'CWAN',
+  'DLO', 'ENVX', 'GCT', 'GENI', 'IOT', 'LSPD', 'MGNI', 'NXST',
+  'PAYO', 'PRFT', 'PSTG', 'QLGN', 'RPD', 'SMAR', 'SPSC', 'TASK',
+  'TDOC', 'TTEC', 'VERX', 'VTEX', 'WEAV', 'WK', 'YOU', 'ZETA',
+  'BASE', 'BRZE', 'CRNC', 'DV', 'EVTC', 'FRSH', 'INFA', 'JAMF',
+  'LSCC', 'MANH', 'NTNX', 'PCOR', 'PEGA', 'PLAN', 'RELY', 'SEMR',
+  'TOST', 'WULF', 'XPRO', 'APGE', 'AVPT', 'CLSK', 'COTY', 'CPRT',
+
+  // === Semiconductors ===
+  'WOLF', 'ACLS', 'ALGM', 'AMKR', 'AOSL', 'ASPN', 'ATOM', 'AXTI',
+  'CAMT', 'CRUS', 'DIOD', 'FORM', 'INDI', 'IPGP', 'ISSI', 'ITOS',
+  'KLIC', 'LEDS', 'LITE', 'MASI', 'MKSI', 'MTSI', 'NOVT', 'NXPI',
+  'OLED', 'ONTO', 'PLAB', 'POWI', 'QRVO', 'RMBS', 'SITM', 'SLAB',
+  'SMTC', 'SYNA', 'TER', 'UCTT', 'VECO', 'VIAV', 'VSH', 'WRAP',
+
+  // === Consumer & Retail ===
+  'FIVE', 'OLLI', 'RH', 'W', 'CHWY', 'CPNG', 'BABA', 'BGFV', 'BIRD',
+  'BOOT', 'BROS', 'CAKE', 'CARS', 'CASA', 'CATO', 'CONN', 'COUR',
+  'CURV', 'EAT', 'ELF', 'EVRI', 'FIZZ', 'FOXF', 'FRPT', 'FTDR',
+  'GOOS', 'GPRO', 'HAIN', 'HIBB', 'HZO', 'IMKTA', 'JACK', 'LANC',
+  'LCUT', 'LEVI', 'LOVE', 'MCBC', 'MED', 'MELI', 'MNST', 'NATH',
+  'NCLH', 'ONON', 'ORLY', 'PTON', 'REAL', 'RMNI', 'SABR', 'SAVE',
+  'SCVL', 'SHAK', 'SITE', 'SFIX', 'SKYW', 'SNBR', 'SPTN', 'SSYS',
+  'STNE', 'SWBI', 'TACO', 'TAST', 'TNET', 'TRIP', 'TXRH', 'VIR',
+  'VRNT', 'VSCO', 'WINA', 'WING', 'WOOF', 'WW', 'YELP', 'YETI',
+
+  // === EV & Clean Energy ===
+  'NIO', 'XPEV', 'LI', 'FSR', 'GOEV', 'WKHS', 'HYLN', 'CHPT', 'BLNK',
+  'EVGO', 'QS', 'PLUG', 'FCEL', 'BE', 'SEDG', 'RUN', 'ARRY', 'BLDP',
+  'CLNE', 'ENVX', 'EVEX', 'FLNC', 'FREY', 'GEVO', 'HYZN', 'LEV',
+  'LILM', 'MVST', 'NKLA', 'NOVA', 'OUST', 'PTRA', 'REE', 'RMO',
+  'SHLS', 'SLDP', 'SPWR', 'STEM', 'VLD', 'XL', 'AEHR', 'AMPX',
+  'AMPS', 'ARBE', 'ARVL', 'BEEM', 'CALX', 'DRIV', 'EOSE', 'FFIE',
+  'FUV', 'LAZR', 'LCID', 'MULN', 'PLTK', 'PODD', 'PRCH', 'SLDP',
+
+  // === Fintech & Financial ===
+  'MSTR', 'VIRT', 'ALLY', 'AX', 'BFAM', 'BL', 'BSIG', 'CACC',
+  'CASH', 'CBSH', 'CFFN', 'COOP', 'CUBI', 'CWCO', 'CZFS', 'DCOM',
+  'DFIN', 'DNLI', 'ENVA', 'ESNT', 'EQBK', 'FBIZ', 'FCBP', 'FCNCA',
+  'FFIC', 'FISI', 'FMBH', 'FNLC', 'FRHC', 'FRME', 'FSBW', 'GBCI',
+  'GNW', 'HFWA', 'HOPE', 'HTLF', 'IBTX', 'INBK', 'INDB', 'ITIC',
+  'KREF', 'LADR', 'LC', 'LMND', 'LOAN', 'LPRO', 'LX', 'MCBS',
+  'MKTW', 'ML', 'NBHC', 'NCR', 'NWBI', 'NYCB', 'OZK', 'PACW',
+  'PATK', 'PFSI', 'PNFP', 'PRDO', 'PRSP', 'RKT', 'RILY', 'SBNY',
+  'SIVB', 'SLQT', 'SNEX', 'SYF', 'TFSL', 'TREE', 'TRUP', 'UBSI',
+  'UFPI', 'VBTX', 'VLY', 'VRTS', 'WABC', 'WAFD', 'WAL', 'WBS',
+  'WRLD', 'WSBC', 'WTBA', 'WTFC', 'XNCR',
+
+  // === Media & Entertainment ===
+  'PARA', 'BMBL', 'ATVI', 'CARG', 'CHDN', 'CNK', 'CPRI', 'CROX',
+  'CWST', 'DXPE', 'EYE', 'FOSL', 'GIII', 'GRPN', 'HAFC', 'HLI',
+  'IMAX', 'INSW', 'LAUR', 'LINC', 'LIND', 'LNW', 'LPTH', 'LSXMA',
+  'LSXMK', 'MARA', 'NAVI', 'NXGN', 'OPRA', 'PENN', 'PLYA', 'PRGS',
+  'QNST', 'RCII', 'RIOT', 'SIRI', 'SONO', 'SPHR', 'STAA', 'STRA',
+  'STRR', 'TARS', 'TME', 'TRMK', 'TUYA', 'WMG', 'WWE', 'XMTR', 'ZUMZ',
+
+  // === Communications & Telecom ===
+  'LUMN', 'FYBR', 'USM', 'SATS', 'GSAT', 'IRDM', 'ASTS', 'BAND',
+  'BCOV', 'CALX', 'CASA', 'CCOI', 'CIEN', 'CIIG', 'CLFD', 'CNSL',
+  'COMM', 'CRNT', 'CTL', 'DZSI', 'EXTR', 'GILT', 'GOGO', 'HLIT',
+  'IDCC', 'INFN', 'INSG', 'LILA', 'LILAK', 'LTRX', 'LUMEN', 'MAXR',
+  'MTCR', 'NTGR', 'OOMA', 'PDCO', 'RBBN', 'RDWR', 'SIFY', 'SPTN',
+  'SWIR', 'TZOO', 'UBNT', 'UI', 'UTI', 'VSAT', 'WSTC', 'ZGID',
+
+  // === Industrial & Transportation ===
+  'SAIA', 'LSTR', 'WERN', 'KNX', 'SNDR', 'AAWW', 'ABUS', 'ACHC',
+  'ACLE', 'ACMR', 'AEIS', 'AGYS', 'AIMC', 'ALEX', 'ALGN', 'ALGT',
+  'AMRC', 'AMSC', 'AMWD', 'ANGI', 'ANIP', 'APEI', 'APOG', 'ARCB',
+  'ARGO', 'AROC', 'ARWR', 'ATEC', 'ATGE', 'ATLC', 'ATNI', 'AVAV',
+  'AVID', 'AXGN', 'AY', 'AZPN', 'BANF', 'BCO', 'BECN', 'BJRI',
+  'BKNG', 'BLD', 'BLDR', 'BLX', 'BMI', 'BRP', 'BRSP', 'CAKE',
+  'CALM', 'CASY', 'CBZ', 'CDNA', 'CFX', 'CGNX', 'CHCO', 'CHE',
+  'CHTR', 'CINF', 'CIR', 'CLAR', 'CLBK', 'CLSK', 'CMCO', 'CMT',
+  'COHU', 'COLM', 'CPSI', 'CRAI', 'CRI', 'CSL', 'CSOD', 'CVCO',
+  'CVLT', 'CWST', 'CYRX', 'CZR', 'DAN', 'DENN', 'DGII', 'DHC',
+  'DIOD', 'DLB', 'DNKN', 'DOOR', 'DY', 'ECHO', 'EEFT', 'EGBN',
+  'EHTH', 'EIGI', 'ENSG', 'ENVA', 'EQH', 'ESE', 'ESGR', 'ETON',
+  'EVTV', 'EXLS', 'EXPO', 'FA', 'FARO', 'FCFS', 'FCN', 'FFIV',
+  'FHN', 'FIGS', 'FLGT', 'FLO', 'FLWS', 'FMAO', 'FN', 'FNKO',
+  'FNV', 'FOXF', 'FRO', 'FROG', 'FRPH', 'FRSH', 'FTI', 'FTNT',
+  'FWRD', 'GBX', 'GCT', 'GDOT', 'GFF', 'GLBE', 'GLDD', 'GLNG',
+  'GLOB', 'GLPI', 'GLW', 'GNTX', 'GO', 'GRBK', 'GRFS', 'GSHD',
+  'GTBIF', 'GTX', 'GVA', 'HA', 'HAIN', 'HBB', 'HBNC', 'HEES',
+  'HGV', 'HLNE', 'HLX', 'HMN', 'HMST', 'HNI', 'HRMY', 'HSC',
+  'HTLD', 'HUBG', 'HURN', 'HWC', 'HWKN', 'HZNP', 'IAA', 'IART',
+  'ICAD', 'ICFI', 'ICUI', 'IDYA', 'IEP', 'IGT', 'IIIN', 'IIIV',
+  'IMXI', 'INGN', 'INMD', 'INST', 'INT', 'IOSP', 'IPAR', 'IRBT',
+  'ISBC', 'ISSC', 'ITRI', 'IVA', 'JBSS', 'JBTX', 'JBT', 'JCOM',
+  'JJSF', 'JKHY', 'JNPR', 'JOE', 'JRVR', 'JTPY', 'JW.A', 'KALU',
+  'KAMN', 'KBAL', 'KELYA', 'KEQU', 'KFRC', 'KIDS', 'KLXE', 'KMDA',
+  'KODK', 'KTOS', 'KURA', 'LAMR', 'LAUR', 'LAWS', 'LBC', 'LDI',
+  'LFST', 'LGIH', 'LGND', 'LIVN', 'LKFN', 'LLNW', 'LMAT', 'LNDC',
+  'LNTH', 'LOB', 'LOGI', 'LPRO', 'LQDA', 'LRCX', 'LSCC', 'LUNA',
+  'LXRX', 'MANH', 'MATW', 'MAXN', 'MBUU', 'MBWM', 'MCBC', 'MCRI',
+  'MDRX', 'MEDS', 'MESA', 'MGEE', 'MGPI', 'MGRC', 'MIDD', 'MKSI',
+  'MLCO', 'MMSI', 'MNTV', 'MOD', 'MODV', 'MOGO', 'MORF', 'MORN',
+  'MPWR', 'MRCY', 'MRSN', 'MRUS', 'MSEX', 'MSGS', 'MTLS', 'MTX',
+  'NARI', 'NATR', 'NAVI', 'NBEV', 'NBTB', 'NCMI', 'NDSN', 'NEO',
+  'NEOG', 'NGVC', 'NINE', 'NMIH', 'NMRK', 'NNBR', 'NOVN', 'NPTN',
+  'NRDS', 'NSIT', 'NSTG', 'NTCT', 'NTRA', 'NUVA', 'NVCR', 'NVT',
+  'NVTR', 'NWPX', 'NWS', 'NWSA', 'NX', 'NXGN', 'OABI', 'OAS',
+  'OCFC', 'OCGN', 'ODP', 'OFIX', 'OFLX', 'OGS', 'OMCL', 'OMER',
+  'ONB', 'OPCH', 'OPI', 'ORBC', 'ORIC', 'OSG', 'OSUR', 'OTTR',
+  'ATRO', 'OVBC', 'OVID', 'PACB', 'PAGS', 'PATI', 'PATK', 'PAYA',
+  'PAYS', 'PBCT', 'PBH', 'PBYI', 'PCTY', 'PDCE', 'PDFS', 'PEGA',
+  'PENN', 'PETQ', 'PFG', 'PFGC', 'PGEN', 'PGNY', 'PINC', 'PKE',
+  'PLAB', 'PLAY', 'PLBY', 'PLCE', 'PLUS', 'PMVP', 'PNRG', 'PNTG',
+  'POWI', 'PPBI', 'PPC', 'PRAA', 'PRFT', 'PRGS', 'PRMW', 'PROS',
+  'PRSC', 'PRVB', 'PSFE', 'PSMT', 'PSN', 'PSTL', 'PTGX', 'PUBM',
+  'PXLW', 'QDEL', 'QLYS', 'QRTEA', 'QTRX', 'QTWO', 'QUIK', 'RAMP',
+  'RAPT', 'RARE', 'RCII', 'RCKT', 'RCUS', 'RDNT', 'RDUS', 'RDVT',
+  'REGI', 'REGN', 'RELL', 'REPH', 'REPL', 'RETO', 'REVG', 'RGC',
+  'RGLD', 'RICK', 'RIGL', 'RIVE', 'RMBS', 'RNET', 'RNR', 'ROCC',
+  'ROCK', 'ROG', 'ROLL', 'RPAY', 'RPRX', 'RRX', 'RSSS', 'RTLR',
+  'RTRX', 'RUBY', 'RUSHA', 'RUSHB', 'RUTH', 'RVMD', 'RVNC', 'RVPH',
+  'RYAM', 'SAIL', 'SAM', 'SANA', 'SANM', 'SBCF', 'SBFG', 'SBGI',
+  'SBRA', 'SCHL', 'SCHN', 'SCOR', 'SCSC', 'SCWX', 'SDGR', 'SEAT',
+  'SENEA', 'SFBS', 'SFNC', 'SGMO', 'SGMS', 'SHBI', 'SHEN', 'SHIP',
+  'SHLS', 'SHOO', 'SHV', 'SIBN', 'SIG', 'SILC', 'SILK', 'SIM',
+  'SITC', 'SIVB', 'SJW', 'SKIN', 'SKWD', 'SKYW', 'SLAB', 'SLDB',
+  'SLP', 'SLQT', 'SMBC', 'SMID', 'SMMT', 'SMPL', 'SMSI', 'SMTX',
+  'SNCR', 'SNDX', 'SNV', 'SNWV', 'SONM', 'SP', 'SPCB', 'SPFI',
+  'SPNE', 'SPNT', 'SPOK', 'SPOT', 'SPRO', 'SPSC', 'SPTN', 'SPWH',
+  'SPXC', 'SRCE', 'SRDX', 'SREV', 'SRNE', 'SSB', 'SSRM', 'SSTI',
+  'SSTK', 'STAG', 'STBA', 'STFC', 'STLD', 'STMP', 'STNG', 'STOK',
+  'STRA', 'STRL', 'STRS', 'STXS', 'SUPN', 'SUSC', 'SVRA', 'SWAV',
+  'SWTX', 'SYBX', 'SYBT', 'SYNA', 'SYNC', 'SYNH', 'SYNL', 'TACO',
+  'TBBK', 'TBI', 'TCBI', 'TCBK', 'TCMD', 'TDOC', 'TECH', 'TELL',
+  'TENB', 'TEN', 'TERN', 'TESS', 'TFII', 'TGNA', 'TH', 'THRY',
+  'TILE', 'TITN', 'TLND', 'TLYS', 'TMDX', 'TMUS', 'TNAV', 'TNDM',
+  'TNXP', 'TOPS', 'TPHS', 'TPTX', 'TR', 'TRDA', 'TRIB', 'TRHC',
+  'TRIP', 'TRM', 'TRMB', 'TRNO', 'TROW', 'TRS', 'TRUE', 'TRVN',
+  'TTGT', 'TTM', 'TTWO', 'TWNK', 'TXG', 'TXMD', 'TXRH', 'UCBI',
+  'UCTT', 'UEIC', 'UFCS', 'UFPI', 'UFPT', 'UG', 'UHAL', 'UHT',
+  'UIHC', 'ULH', 'ULTA', 'UMBF', 'UNIT', 'UNTY', 'UPLD', 'URGN',
+  'USAK', 'USAP', 'USAU', 'USCR', 'USIO', 'USNA', 'USPH', 'UTMD',
+  'VBF', 'VCRA', 'VCYT', 'VECO', 'VEON', 'VERA', 'VERI', 'VERU',
+  'VIAV', 'VICR', 'VIE', 'VIEW', 'VINC', 'VIR', 'VIRC', 'VIRI',
+  'VIS', 'VITL', 'VIVO', 'VKTX', 'VLDR', 'VLY', 'VMEO', 'VNCE',
+  'VNDA', 'VNE', 'VNET', 'VOXX', 'VOYA', 'VRA', 'VRRM', 'VRSK',
+  'VRTS', 'VSAT', 'VSEC', 'VSH', 'VSTM', 'VTS', 'VTVT', 'VXRT',
+  'WAFD', 'WASH', 'WATT', 'WBS', 'WDAY', 'WDC', 'WDFC', 'WELL',
+  'WETF', 'WEYS', 'WHF', 'WIX', 'WKHS', 'WKSP', 'WLDN', 'WLK',
+  'WMK', 'WNEB', 'WOR', 'WPRT', 'WRAP', 'WRBY', 'WRLD', 'WSBC',
+  'WSBF', 'WSC', 'WSTG', 'WTBA', 'WTRG', 'WVVI', 'WWD', 'WWW',
+  'XBIT', 'XELA', 'XENE', 'XERS', 'XLNX', 'XNCR', 'XNET', 'XOG',
+  'XOMA', 'XONE', 'XPEL', 'XPER', 'XRAY', 'YGTY', 'YMAB', 'YORW',
+  'YRCW', 'YSG', 'YY', 'ZBRA', 'ZEAL', 'ZEUS', 'ZIMV', 'ZION',
+  'ZIXI', 'ZLAB', 'ZNTL', 'ZS', 'ZTO', 'ZUMZ', 'ZVO',
+
+  // === Real Estate & REITs ===
+  'REXR', 'COLD', 'IIPR', 'ADC', 'AHH', 'AIRC', 'ALEX', 'APLE',
+  'BDN', 'BNL', 'BRX', 'BXP', 'CIO', 'CLPR', 'CMCT', 'CTRE',
+  'CUBE', 'CUZ', 'DEA', 'DEI', 'DGRW', 'DHC', 'DOC', 'EGP',
+  'ELME', 'EPR', 'ESRT', 'FAT', 'FCPT', 'FPI', 'FR', 'FSP',
+  'GNL', 'GOOD', 'GPMT', 'GTY', 'HT', 'ILPT', 'INN', 'IRT',
+  'IIPR', 'JBGS', 'KRC', 'LAND', 'LTC', 'MAC', 'MDRR', 'MFA',
+  'MGP', 'MPW', 'NHI', 'NNN', 'NSA', 'NXRT', 'NYT', 'OFC',
+  'OFFS', 'OHI', 'OUT', 'PGRE', 'PK', 'PLYM', 'PSTL', 'QTS',
+  'RC', 'RLGT', 'RLJ', 'RYN', 'SAFE', 'SBRA', 'SKT', 'SLG',
+  'SNDE', 'SRC', 'STAG', 'STAR', 'STOR', 'SUI', 'SVC', 'TRNO',
+  'TRTX', 'UBFO', 'UBA', 'UE', 'UNIT', 'VER', 'VICI', 'VNO',
+  'VRE', 'VSTA', 'WPC', 'WRI', 'WTRE', 'XHR',
 ] as const;
 
 // ============================================================
@@ -459,7 +600,7 @@ export const ASSET_INFO: Record<string, { name: string; category: string }> = {
   F: { name: 'Ford Motor Company', category: 'Consumer Cyclical' },
   CVS: { name: 'CVS Health Corp.', category: 'Healthcare' },
 
-  // NASDAQ Additional
+  // NASDAQ Additional - Growth Stocks
   MELI: { name: 'MercadoLibre', category: 'Consumer Cyclical' },
   TEAM: { name: 'Atlassian', category: 'Technology' },
   LCID: { name: 'Lucid Group', category: 'Consumer Cyclical' },
@@ -476,6 +617,236 @@ export const ASSET_INFO: Record<string, { name: string; category: string }> = {
   PDD: { name: 'PDD Holdings', category: 'Consumer Cyclical' },
   JD: { name: 'JD.com', category: 'Consumer Cyclical' },
   BIDU: { name: 'Baidu Inc.', category: 'Technology' },
+  NTES: { name: 'NetEase Inc.', category: 'Technology' },
+  TCOM: { name: 'Trip.com Group', category: 'Consumer Cyclical' },
+
+  // NASDAQ Growth & Fintech
+  SOFI: { name: 'SoFi Technologies', category: 'Financial' },
+  UPST: { name: 'Upstart Holdings', category: 'Financial' },
+  AFRM: { name: 'Affirm Holdings', category: 'Financial' },
+  PATH: { name: 'UiPath', category: 'Technology' },
+  SNOW: { name: 'Snowflake Inc.', category: 'Technology' },
+  DKNG: { name: 'DraftKings', category: 'Consumer Cyclical' },
+  RBLX: { name: 'Roblox Corporation', category: 'Technology' },
+  U: { name: 'Unity Software', category: 'Technology' },
+  BILL: { name: 'Bill.com Holdings', category: 'Technology' },
+  HUBS: { name: 'HubSpot Inc.', category: 'Technology' },
+  TWLO: { name: 'Twilio Inc.', category: 'Technology' },
+  MDB: { name: 'MongoDB Inc.', category: 'Technology' },
+  CFLT: { name: 'Confluent Inc.', category: 'Technology' },
+  GTLB: { name: 'GitLab Inc.', category: 'Technology' },
+  S: { name: 'SentinelOne', category: 'Technology' },
+  DUOL: { name: 'Duolingo Inc.', category: 'Technology' },
+  PINS: { name: 'Pinterest Inc.', category: 'Technology' },
+  SNAP: { name: 'Snap Inc.', category: 'Technology' },
+  SPOT: { name: 'Spotify Technology', category: 'Communication Services' },
+  LYFT: { name: 'Lyft Inc.', category: 'Technology' },
+  GRAB: { name: 'Grab Holdings', category: 'Technology' },
+  SE: { name: 'Sea Limited', category: 'Consumer Cyclical' },
+  SHOP: { name: 'Shopify Inc.', category: 'Technology' },
+  SQ: { name: 'Block Inc.', category: 'Financial' },
+  FUBO: { name: 'fuboTV Inc.', category: 'Communication Services' },
+
+  // NASDAQ Biotech
+  MRNA: { name: 'Moderna Inc.', category: 'Healthcare' },
+  BNTX: { name: 'BioNTech SE', category: 'Healthcare' },
+  NVAX: { name: 'Novavax Inc.', category: 'Healthcare' },
+  SGEN: { name: 'Seagen Inc.', category: 'Healthcare' },
+  EXAS: { name: 'Exact Sciences', category: 'Healthcare' },
+  ALNY: { name: 'Alnylam Pharmaceuticals', category: 'Healthcare' },
+  SRPT: { name: 'Sarepta Therapeutics', category: 'Healthcare' },
+  RARE: { name: 'Ultragenyx Pharmaceutical', category: 'Healthcare' },
+  BMRN: { name: 'BioMarin Pharmaceutical', category: 'Healthcare' },
+  NBIX: { name: 'Neurocrine Biosciences', category: 'Healthcare' },
+  UTHR: { name: 'United Therapeutics', category: 'Healthcare' },
+  INCY: { name: 'Incyte Corporation', category: 'Healthcare' },
+  IONS: { name: 'Ionis Pharmaceuticals', category: 'Healthcare' },
+  HALO: { name: 'Halozyme Therapeutics', category: 'Healthcare' },
+  LEGN: { name: 'Legend Biotech', category: 'Healthcare' },
+  PCVX: { name: 'Vaxcyte Inc.', category: 'Healthcare' },
+  KRYS: { name: 'Krystal Biotech', category: 'Healthcare' },
+
+  // NASDAQ Tech & AI
+  ARM: { name: 'ARM Holdings', category: 'Technology' },
+  SMCI: { name: 'Super Micro Computer', category: 'Technology' },
+  IONQ: { name: 'IonQ Inc.', category: 'Technology' },
+  RGTI: { name: 'Rigetti Computing', category: 'Technology' },
+  AI: { name: 'C3.ai Inc.', category: 'Technology' },
+  SOUN: { name: 'SoundHound AI', category: 'Technology' },
+  BBAI: { name: 'BigBear.ai Holdings', category: 'Technology' },
+  UPWK: { name: 'Upwork Inc.', category: 'Technology' },
+  FVRR: { name: 'Fiverr International', category: 'Technology' },
+  WIX: { name: 'Wix.com Ltd.', category: 'Technology' },
+  ZI: { name: 'ZoomInfo Technologies', category: 'Technology' },
+  ESTC: { name: 'Elastic N.V.', category: 'Technology' },
+  NEWR: { name: 'New Relic Inc.', category: 'Technology' },
+  ASAN: { name: 'Asana Inc.', category: 'Technology' },
+  MNDY: { name: 'Monday.com Ltd.', category: 'Technology' },
+  DOCN: { name: 'DigitalOcean Holdings', category: 'Technology' },
+  FSLY: { name: 'Fastly Inc.', category: 'Technology' },
+  AKAM: { name: 'Akamai Technologies', category: 'Technology' },
+
+  // NASDAQ Consumer & Retail
+  LULU: { name: 'Lululemon Athletica', category: 'Consumer Cyclical' },
+  ROST: { name: 'Ross Stores', category: 'Consumer Cyclical' },
+  DLTR: { name: 'Dollar Tree Inc.', category: 'Consumer Defensive' },
+  DG: { name: 'Dollar General', category: 'Consumer Defensive' },
+  FIVE: { name: 'Five Below Inc.', category: 'Consumer Cyclical' },
+  OLLI: { name: "Ollie's Bargain Outlet", category: 'Consumer Cyclical' },
+  TSCO: { name: 'Tractor Supply Co.', category: 'Consumer Cyclical' },
+  WSM: { name: 'Williams-Sonoma', category: 'Consumer Cyclical' },
+  RH: { name: 'Restoration Hardware', category: 'Consumer Cyclical' },
+  ETSY: { name: 'Etsy Inc.', category: 'Consumer Cyclical' },
+  W: { name: 'Wayfair Inc.', category: 'Consumer Cyclical' },
+  CHWY: { name: 'Chewy Inc.', category: 'Consumer Cyclical' },
+  CVNA: { name: 'Carvana Co.', category: 'Consumer Cyclical' },
+  CPNG: { name: 'Coupang Inc.', category: 'Consumer Cyclical' },
+  BABA: { name: 'Alibaba Group', category: 'Consumer Cyclical' },
+
+  // NASDAQ EV & Clean Energy
+  NIO: { name: 'NIO Inc.', category: 'Consumer Cyclical' },
+  XPEV: { name: 'XPeng Inc.', category: 'Consumer Cyclical' },
+  LI: { name: 'Li Auto Inc.', category: 'Consumer Cyclical' },
+  FSR: { name: 'Fisker Inc.', category: 'Consumer Cyclical' },
+  GOEV: { name: 'Canoo Inc.', category: 'Consumer Cyclical' },
+  WKHS: { name: 'Workhorse Group', category: 'Industrial' },
+  HYLN: { name: 'Hyliion Holdings', category: 'Industrial' },
+  CHPT: { name: 'ChargePoint Holdings', category: 'Industrial' },
+  BLNK: { name: 'Blink Charging', category: 'Industrial' },
+  EVGO: { name: 'EVgo Inc.', category: 'Industrial' },
+  QS: { name: 'QuantumScape Corp.', category: 'Technology' },
+  PLUG: { name: 'Plug Power Inc.', category: 'Industrial' },
+  FCEL: { name: 'FuelCell Energy', category: 'Industrial' },
+  BE: { name: 'Bloom Energy Corp.', category: 'Industrial' },
+  SEDG: { name: 'SolarEdge Technologies', category: 'Technology' },
+  RUN: { name: 'Sunrun Inc.', category: 'Industrial' },
+
+  // NASDAQ Media & Entertainment
+  PARA: { name: 'Paramount Global', category: 'Communication Services' },
+  WBD: { name: 'Warner Bros Discovery', category: 'Communication Services' },
+  LYV: { name: 'Live Nation Entertainment', category: 'Communication Services' },
+  MTCH: { name: 'Match Group', category: 'Communication Services' },
+  BMBL: { name: 'Bumble Inc.', category: 'Communication Services' },
+  TTWO: { name: 'Take-Two Interactive', category: 'Communication Services' },
+  EA: { name: 'Electronic Arts', category: 'Communication Services' },
+
+  // NASDAQ Communications
+  LUMN: { name: 'Lumen Technologies', category: 'Communication Services' },
+  FYBR: { name: 'Frontier Communications', category: 'Communication Services' },
+  USM: { name: 'United States Cellular', category: 'Communication Services' },
+  SATS: { name: 'EchoStar Corporation', category: 'Communication Services' },
+  GSAT: { name: 'Globalstar Inc.', category: 'Communication Services' },
+  IRDM: { name: 'Iridium Communications', category: 'Communication Services' },
+
+  // NASDAQ Transportation
+  ODFL: { name: 'Old Dominion Freight', category: 'Industrial' },
+  SAIA: { name: 'Saia Inc.', category: 'Industrial' },
+  XPO: { name: 'XPO Logistics', category: 'Industrial' },
+  JBHT: { name: 'J.B. Hunt Transport', category: 'Industrial' },
+  CHRW: { name: 'C.H. Robinson', category: 'Industrial' },
+  EXPD: { name: 'Expeditors International', category: 'Industrial' },
+  LSTR: { name: 'Landstar System', category: 'Industrial' },
+  WERN: { name: 'Werner Enterprises', category: 'Industrial' },
+  KNX: { name: 'Knight-Swift Transportation', category: 'Industrial' },
+  SNDR: { name: 'Schneider National', category: 'Industrial' },
+
+  // NASDAQ REITs
+  DLR: { name: 'Digital Realty Trust', category: 'Real Estate' },
+  SBAC: { name: 'SBA Communications', category: 'Real Estate' },
+  CCI: { name: 'Crown Castle', category: 'Real Estate' },
+  REXR: { name: 'Rexford Industrial', category: 'Real Estate' },
+  COLD: { name: 'Americold Realty', category: 'Real Estate' },
+  IIPR: { name: 'Innovative Industrial Properties', category: 'Real Estate' },
+
+  // NASDAQ Financial
+  MSTR: { name: 'MicroStrategy', category: 'Technology' },
+  IBKR: { name: 'Interactive Brokers', category: 'Financial' },
+  VIRT: { name: 'Virtu Financial', category: 'Financial' },
+  NDAQ: { name: 'Nasdaq Inc.', category: 'Financial' },
+  LPLA: { name: 'LPL Financial', category: 'Financial' },
+
+  // Additional NASDAQ Biotech
+  NTLA: { name: 'Intellia Therapeutics', category: 'Healthcare' },
+  EDIT: { name: 'Editas Medicine', category: 'Healthcare' },
+  BEAM: { name: 'Beam Therapeutics', category: 'Healthcare' },
+  ARWR: { name: 'Arrowhead Research', category: 'Healthcare' },
+  BGNE: { name: 'BeiGene Ltd.', category: 'Healthcare' },
+  JAZZ: { name: 'Jazz Pharmaceuticals', category: 'Healthcare' },
+  EXEL: { name: 'Exelixis Inc.', category: 'Healthcare' },
+  IOVA: { name: 'Iovance Biotherapeutics', category: 'Healthcare' },
+  SAGE: { name: 'Sage Therapeutics', category: 'Healthcare' },
+  ACAD: { name: 'Acadia Pharmaceuticals', category: 'Healthcare' },
+
+  // Additional Tech & SaaS
+  SPLK: { name: 'Splunk Inc.', category: 'Technology' },
+  DBX: { name: 'Dropbox Inc.', category: 'Technology' },
+  BOX: { name: 'Box Inc.', category: 'Technology' },
+  COUP: { name: 'Coupa Software', category: 'Technology' },
+  QLYS: { name: 'Qualys Inc.', category: 'Technology' },
+  TENB: { name: 'Tenable Holdings', category: 'Technology' },
+  VRNS: { name: 'Varonis Systems', category: 'Technology' },
+  RPD: { name: 'Rapid7 Inc.', category: 'Technology' },
+  NTNX: { name: 'Nutanix Inc.', category: 'Technology' },
+  MANH: { name: 'Manhattan Associates', category: 'Technology' },
+  PEGA: { name: 'Pegasystems Inc.', category: 'Technology' },
+  PLAN: { name: 'Anaplan Inc.', category: 'Technology' },
+  TOST: { name: 'Toast Inc.', category: 'Technology' },
+  BRZE: { name: 'Braze Inc.', category: 'Technology' },
+  JAMF: { name: 'Jamf Holding', category: 'Technology' },
+
+  // Additional Semiconductors
+  WOLF: { name: 'Wolfspeed Inc.', category: 'Technology' },
+  CRUS: { name: 'Cirrus Logic', category: 'Technology' },
+  DIOD: { name: 'Diodes Inc.', category: 'Technology' },
+  MKSI: { name: 'MKS Instruments', category: 'Technology' },
+  OLED: { name: 'Universal Display', category: 'Technology' },
+  ONTO: { name: 'Onto Innovation', category: 'Technology' },
+  POWI: { name: 'Power Integrations', category: 'Technology' },
+  QRVO: { name: 'Qorvo Inc.', category: 'Technology' },
+  RMBS: { name: 'Rambus Inc.', category: 'Technology' },
+  SLAB: { name: 'Silicon Labs', category: 'Technology' },
+
+  // Additional EV & Clean Tech
+  ARRY: { name: 'Array Technologies', category: 'Industrial' },
+  BLDP: { name: 'Ballard Power', category: 'Industrial' },
+  GEVO: { name: 'Gevo Inc.', category: 'Industrial' },
+  STEM: { name: 'Stem Inc.', category: 'Technology' },
+  LAZR: { name: 'Luminar Technologies', category: 'Technology' },
+  NKLA: { name: 'Nikola Corporation', category: 'Consumer Cyclical' },
+
+  // Additional Consumer
+  ONON: { name: 'On Holding AG', category: 'Consumer Cyclical' },
+  PTON: { name: 'Peloton Interactive', category: 'Consumer Cyclical' },
+  SHAK: { name: 'Shake Shack', category: 'Consumer Cyclical' },
+  WING: { name: 'Wingstop Inc.', category: 'Consumer Cyclical' },
+  TXRH: { name: 'Texas Roadhouse', category: 'Consumer Cyclical' },
+  ELF: { name: 'e.l.f. Beauty', category: 'Consumer Cyclical' },
+  CROX: { name: 'Crocs Inc.', category: 'Consumer Cyclical' },
+  YETI: { name: 'YETI Holdings', category: 'Consumer Cyclical' },
+  BROS: { name: 'Dutch Bros Inc.', category: 'Consumer Cyclical' },
+
+  // Additional Fintech
+  LMND: { name: 'Lemonade Inc.', category: 'Financial' },
+  RKT: { name: 'Rocket Companies', category: 'Financial' },
+  LC: { name: 'LendingClub Corp', category: 'Financial' },
+  ALLY: { name: 'Ally Financial', category: 'Financial' },
+  FCNCA: { name: 'First Citizens Bank', category: 'Financial' },
+  WAL: { name: 'Western Alliance', category: 'Financial' },
+
+  // Additional Media & Gaming
+  MARA: { name: 'Marathon Digital', category: 'Technology' },
+  RIOT: { name: 'Riot Platforms', category: 'Technology' },
+  WMG: { name: 'Warner Music Group', category: 'Communication Services' },
+  SONO: { name: 'Sonos Inc.', category: 'Technology' },
+  IMAX: { name: 'IMAX Corporation', category: 'Communication Services' },
+
+  // Additional Industrial
+  ZBRA: { name: 'Zebra Technologies', category: 'Technology' },
+  LOGI: { name: 'Logitech International', category: 'Technology' },
+  IRBT: { name: 'iRobot Corporation', category: 'Consumer Cyclical' },
+  GNRC: { name: 'Generac Holdings', category: 'Industrial' },
+  AVAV: { name: 'AeroVironment Inc.', category: 'Industrial' },
+  KTOS: { name: 'Kratos Defense', category: 'Industrial' },
 };
 
 // Get asset info with fallback
