@@ -285,9 +285,9 @@ async function fetchYahooQuote(symbol) {
 
 async function fetchYahooHistorical(symbol) {
   try {
-    // Use hourly candles so signals actually change between runs (not just once per day)
+    // Use 1-minute candles so signals change every run for responsive trading
     const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1mo&interval=1h`,
+      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=5d&interval=1m`,
       { headers: { 'User-Agent': 'Mozilla/5.0 (compatible)' } }
     );
     const data = await response.json();
@@ -299,7 +299,7 @@ async function fetchYahooHistorical(symbol) {
 
     return timestamp
       .map((ts, i) => ({
-        date: new Date(ts * 1000).toISOString().split('T')[0],
+        date: new Date(ts * 1000).toISOString(),
         open: quote.open[i],
         high: quote.high[i],
         low: quote.low[i],

@@ -185,27 +185,31 @@ export default function TradingBot() {
   const riskMetrics = useMemo(() => {
     if (data.history.length < 2) return null;
 
-    // Detect data frequency from timestamps to annualize correctly
-    const firstTime = new Date(data.history[0].timestamp).getTime();
-    const lastTime = new Date(data.history[data.history.length - 1].timestamp).getTime();
-    const avgIntervalMs = (lastTime - firstTime) / (data.history.length - 1);
-    const periodsPerYear = (365.25 * 24 * 60 * 60 * 1000) / avgIntervalMs;
+    // Aggregate per-minute snapshots to daily closing values to avoid
+    // inflated Sharpe from hundreds of zero-return overnight/weekend periods
+    const dailyMap = new Map<string, number>();
+    for (const point of data.history) {
+      const day = point.timestamp.slice(0, 10); // YYYY-MM-DD
+      dailyMap.set(day, point.totalValue); // last value of each day wins
+    }
+    const dailyValues = Array.from(dailyMap.values());
 
-    const returns: number[] = [];
-    for (let i = 1; i < data.history.length; i++) {
-      const ret = (data.history[i].totalValue - data.history[i - 1].totalValue) / data.history[i - 1].totalValue;
-      returns.push(ret);
+    if (dailyValues.length < 2) return null;
+
+    const dailyReturns: number[] = [];
+    for (let i = 1; i < dailyValues.length; i++) {
+      dailyReturns.push((dailyValues[i] - dailyValues[i - 1]) / dailyValues[i - 1]);
     }
 
-    const avgReturn = returns.reduce((a, b) => a + b, 0) / returns.length;
-    const variance = returns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / returns.length;
-    const volatility = Math.sqrt(variance) * Math.sqrt(periodsPerYear) * 100;
+    const avgReturn = dailyReturns.reduce((a, b) => a + b, 0) / dailyReturns.length;
+    const variance = dailyReturns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / dailyReturns.length;
+    const volatility = Math.sqrt(variance) * Math.sqrt(252) * 100; // Annualized with trading days
 
-    const riskFreeRate = 0.05 / periodsPerYear;
-    const excessReturns = returns.map(r => r - riskFreeRate);
+    const riskFreeRate = 0.05 / 252; // Daily risk-free rate
+    const excessReturns = dailyReturns.map(r => r - riskFreeRate);
     const avgExcessReturn = excessReturns.reduce((a, b) => a + b, 0) / excessReturns.length;
     const excessVariance = excessReturns.reduce((sum, r) => sum + Math.pow(r - avgExcessReturn, 2), 0) / excessReturns.length;
-    const sharpeRatio = excessVariance > 0 ? (avgExcessReturn * Math.sqrt(periodsPerYear)) / Math.sqrt(excessVariance) : 0;
+    const sharpeRatio = excessVariance > 0 ? (avgExcessReturn * Math.sqrt(252)) / Math.sqrt(excessVariance) : 0;
 
     let maxDrawdown = 0, peak = data.history[0].totalValue;
     for (const point of data.history) {
