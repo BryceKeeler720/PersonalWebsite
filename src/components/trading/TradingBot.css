@@ -1144,23 +1144,168 @@
     flex-wrap: wrap;
     justify-content: center;
   }
+
+  .bot-status {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }
 
 @media (max-width: 768px) {
   .trading-bot {
+    padding: 0.75rem;
+  }
+
+  .trading-header {
     padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .header-content h1 {
+    font-size: 1.25rem;
+  }
+
+  .header-content p {
+    font-size: 0.75rem;
   }
 
   .tab-nav {
     flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-bottom: 1rem;
   }
 
   .tab-nav button {
     flex: 1;
-    min-width: 100px;
+    min-width: 80px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .trading-card {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .trading-card h2 {
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
   }
 
   .portfolio-stats {
     grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .stat-box {
+    padding: 0.5rem;
+  }
+
+  .stat-box .stat-value {
+    font-size: 1rem;
+  }
+
+  .stat-box .stat-label {
+    font-size: 0.65rem;
+  }
+
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .chart-value-display {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .chart-current-value {
+    font-size: 1.1rem;
+  }
+
+  .chart-time-range {
+    gap: 0.25rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+  }
+
+  .time-range-btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+  }
+
+  .performance-chart {
+    padding: 0.75rem;
+  }
+
+  .holdings-list {
+    max-height: 200px;
+  }
+
+  .holding-item {
+    padding: 0.5rem;
+  }
+
+  .trade-log {
+    max-height: 400px;
+  }
+
+  .trade-item {
+    padding: 0.75rem;
+  }
+
+  .portfolio-value .value {
+    font-size: 1.5rem;
+  }
+
+  .last-run {
+    font-size: 0.65rem;
+    border-left: none;
+    padding-left: 0;
+    margin-top: 0.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .trading-bot {
+    padding: 0.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-container {
+    margin: 0 -0.5rem;
+  }
+
+  .stock-dropdown-trigger {
+    font-size: 0.75rem;
+    padding: 0.625rem;
+  }
+
+  .stock-dropdown-item {
+    padding: 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .signal-item {
+    padding: 0.75rem;
+  }
+
+  .combined-signal {
+    padding: 1rem;
+  }
+
+  .combined-signal .score {
+    font-size: 2rem;
   }
 }

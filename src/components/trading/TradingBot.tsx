@@ -55,6 +55,27 @@ const SECTOR_COLORS: Record<string, string> = {
   Stock: '#64748b',
 };
 
+const getMarketStatus = () => {
+  const now = new Date();
+  const nyTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+  const day = nyTime.getDay();
+  const hours = nyTime.getHours();
+  const minutes = nyTime.getMinutes();
+  const time = hours * 60 + minutes;
+
+  const isWeekend = day === 0 || day === 6;
+  const preMarketStart = 4 * 60;
+  const marketOpen = 9 * 60 + 30;
+  const marketClose = 16 * 60;
+  const afterHoursEnd = 20 * 60;
+
+  if (isWeekend) return { status: 'closed', label: 'Weekend', color: '#64748b' };
+  if (time >= marketOpen && time < marketClose) return { status: 'open', label: 'Market Open', color: '#22c55e' };
+  if (time >= preMarketStart && time < marketOpen) return { status: 'pre', label: 'Pre-Market', color: '#f59e0b' };
+  if (time >= marketClose && time < afterHoursEnd) return { status: 'after', label: 'After Hours', color: '#8b5cf6' };
+  return { status: 'closed', label: 'Market Closed', color: '#64748b' };
+};
+
 export default function TradingBot() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [selectedStock, setSelectedStock] = useState<string | null>(null);
@@ -157,6 +178,54 @@ export default function TradingBot() {
     return { volatility, sharpeRatio, maxDrawdown: maxDrawdown * 100 };
   }, [data.history]);
 
+  const strategyPerformance = useMemo(() => {
+    const sells = data.trades.filter(t => t.action === 'SELL' && t.signals);
+    if (sells.length < 3) return null;
+
+    const strategies = {
+      momentum: { wins: 0, losses: 0, total: 0 },
+      meanReversion: { wins: 0, losses: 0, total: 0 },
+      sentiment: { wins: 0, losses: 0, total: 0 },
+      technical: { wins: 0, losses: 0, total: 0 },
+    };
+
+    for (const trade of sells) {
+      if (!trade.signals) continue;
+      const isWin = trade.reason.includes('+') || trade.reason.includes('profit');
+      const { momentum, meanReversion, sentiment, technical } = trade.signals;
+
+      if (momentum && momentum.score > 0.1) {
+        strategies.momentum.total++;
+        if (isWin) strategies.momentum.wins++; else strategies.momentum.losses++;
+      }
+      if (meanReversion && meanReversion.score > 0.1) {
+        strategies.meanReversion.total++;
+        if (isWin) strategies.meanReversion.wins++; else strategies.meanReversion.losses++;
+      }
+      if (sentiment && sentiment.score > 0.1) {
+        strategies.sentiment.total++;
+        if (isWin) strategies.sentiment.wins++; else strategies.sentiment.losses++;
+      }
+      if (technical && technical.score > 0.1) {
+        strategies.technical.total++;
+        if (isWin) strategies.technical.wins++; else strategies.technical.losses++;
+      }
+    }
+
+    return Object.entries(strategies)
+      .filter(([, s]) => s.total > 0)
+      .map(([name, s]) => ({
+        name: name.charAt(0).toUpperCase() + name.slice(1).replace(/([A-Z])/g, ' $1'),
+        winRate: (s.wins / s.total) * 100,
+        wins: s.wins,
+        losses: s.losses,
+        total: s.total,
+      }))
+      .sort((a, b) => b.winRate - a.winRate);
+  }, [data.trades]);
+
+  const marketStatus = getMarketStatus();
+
   const getTopBuyCandidates = (limit: number) => {
     return Object.values(data.signals)
       .filter(s => s.recommendation === 'BUY' || s.recommendation === 'STRONG_BUY')
@@ -184,6 +253,33 @@ export default function TradingBot() {
 
   const totalHoldingsValue = data.portfolio.holdings.reduce((sum, h) => sum + h.marketValue, 0);
 
+  const dividendIncome = useMemo(() => {
+    const holdings = data.portfolio.holdings;
+    if (holdings.length === 0) return null;
+
+    let totalAnnualDividend = 0;
+    const dividendHoldings = holdings.filter(h => h.dividendYield && h.dividendYield > 0);
+
+    for (const holding of dividendHoldings) {
+      if (holding.annualDividend) {
+        totalAnnualDividend += holding.annualDividend * holding.shares;
+      }
+    }
+
+    const holdingsValue = holdings.reduce((sum, h) => sum + h.marketValue, 0);
+    const portfolioYield = holdingsValue > 0
+      ? (totalAnnualDividend / holdingsValue) * 100
+      : 0;
+
+    return {
+      annualIncome: totalAnnualDividend,
+      monthlyIncome: totalAnnualDividend / 12,
+      portfolioYield,
+      dividendPayingCount: dividendHoldings.length,
+      totalHoldings: holdings.length,
+    };
+  }, [data.portfolio.holdings]);
+
   return (
     <div className="trading-bot">
       <a href="/traditional" className="back-link" style={{
@@ -207,8 +303,16 @@ export default function TradingBot() {
           <p>Multi-asset analysis: Crypto, Forex, Futures, Stocks</p>
         </div>
         <div className="bot-status">
-          <span className="status-dot running" />
-          <span className="status-text">Running</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <span className="status-dot running" />
+              <span className="status-text">Bot Running</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.25rem 0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: marketStatus.color }} />
+              <span style={{ fontSize: '0.75rem', color: marketStatus.color }}>{marketStatus.label}</span>
+            </div>
+          </div>
           {data.lastRun && (
             <span className="last-run">
               Last analysis: {new Date(data.lastRun).toLocaleString()}
@@ -311,6 +415,67 @@ export default function TradingBot() {
                       <div className="stat-box">
                         <div className="stat-label">Data Points</div>
                         <div className="stat-value">{data.history.length}</div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {strategyPerformance && strategyPerformance.length > 0 && (
+                  <div className="trading-card">
+                    <h2>Strategy Performance</h2>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      {strategyPerformance.map(strategy => (
+                        <div key={strategy.name} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#fff' }}>{strategy.name}</span>
+                            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: strategy.winRate >= 50 ? '#22c55e' : '#ef4444' }}>
+                              {strategy.winRate.toFixed(0)}%
+                            </span>
+                          </div>
+                          <div style={{ height: 4, background: 'rgba(255,255,255,0.1)', borderRadius: 2, overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${strategy.winRate}%`, background: strategy.winRate >= 50 ? '#22c55e' : '#ef4444', borderRadius: 2 }} />
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.25rem' }}>
+                            <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)' }}>
+                              {strategy.wins}W / {strategy.losses}L
+                            </span>
+                            <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>
+                              {strategy.total} trades
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {dividendIncome && dividendIncome.annualIncome > 0 && (
+                  <div className="trading-card">
+                    <h2>Dividend Income</h2>
+                    <div className="stats-grid">
+                      <div className="stat-box">
+                        <div className="stat-label">Annual Income</div>
+                        <div className="stat-value positive">
+                          ${dividendIncome.annualIncome.toFixed(2)}
+                        </div>
+                      </div>
+                      <div className="stat-box">
+                        <div className="stat-label">Monthly Income</div>
+                        <div className="stat-value positive">
+                          ${dividendIncome.monthlyIncome.toFixed(2)}
+                        </div>
+                      </div>
+                      <div className="stat-box">
+                        <div className="stat-label">Portfolio Yield</div>
+                        <div className="stat-value">
+                          {dividendIncome.portfolioYield.toFixed(2)}%
+                        </div>
+                      </div>
+                      <div className="stat-box">
+                        <div className="stat-label">Dividend Payers</div>
+                        <div className="stat-value">
+                          {dividendIncome.dividendPayingCount}/{dividendIncome.totalHoldings}
+                        </div>
                       </div>
                     </div>
                   </div>

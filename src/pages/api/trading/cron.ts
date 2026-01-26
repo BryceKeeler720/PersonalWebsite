@@ -29,9 +29,15 @@ const CRON_SECRET = process.env.CRON_SECRET;
 const BATCH_SIZE = 15; // Number of stocks to analyze in parallel
 const BATCH_DELAY_MS = 500; // Delay between batches to avoid rate limiting
 
-async function fetchYahooQuote(symbol: string): Promise<{ price: number; isExtendedHours: boolean } | null> {
+interface QuoteData {
+  price: number;
+  isExtendedHours: boolean;
+  dividendYield?: number;
+  annualDividend?: number;
+}
+
+async function fetchYahooQuote(symbol: string): Promise<QuoteData | null> {
   try {
-    // Use the chart endpoint with pre/post market data included
     const response = await fetch(
       `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1m&range=1d&includePrePost=true`,
       {
@@ -49,16 +55,15 @@ async function fetchYahooQuote(symbol: string): Promise<{ price: number; isExten
     const quotes = result.indicators?.quote?.[0];
     const timestamps = result.timestamp;
 
-    // Try to get the most recent price from the data
-    // Check if we have intraday data with pre/post market
+    let price = meta.regularMarketPrice;
+    let isExtendedHours = false;
+
     if (quotes?.close && timestamps && timestamps.length > 0) {
-      // Find the last valid close price
       for (let i = quotes.close.length - 1; i >= 0; i--) {
         if (quotes.close[i] !== null) {
           const lastTimestamp = timestamps[i];
           const tradingPeriod = meta.currentTradingPeriod;
 
-          // Determine if this is extended hours
           const isPreMarket = tradingPeriod?.pre &&
             lastTimestamp >= tradingPeriod.pre.start &&
             lastTimestamp < tradingPeriod.pre.end;
@@ -66,20 +71,21 @@ async function fetchYahooQuote(symbol: string): Promise<{ price: number; isExten
             lastTimestamp >= tradingPeriod.post.start &&
             lastTimestamp < tradingPeriod.post.end;
 
-          return {
-            price: quotes.close[i],
-            isExtendedHours: isPreMarket || isPostMarket
-          };
+          price = quotes.close[i];
+          isExtendedHours = isPreMarket || isPostMarket;
+          break;
         }
       }
     }
 
-    // Fallback to regular market price
-    if (meta.regularMarketPrice) {
-      return { price: meta.regularMarketPrice, isExtendedHours: false };
-    }
+    if (!price) return null;
 
-    return null;
+    return {
+      price,
+      isExtendedHours,
+      dividendYield: meta.dividendYield || undefined,
+      annualDividend: meta.trailingAnnualDividendRate || undefined,
+    };
   } catch (error) {
     console.error(`Error fetching quote for ${symbol}:`, error);
     return null;
@@ -222,7 +228,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     console.log(`Successfully analyzed ${Object.keys(allSignals).length} stocks`);
 
-    // Update holding prices
+    // Update holding prices and dividend data
     for (const holding of portfolio.holdings) {
       const quote = await fetchYahooQuote(holding.symbol);
       if (quote) {
@@ -232,6 +238,8 @@ export const GET: APIRoute = async ({ request }) => {
         holding.gainLossPercent = ((quote.price - holding.avgCost) / holding.avgCost) * 100;
         holding.isExtendedHours = quote.isExtendedHours;
         holding.priceUpdatedAt = new Date().toISOString();
+        holding.dividendYield = quote.dividendYield;
+        holding.annualDividend = quote.annualDividend;
       }
     }
 

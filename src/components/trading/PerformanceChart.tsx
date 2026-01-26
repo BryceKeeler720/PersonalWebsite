@@ -90,17 +90,29 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
     const chartWidth = width - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
 
+    // Get time range for proper x-axis alignment
+    const historyStartTime = new Date(filteredHistory[0].timestamp).getTime();
+    const historyEndTime = new Date(filteredHistory[filteredHistory.length - 1].timestamp).getTime();
+    const timeSpan = historyEndTime - historyStartTime;
+
     const points: ChartPoint[] = filteredHistory.map((h, i) => {
-      const x = padding.left + (i / (filteredHistory.length - 1 || 1)) * chartWidth;
+      const time = new Date(h.timestamp).getTime();
+      const x = timeSpan > 0
+        ? padding.left + ((time - historyStartTime) / timeSpan) * chartWidth
+        : padding.left + (i / (filteredHistory.length - 1 || 1)) * chartWidth;
       const y = padding.top + chartHeight - ((h.totalValue - minValue) / range) * chartHeight;
       return { x, y, value: h.totalValue, timestamp: h.timestamp, index: i };
     });
 
+    // Align benchmark points to the same time axis as portfolio
     const benchmarkPoints: ChartPoint[] = filteredBenchmark.map((b, i) => {
-      const x = padding.left + (i / (filteredBenchmark.length - 1 || 1)) * chartWidth;
+      const time = new Date(b.timestamp).getTime();
+      const x = timeSpan > 0
+        ? padding.left + ((time - historyStartTime) / timeSpan) * chartWidth
+        : padding.left + (i / (filteredBenchmark.length - 1 || 1)) * chartWidth;
       const y = padding.top + chartHeight - ((b.value - minValue) / range) * chartHeight;
       return { x, y, value: b.value, timestamp: b.timestamp, index: i };
-    });
+    }).filter(p => p.x >= padding.left && p.x <= padding.left + chartWidth);
 
     const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
     const benchmarkPathD = benchmarkPoints.length > 1
@@ -109,7 +121,8 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
     const areaD = `${pathD} L ${points[points.length - 1].x} ${padding.top + chartHeight} L ${padding.left} ${padding.top + chartHeight} Z`;
 
     const currentValue = filteredHistory[filteredHistory.length - 1]?.totalValue || initialCapital;
-    const isPositive = currentValue >= initialCapital;
+    const startValue = filteredHistory[0]?.totalValue || initialCapital;
+    const isPositive = currentValue >= startValue;
 
     const yLabels = [];
     for (let val = minValue; val <= maxValue; val += tickIncrement) {
@@ -122,16 +135,20 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
     for (let i = 0; i < numXLabels; i++) {
       const idx = Math.floor((i / (numXLabels - 1)) * (filteredHistory.length - 1));
       if (filteredHistory[idx]) {
-        const x = padding.left + (idx / (filteredHistory.length - 1 || 1)) * chartWidth;
+        const time = new Date(filteredHistory[idx].timestamp).getTime();
+        const x = timeSpan > 0
+          ? padding.left + ((time - historyStartTime) / timeSpan) * chartWidth
+          : padding.left + (idx / (filteredHistory.length - 1 || 1)) * chartWidth;
         xLabels.push({ timestamp: filteredHistory[idx].timestamp, x });
       }
     }
 
-    const spyCurrentValue = filteredBenchmark[filteredBenchmark.length - 1]?.value || initialCapital;
-    const spyChangePercent = ((spyCurrentValue - initialCapital) / initialCapital) * 100;
+    const spyStartValue = filteredBenchmark[0]?.value || initialCapital;
+    const spyCurrentValue = filteredBenchmark[filteredBenchmark.length - 1]?.value || spyStartValue;
+    const spyChangePercent = ((spyCurrentValue - spyStartValue) / spyStartValue) * 100;
 
     return {
-      points, benchmarkPoints, pathD, benchmarkPathD, areaD, minValue, maxValue, isPositive, currentValue,
+      points, benchmarkPoints, pathD, benchmarkPathD, areaD, minValue, maxValue, isPositive, currentValue, startValue,
       padding, chartWidth, chartHeight, width, height, yLabels, xLabels, spyChangePercent,
     };
   }, [filteredHistory, filteredBenchmark, initialCapital]);
@@ -187,8 +204,8 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
     );
   }
 
-  const { pathD, benchmarkPathD, areaD, isPositive, currentValue, padding, chartWidth, chartHeight, width, height, yLabels, xLabels, points, spyChangePercent } = chartData;
-  const changePercent = ((currentValue - initialCapital) / initialCapital) * 100;
+  const { pathD, benchmarkPathD, areaD, isPositive, currentValue, startValue, padding, chartWidth, chartHeight, width, height, yLabels, xLabels, points, spyChangePercent } = chartData;
+  const changePercent = ((currentValue - startValue) / startValue) * 100;
   const hoveredPoint = hoveredIndex !== null ? points[hoveredIndex] : null;
   const timeRanges: TimeRange[] = ['1D', '1W', '1M', 'YTD', 'All'];
 
@@ -197,19 +214,19 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
       <div className="chart-header">
         <div className="chart-title">
           <span style={{ marginRight: '1rem' }}>Fund Performance</span>
-          {benchmarkPathD && (
-            <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)' }}>
-              <span style={{ color: isPositive ? '#22c55e' : '#ef4444' }}>● Portfolio</span>
+          <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)' }}>
+            <span style={{ color: isPositive ? '#22c55e' : '#ef4444' }}>● Portfolio</span>
+            {filteredBenchmark.length > 0 && (
               <span style={{ marginLeft: '0.75rem', color: '#f59e0b' }}>● S&P 500</span>
-            </span>
-          )}
+            )}
+          </span>
         </div>
         <div className="chart-value-display">
           <span className="chart-current-value">{formatCurrencyPrecise(currentValue)}</span>
           <span className={`chart-change ${isPositive ? 'positive' : 'negative'}`}>
             {isPositive ? '+' : ''}{changePercent.toFixed(2)}%
           </span>
-          {benchmarkPathD && (
+          {filteredBenchmark.length > 0 && (
             <span style={{ fontSize: '0.75rem', color: '#f59e0b', marginLeft: '0.5rem' }}>
               (SPY: {spyChangePercent >= 0 ? '+' : ''}{spyChangePercent.toFixed(2)}%)
             </span>
@@ -252,7 +269,7 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
           <path d={areaD} fill="url(#chartGradient)" />
 
           {benchmarkPathD && (
-            <path d={benchmarkPathD} fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.7" />
+            <path d={benchmarkPathD} fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
           )}
 
           <path d={pathD} fill="none" stroke={isPositive ? '#22c55e' : '#ef4444'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -261,7 +278,7 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
             <>
               <line x1={hoveredPoint.x} y1={padding.top} x2={hoveredPoint.x} y2={padding.top + chartHeight} stroke="rgba(255, 255, 255, 0.4)" strokeWidth="1" />
               <line x1={padding.left} y1={hoveredPoint.y} x2={hoveredPoint.x} y2={hoveredPoint.y} stroke="rgba(255, 255, 255, 0.2)" strokeWidth="1" strokeDasharray="4 4" />
-              <circle cx={hoveredPoint.x} cy={hoveredPoint.y} r="4" fill={hoveredPoint.value >= initialCapital ? '#22c55e' : '#ef4444'} stroke="white" strokeWidth="1.5" />
+              <circle cx={hoveredPoint.x} cy={hoveredPoint.y} r="4" fill={hoveredPoint.value >= startValue ? '#22c55e' : '#ef4444'} stroke="white" strokeWidth="1.5" />
             </>
           )}
         </svg>
@@ -270,9 +287,9 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
           <div className="chart-tooltip" style={{ left: `${(hoveredPoint.x / width) * 100}%`, top: '10px', transform: hoveredPoint.x > width / 2 ? 'translateX(-110%)' : 'translateX(10%)' }}>
             <div className="tooltip-value">{formatCurrencyPrecise(hoveredPoint.value)}</div>
             <div className="tooltip-time">{formatTooltipTime(hoveredPoint.timestamp)}</div>
-            <div className={`tooltip-change ${hoveredPoint.value >= initialCapital ? 'positive' : 'negative'}`}>
-              {hoveredPoint.value >= initialCapital ? '+' : ''}
-              {formatCurrencyPrecise(hoveredPoint.value - initialCapital)} ({((hoveredPoint.value - initialCapital) / initialCapital * 100).toFixed(2)}%)
+            <div className={`tooltip-change ${hoveredPoint.value >= startValue ? 'positive' : 'negative'}`}>
+              {hoveredPoint.value >= startValue ? '+' : ''}
+              {formatCurrencyPrecise(hoveredPoint.value - startValue)} ({((hoveredPoint.value - startValue) / startValue * 100).toFixed(2)}%)
             </div>
           </div>
         )}
