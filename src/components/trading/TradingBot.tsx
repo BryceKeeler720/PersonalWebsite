@@ -90,6 +90,10 @@ export default function TradingBot() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sectorsExpanded, setSectorsExpanded] = useState(false);
+  const [backtestData, setBacktestData] = useState<{
+    portfolioHistory: { timestamp: string; totalValue: number }[];
+    spyBenchmark: { timestamp: string; value: number }[];
+  } | null>(null);
 
   const fetchData = async () => {
     try {
@@ -112,6 +116,35 @@ export default function TradingBot() {
     return () => clearInterval(interval);
   }, []);
 
+  // Fetch backtest results for extended chart history
+  useEffect(() => {
+    fetch('/backtest-results.json')
+      .then(res => res.ok ? res.json() : null)
+      .then(result => {
+        if (result?.portfolioHistory) setBacktestData(result);
+      })
+      .catch(() => {}); // Silently fail if no backtest data
+  }, []);
+
+  // Merge backtest history with live history for the chart
+  const combinedHistory = useMemo(() => {
+    if (!backtestData?.portfolioHistory?.length) return data.history;
+    const liveStart = data.history.length > 0 ? new Date(data.history[0].timestamp).getTime() : Infinity;
+    const backtestOnly = backtestData.portfolioHistory.filter(
+      p => new Date(p.timestamp).getTime() < liveStart
+    );
+    return [...backtestOnly, ...data.history];
+  }, [backtestData, data.history]);
+
+  const combinedBenchmark = useMemo(() => {
+    if (!backtestData?.spyBenchmark?.length) return data.spyBenchmark;
+    const liveStart = data.spyBenchmark.length > 0 ? new Date(data.spyBenchmark[0].timestamp).getTime() : Infinity;
+    const backtestOnly = backtestData.spyBenchmark.filter(
+      p => new Date(p.timestamp).getTime() < liveStart
+    );
+    return [...backtestOnly, ...data.spyBenchmark];
+  }, [backtestData, data.spyBenchmark]);
+
   const signalsMap = new Map(Object.entries(data.signals));
 
   const sectorAllocation = useMemo(() => {
@@ -132,14 +165,13 @@ export default function TradingBot() {
 
     let wins = 0, losses = 0, totalGain = 0, totalLoss = 0;
     for (const trade of sells) {
-      if (trade.reason.includes('+') || trade.reason.includes('profit')) {
+      const pct = trade.gainLossPercent ?? 0;
+      if (pct >= 0) {
         wins++;
-        const match = trade.reason.match(/([+-]?\d+\.?\d*)%/);
-        if (match) totalGain += parseFloat(match[1]);
-      } else if (trade.reason.includes('-') || trade.reason.includes('loss') || trade.reason.includes('Stop')) {
+        totalGain += pct;
+      } else {
         losses++;
-        const match = trade.reason.match(/([+-]?\d+\.?\d*)%/);
-        if (match) totalLoss += Math.abs(parseFloat(match[1]));
+        totalLoss += Math.abs(pct);
       }
     }
 
@@ -153,6 +185,12 @@ export default function TradingBot() {
   const riskMetrics = useMemo(() => {
     if (data.history.length < 2) return null;
 
+    // Detect data frequency from timestamps to annualize correctly
+    const firstTime = new Date(data.history[0].timestamp).getTime();
+    const lastTime = new Date(data.history[data.history.length - 1].timestamp).getTime();
+    const avgIntervalMs = (lastTime - firstTime) / (data.history.length - 1);
+    const periodsPerYear = (365.25 * 24 * 60 * 60 * 1000) / avgIntervalMs;
+
     const returns: number[] = [];
     for (let i = 1; i < data.history.length; i++) {
       const ret = (data.history[i].totalValue - data.history[i - 1].totalValue) / data.history[i - 1].totalValue;
@@ -161,13 +199,13 @@ export default function TradingBot() {
 
     const avgReturn = returns.reduce((a, b) => a + b, 0) / returns.length;
     const variance = returns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / returns.length;
-    const volatility = Math.sqrt(variance) * Math.sqrt(252) * 100;
+    const volatility = Math.sqrt(variance) * Math.sqrt(periodsPerYear) * 100;
 
-    const riskFreeRate = 0.05 / 252;
+    const riskFreeRate = 0.05 / periodsPerYear;
     const excessReturns = returns.map(r => r - riskFreeRate);
     const avgExcessReturn = excessReturns.reduce((a, b) => a + b, 0) / excessReturns.length;
     const excessVariance = excessReturns.reduce((sum, r) => sum + Math.pow(r - avgExcessReturn, 2), 0) / excessReturns.length;
-    const sharpeRatio = excessVariance > 0 ? (avgExcessReturn * Math.sqrt(252)) / Math.sqrt(excessVariance) : 0;
+    const sharpeRatio = excessVariance > 0 ? (avgExcessReturn * Math.sqrt(periodsPerYear)) / Math.sqrt(excessVariance) : 0;
 
     let maxDrawdown = 0, peak = data.history[0].totalValue;
     for (const point of data.history) {
@@ -361,9 +399,9 @@ export default function TradingBot() {
               <div className="trading-card">
                 <h2>Portfolio Performance vs S&P 500</h2>
                 <PerformanceChart
-                  history={data.history}
+                  history={combinedHistory}
                   initialCapital={DEFAULT_CONFIG.initialCapital}
-                  spyBenchmark={data.spyBenchmark}
+                  spyBenchmark={combinedBenchmark}
                 />
               </div>
 
