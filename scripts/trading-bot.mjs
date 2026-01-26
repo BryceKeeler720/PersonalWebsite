@@ -285,8 +285,9 @@ async function fetchYahooQuote(symbol) {
 
 async function fetchYahooHistorical(symbol) {
   try {
+    // Use hourly candles so signals actually change between runs (not just once per day)
     const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=3mo&interval=1d`,
+      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1mo&interval=1h`,
       { headers: { 'User-Agent': 'Mozilla/5.0 (compatible)' } }
     );
     const data = await response.json();
@@ -563,17 +564,17 @@ async function main() {
     } else if (signal.recommendation === 'STRONG_SELL') {
       sellPercent = 1.0;
       sellReason = `STRONG_SELL: score ${signal.combined.toFixed(2)}`;
-    } else if (holding.gainLossPercent <= -3) {
+    } else if (holding.gainLossPercent <= -2) {
       sellPercent = 1.0;
       sellReason = `Stop loss at ${holding.gainLossPercent.toFixed(1)}%`;
     } else if (signal.combined < 0.02) {
       sellPercent = 1.0;
       sellReason = `Weak signal (${signal.combined.toFixed(3)})`;
-    } else if (holding.gainLossPercent >= 4) {
+    } else if (holding.gainLossPercent >= 2) {
       sellPercent = 0.5;
       sellReason = `Taking profits at ${holding.gainLossPercent.toFixed(1)}%`;
     } else if (signal.recommendation === 'SELL') {
-      sellPercent = 0.5;
+      sellPercent = 0.75;
       sellReason = `SELL: score ${signal.combined.toFixed(2)}`;
     }
 
@@ -608,11 +609,56 @@ async function main() {
     }
   }
 
+  // Position rotation: sell weakest holdings to free cash for stronger candidates
+  const targetCash = portfolio.totalValue * DEFAULT_CONFIG.targetCashRatio;
+  const availableCash = Math.max(0, portfolio.cash - targetCash);
+  const strongBuyCandidates = Object.values(allSignals)
+    .filter(s => s.combined > 0.15 && !portfolio.holdings.some(h => h.symbol === s.symbol))
+    .length;
+
+  if (strongBuyCandidates > 0 && (availableCash < DEFAULT_CONFIG.minTradeValue || portfolio.holdings.length >= DEFAULT_CONFIG.maxPositions)) {
+    // Find weakest holdings that we have signals for
+    const holdingsWithSignals = portfolio.holdings
+      .map(h => ({ holding: h, signal: allSignals[h.symbol] }))
+      .filter(h => h.signal)
+      .sort((a, b) => a.signal.combined - b.signal.combined);
+
+    // Sell up to 3 weakest positions to free cash
+    let rotated = 0;
+    for (const { holding, signal } of holdingsWithSignals) {
+      if (rotated >= 3) break;
+      if (signal.combined >= 0.15) break; // Don't sell strong holdings
+
+      const quote = await fetchYahooQuote(holding.symbol);
+      if (!quote) continue;
+
+      const trade = {
+        id: crypto.randomUUID(),
+        timestamp: new Date().toISOString(),
+        symbol: holding.symbol,
+        action: 'SELL',
+        shares: holding.shares,
+        price: quote.price,
+        total: holding.shares * quote.price,
+        reason: `Rotation: weak signal (${signal.combined.toFixed(3)}) → stronger candidates`,
+        signals: signal,
+        gainLoss: (quote.price - holding.avgCost) * holding.shares,
+        gainLossPercent: holding.gainLossPercent,
+      };
+
+      portfolio.cash += trade.total;
+      portfolio.holdings = portfolio.holdings.filter(h => h.symbol !== holding.symbol);
+      await addTrade(trade);
+      console.log(`ROTATE OUT ${trade.shares} ${trade.symbol} @ $${trade.price} (signal: ${signal.combined.toFixed(3)})`);
+      rotated++;
+    }
+  }
+
   // Check for buys
   const buyCandidates = Object.values(allSignals)
     .filter(s => s.combined > 0.02)
     .sort((a, b) => b.combined - a.combined)
-    .slice(0, 35);
+    .slice(0, 50);
 
   for (const signal of buyCandidates) {
     if (portfolio.holdings.some(h => h.symbol === signal.symbol)) continue;
