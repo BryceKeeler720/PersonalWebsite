@@ -16,16 +16,16 @@ let currentRunPromise = null;
 const BATCH_SIZE = 20;
 const BATCH_DELAY_MS = 400;
 const DEFAULT_CONFIG = {
-  initialCapital: 10000,
+  initialCapital: 10303.28,
   maxPositionSize: 0.12,
   maxPositions: 50,
   minTradeValue: 15,
   targetCashRatio: 0,
   strategyWeights: {
-    momentum: 0.30,
-    meanReversion: 0.25,
-    sentiment: 0.15,
-    technical: 0.30,
+    momentum: 0.00,
+    meanReversion: 0.39,
+    sentiment: 0.05,
+    technical: 0.56,
   },
 };
 
