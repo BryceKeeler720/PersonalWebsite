@@ -85,6 +85,7 @@ export interface TradingConfig {
   maxPositionSize: number; // % of portfolio per stock
   maxPositions: number; // Maximum number of positions
   minTradeValue: number; // Minimum trade value
+  targetCashRatio: number; // Target cash % to maintain (e.g., 0.10 = 10%)
   strategyWeights: StrategyWeights;
   scheduleInterval: 'hourly' | 'daily' | 'manual';
 }
@@ -106,9 +107,10 @@ export interface SchedulerState {
 // Default configuration - optimized for high-frequency trading
 export const DEFAULT_CONFIG: TradingConfig = {
   initialCapital: 10000,
-  maxPositionSize: 0.05, // 5% max per position for more diversification
+  maxPositionSize: 0.08, // 8% max per position
   maxPositions: 50, // Allow more simultaneous positions
-  minTradeValue: 25, // Lower minimum for more frequent smaller trades
+  minTradeValue: 20, // Lower minimum for more frequent smaller trades
+  targetCashRatio: 0.10, // Keep ~10% in cash ($1k of $10k)
   strategyWeights: {
     momentum: 0.30,
     meanReversion: 0.25,

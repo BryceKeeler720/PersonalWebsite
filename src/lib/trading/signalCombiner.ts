@@ -112,17 +112,31 @@ export function shouldTrade(signal: SignalSnapshot, minScore: number = 0.25): bo
 }
 
 /**
- * Calculate position size based on signal strength
+ * Calculate position size based on signal strength and cash deployment needs
  * Stronger signals = larger positions (up to max)
+ * When cash exceeds target ratio, scale up positions to deploy excess
  */
 export function calculatePositionSize(
   signal: SignalSnapshot,
   availableCash: number,
-  maxPositionPercent: number = 0.2
+  maxPositionPercent: number = 0.2,
+  totalValue?: number,
+  targetCashRatio?: number
 ): number {
-  const baseSize = availableCash * maxPositionPercent;
+  // Calculate base deployment multiplier based on excess cash
+  let deploymentMultiplier = 1.0;
+  if (totalValue && targetCashRatio) {
+    const currentCashRatio = availableCash / totalValue;
+    const excessCashRatio = currentCashRatio - targetCashRatio;
+    // If we have excess cash, scale up position sizes (up to 3x normal)
+    if (excessCashRatio > 0) {
+      deploymentMultiplier = Math.min(1.0 + excessCashRatio * 10, 3.0);
+    }
+  }
 
-  // Scale by signal strength (0.25 to 1.0 maps to 0.5x to 1.0x)
+  const baseSize = availableCash * maxPositionPercent * deploymentMultiplier;
+
+  // Scale by signal strength (0.5 to 1.0 maps to 0.5x to 1.0x)
   const strengthMultiplier = 0.5 + Math.abs(signal.combined) * 0.5;
 
   return baseSize * strengthMultiplier;

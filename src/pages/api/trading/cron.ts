@@ -346,8 +346,14 @@ export const GET: APIRoute = async ({ request }) => {
         break;
       }
 
-      // Calculate position size
-      const positionSize = calculatePositionSize(signal, portfolio.cash, DEFAULT_CONFIG.maxPositionSize);
+      // Calculate position size - deploy excess cash more aggressively
+      const positionSize = calculatePositionSize(
+        signal,
+        portfolio.cash,
+        DEFAULT_CONFIG.maxPositionSize,
+        portfolio.totalValue,
+        DEFAULT_CONFIG.targetCashRatio
+      );
       if (positionSize < DEFAULT_CONFIG.minTradeValue) {
         continue;
       }
