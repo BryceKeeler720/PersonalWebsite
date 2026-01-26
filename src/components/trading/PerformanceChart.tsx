@@ -61,12 +61,24 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
     return spyBenchmark.filter(h => new Date(h.timestamp) >= cutoffDate);
   }, [spyBenchmark, timeRange]);
 
-  const chartData = useMemo(() => {
-    if (filteredHistory.length === 0) return null;
+  // If we have no portfolio history but have benchmark data, create a synthetic history line at initialCapital
+  const displayHistory = useMemo(() => {
+    if (filteredHistory.length >= 2) return filteredHistory;
+    if (filteredBenchmark.length >= 2) {
+      return [
+        { timestamp: filteredBenchmark[0].timestamp, totalValue: initialCapital },
+        { timestamp: filteredBenchmark[filteredBenchmark.length - 1].timestamp, totalValue: initialCapital }
+      ];
+    }
+    return filteredHistory;
+  }, [filteredHistory, filteredBenchmark, initialCapital]);
 
-    const portfolioValues = filteredHistory.map(h => h.totalValue);
+  const chartData = useMemo(() => {
+    if (displayHistory.length === 0) return null;
+
+    const portfolioValues = displayHistory.map(h => h.totalValue);
     const benchmarkValues = filteredBenchmark.map(b => b.value);
-    const allValues = [...portfolioValues, ...benchmarkValues];
+    const allValues = [...portfolioValues, ...(benchmarkValues.length > 0 ? benchmarkValues : [])];
 
     const dataMin = Math.min(...allValues);
     const dataMax = Math.max(...allValues);
@@ -90,38 +102,32 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
     const chartWidth = width - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
 
-    // Get time range for proper x-axis alignment
-    const historyStartTime = new Date(filteredHistory[0].timestamp).getTime();
-    const historyEndTime = new Date(filteredHistory[filteredHistory.length - 1].timestamp).getTime();
-    const timeSpan = historyEndTime - historyStartTime;
-
-    const points: ChartPoint[] = filteredHistory.map((h, i) => {
-      const time = new Date(h.timestamp).getTime();
-      const x = timeSpan > 0
-        ? padding.left + ((time - historyStartTime) / timeSpan) * chartWidth
-        : padding.left + (i / (filteredHistory.length - 1 || 1)) * chartWidth;
+    // Use simple index-based positioning for portfolio
+    const points: ChartPoint[] = displayHistory.map((h, i) => {
+      const x = padding.left + (i / Math.max(displayHistory.length - 1, 1)) * chartWidth;
       const y = padding.top + chartHeight - ((h.totalValue - minValue) / range) * chartHeight;
       return { x, y, value: h.totalValue, timestamp: h.timestamp, index: i };
     });
 
-    // Align benchmark points to the same time axis as portfolio
+    // Simple index-based positioning for benchmark (spans full width)
     const benchmarkPoints: ChartPoint[] = filteredBenchmark.map((b, i) => {
-      const time = new Date(b.timestamp).getTime();
-      const x = timeSpan > 0
-        ? padding.left + ((time - historyStartTime) / timeSpan) * chartWidth
-        : padding.left + (i / (filteredBenchmark.length - 1 || 1)) * chartWidth;
+      const x = padding.left + (i / Math.max(filteredBenchmark.length - 1, 1)) * chartWidth;
       const y = padding.top + chartHeight - ((b.value - minValue) / range) * chartHeight;
       return { x, y, value: b.value, timestamp: b.timestamp, index: i };
-    }).filter(p => p.x >= padding.left && p.x <= padding.left + chartWidth);
+    });
 
-    const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+    const pathD = points.length > 0
+      ? points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
+      : '';
     const benchmarkPathD = benchmarkPoints.length > 1
       ? benchmarkPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
       : '';
-    const areaD = `${pathD} L ${points[points.length - 1].x} ${padding.top + chartHeight} L ${padding.left} ${padding.top + chartHeight} Z`;
+    const areaD = points.length > 0
+      ? `${pathD} L ${points[points.length - 1].x} ${padding.top + chartHeight} L ${padding.left} ${padding.top + chartHeight} Z`
+      : '';
 
-    const currentValue = filteredHistory[filteredHistory.length - 1]?.totalValue || initialCapital;
-    const startValue = filteredHistory[0]?.totalValue || initialCapital;
+    const currentValue = displayHistory[displayHistory.length - 1]?.totalValue || initialCapital;
+    const startValue = displayHistory[0]?.totalValue || initialCapital;
     const isPositive = currentValue >= startValue;
 
     const yLabels = [];
@@ -133,25 +139,23 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
     const xLabels = [];
     const numXLabels = 5;
     for (let i = 0; i < numXLabels; i++) {
-      const idx = Math.floor((i / (numXLabels - 1)) * (filteredHistory.length - 1));
-      if (filteredHistory[idx]) {
-        const time = new Date(filteredHistory[idx].timestamp).getTime();
-        const x = timeSpan > 0
-          ? padding.left + ((time - historyStartTime) / timeSpan) * chartWidth
-          : padding.left + (idx / (filteredHistory.length - 1 || 1)) * chartWidth;
-        xLabels.push({ timestamp: filteredHistory[idx].timestamp, x });
+      const idx = Math.floor((i / (numXLabels - 1)) * (displayHistory.length - 1));
+      if (displayHistory[idx]) {
+        const x = padding.left + (idx / Math.max(displayHistory.length - 1, 1)) * chartWidth;
+        xLabels.push({ timestamp: displayHistory[idx].timestamp, x });
       }
     }
 
+    // Calculate SPY performance from its own start
     const spyStartValue = filteredBenchmark[0]?.value || initialCapital;
     const spyCurrentValue = filteredBenchmark[filteredBenchmark.length - 1]?.value || spyStartValue;
-    const spyChangePercent = ((spyCurrentValue - spyStartValue) / spyStartValue) * 100;
+    const spyChangePercent = spyStartValue > 0 ? ((spyCurrentValue - spyStartValue) / spyStartValue) * 100 : 0;
 
     return {
       points, benchmarkPoints, pathD, benchmarkPathD, areaD, minValue, maxValue, isPositive, currentValue, startValue,
-      padding, chartWidth, chartHeight, width, height, yLabels, xLabels, spyChangePercent,
+      padding, chartWidth, chartHeight, width, height, yLabels, xLabels, spyChangePercent, hasBenchmark: filteredBenchmark.length > 1,
     };
-  }, [filteredHistory, filteredBenchmark, initialCapital]);
+  }, [displayHistory, filteredBenchmark, initialCapital]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!chartRef.current || !chartData) return;
@@ -189,7 +193,7 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
   const formatTooltipTime = (timestamp: string) =>
     new Date(timestamp).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
-  if (!chartData || filteredHistory.length < 2) {
+  if (!chartData || displayHistory.length < 2) {
     return (
       <div className="performance-chart empty">
         <div className="chart-placeholder">
@@ -204,7 +208,7 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
     );
   }
 
-  const { pathD, benchmarkPathD, areaD, isPositive, currentValue, startValue, padding, chartWidth, chartHeight, width, height, yLabels, xLabels, points, spyChangePercent } = chartData;
+  const { pathD, benchmarkPathD, areaD, isPositive, currentValue, startValue, padding, chartWidth, chartHeight, width, height, yLabels, xLabels, points, spyChangePercent, hasBenchmark } = chartData;
   const changePercent = ((currentValue - startValue) / startValue) * 100;
   const hoveredPoint = hoveredIndex !== null ? points[hoveredIndex] : null;
   const timeRanges: TimeRange[] = ['1D', '1W', '1M', 'YTD', 'All'];
@@ -216,7 +220,7 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
           <span style={{ marginRight: '1rem' }}>Fund Performance</span>
           <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)' }}>
             <span style={{ color: isPositive ? '#22c55e' : '#ef4444' }}>● Portfolio</span>
-            {filteredBenchmark.length > 0 && (
+            {hasBenchmark && (
               <span style={{ marginLeft: '0.75rem', color: '#f59e0b' }}>● S&P 500</span>
             )}
           </span>
@@ -226,7 +230,7 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
           <span className={`chart-change ${isPositive ? 'positive' : 'negative'}`}>
             {isPositive ? '+' : ''}{changePercent.toFixed(2)}%
           </span>
-          {filteredBenchmark.length > 0 && (
+          {hasBenchmark && (
             <span style={{ fontSize: '0.75rem', color: '#f59e0b', marginLeft: '0.5rem' }}>
               (SPY: {spyChangePercent >= 0 ? '+' : ''}{spyChangePercent.toFixed(2)}%)
             </span>
@@ -266,13 +270,13 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
             </text>
           ))}
 
-          <path d={areaD} fill="url(#chartGradient)" />
+          {areaD && <path d={areaD} fill="url(#chartGradient)" />}
 
           {benchmarkPathD && (
             <path d={benchmarkPathD} fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
           )}
 
-          <path d={pathD} fill="none" stroke={isPositive ? '#22c55e' : '#ef4444'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          {pathD && <path d={pathD} fill="none" stroke={isPositive ? '#22c55e' : '#ef4444'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />}
 
           {hoveredPoint && (
             <>
