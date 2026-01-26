@@ -128,9 +128,9 @@ export function calculatePositionSize(
   if (totalValue && targetCashRatio) {
     const currentCashRatio = availableCash / totalValue;
     const excessCashRatio = currentCashRatio - targetCashRatio;
-    // If we have excess cash, scale up position sizes (up to 3x normal)
+    // If we have excess cash, scale up position sizes aggressively (up to 5x normal)
     if (excessCashRatio > 0) {
-      deploymentMultiplier = Math.min(1.0 + excessCashRatio * 10, 3.0);
+      deploymentMultiplier = Math.min(1.0 + excessCashRatio * 15, 5.0);
     }
   }
 

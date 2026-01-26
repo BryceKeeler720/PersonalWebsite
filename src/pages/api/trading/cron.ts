@@ -333,7 +333,7 @@ export const GET: APIRoute = async ({ request }) => {
     const buyCandidates = Object.values(allSignals)
       .filter(s => s.combined > 0.02) // Very low threshold - any slightly positive signal
       .sort((a, b) => b.combined - a.combined)
-      .slice(0, 20); // Consider up to 20 candidates per run
+      .slice(0, 35); // Consider up to 35 candidates per run to deploy cash faster
 
     for (const signal of buyCandidates) {
       // Skip if already holding
