@@ -3,12 +3,14 @@ import type { Portfolio } from './types';
 
 interface PortfolioDashboardProps {
   portfolio: Portfolio;
+  initialCapital?: number;
   onStockSelect?: (symbol: string) => void;
 }
 
-export default function PortfolioDashboard({ portfolio, onStockSelect }: PortfolioDashboardProps) {
-  const totalGainLoss = portfolio.totalValue - portfolio.initialCapital;
-  const totalGainLossPercent = (totalGainLoss / portfolio.initialCapital) * 100;
+export default function PortfolioDashboard({ portfolio, initialCapital, onStockSelect }: PortfolioDashboardProps) {
+  const baseline = initialCapital ?? portfolio.initialCapital;
+  const totalGainLoss = portfolio.totalValue - baseline;
+  const totalGainLossPercent = (totalGainLoss / baseline) * 100;
   const holdingsValue = portfolio.holdings.reduce((sum, h) => sum + h.marketValue, 0);
 
   const formatCurrency = (value: number) => {

@@ -201,12 +201,12 @@ export default function TradingBot() {
   }, [data.trades]);
 
   const riskMetrics = useMemo(() => {
-    if (data.history.length < 2) return null;
+    if (combinedHistory.length < 2) return null;
 
     // Aggregate per-minute snapshots to daily closing values to avoid
     // inflated Sharpe from hundreds of zero-return overnight/weekend periods
     const dailyMap = new Map<string, number>();
-    for (const point of data.history) {
+    for (const point of combinedHistory) {
       const day = point.timestamp.slice(0, 10); // YYYY-MM-DD
       dailyMap.set(day, point.totalValue); // last value of each day wins
     }
@@ -229,15 +229,15 @@ export default function TradingBot() {
     const excessVariance = excessReturns.reduce((sum, r) => sum + Math.pow(r - avgExcessReturn, 2), 0) / excessReturns.length;
     const sharpeRatio = excessVariance > 0 ? (avgExcessReturn * Math.sqrt(252)) / Math.sqrt(excessVariance) : 0;
 
-    let maxDrawdown = 0, peak = data.history[0].totalValue;
-    for (const point of data.history) {
+    let maxDrawdown = 0, peak = combinedHistory[0].totalValue;
+    for (const point of combinedHistory) {
       if (point.totalValue > peak) peak = point.totalValue;
       const drawdown = (peak - point.totalValue) / peak;
       if (drawdown > maxDrawdown) maxDrawdown = drawdown;
     }
 
     return { volatility, sharpeRatio, maxDrawdown: maxDrawdown * 100 };
-  }, [data.history]);
+  }, [combinedHistory]);
 
   const strategyPerformance = useMemo(() => {
     const sells = data.trades.filter(t => t.action === 'SELL' && t.signals);
@@ -396,6 +396,7 @@ export default function TradingBot() {
         <div className="sidebar">
           <PortfolioDashboard
             portfolio={data.portfolio}
+            initialCapital={chartInitialCapital}
             onStockSelect={symbol => {
               setSelectedStock(symbol);
               setActiveTab('signals');
