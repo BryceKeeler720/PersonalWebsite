@@ -20,7 +20,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 // Configuration (same as live bot)
 const DEFAULT_CONFIG = {
   initialCapital: 10000,
-  maxPositionSize: 0.12,
+  maxPositionSize: 0.04,
   maxPositions: 50,
   minTradeValue: 15,
   targetCashRatio: 0,
@@ -307,13 +307,6 @@ function combineSignals(symbol, momentum, meanReversion, sentiment, technical, w
   return { symbol, combined, recommendation };
 }
 
-function calculatePositionSize(signal, cash, maxPositionSize, totalValue, targetCashRatio) {
-  const targetCash = totalValue * targetCashRatio;
-  const availableCash = Math.max(0, cash - targetCash);
-  const maxPosition = totalValue * maxPositionSize;
-  const signalStrength = Math.abs(signal.combined);
-  return Math.min(availableCash * signalStrength, maxPosition);
-}
 
 // ────────────────────────────────────────────
 // Pre-compute signals for all symbols on all dates
@@ -471,40 +464,62 @@ function simulateLite(signalsByDate, pricesByDate, backtestDates, weights, confi
       }
     }
 
-    // Buy logic
+    // Buy logic — proportional allocation across all candidates
+    const openSlots = config.maxPositions - portfolio.holdings.length;
     const buyCandidates = Object.values(allSignals)
-      .filter(s => s.combined > config.buyThreshold)
+      .filter(s => s.combined > config.buyThreshold && !portfolio.holdings.some(h => h.symbol === s.symbol))
       .sort((a, b) => b.combined - a.combined)
-      .slice(0, 50);
+      .slice(0, openSlots);
 
-    for (const signal of buyCandidates) {
-      if (portfolio.holdings.some(h => h.symbol === signal.symbol)) continue;
-      if (portfolio.holdings.length >= config.maxPositions) break;
-
+    if (buyCandidates.length > 0) {
       const tgtCash = portfolio.totalValue * config.targetCashRatio;
       const availCash = Math.max(0, portfolio.cash - tgtCash);
       const maxPosition = portfolio.totalValue * config.maxPositionSize;
-      const signalStrength = Math.abs(signal.combined);
-      const positionSize = Math.min(availCash * signalStrength, maxPosition);
+      const totalStrength = buyCandidates.reduce((sum, s) => sum + Math.abs(s.combined), 0);
 
-      if (positionSize < config.minTradeValue) continue;
+      let allocations = buyCandidates.map(signal => {
+        const weight = Math.abs(signal.combined) / totalStrength;
+        return { signal, size: Math.min(availCash * weight, maxPosition) };
+      });
 
-      const price = dayPrices[signal.symbol];
-      if (!price) continue;
+      const cappedTotal = allocations.reduce((sum, a) => sum + a.size, 0);
+      if (cappedTotal < availCash) {
+        const uncapped = allocations.filter(a => a.size < maxPosition);
+        const excess = availCash - cappedTotal;
+        const uncappedStr = uncapped.reduce((sum, a) => sum + Math.abs(a.signal.combined), 0);
+        if (uncappedStr > 0) {
+          for (const alloc of uncapped) {
+            const bonus = excess * (Math.abs(alloc.signal.combined) / uncappedStr);
+            alloc.size = Math.min(alloc.size + bonus, maxPosition);
+          }
+        }
+      }
 
-      const shares = Math.round((positionSize / price) * 10000) / 10000;
-      if (shares >= 0.0001) {
-        const total = shares * price;
-        portfolio.cash -= total;
-        portfolio.holdings.push({
-          symbol: signal.symbol,
-          shares,
-          avgCost: price,
-          currentPrice: price,
-          marketValue: total,
-          gainLoss: 0,
-          gainLossPercent: 0,
-        });
+      const totalAllocated = allocations.reduce((sum, a) => sum + a.size, 0);
+      if (totalAllocated > availCash) {
+        const scale = availCash / totalAllocated;
+        allocations = allocations.map(a => ({ ...a, size: a.size * scale }));
+      }
+
+      for (const { signal, size } of allocations) {
+        if (size < config.minTradeValue) continue;
+        const price = dayPrices[signal.symbol];
+        if (!price) continue;
+
+        const shares = Math.round((size / price) * 10000) / 10000;
+        if (shares >= 0.0001) {
+          const total = shares * price;
+          portfolio.cash -= total;
+          portfolio.holdings.push({
+            symbol: signal.symbol,
+            shares,
+            avgCost: price,
+            currentPrice: price,
+            marketValue: total,
+            gainLoss: 0,
+            gainLossPercent: 0,
+          });
+        }
       }
     }
 
@@ -881,42 +896,69 @@ async function runBacktest() {
       }
     }
 
-    // ── Buy logic ──
+    // ── Buy logic — proportional allocation across all candidates ──
+    const openSlots = DEFAULT_CONFIG.maxPositions - portfolio.holdings.length;
     const buyCandidates = Object.values(allSignals)
-      .filter(s => s.combined > DEFAULT_CONFIG.buyThreshold)
+      .filter(s => s.combined > DEFAULT_CONFIG.buyThreshold && !portfolio.holdings.some(h => h.symbol === s.symbol))
       .sort((a, b) => b.combined - a.combined)
-      .slice(0, 50);
+      .slice(0, openSlots);
 
-    for (const signal of buyCandidates) {
-      if (portfolio.holdings.some(h => h.symbol === signal.symbol)) continue;
-      if (portfolio.holdings.length >= DEFAULT_CONFIG.maxPositions) break;
+    if (buyCandidates.length > 0) {
+      const tgtCash = portfolio.totalValue * DEFAULT_CONFIG.targetCashRatio;
+      const availCash = Math.max(0, portfolio.cash - tgtCash);
+      const maxPosition = portfolio.totalValue * DEFAULT_CONFIG.maxPositionSize;
+      const totalStrength = buyCandidates.reduce((sum, s) => sum + Math.abs(s.combined), 0);
 
-      const positionSize = calculatePositionSize(signal, portfolio.cash, DEFAULT_CONFIG.maxPositionSize, portfolio.totalValue, DEFAULT_CONFIG.targetCashRatio);
-      if (positionSize < DEFAULT_CONFIG.minTradeValue) continue;
+      let allocations = buyCandidates.map(signal => {
+        const weight = Math.abs(signal.combined) / totalStrength;
+        return { signal, size: Math.min(availCash * weight, maxPosition) };
+      });
 
-      const price = dayPrices[signal.symbol];
-      if (!price) continue;
+      const cappedTotal = allocations.reduce((sum, a) => sum + a.size, 0);
+      if (cappedTotal < availCash) {
+        const uncapped = allocations.filter(a => a.size < maxPosition);
+        const excess = availCash - cappedTotal;
+        const uncappedStr = uncapped.reduce((sum, a) => sum + Math.abs(a.signal.combined), 0);
+        if (uncappedStr > 0) {
+          for (const alloc of uncapped) {
+            const bonus = excess * (Math.abs(alloc.signal.combined) / uncappedStr);
+            alloc.size = Math.min(alloc.size + bonus, maxPosition);
+          }
+        }
+      }
 
-      const shares = Math.round((positionSize / price) * 10000) / 10000;
-      if (shares >= 0.0001) {
-        const total = shares * price;
-        trades.push({
-          date, symbol: signal.symbol, action: 'BUY',
-          shares, price, total,
-          reason: `${signal.recommendation}: ${signal.combined.toFixed(2)}`,
-          gainLoss: 0, gainLossPercent: 0,
-        });
+      const totalAllocated = allocations.reduce((sum, a) => sum + a.size, 0);
+      if (totalAllocated > availCash) {
+        const scale = availCash / totalAllocated;
+        allocations = allocations.map(a => ({ ...a, size: a.size * scale }));
+      }
 
-        portfolio.cash -= total;
-        portfolio.holdings.push({
-          symbol: signal.symbol,
-          shares,
-          avgCost: price,
-          currentPrice: price,
-          marketValue: total,
-          gainLoss: 0,
-          gainLossPercent: 0,
-        });
+      for (const { signal, size } of allocations) {
+        if (size < DEFAULT_CONFIG.minTradeValue) continue;
+        const price = dayPrices[signal.symbol];
+        if (!price) continue;
+
+        const shares = Math.round((size / price) * 10000) / 10000;
+        if (shares >= 0.0001) {
+          const total = shares * price;
+          trades.push({
+            date, symbol: signal.symbol, action: 'BUY',
+            shares, price, total,
+            reason: `${signal.recommendation}: ${signal.combined.toFixed(2)}`,
+            gainLoss: 0, gainLossPercent: 0,
+          });
+
+          portfolio.cash -= total;
+          portfolio.holdings.push({
+            symbol: signal.symbol,
+            shares,
+            avgCost: price,
+            currentPrice: price,
+            marketValue: total,
+            gainLoss: 0,
+            gainLossPercent: 0,
+          });
+        }
       }
     }
 

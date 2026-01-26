@@ -16,16 +16,16 @@ let currentRunPromise = null;
 const BATCH_SIZE = 20;
 const BATCH_DELAY_MS = 400;
 const DEFAULT_CONFIG = {
-  initialCapital: 10067.03,
-  maxPositionSize: 0.12,
+  initialCapital: 10190.65,
+  maxPositionSize: 0.04,
   maxPositions: 50,
   minTradeValue: 15,
   targetCashRatio: 0,
   strategyWeights: {
     momentum: 0.00,
-    meanReversion: 0.48,
-    sentiment: 0.01,
-    technical: 0.51,
+    meanReversion: 0.34,
+    sentiment: 0.14,
+    technical: 0.52,
   },
 };
 
@@ -700,13 +700,6 @@ function combineSignals(symbol, momentum, meanReversion, sentiment, technical, w
   };
 }
 
-function calculatePositionSize(signal, cash, maxPositionSize, totalValue, targetCashRatio) {
-  const targetCash = totalValue * targetCashRatio;
-  const availableCash = Math.max(0, cash - targetCash);
-  const maxPosition = totalValue * maxPositionSize;
-  const signalStrength = Math.abs(signal.combined);
-  return Math.min(availableCash * signalStrength, maxPosition);
-}
 
 async function analyzeStock(symbol) {
   const historicalData = await fetchYahooHistorical(symbol);
@@ -928,58 +921,91 @@ async function main() {
     }
   }
 
-  // Check for buys
+  // Check for buys — pre-allocate cash across ALL candidates proportionally
+  const openSlots = DEFAULT_CONFIG.maxPositions - portfolio.holdings.length;
   const buyCandidates = Object.values(allSignals)
-    .filter(s => s.combined > 0.02)
+    .filter(s => s.combined > 0.02 && !portfolio.holdings.some(h => h.symbol === s.symbol))
     .sort((a, b) => b.combined - a.combined)
-    .slice(0, 50);
+    .slice(0, openSlots);
 
-  for (const signal of buyCandidates) {
-    if (portfolio.holdings.some(h => h.symbol === signal.symbol)) continue;
-    if (portfolio.holdings.length >= DEFAULT_CONFIG.maxPositions) break;
+  if (buyCandidates.length > 0) {
+    const targetCash = portfolio.totalValue * DEFAULT_CONFIG.targetCashRatio;
+    const availableCash = Math.max(0, portfolio.cash - targetCash);
+    const maxPosition = portfolio.totalValue * DEFAULT_CONFIG.maxPositionSize;
 
-    const positionSize = calculatePositionSize(signal, portfolio.cash, DEFAULT_CONFIG.maxPositionSize, portfolio.totalValue, DEFAULT_CONFIG.targetCashRatio);
-    if (positionSize < DEFAULT_CONFIG.minTradeValue) continue;
+    // Assign each candidate a share of cash proportional to signal strength
+    const totalStrength = buyCandidates.reduce((sum, s) => sum + Math.abs(s.combined), 0);
+    let allocations = buyCandidates.map(signal => {
+      const weight = Math.abs(signal.combined) / totalStrength;
+      return { signal, size: Math.min(availableCash * weight, maxPosition) };
+    });
 
-    let buyPrice = priceCache[signal.symbol];
-    if (!buyPrice) {
-      const quote = await fetchYahooQuote(signal.symbol);
-      if (quote) {
-        buyPrice = quote.price;
-        priceCache[signal.symbol] = buyPrice;
+    // If capping at maxPosition freed up cash, redistribute to uncapped positions
+    const cappedTotal = allocations.reduce((sum, a) => sum + a.size, 0);
+    if (cappedTotal < availableCash) {
+      const uncapped = allocations.filter(a => a.size < maxPosition);
+      const excess = availableCash - cappedTotal;
+      const uncappedStrength = uncapped.reduce((sum, a) => sum + Math.abs(a.signal.combined), 0);
+      if (uncappedStrength > 0) {
+        for (const alloc of uncapped) {
+          const bonus = excess * (Math.abs(alloc.signal.combined) / uncappedStrength);
+          alloc.size = Math.min(alloc.size + bonus, maxPosition);
+        }
       }
     }
-    if (buyPrice) {
-      const shares = Math.round((positionSize / buyPrice) * 10000) / 10000;
-      if (shares >= 0.0001) {
-        const total = shares * buyPrice;
 
-        const trade = {
-          id: crypto.randomUUID(),
-          timestamp: new Date().toISOString(),
-          symbol: signal.symbol,
-          action: 'BUY',
-          shares,
-          price: buyPrice,
-          total,
-          reason: `${signal.recommendation}: score ${signal.combined.toFixed(2)}`,
-          signals: signal,
-        };
+    // Scale down if total still exceeds available cash
+    const totalAllocated = allocations.reduce((sum, a) => sum + a.size, 0);
+    if (totalAllocated > availableCash) {
+      const scale = availableCash / totalAllocated;
+      allocations = allocations.map(a => ({ ...a, size: a.size * scale }));
+    }
 
-        portfolio.cash -= total;
-        portfolio.holdings.push({
-          symbol: signal.symbol,
-          shares,
-          avgCost: buyPrice,
-          currentPrice: buyPrice,
-          marketValue: total,
-          gainLoss: 0,
-          gainLossPercent: 0,
-          priceUpdatedAt: new Date().toISOString(),
-        });
+    console.log(`\nBuy candidates: ${buyCandidates.length} | Available cash: $${availableCash.toFixed(2)}`);
 
-        await addTrade(trade);
-        console.log(`BUY ${shares} ${signal.symbol} @ $${buyPrice}`);
+    for (const { signal, size } of allocations) {
+      if (size < DEFAULT_CONFIG.minTradeValue) continue;
+
+      let buyPrice = priceCache[signal.symbol];
+      if (!buyPrice) {
+        const quote = await fetchYahooQuote(signal.symbol);
+        if (quote) {
+          buyPrice = quote.price;
+          priceCache[signal.symbol] = buyPrice;
+        }
+      }
+      if (buyPrice) {
+        const shares = Math.round((size / buyPrice) * 10000) / 10000;
+        if (shares >= 0.0001) {
+          const total = shares * buyPrice;
+
+          const trade = {
+            id: crypto.randomUUID(),
+            timestamp: new Date().toISOString(),
+            symbol: signal.symbol,
+            action: 'BUY',
+            shares,
+            price: buyPrice,
+            total,
+            reason: `${signal.recommendation}: score ${signal.combined.toFixed(2)}`,
+            signals: signal,
+          };
+
+          portfolio.cash -= total;
+          portfolio.holdings.push({
+            symbol: signal.symbol,
+            shares,
+            avgCost: buyPrice,
+            currentPrice: buyPrice,
+            marketValue: total,
+            gainLoss: 0,
+            gainLossPercent: 0,
+            priceUpdatedAt: new Date().toISOString(),
+          });
+
+          await addTrade(trade);
+          console.log(`BUY ${shares} ${signal.symbol} @ $${buyPrice} ($${total.toFixed(2)})`);
+        }
       }
     }
   }

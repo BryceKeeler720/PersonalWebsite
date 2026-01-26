@@ -111,16 +111,16 @@ export interface SchedulerState {
 
 // Default configuration - optimized for high-frequency trading
 export const DEFAULT_CONFIG: TradingConfig = {
-  initialCapital: 10067.03,
-  maxPositionSize: 0.12, // 12% max per position (larger positions to deploy cash)
+  initialCapital: 10190.65,
+  maxPositionSize: 0.04, // 4% max per position for diversification
   maxPositions: 50, // Allow more simultaneous positions
   minTradeValue: 15, // Lower minimum for more frequent smaller trades
   targetCashRatio: 0, // No cash reserve - sell proceeds fund new buys
   strategyWeights: {
     momentum: 0.00,
-    meanReversion: 0.48,
-    sentiment: 0.01,
-    technical: 0.51,
+    meanReversion: 0.34,
+    sentiment: 0.14,
+    technical: 0.52,
   },
   scheduleInterval: 'daily',
 };
