@@ -163,19 +163,21 @@ export default function StrategySignals({
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
+            {/* Back button outside scrollable area */}
+            {expandedCategory && expandedCategoryData && (
+              <button
+                className="stock-dropdown-back"
+                onClick={handleBack}
+              >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                  <path d="M8 1L3 6l5 5" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                </svg>
+                <span>{expandedCategoryData.label}</span>
+              </button>
+            )}
             <div className="stock-dropdown-list">
-              {/* Show back button and items when a category is expanded */}
               {expandedCategory && expandedCategoryData ? (
                 <>
-                  <button
-                    className="stock-dropdown-back"
-                    onClick={handleBack}
-                  >
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-                      <path d="M8 1L3 6l5 5" stroke="currentColor" strokeWidth="1.5" fill="none" />
-                    </svg>
-                    <span>{expandedCategoryData.label}</span>
-                  </button>
                   {expandedCategoryData.symbols.map((symbol: string) => {
                     const info = getAssetInfo(symbol);
                     return (
@@ -194,7 +196,6 @@ export default function StrategySignals({
                   )}
                 </>
               ) : (
-                /* Show category list */
                 <>
                   {filteredCategories.map(category => (
                     <button

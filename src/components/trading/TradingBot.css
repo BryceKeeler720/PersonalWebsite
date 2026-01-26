@@ -548,7 +548,7 @@
 .stock-dropdown-back {
   width: 100%;
   padding: 0.6rem 0.75rem;
-  background: rgba(255, 255, 255, 0.03);
+  background: #1a1a1a;
   border: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.8);
@@ -562,11 +562,11 @@
   text-align: left;
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 10;
 }
 
 .stock-dropdown-back:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: #252525;
 }
 
 .signals-grid {
