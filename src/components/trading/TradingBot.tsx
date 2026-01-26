@@ -226,31 +226,6 @@ export default function TradingBot() {
 
   const marketStatus = getMarketStatus();
 
-  const getTopBuyCandidates = (limit: number) => {
-    return Object.values(data.signals)
-      .filter(s => s.recommendation === 'BUY' || s.recommendation === 'STRONG_BUY')
-      .sort((a, b) => b.combined - a.combined)
-      .slice(0, limit);
-  };
-
-  const getTopSellCandidates = (limit: number) => {
-    return Object.values(data.signals)
-      .filter(s => s.recommendation === 'SELL' || s.recommendation === 'STRONG_SELL')
-      .sort((a, b) => a.combined - b.combined)
-      .slice(0, limit);
-  };
-
-  if (isLoading) {
-    return (
-      <div className="trading-bot">
-        <div className="loading-container">
-          <div className="loading-spinner" />
-          <p>Loading trading bot data...</p>
-        </div>
-      </div>
-    );
-  }
-
   const totalHoldingsValue = data.portfolio.holdings.reduce((sum, h) => sum + h.marketValue, 0);
 
   const dividendIncome = useMemo(() => {
@@ -279,6 +254,31 @@ export default function TradingBot() {
       totalHoldings: holdings.length,
     };
   }, [data.portfolio.holdings]);
+
+  const getTopBuyCandidates = (limit: number) => {
+    return Object.values(data.signals)
+      .filter(s => s.recommendation === 'BUY' || s.recommendation === 'STRONG_BUY')
+      .sort((a, b) => b.combined - a.combined)
+      .slice(0, limit);
+  };
+
+  const getTopSellCandidates = (limit: number) => {
+    return Object.values(data.signals)
+      .filter(s => s.recommendation === 'SELL' || s.recommendation === 'STRONG_SELL')
+      .sort((a, b) => a.combined - b.combined)
+      .slice(0, limit);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="trading-bot">
+        <div className="loading-container">
+          <div className="loading-spinner" />
+          <p>Loading trading bot data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="trading-bot">
