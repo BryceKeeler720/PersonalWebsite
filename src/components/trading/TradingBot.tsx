@@ -128,11 +128,10 @@ export default function TradingBot() {
   }, []);
 
   // Merge backtest history with live history for the chart
-  // Backtest data is the primary source for its period; live data appended after
+  // Backtest data covers the historical period; live data appends after it
   const combinedHistory = useMemo(() => {
     if (!backtestData?.portfolioHistory?.length) return data.history;
 
-    // Always use all backtest data; only use live data from AFTER the backtest ends
     const backtestEnd = new Date(
       backtestData.portfolioHistory[backtestData.portfolioHistory.length - 1].timestamp
     ).getTime();
@@ -140,25 +139,7 @@ export default function TradingBot() {
       h => new Date(h.timestamp).getTime() > backtestEnd
     );
 
-    if (liveAfterBacktest.length === 0) {
-      return backtestData.portfolioHistory;
-    }
-
-    // Scale live data to continue from backtest ending value
-    const backtestEndValue = backtestData.portfolioHistory[backtestData.portfolioHistory.length - 1].totalValue;
-    const liveStartValue = liveAfterBacktest[0].totalValue;
-    const scaleFactor = liveStartValue > 0 ? backtestEndValue / liveStartValue : 1;
-
-    if (Math.abs(scaleFactor - 1) < 0.01) {
-      return [...backtestData.portfolioHistory, ...liveAfterBacktest];
-    }
-
-    const scaledLiveHistory = liveAfterBacktest.map(h => ({
-      ...h,
-      totalValue: Math.round(h.totalValue * scaleFactor * 100) / 100,
-    }));
-
-    return [...backtestData.portfolioHistory, ...scaledLiveHistory];
+    return [...backtestData.portfolioHistory, ...liveAfterBacktest];
   }, [backtestData, data.history]);
 
   const combinedBenchmark = useMemo(() => {
@@ -171,25 +152,7 @@ export default function TradingBot() {
       b => new Date(b.timestamp).getTime() > backtestEnd
     );
 
-    if (liveAfterBacktest.length === 0) {
-      return backtestData.spyBenchmark;
-    }
-
-    // Scale live benchmark to continue from backtest ending value
-    const backtestEndValue = backtestData.spyBenchmark[backtestData.spyBenchmark.length - 1].value;
-    const liveStartValue = liveAfterBacktest[0].value;
-    const scaleFactor = liveStartValue > 0 ? backtestEndValue / liveStartValue : 1;
-
-    if (Math.abs(scaleFactor - 1) < 0.01) {
-      return [...backtestData.spyBenchmark, ...liveAfterBacktest];
-    }
-
-    const scaledBenchmark = liveAfterBacktest.map(b => ({
-      ...b,
-      value: Math.round(b.value * scaleFactor * 100) / 100,
-    }));
-
-    return [...backtestData.spyBenchmark, ...scaledBenchmark];
+    return [...backtestData.spyBenchmark, ...liveAfterBacktest];
   }, [backtestData, data.spyBenchmark]);
 
   // Use the backtest's starting capital for the chart baseline when available
