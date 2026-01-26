@@ -532,30 +532,69 @@ function calculateRSI(data, period = 14) {
 }
 
 function calculateMomentumSignal(data) {
-  if (data.length < 50) return { name: 'Momentum', score: 0, confidence: 0, reason: 'Insufficient data' };
+  if (data.length < 200) return { name: 'Momentum', score: 0, confidence: 0, reason: 'Insufficient data' };
 
   const currentPrice = data[data.length - 1].close;
-  const sma20 = calculateSMA(data, 20);
-  const sma50 = calculateSMA(data, 50);
-  const ema12 = calculateEMA(data, 12);
-  const ema26 = calculateEMA(data, 26);
+
+  // With minute candles: SMA-200 ≈ 3.3hrs, SMA-500 ≈ 1 trading day
+  const smaShort = calculateSMA(data, 200);
+  const smaLong = calculateSMA(data, Math.min(500, data.length));
+  // EMA-100 ≈ 1.7hrs, EMA-200 ≈ 3.3hrs
+  const emaShort = calculateEMA(data, 100);
+  const emaLong = calculateEMA(data, 200);
 
   let score = 0;
   const reasons = [];
 
-  if (currentPrice > sma20) { score += 0.25; reasons.push('Above SMA20'); }
-  else { score -= 0.25; reasons.push('Below SMA20'); }
+  // Price vs short-term average: graded by distance
+  if (smaShort) {
+    const pctAboveShort = ((currentPrice - smaShort) / smaShort) * 100;
+    if (pctAboveShort > 1.0) { score += 0.25; reasons.push(`+${pctAboveShort.toFixed(1)}% vs SMA200`); }
+    else if (pctAboveShort > 0.3) { score += 0.15; reasons.push(`Above SMA200`); }
+    else if (pctAboveShort > -0.3) { score += 0; reasons.push('Near SMA200'); }
+    else if (pctAboveShort > -1.0) { score -= 0.15; reasons.push(`Below SMA200`); }
+    else { score -= 0.25; reasons.push(`${pctAboveShort.toFixed(1)}% vs SMA200`); }
+  }
 
-  if (currentPrice > sma50) { score += 0.25; reasons.push('Above SMA50'); }
-  else { score -= 0.25; reasons.push('Below SMA50'); }
+  // Price vs long-term average: graded by distance
+  if (smaLong) {
+    const pctAboveLong = ((currentPrice - smaLong) / smaLong) * 100;
+    if (pctAboveLong > 2.0) { score += 0.25; reasons.push(`+${pctAboveLong.toFixed(1)}% vs SMA500`); }
+    else if (pctAboveLong > 0.5) { score += 0.15; reasons.push('Above SMA500'); }
+    else if (pctAboveLong > -0.5) { score += 0; }
+    else if (pctAboveLong > -2.0) { score -= 0.15; reasons.push('Below SMA500'); }
+    else { score -= 0.25; reasons.push(`${pctAboveLong.toFixed(1)}% vs SMA500`); }
+  }
 
-  if (sma20 > sma50) { score += 0.25; reasons.push('SMA20 > SMA50'); }
-  else { score -= 0.25; reasons.push('SMA20 < SMA50'); }
+  // Moving average crossover (trend direction)
+  if (smaShort && smaLong) {
+    const crossPct = ((smaShort - smaLong) / smaLong) * 100;
+    if (crossPct > 0.5) { score += 0.2; reasons.push('Bullish MA cross'); }
+    else if (crossPct > 0) { score += 0.1; }
+    else if (crossPct > -0.5) { score -= 0.1; }
+    else { score -= 0.2; reasons.push('Bearish MA cross'); }
+  }
 
-  if (ema12 > ema26) { score += 0.25; reasons.push('MACD bullish'); }
-  else { score -= 0.25; reasons.push('MACD bearish'); }
+  // MACD-style (EMA crossover) with graded scoring
+  if (emaShort && emaLong) {
+    const macdPct = ((emaShort - emaLong) / emaLong) * 100;
+    if (macdPct > 0.5) { score += 0.2; reasons.push('Strong MACD bullish'); }
+    else if (macdPct > 0) { score += 0.1; reasons.push('MACD bullish'); }
+    else if (macdPct > -0.5) { score -= 0.1; reasons.push('MACD bearish'); }
+    else { score -= 0.2; reasons.push('Strong MACD bearish'); }
+  }
 
-  return { name: 'Momentum', score: Math.max(-1, Math.min(1, score)), confidence: 0.7, reason: reasons.slice(0, 2).join(', ') };
+  // Rate of change over last hour (60 bars) and last 4 hours (240 bars)
+  const roc60 = data.length > 60 ? ((currentPrice - data[data.length - 60].close) / data[data.length - 60].close) * 100 : 0;
+  const roc240 = data.length > 240 ? ((currentPrice - data[data.length - 240].close) / data[data.length - 240].close) * 100 : 0;
+
+  if (roc60 > 0.5) { score += 0.05; }
+  else if (roc60 < -0.5) { score -= 0.05; }
+  if (roc240 > 1.0) { score += 0.05; }
+  else if (roc240 < -1.0) { score -= 0.05; }
+
+  const confidence = data.length >= 500 ? 0.7 : 0.5;
+  return { name: 'Momentum', score: Math.max(-1, Math.min(1, score)), confidence, reason: reasons.slice(0, 3).join(', ') };
 }
 
 function calculateMeanReversionSignal(data) {
@@ -667,14 +706,16 @@ function calculatePositionSize(signal, cash, maxPositionSize, totalValue, target
 
 async function analyzeStock(symbol) {
   const historicalData = await fetchYahooHistorical(symbol);
-  if (!historicalData || historicalData.length < 50) return null;
+  if (!historicalData || historicalData.length < 50) return { signal: null, lastPrice: null };
 
   const momentum = calculateMomentumSignal(historicalData);
   const meanReversion = calculateMeanReversionSignal(historicalData);
   const technical = calculateTechnicalSignal(historicalData);
   const sentiment = calculateSentimentSignal();
 
-  return combineSignals(symbol, momentum, meanReversion, sentiment, technical, DEFAULT_CONFIG.strategyWeights);
+  const signal = combineSignals(symbol, momentum, meanReversion, sentiment, technical, DEFAULT_CONFIG.strategyWeights);
+  const lastPrice = historicalData[historicalData.length - 1].close;
+  return { signal, lastPrice };
 }
 
 // Main execution
@@ -689,6 +730,7 @@ async function main() {
 
   let portfolio = await getPortfolio();
   const allSignals = {};
+  const priceCache = {}; // Cache prices from analysis to avoid redundant API calls
 
   // Determine assets to analyze
   const now = new Date();
@@ -718,15 +760,18 @@ async function main() {
 
     const results = await Promise.all(batch.map(async (symbol) => {
       try {
-        const signal = await analyzeStock(symbol);
-        return { symbol, signal };
+        const result = await analyzeStock(symbol);
+        return { symbol, ...result };
       } catch (error) {
         console.error(`Error analyzing ${symbol}:`, error.message);
-        return { symbol, signal: null };
+        return { symbol, signal: null, lastPrice: null };
       }
     }));
 
-    for (const { symbol, signal } of results) {
+    for (const { symbol, signal, lastPrice } of results) {
+      if (lastPrice) {
+        priceCache[symbol] = lastPrice;
+      }
       if (signal) {
         allSignals[symbol] = signal;
       } else {
@@ -751,31 +796,34 @@ async function main() {
 
   console.log(`Analyzed ${Object.keys(allSignals).length} assets successfully`);
 
-  // Update holding prices
+  // Update holding prices using cached prices from analysis (avoids rate-limiting)
+  // Only fetch fresh quotes for holdings NOT in the price cache
   for (const holding of portfolio.holdings) {
-    const quote = await fetchYahooQuote(holding.symbol);
-    if (quote) {
-      holding.currentPrice = quote.price;
-      holding.marketValue = holding.shares * quote.price;
-      holding.gainLoss = (quote.price - holding.avgCost) * holding.shares;
-      holding.gainLossPercent = ((quote.price - holding.avgCost) / holding.avgCost) * 100;
-      holding.isExtendedHours = quote.isExtendedHours;
+    let price = priceCache[holding.symbol];
+    if (!price) {
+      const quote = await fetchYahooQuote(holding.symbol);
+      if (quote) {
+        price = quote.price;
+        priceCache[holding.symbol] = price;
+        holding.isExtendedHours = quote.isExtendedHours;
+        holding.dividendYield = quote.dividendYield;
+        holding.annualDividend = quote.annualDividend;
+      }
+    }
+    if (price) {
+      holding.currentPrice = price;
+      holding.marketValue = holding.shares * price;
+      holding.gainLoss = (price - holding.avgCost) * holding.shares;
+      holding.gainLossPercent = ((price - holding.avgCost) / holding.avgCost) * 100;
       holding.priceUpdatedAt = new Date().toISOString();
-      holding.dividendYield = quote.dividendYield;
-      holding.annualDividend = quote.annualDividend;
     }
   }
 
-  // Check for sells
+  // Check for sells (uses already-cached prices, no redundant API calls)
   for (const holding of portfolio.holdings) {
     const signal = allSignals[holding.symbol];
-    const quote = await fetchYahooQuote(holding.symbol);
-    if (!quote) continue;
-
-    holding.currentPrice = quote.price;
-    holding.marketValue = holding.shares * quote.price;
-    holding.gainLoss = (quote.price - holding.avgCost) * holding.shares;
-    holding.gainLossPercent = ((quote.price - holding.avgCost) / holding.avgCost) * 100;
+    const price = priceCache[holding.symbol] || holding.currentPrice;
+    if (!price) continue;
 
     let sellPercent = 0;
     let sellReason = '';
@@ -809,11 +857,11 @@ async function main() {
         symbol: holding.symbol,
         action: 'SELL',
         shares: sharesToSell,
-        price: quote.price,
-        total: sharesToSell * quote.price,
+        price,
+        total: sharesToSell * price,
         reason: sellReason,
         signals: signal || { symbol: holding.symbol, timestamp: new Date().toISOString(), momentum: {}, meanReversion: {}, sentiment: {}, technical: {}, combined: 0, recommendation: 'HOLD' },
-        gainLoss: (quote.price - holding.avgCost) * sharesToSell,
+        gainLoss: (price - holding.avgCost) * sharesToSell,
         gainLossPercent: holding.gainLossPercent,
       };
 
@@ -823,7 +871,7 @@ async function main() {
         portfolio.holdings = portfolio.holdings.filter(h => h.symbol !== holding.symbol);
       } else {
         holding.shares -= sharesToSell;
-        holding.marketValue = holding.shares * quote.price;
+        holding.marketValue = holding.shares * price;
       }
 
       await addTrade(trade);
@@ -851,8 +899,8 @@ async function main() {
       if (rotated >= 3) break;
       if (signal.combined >= 0.15) break; // Don't sell strong holdings
 
-      const quote = await fetchYahooQuote(holding.symbol);
-      if (!quote) continue;
+      const rotatePrice = priceCache[holding.symbol] || holding.currentPrice;
+      if (!rotatePrice) continue;
 
       const trade = {
         id: crypto.randomUUID(),
@@ -860,11 +908,11 @@ async function main() {
         symbol: holding.symbol,
         action: 'SELL',
         shares: holding.shares,
-        price: quote.price,
-        total: holding.shares * quote.price,
+        price: rotatePrice,
+        total: holding.shares * rotatePrice,
         reason: `Rotation: weak signal (${signal.combined.toFixed(3)}) → stronger candidates`,
         signals: signal,
-        gainLoss: (quote.price - holding.avgCost) * holding.shares,
+        gainLoss: (rotatePrice - holding.avgCost) * holding.shares,
         gainLossPercent: holding.gainLossPercent,
       };
 
@@ -889,11 +937,18 @@ async function main() {
     const positionSize = calculatePositionSize(signal, portfolio.cash, DEFAULT_CONFIG.maxPositionSize, portfolio.totalValue, DEFAULT_CONFIG.targetCashRatio);
     if (positionSize < DEFAULT_CONFIG.minTradeValue) continue;
 
-    const quote = await fetchYahooQuote(signal.symbol);
-    if (quote) {
-      const shares = Math.round((positionSize / quote.price) * 10000) / 10000;
+    let buyPrice = priceCache[signal.symbol];
+    if (!buyPrice) {
+      const quote = await fetchYahooQuote(signal.symbol);
+      if (quote) {
+        buyPrice = quote.price;
+        priceCache[signal.symbol] = buyPrice;
+      }
+    }
+    if (buyPrice) {
+      const shares = Math.round((positionSize / buyPrice) * 10000) / 10000;
       if (shares >= 0.0001) {
-        const total = shares * quote.price;
+        const total = shares * buyPrice;
 
         const trade = {
           id: crypto.randomUUID(),
@@ -901,7 +956,7 @@ async function main() {
           symbol: signal.symbol,
           action: 'BUY',
           shares,
-          price: quote.price,
+          price: buyPrice,
           total,
           reason: `${signal.recommendation}: score ${signal.combined.toFixed(2)}`,
           signals: signal,
@@ -911,17 +966,16 @@ async function main() {
         portfolio.holdings.push({
           symbol: signal.symbol,
           shares,
-          avgCost: quote.price,
-          currentPrice: quote.price,
+          avgCost: buyPrice,
+          currentPrice: buyPrice,
           marketValue: total,
           gainLoss: 0,
           gainLossPercent: 0,
-          isExtendedHours: quote.isExtendedHours,
           priceUpdatedAt: new Date().toISOString(),
         });
 
         await addTrade(trade);
-        console.log(`BUY ${shares} ${signal.symbol} @ $${quote.price}`);
+        console.log(`BUY ${shares} ${signal.symbol} @ $${buyPrice}`);
       }
     }
   }
