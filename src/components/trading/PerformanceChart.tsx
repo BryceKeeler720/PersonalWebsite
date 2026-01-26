@@ -102,16 +102,25 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
     const chartWidth = width - padding.left - padding.right;
     const chartHeight = height - padding.top - padding.bottom;
 
-    // Use simple index-based positioning for portfolio
+    // Time-based positioning: map timestamps to x coordinates proportionally
+    const allTimestamps = [
+      ...displayHistory.map(h => new Date(h.timestamp).getTime()),
+      ...filteredBenchmark.map(b => new Date(b.timestamp).getTime()),
+    ];
+    const timeMin = Math.min(...allTimestamps);
+    const timeMax = Math.max(...allTimestamps);
+    const timeSpan = timeMax - timeMin || 1;
+
     const points: ChartPoint[] = displayHistory.map((h, i) => {
-      const x = padding.left + (i / Math.max(displayHistory.length - 1, 1)) * chartWidth;
+      const t = new Date(h.timestamp).getTime();
+      const x = padding.left + ((t - timeMin) / timeSpan) * chartWidth;
       const y = padding.top + chartHeight - ((h.totalValue - minValue) / range) * chartHeight;
       return { x, y, value: h.totalValue, timestamp: h.timestamp, index: i };
     });
 
-    // Simple index-based positioning for benchmark (spans full width)
     const benchmarkPoints: ChartPoint[] = filteredBenchmark.map((b, i) => {
-      const x = padding.left + (i / Math.max(filteredBenchmark.length - 1, 1)) * chartWidth;
+      const t = new Date(b.timestamp).getTime();
+      const x = padding.left + ((t - timeMin) / timeSpan) * chartWidth;
       const y = padding.top + chartHeight - ((b.value - minValue) / range) * chartHeight;
       return { x, y, value: b.value, timestamp: b.timestamp, index: i };
     });
@@ -139,11 +148,9 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
     const xLabels = [];
     const numXLabels = 5;
     for (let i = 0; i < numXLabels; i++) {
-      const idx = Math.floor((i / (numXLabels - 1)) * (displayHistory.length - 1));
-      if (displayHistory[idx]) {
-        const x = padding.left + (idx / Math.max(displayHistory.length - 1, 1)) * chartWidth;
-        xLabels.push({ timestamp: displayHistory[idx].timestamp, x });
-      }
+      const t = timeMin + (i / (numXLabels - 1)) * timeSpan;
+      const x = padding.left + (i / (numXLabels - 1)) * chartWidth;
+      xLabels.push({ timestamp: new Date(t).toISOString(), x });
     }
 
     // Calculate SPY performance from its own start
@@ -154,6 +161,7 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
     return {
       points, benchmarkPoints, pathD, benchmarkPathD, areaD, minValue, maxValue, isPositive, currentValue, startValue,
       padding, chartWidth, chartHeight, width, height, yLabels, xLabels, spyChangePercent, hasBenchmark: filteredBenchmark.length > 1,
+      timeMin, timeSpan,
     };
   }, [displayHistory, filteredBenchmark, initialCapital]);
 
@@ -170,9 +178,20 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
       return;
     }
 
-    const percentX = (mouseX - chartStartX) / (chartEndX - chartStartX);
-    const index = Math.round(percentX * (points.length - 1));
-    setHoveredIndex(Math.max(0, Math.min(points.length - 1, index)));
+    // Convert mouse position to SVG x coordinate
+    const svgX = padding.left + ((mouseX - chartStartX) / (chartEndX - chartStartX)) * chartWidth;
+
+    // Find nearest point by x position (points may not be evenly spaced)
+    let closest = 0;
+    let closestDist = Infinity;
+    for (let i = 0; i < points.length; i++) {
+      const dist = Math.abs(points[i].x - svgX);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closest = i;
+      }
+    }
+    setHoveredIndex(closest);
   };
 
   const formatCurrency = (value: number) =>
