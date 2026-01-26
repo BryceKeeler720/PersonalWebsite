@@ -191,7 +191,10 @@ export default function TradingBot() {
 
     for (const trade of sells) {
       if (!trade.signals) continue;
-      const isWin = trade.reason.includes('+') || trade.reason.includes('profit');
+      // Use actual P&L if available, otherwise fall back to string matching for older trades
+      const isWin = trade.gainLossPercent !== undefined
+        ? trade.gainLossPercent >= 0
+        : (trade.reason.includes('+') || trade.reason.includes('profit'));
       const { momentum, meanReversion, sentiment, technical } = trade.signals;
 
       if (momentum && momentum.score > 0.1) {

@@ -32,6 +32,8 @@ export interface Trade {
   total: number;
   reason: string;
   signals: SignalSnapshot;
+  gainLoss?: number;
+  gainLossPercent?: number;
 }
 
 // Stock data

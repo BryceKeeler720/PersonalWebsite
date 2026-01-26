@@ -473,6 +473,8 @@ async function main() {
         total: sharesToSell * quote.price,
         reason: sellReason,
         signals: signal || { symbol: holding.symbol, timestamp: new Date().toISOString(), momentum: {}, meanReversion: {}, sentiment: {}, technical: {}, combined: 0, recommendation: 'HOLD' },
+        gainLoss: (quote.price - holding.avgCost) * sharesToSell,
+        gainLossPercent: holding.gainLossPercent,
       };
 
       portfolio.cash += trade.total;
