@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
  * Trading Bot Script - Self-hosted continuous service
- * Runs as a daemon analyzing hourly candles every 10 minutes
+ * Runs as a daemon analyzing 5-min intraday candles via Alpaca
+ * Submits paper trades to Alpaca for real execution tracking
  */
 
 import { Redis } from '@upstash/redis';
@@ -35,10 +36,15 @@ const DEFAULT_CONFIG = {
   },
 };
 
+// Trade cooldown: prevent buying/selling the same symbol within 30 minutes
+const TRADE_COOLDOWN_MS = 30 * 60 * 1000;
+const tradeCooldowns = new Map(); // symbol → last trade timestamp
+
 // Alpaca API Configuration
 const ALPACA_API_KEY = process.env.ALPACA_API_KEY;
 const ALPACA_SECRET_KEY = process.env.ALPACA_SECRET_KEY;
 const ALPACA_DATA_URL = 'https://data.alpaca.markets';
+const ALPACA_PAPER_URL = 'https://paper-api.alpaca.markets';
 
 // Asset lists
 const CRYPTO_SYMBOLS = [
@@ -605,6 +611,57 @@ async function fetchAllMarketData(symbols) {
   };
 }
 
+// Alpaca Paper Trading — submit orders to mirror simulated trades
+function toAlpacaOrderSymbol(symbol) {
+  if (isCryptoSymbol(symbol)) return toAlpacaCryptoSymbol(symbol); // BTC-USD → BTC/USD
+  return toAlpacaStockSymbol(symbol); // BRK-B → BRK.B
+}
+
+async function submitAlpacaOrder(symbol, qty, side) {
+  try {
+    const alpacaSymbol = toAlpacaOrderSymbol(symbol);
+    const isCrypto = isCryptoSymbol(symbol);
+    const response = await fetch(`${ALPACA_PAPER_URL}/v2/orders`, {
+      method: 'POST',
+      headers: {
+        'APCA-API-KEY-ID': ALPACA_API_KEY,
+        'APCA-API-SECRET-KEY': ALPACA_SECRET_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        symbol: alpacaSymbol,
+        qty: qty.toFixed(4),
+        side,
+        type: 'market',
+        time_in_force: isCrypto ? 'gtc' : 'day',
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.log(`  Alpaca paper ${side} failed (${symbol}): ${errorText}`);
+      return null;
+    }
+
+    const order = await response.json();
+    console.log(`  Alpaca paper ${side.toUpperCase()} ${qty.toFixed(4)} ${symbol} → ${order.status}`);
+    return order;
+  } catch (error) {
+    console.log(`  Alpaca order error (${symbol}): ${error.message}`);
+    return null;
+  }
+}
+
+function isOnCooldown(symbol) {
+  const lastTrade = tradeCooldowns.get(symbol);
+  if (!lastTrade) return false;
+  return Date.now() - lastTrade < TRADE_COOLDOWN_MS;
+}
+
+function setCooldown(symbol) {
+  tradeCooldowns.set(symbol, Date.now());
+}
+
 // Strategy calculations
 function calculateRSI(data, period = 14) {
   if (data.length < period + 1) return 50;
@@ -1021,6 +1078,10 @@ async function main() {
     const price = priceCache[holding.symbol] || holding.currentPrice;
     if (!price) continue;
 
+    // Stop loss always fires; other sells respect cooldown
+    const isStopLoss = holding.gainLossPercent <= DEFAULT_CONFIG.stopLoss;
+    if (!isStopLoss && isOnCooldown(holding.symbol)) continue;
+
     let sellPercent = 0;
     let sellReason = '';
 
@@ -1030,7 +1091,7 @@ async function main() {
     } else if (signal.recommendation === 'STRONG_SELL') {
       sellPercent = 1.0;
       sellReason = `STRONG_SELL: score ${signal.combined.toFixed(2)}`;
-    } else if (holding.gainLossPercent <= DEFAULT_CONFIG.stopLoss) {
+    } else if (isStopLoss) {
       sellPercent = 1.0;
       sellReason = `Stop loss at ${holding.gainLossPercent.toFixed(1)}%`;
     } else if (signal.combined < DEFAULT_CONFIG.weakSignalSell) {
@@ -1071,6 +1132,8 @@ async function main() {
       }
 
       await addTrade(trade);
+      setCooldown(trade.symbol);
+      await submitAlpacaOrder(trade.symbol, trade.shares, 'sell');
       console.log(`SELL ${trade.shares} ${trade.symbol} @ $${trade.price}: ${sellReason}`);
     }
   }
@@ -1094,6 +1157,7 @@ async function main() {
     for (const { holding, signal } of holdingsWithSignals) {
       if (rotated >= 3) break;
       if (signal.combined >= 0.15) break; // Don't sell strong holdings
+      if (isOnCooldown(holding.symbol)) continue;
 
       const rotatePrice = priceCache[holding.symbol] || holding.currentPrice;
       if (!rotatePrice) continue;
@@ -1115,6 +1179,8 @@ async function main() {
       portfolio.cash += trade.total;
       portfolio.holdings = portfolio.holdings.filter(h => h.symbol !== holding.symbol);
       await addTrade(trade);
+      setCooldown(trade.symbol);
+      await submitAlpacaOrder(trade.symbol, trade.shares, 'sell');
       console.log(`ROTATE OUT ${trade.shares} ${trade.symbol} @ $${trade.price} (signal: ${signal.combined.toFixed(3)})`);
       rotated++;
     }
@@ -1123,7 +1189,7 @@ async function main() {
   // Check for buys — pre-allocate cash across ALL candidates proportionally
   const openSlots = DEFAULT_CONFIG.maxPositions - portfolio.holdings.length;
   const buyCandidates = Object.values(allSignals)
-    .filter(s => s.combined > DEFAULT_CONFIG.buyThreshold && !portfolio.holdings.some(h => h.symbol === s.symbol))
+    .filter(s => s.combined > DEFAULT_CONFIG.buyThreshold && !portfolio.holdings.some(h => h.symbol === s.symbol) && !isOnCooldown(s.symbol))
     .sort((a, b) => b.combined - a.combined)
     .slice(0, openSlots);
 
@@ -1203,6 +1269,8 @@ async function main() {
           });
 
           await addTrade(trade);
+          setCooldown(signal.symbol);
+          await submitAlpacaOrder(signal.symbol, shares, 'buy');
           console.log(`BUY ${shares} ${signal.symbol} @ $${buyPrice} ($${total.toFixed(2)})`);
         }
       }
