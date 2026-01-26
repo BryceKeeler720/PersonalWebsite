@@ -81,6 +81,7 @@ export interface SignalSnapshot {
   technical: StrategySignal;
   combined: number; // Weighted final score
   recommendation: 'STRONG_BUY' | 'BUY' | 'HOLD' | 'SELL' | 'STRONG_SELL';
+  price?: number; // Current price from latest candle
 }
 
 // Configuration
@@ -110,16 +111,16 @@ export interface SchedulerState {
 
 // Default configuration - optimized for high-frequency trading
 export const DEFAULT_CONFIG: TradingConfig = {
-  initialCapital: 10303.28,
+  initialCapital: 10067.03,
   maxPositionSize: 0.12, // 12% max per position (larger positions to deploy cash)
   maxPositions: 50, // Allow more simultaneous positions
   minTradeValue: 15, // Lower minimum for more frequent smaller trades
   targetCashRatio: 0, // No cash reserve - sell proceeds fund new buys
   strategyWeights: {
     momentum: 0.00,
-    meanReversion: 0.39,
-    sentiment: 0.05,
-    technical: 0.56,
+    meanReversion: 0.48,
+    sentiment: 0.01,
+    technical: 0.51,
   },
   scheduleInterval: 'daily',
 };

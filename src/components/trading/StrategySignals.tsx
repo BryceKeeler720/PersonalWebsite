@@ -236,7 +236,14 @@ export default function StrategySignals({
         <>
           {/* Asset Info */}
           <div style={{ marginBottom: '1rem', color: 'rgba(255, 255, 255, 0.6)' }}>
-            <div style={{ fontSize: '0.875rem' }}>{assetInfo.name}</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+              <div style={{ fontSize: '0.875rem' }}>{assetInfo.name}</div>
+              {currentSignal.price != null && (
+                <div style={{ fontSize: '1rem', fontWeight: 600, color: '#fff' }}>
+                  ${currentSignal.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </div>
+              )}
+            </div>
             <div style={{ fontSize: '0.75rem' }}>Category: {assetInfo.category}</div>
           </div>
 

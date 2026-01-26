@@ -93,6 +93,7 @@ export default function TradingBot() {
   const [backtestData, setBacktestData] = useState<{
     portfolioHistory: { timestamp: string; totalValue: number }[];
     spyBenchmark: { timestamp: string; value: number }[];
+    config?: { initialCapital: number };
   } | null>(null);
 
   const fetchData = async () => {
@@ -127,13 +128,34 @@ export default function TradingBot() {
   }, []);
 
   // Merge backtest history with live history for the chart
+  // Scale live data so it continues seamlessly from the backtest ending value
   const combinedHistory = useMemo(() => {
     if (!backtestData?.portfolioHistory?.length) return data.history;
     const liveStart = data.history.length > 0 ? new Date(data.history[0].timestamp).getTime() : Infinity;
     const backtestOnly = backtestData.portfolioHistory.filter(
       p => new Date(p.timestamp).getTime() < liveStart
     );
-    return [...backtestOnly, ...data.history];
+
+    if (data.history.length === 0 || backtestOnly.length === 0) {
+      return [...backtestOnly, ...data.history];
+    }
+
+    // Scale live data to continue from backtest ending value
+    const backtestEndValue = backtestOnly[backtestOnly.length - 1].totalValue;
+    const liveStartValue = data.history[0].totalValue;
+    const scaleFactor = liveStartValue > 0 ? backtestEndValue / liveStartValue : 1;
+
+    // Only scale if there's a meaningful difference (>1%)
+    if (Math.abs(scaleFactor - 1) < 0.01) {
+      return [...backtestOnly, ...data.history];
+    }
+
+    const scaledLiveHistory = data.history.map(h => ({
+      ...h,
+      totalValue: Math.round(h.totalValue * scaleFactor * 100) / 100,
+    }));
+
+    return [...backtestOnly, ...scaledLiveHistory];
   }, [backtestData, data.history]);
 
   const combinedBenchmark = useMemo(() => {
@@ -142,8 +164,35 @@ export default function TradingBot() {
     const backtestOnly = backtestData.spyBenchmark.filter(
       p => new Date(p.timestamp).getTime() < liveStart
     );
-    return [...backtestOnly, ...data.spyBenchmark];
+
+    if (data.spyBenchmark.length === 0 || backtestOnly.length === 0) {
+      return [...backtestOnly, ...data.spyBenchmark];
+    }
+
+    // Scale live benchmark to continue from backtest ending value
+    const backtestEndValue = backtestOnly[backtestOnly.length - 1].value;
+    const liveStartValue = data.spyBenchmark[0].value;
+    const scaleFactor = liveStartValue > 0 ? backtestEndValue / liveStartValue : 1;
+
+    if (Math.abs(scaleFactor - 1) < 0.01) {
+      return [...backtestOnly, ...data.spyBenchmark];
+    }
+
+    const scaledBenchmark = data.spyBenchmark.map(b => ({
+      ...b,
+      value: Math.round(b.value * scaleFactor * 100) / 100,
+    }));
+
+    return [...backtestOnly, ...scaledBenchmark];
   }, [backtestData, data.spyBenchmark]);
+
+  // Use the backtest's starting capital for the chart baseline when available
+  const chartInitialCapital = useMemo(() => {
+    if (backtestData?.config?.initialCapital) {
+      return backtestData.config.initialCapital;
+    }
+    return DEFAULT_CONFIG.initialCapital;
+  }, [backtestData]);
 
   const signalsMap = new Map(Object.entries(data.signals));
 
@@ -404,7 +453,7 @@ export default function TradingBot() {
                 <h2>Portfolio Performance vs S&P 500</h2>
                 <PerformanceChart
                   history={combinedHistory}
-                  initialCapital={DEFAULT_CONFIG.initialCapital}
+                  initialCapital={chartInitialCapital}
                   spyBenchmark={combinedBenchmark}
                 />
               </div>

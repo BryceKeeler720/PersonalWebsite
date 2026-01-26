@@ -16,16 +16,16 @@ let currentRunPromise = null;
 const BATCH_SIZE = 20;
 const BATCH_DELAY_MS = 400;
 const DEFAULT_CONFIG = {
-  initialCapital: 10303.28,
+  initialCapital: 10067.03,
   maxPositionSize: 0.12,
   maxPositions: 50,
   minTradeValue: 15,
   targetCashRatio: 0,
   strategyWeights: {
     momentum: 0.00,
-    meanReversion: 0.39,
-    sentiment: 0.05,
-    technical: 0.56,
+    meanReversion: 0.48,
+    sentiment: 0.01,
+    technical: 0.51,
   },
 };
 
@@ -777,7 +777,7 @@ async function main() {
         priceCache[symbol] = lastPrice;
       }
       if (signal) {
-        allSignals[symbol] = signal;
+        allSignals[symbol] = { ...signal, price: lastPrice };
       } else {
         // Store a placeholder signal so the frontend always shows something
         allSignals[symbol] = {

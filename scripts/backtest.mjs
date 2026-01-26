@@ -5,8 +5,9 @@
  * window, then validates on a held-out test window (out-of-sample).
  *
  * Usage:
- *   node scripts/backtest.mjs [--days=30] [--train-days=60] [--symbols=1500] [--optimize] [--verbose]
+ *   node scripts/backtest.mjs [--days=30] [--train-days=60] [--test-start=YYYY-MM-DD] [--symbols=1500] [--optimize] [--verbose]
  *   node scripts/backtest.mjs --days=30 --train-days=60   # Train on 60 days, test on 30 days (OOS)
+ *   node scripts/backtest.mjs --test-start=2025-12-26     # Test window starts on specific date
  *   node scripts/backtest.mjs --optimize=false --days=30   # Skip optimization, use current weights
  */
 
@@ -46,6 +47,7 @@ const args = Object.fromEntries(
 );
 const BACKTEST_DAYS = parseInt(args.days || '30', 10);
 const TRAIN_DAYS = parseInt(args['train-days'] || '60', 10);
+const TEST_START = args['test-start'] || null; // e.g., '2025-12-26' - overrides --days for test window start
 const MAX_SYMBOLS = parseInt(args.symbols || '1500', 10);
 const VERBOSE = args.verbose === 'true';
 const OPTIMIZE = args.optimize !== 'false'; // default: optimize
@@ -628,14 +630,13 @@ function optimizeWeights(signalsByDate, pricesByDate, backtestDates, config) {
 // ────────────────────────────────────────────
 
 async function runBacktest() {
-  const totalDays = OPTIMIZE ? TRAIN_DAYS + BACKTEST_DAYS : BACKTEST_DAYS;
   console.log('='.repeat(60));
   console.log('TRADING BOT BACKTEST' + (OPTIMIZE ? ' + WALK-FORWARD OPTIMIZATION' : ''));
   if (OPTIMIZE) {
     console.log(`Train window: ${TRAIN_DAYS} trading days`);
-    console.log(`Test window:  ${BACKTEST_DAYS} trading days (out-of-sample)`);
+    console.log(`Test window:  ${TEST_START ? `from ${TEST_START}` : `${BACKTEST_DAYS} trading days`} (out-of-sample)`);
   } else {
-    console.log(`Period: ${BACKTEST_DAYS} trading days`);
+    console.log(`Period: ${TEST_START ? `from ${TEST_START}` : `${BACKTEST_DAYS} trading days`}`);
   }
   console.log(`Symbols: ${BACKTEST_SYMBOLS.length}`);
   console.log(`Initial Capital: $${DEFAULT_CONFIG.initialCapital.toLocaleString()}`);
@@ -684,19 +685,38 @@ async function runBacktest() {
 
   // Determine backtest window: need warmup + train + test
   const warmupDays = 50;
-  const startIdx = Math.max(warmupDays, allDates.length - totalDays);
-  const allBacktestDates = allDates.slice(startIdx);
+  let allBacktestDates, trainDates, testDates;
 
-  // Split into train and test windows for walk-forward validation
-  let trainDates, testDates;
-  if (OPTIMIZE && allBacktestDates.length > BACKTEST_DAYS) {
+  if (OPTIMIZE && TEST_START) {
+    // Use specific start date for test window
+    const availableDates = allDates.slice(warmupDays);
+    testDates = availableDates.filter(d => d >= TEST_START);
+    const preDates = availableDates.filter(d => d < TEST_START);
+    trainDates = preDates.slice(-TRAIN_DAYS);
+    allBacktestDates = [...trainDates, ...testDates];
+    console.log(`Warmup: ${warmupDays} days`);
+    console.log(`Train:  ${trainDates.length} days (${trainDates[0]} -> ${trainDates[trainDates.length - 1]})`);
+    console.log(`Test:   ${testDates.length} days (${testDates[0]} -> ${testDates[testDates.length - 1]}) [OUT-OF-SAMPLE]`);
+  } else if (OPTIMIZE) {
+    const totalDays = TRAIN_DAYS + BACKTEST_DAYS;
+    const startIdx = Math.max(warmupDays, allDates.length - totalDays);
+    allBacktestDates = allDates.slice(startIdx);
     const splitPoint = allBacktestDates.length - BACKTEST_DAYS;
     trainDates = allBacktestDates.slice(0, splitPoint);
     testDates = allBacktestDates.slice(splitPoint);
     console.log(`Warmup: ${startIdx} days`);
     console.log(`Train:  ${trainDates.length} days (${trainDates[0]} -> ${trainDates[trainDates.length - 1]})`);
     console.log(`Test:   ${testDates.length} days (${testDates[0]} -> ${testDates[testDates.length - 1]}) [OUT-OF-SAMPLE]`);
+  } else if (TEST_START) {
+    allBacktestDates = allDates.slice(warmupDays).filter(d => d >= TEST_START);
+    trainDates = allBacktestDates;
+    testDates = allBacktestDates;
+    console.log(`Warmup: ${warmupDays} days | Backtest: ${allBacktestDates.length} trading days`);
+    console.log(`Date range: ${allBacktestDates[0]} -> ${allBacktestDates[allBacktestDates.length - 1]}`);
   } else {
+    const totalDays = BACKTEST_DAYS;
+    const startIdx = Math.max(warmupDays, allDates.length - totalDays);
+    allBacktestDates = allDates.slice(startIdx);
     trainDates = allBacktestDates;
     testDates = allBacktestDates;
     console.log(`Warmup: ${startIdx} days | Backtest: ${allBacktestDates.length} trading days`);

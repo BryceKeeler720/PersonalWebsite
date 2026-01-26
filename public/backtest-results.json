@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-01-26T05:01:50.635Z",
+  "generatedAt": "2026-01-26T05:12:41.040Z",
   "config": {
     "initialCapital": 10000,
     "maxPositionSize": 0.12,
@@ -12,2807 +12,529 @@
     "profitTake": 2,
     "strategyWeights": {
       "momentum": 0,
-      "meanReversion": 0.39,
-      "sentiment": 0.05,
-      "technical": 0.56
+      "meanReversion": 0.48,
+      "sentiment": 0.01,
+      "technical": 0.51
     }
   },
   "dateRange": {
-    "start": "2025-12-10",
+    "start": "2025-12-26",
     "end": "2026-01-23"
   },
   "portfolioHistory": [
     {
-      "timestamp": "2025-12-10T16:00:00.000Z",
+      "timestamp": "2025-12-26T16:00:00.000Z",
       "totalValue": 10000
     },
     {
-      "timestamp": "2025-12-11T16:00:00.000Z",
-      "totalValue": 10039.22
-    },
-    {
-      "timestamp": "2025-12-12T16:00:00.000Z",
-      "totalValue": 10094.45
-    },
-    {
-      "timestamp": "2025-12-15T16:00:00.000Z",
-      "totalValue": 10159.7
-    },
-    {
-      "timestamp": "2025-12-16T16:00:00.000Z",
-      "totalValue": 10149.24
-    },
-    {
-      "timestamp": "2025-12-17T16:00:00.000Z",
-      "totalValue": 10174.63
-    },
-    {
-      "timestamp": "2025-12-18T16:00:00.000Z",
-      "totalValue": 10156.75
-    },
-    {
-      "timestamp": "2025-12-19T16:00:00.000Z",
-      "totalValue": 10204.78
-    },
-    {
-      "timestamp": "2025-12-22T16:00:00.000Z",
-      "totalValue": 10274.97
-    },
-    {
-      "timestamp": "2025-12-23T16:00:00.000Z",
-      "totalValue": 10241.21
-    },
-    {
-      "timestamp": "2025-12-24T16:00:00.000Z",
-      "totalValue": 10274.85
-    },
-    {
-      "timestamp": "2025-12-26T16:00:00.000Z",
-      "totalValue": 10279.49
-    },
-    {
       "timestamp": "2025-12-29T16:00:00.000Z",
-      "totalValue": 10241.48
+      "totalValue": 9972.2
     },
     {
       "timestamp": "2025-12-30T16:00:00.000Z",
-      "totalValue": 10245.23
+      "totalValue": 9964.09
     },
     {
       "timestamp": "2025-12-31T16:00:00.000Z",
-      "totalValue": 10153.53
+      "totalValue": 9914.02
     },
     {
       "timestamp": "2026-01-02T16:00:00.000Z",
-      "totalValue": 10220.17
+      "totalValue": 9911.9
     },
     {
       "timestamp": "2026-01-05T16:00:00.000Z",
-      "totalValue": 10249.69
+      "totalValue": 9955.31
     },
     {
       "timestamp": "2026-01-06T16:00:00.000Z",
-      "totalValue": 10323.99
+      "totalValue": 10064.76
     },
     {
       "timestamp": "2026-01-07T16:00:00.000Z",
-      "totalValue": 10292.57
+      "totalValue": 10042.96
     },
     {
       "timestamp": "2026-01-08T16:00:00.000Z",
-      "totalValue": 10405.99
+      "totalValue": 10136.9
     },
     {
       "timestamp": "2026-01-09T16:00:00.000Z",
-      "totalValue": 10506.27
+      "totalValue": 10172.54
     },
     {
       "timestamp": "2026-01-12T16:00:00.000Z",
-      "totalValue": 10518.54
+      "totalValue": 10181.98
     },
     {
       "timestamp": "2026-01-13T16:00:00.000Z",
-      "totalValue": 10540.51
+      "totalValue": 10153.71
     },
     {
       "timestamp": "2026-01-14T16:00:00.000Z",
-      "totalValue": 10434.12
+      "totalValue": 10143.8
     },
     {
       "timestamp": "2026-01-15T16:00:00.000Z",
-      "totalValue": 10389.96
+      "totalValue": 10111.54
     },
     {
       "timestamp": "2026-01-16T16:00:00.000Z",
-      "totalValue": 10307.63
+      "totalValue": 10070.46
     },
     {
       "timestamp": "2026-01-20T16:00:00.000Z",
-      "totalValue": 10079.39
+      "totalValue": 9910.84
     },
     {
       "timestamp": "2026-01-21T16:00:00.000Z",
-      "totalValue": 10132.33
+      "totalValue": 9961.88
     },
     {
       "timestamp": "2026-01-22T16:00:00.000Z",
-      "totalValue": 10300.88
+      "totalValue": 10068.97
     },
     {
       "timestamp": "2026-01-23T16:00:00.000Z",
-      "totalValue": 10303.28
+      "totalValue": 10067.03
     }
   ],
   "spyBenchmark": [
     {
-      "timestamp": "2025-12-10T16:00:00.000Z",
+      "timestamp": "2025-12-26T16:00:00.000Z",
       "value": 10000
     },
     {
-      "timestamp": "2025-12-11T16:00:00.000Z",
-      "value": 10023.27
-    },
-    {
-      "timestamp": "2025-12-12T16:00:00.000Z",
-      "value": 9915.5
-    },
-    {
-      "timestamp": "2025-12-15T16:00:00.000Z",
-      "value": 9900.52
-    },
-    {
-      "timestamp": "2025-12-16T16:00:00.000Z",
-      "value": 9873.47
-    },
-    {
-      "timestamp": "2025-12-17T16:00:00.000Z",
-      "value": 9764.82
-    },
-    {
-      "timestamp": "2025-12-18T16:00:00.000Z",
-      "value": 9838.56
-    },
-    {
-      "timestamp": "2025-12-19T16:00:00.000Z",
-      "value": 9898.48
-    },
-    {
-      "timestamp": "2025-12-22T16:00:00.000Z",
-      "value": 9960.15
-    },
-    {
-      "timestamp": "2025-12-23T16:00:00.000Z",
-      "value": 10005.67
-    },
-    {
-      "timestamp": "2025-12-24T16:00:00.000Z",
-      "value": 10040.87
-    },
-    {
-      "timestamp": "2025-12-26T16:00:00.000Z",
-      "value": 10039.85
-    },
-    {
       "timestamp": "2025-12-29T16:00:00.000Z",
-      "value": 10004.07
+      "value": 9964.36
     },
     {
       "timestamp": "2025-12-30T16:00:00.000Z",
-      "value": 9991.86
+      "value": 9952.2
     },
     {
       "timestamp": "2025-12-31T16:00:00.000Z",
-      "value": 9917.83
+      "value": 9878.46
     },
     {
       "timestamp": "2026-01-02T16:00:00.000Z",
-      "value": 9936.01
+      "value": 9896.57
     },
     {
       "timestamp": "2026-01-05T16:00:00.000Z",
-      "value": 10002.18
+      "value": 9962.48
     },
     {
       "timestamp": "2026-01-06T16:00:00.000Z",
-      "value": 10061.67
+      "value": 10021.73
     },
     {
       "timestamp": "2026-01-07T16:00:00.000Z",
-      "value": 10029.23
+      "value": 9989.43
     },
     {
       "timestamp": "2026-01-08T16:00:00.000Z",
-      "value": 10028.22
+      "value": 9988.41
     },
     {
       "timestamp": "2026-01-09T16:00:00.000Z",
-      "value": 10094.54
+      "value": 10054.47
     },
     {
       "timestamp": "2026-01-12T16:00:00.000Z",
-      "value": 10110.39
+      "value": 10070.26
     },
     {
       "timestamp": "2026-01-13T16:00:00.000Z",
-      "value": 10090.17
+      "value": 10050.12
     },
     {
       "timestamp": "2026-01-14T16:00:00.000Z",
-      "value": 10040.58
+      "value": 10000.72
     },
     {
       "timestamp": "2026-01-15T16:00:00.000Z",
-      "value": 10067.92
+      "value": 10027.96
     },
     {
       "timestamp": "2026-01-16T16:00:00.000Z",
-      "value": 10059.48
+      "value": 10019.56
     },
     {
       "timestamp": "2026-01-20T16:00:00.000Z",
-      "value": 9854.71
+      "value": 9815.59
     },
     {
       "timestamp": "2026-01-21T16:00:00.000Z",
-      "value": 9968.44
+      "value": 9928.87
     },
     {
       "timestamp": "2026-01-22T16:00:00.000Z",
-      "value": 10020.51
+      "value": 9980.73
     },
     {
       "timestamp": "2026-01-23T16:00:00.000Z",
-      "value": 10024.14
+      "value": 9984.35
     }
   ],
   "trades": [
     {
-      "date": "2025-12-10",
-      "symbol": "WEC",
-      "action": "BUY",
-      "shares": 11.5763,
-      "price": 103.66000366210938,
-      "total": 1199.9993003936768,
-      "reason": "STRONG_BUY: 0.60",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-10",
-      "symbol": "PPL",
-      "action": "BUY",
-      "shares": 36.0794,
-      "price": 33.2599983215332,
-      "total": 1200.000783441925,
-      "reason": "STRONG_BUY: 0.59",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-10",
-      "symbol": "KR",
-      "action": "BUY",
-      "shares": 19.595,
-      "price": 61.2400016784668,
-      "total": 1199.9978328895568,
-      "reason": "STRONG_BUY: 0.59",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-10",
-      "symbol": "DUK",
-      "action": "BUY",
-      "shares": 10.5263,
-      "price": 114,
-      "total": 1199.9982,
-      "reason": "STRONG_BUY: 0.58",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-10",
-      "symbol": "SO",
-      "action": "BUY",
-      "shares": 14.2721,
-      "price": 84.08000183105469,
-      "total": 1199.9981941329956,
-      "reason": "STRONG_BUY: 0.57",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-10",
-      "symbol": "TMUS",
-      "action": "BUY",
-      "shares": 6.1438,
-      "price": 195.32000732421875,
-      "total": 1200.007060998535,
-      "reason": "STRONG_BUY: 0.57",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-10",
-      "symbol": "CNP",
-      "action": "BUY",
-      "shares": 32.0171,
-      "price": 37.47999954223633,
-      "total": 1200.0008933437348,
-      "reason": "STRONG_BUY: 0.52",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-10",
-      "symbol": "ZS",
-      "action": "BUY",
-      "shares": 3.4166,
-      "price": 243.2899932861328,
-      "total": 831.2245910614014,
-      "reason": "STRONG_BUY: 0.52",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-10",
-      "symbol": "VICI",
-      "action": "BUY",
-      "shares": 14.024,
-      "price": 27.760000228881836,
-      "total": 389.30624320983884,
-      "reason": "STRONG_BUY: 0.51",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-10",
-      "symbol": "LIN",
-      "action": "BUY",
-      "shares": 0.487,
-      "price": 392.67999267578125,
-      "total": 191.23515643310546,
-      "reason": "STRONG_BUY: 0.50",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-10",
-      "symbol": "USDCNY=X",
-      "action": "BUY",
-      "shares": 13.2106,
-      "price": 7.063300132751465,
-      "total": 93.3104327337265,
-      "reason": "BUY: 0.50",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-10",
-      "symbol": "PODD",
-      "action": "BUY",
-      "shares": 0.1586,
-      "price": 295.19000244140625,
-      "total": 46.81713438720703,
-      "reason": "BUY: 0.49",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-10",
-      "symbol": "MSCI",
-      "action": "BUY",
-      "shares": 0.0439,
-      "price": 538.1900024414062,
-      "total": 23.626541107177736,
-      "reason": "BUY: 0.49",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-11",
-      "symbol": "LIN",
-      "action": "SELL",
-      "shares": 0.2435,
-      "price": 403.29998779296875,
-      "total": 98.20354702758789,
-      "reason": "Taking profits at 2.7%",
-      "gainLossPercent": 2.704491014380752
-    },
-    {
-      "date": "2025-12-11",
-      "symbol": "MSCI",
-      "action": "SELL",
-      "shares": 0.022,
-      "price": 549.6099853515625,
-      "total": 12.091419677734374,
-      "reason": "Taking profits at 2.1%",
-      "gainLossPercent": 2.1219240153758827
-    },
-    {
-      "date": "2025-12-11",
-      "symbol": "EURAUD=X",
-      "action": "BUY",
-      "shares": 45.8409,
-      "price": 1.7530100345611572,
-      "total": 80.35955769331454,
-      "reason": "STRONG_BUY: 0.60",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-11",
-      "symbol": "CMS",
-      "action": "BUY",
-      "shares": 0.461,
-      "price": 69.73999786376953,
-      "total": 32.15013901519776,
-      "reason": "STRONG_BUY: 0.59",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-12",
-      "symbol": "PPL",
-      "action": "SELL",
-      "shares": 18.0397,
-      "price": 33.9900016784668,
-      "total": 613.1694332790374,
-      "reason": "Taking profits at 2.2%",
-      "gainLossPercent": 2.194838826738529
-    },
-    {
-      "date": "2025-12-12",
-      "symbol": "KR",
-      "action": "SELL",
-      "shares": 9.7975,
-      "price": 63.189998626708984,
-      "total": 619.1040115451813,
-      "reason": "Taking profits at 3.2%",
-      "gainLossPercent": 3.1841882671401778
-    },
-    {
-      "date": "2025-12-12",
-      "symbol": "ZS",
-      "action": "SELL",
-      "shares": 3.4166,
-      "price": 236.27999877929688,
-      "total": 807.2742438293457,
-      "reason": "Stop loss at -2.9%",
-      "gainLossPercent": -2.8813328539129426
-    },
-    {
-      "date": "2025-12-12",
-      "symbol": "VICI",
-      "action": "SELL",
-      "shares": 7.012,
-      "price": 28.65999984741211,
-      "total": 200.9639189300537,
-      "reason": "Taking profits at 3.2%",
-      "gainLossPercent": 3.242073527052435
-    },
-    {
-      "date": "2025-12-12",
-      "symbol": "LIN",
-      "action": "SELL",
-      "shares": 0.1218,
-      "price": 416.239990234375,
-      "total": 50.698030810546875,
-      "reason": "Taking profits at 6.0%",
-      "gainLossPercent": 5.999795761951695
-    },
-    {
-      "date": "2025-12-12",
-      "symbol": "MSCI",
-      "action": "SELL",
-      "shares": 0.011,
-      "price": 551.0900268554688,
-      "total": 6.061990295410156,
-      "reason": "Taking profits at 2.4%",
-      "gainLossPercent": 2.3969275452059238
-    },
-    {
-      "date": "2025-12-12",
-      "symbol": "DTE",
-      "action": "BUY",
-      "shares": 9.2812,
-      "price": 129.8000030517578,
-      "total": 1204.6997883239746,
-      "reason": "STRONG_BUY: 0.60",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-12",
-      "symbol": "REG",
-      "action": "BUY",
-      "shares": 9.4797,
-      "price": 67.76000213623047,
-      "total": 642.3444922508239,
-      "reason": "STRONG_BUY: 0.58",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-12",
-      "symbol": "USDMXN=X",
-      "action": "BUY",
-      "shares": 15.0497,
-      "price": 18.031539916992188,
-      "total": 271.36926628875733,
-      "reason": "STRONG_BUY: 0.57",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-12",
-      "symbol": "USDZAR=X",
-      "action": "BUY",
-      "shares": 6.805,
-      "price": 16.851699829101562,
-      "total": 114.67581733703612,
-      "reason": "STRONG_BUY: 0.57",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-12",
-      "symbol": "ORLY",
-      "action": "BUY",
-      "shares": 0.4802,
-      "price": 94.11000061035156,
-      "total": 45.19162229309082,
-      "reason": "STRONG_BUY: 0.52",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-12",
-      "symbol": "ZS",
-      "action": "BUY",
-      "shares": 0.0907,
-      "price": 236.27999877929688,
-      "total": 21.430595889282227,
-      "reason": "STRONG_BUY: 0.52",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-15",
-      "symbol": "PPL",
-      "action": "SELL",
-      "shares": 9.0199,
-      "price": 34.2599983215332,
-      "total": 309.0217588603973,
-      "reason": "Taking profits at 3.0%",
-      "gainLossPercent": 3.006614703743324
-    },
-    {
-      "date": "2025-12-15",
-      "symbol": "KR",
-      "action": "SELL",
-      "shares": 4.8988,
-      "price": 62.65999984741211,
-      "total": 306.9588072525024,
-      "reason": "Taking profits at 2.3%",
-      "gainLossPercent": 2.318742864183513
-    },
-    {
-      "date": "2025-12-15",
-      "symbol": "DUK",
-      "action": "SELL",
-      "shares": 5.2632,
-      "price": 116.7300033569336,
-      "total": 614.3733536682129,
-      "reason": "Taking profits at 2.4%",
-      "gainLossPercent": 2.3947397867838545
-    },
-    {
-      "date": "2025-12-15",
-      "symbol": "SO",
-      "action": "SELL",
-      "shares": 7.1361,
-      "price": 86,
-      "total": 613.7046,
-      "reason": "Taking profits at 2.3%",
-      "gainLossPercent": 2.283537258720857
-    },
-    {
-      "date": "2025-12-15",
-      "symbol": "VICI",
-      "action": "SELL",
-      "shares": 3.506,
-      "price": 28.600000381469727,
-      "total": 100.27160133743286,
-      "reason": "Taking profits at 3.0%",
-      "gainLossPercent": 3.025937124142904
-    },
-    {
-      "date": "2025-12-15",
-      "symbol": "LIN",
-      "action": "SELL",
-      "shares": 0.1217,
-      "price": 416.989990234375,
-      "total": 50.747681811523435,
-      "reason": "Weak signal (-0.010)",
-      "gainLossPercent": 6.19079097790079
-    },
-    {
-      "date": "2025-12-15",
-      "symbol": "MSCI",
-      "action": "SELL",
-      "shares": 0.0109,
-      "price": 553.510009765625,
-      "total": 6.033259106445312,
-      "reason": "Weak signal (-0.022)",
-      "gainLossPercent": 2.846579693922625
-    },
-    {
-      "date": "2025-12-15",
-      "symbol": "ZS",
-      "action": "SELL",
-      "shares": 0.0907,
-      "price": 230.30999755859375,
-      "total": 20.889116778564453,
-      "reason": "Stop loss at -2.5%",
-      "gainLossPercent": -2.526663810540964
-    },
-    {
-      "date": "2025-12-15",
-      "symbol": "ZS",
-      "action": "BUY",
-      "shares": 5.2596,
-      "price": 230.30999755859375,
-      "total": 1211.3384631591796,
-      "reason": "STRONG_BUY: 0.60",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-15",
-      "symbol": "CPB",
-      "action": "BUY",
-      "shares": 17.4693,
-      "price": 28.270000457763672,
-      "total": 493.8571189968109,
-      "reason": "STRONG_BUY: 0.59",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-15",
-      "symbol": "NFLX",
-      "action": "BUY",
-      "shares": 2.0474,
-      "price": 93.7699966430664,
-      "total": 191.98469112701417,
-      "reason": "STRONG_BUY: 0.57",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-15",
-      "symbol": "T",
-      "action": "BUY",
-      "shares": 2.9512,
-      "price": 24.309999465942383,
-      "total": 71.74367042388916,
-      "reason": "BUY: 0.50",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-15",
-      "symbol": "HBAR-USD",
-      "action": "BUY",
-      "shares": 293.8184,
-      "price": 0.1141899973154068,
-      "total": 33.55112230721712,
-      "reason": "BUY: 0.46",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-15",
-      "symbol": "AZO",
-      "action": "BUY",
-      "shares": 0.0051,
-      "price": 3488.7099609375,
-      "total": 17.79242080078125,
-      "reason": "BUY: 0.46",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-16",
-      "symbol": "PPL",
-      "action": "SELL",
-      "shares": 4.5099,
-      "price": 33.97999954223633,
-      "total": 153.24639993553163,
-      "reason": "Taking profits at 2.2%",
-      "gainLossPercent": 2.1647662568791577
-    },
-    {
-      "date": "2025-12-16",
-      "symbol": "PODD",
-      "action": "SELL",
-      "shares": 0.1586,
-      "price": 288.7300109863281,
-      "total": 45.79257974243164,
-      "reason": "Stop loss at -2.2%",
-      "gainLossPercent": -2.18841810415324
-    },
-    {
-      "date": "2025-12-16",
-      "symbol": "MSCI",
-      "action": "SELL",
-      "shares": 3.469446951953614e-18,
-      "price": 551.22998046875,
-      "total": 1.912463175562755e-15,
-      "reason": "Taking profits at 2.4%",
-      "gainLossPercent": 2.422932044108983
-    },
-    {
-      "date": "2025-12-16",
-      "symbol": "AZO",
-      "action": "SELL",
-      "shares": 0.0051,
-      "price": 3417.419921875,
-      "total": 17.4288416015625,
-      "reason": "Stop loss at -2.0%",
-      "gainLossPercent": -2.043449867163582
-    },
-    {
-      "date": "2025-12-16",
-      "symbol": "AZO",
-      "action": "BUY",
-      "shares": 0.0414,
-      "price": 3417.419921875,
-      "total": 141.481184765625,
-      "reason": "STRONG_BUY: 0.60",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-16",
-      "symbol": "BZ=F",
-      "action": "BUY",
-      "shares": 0.9334,
-      "price": 58.91999816894531,
-      "total": 54.99592629089356,
-      "reason": "STRONG_BUY: 0.57",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-16",
-      "symbol": "XRP-USD",
-      "action": "BUY",
-      "shares": 11.202,
-      "price": 1.9300730228424072,
-      "total": 21.620678001880645,
-      "reason": "STRONG_BUY: 0.52",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-17",
-      "symbol": "PPL",
-      "action": "SELL",
-      "shares": 2.255,
-      "price": 34.34000015258789,
-      "total": 77.4367003440857,
-      "reason": "Taking profits at 3.2%",
-      "gainLossPercent": 3.2471493853187363
-    },
-    {
-      "date": "2025-12-17",
-      "symbol": "KR",
-      "action": "SELL",
-      "shares": 2.4494,
-      "price": 63.810001373291016,
-      "total": 156.296217363739,
-      "reason": "Taking profits at 4.2%",
-      "gainLossPercent": 4.1966029137583805
-    },
-    {
-      "date": "2025-12-17",
-      "symbol": "DUK",
-      "action": "SELL",
-      "shares": 2.6316,
-      "price": 117.43000030517578,
-      "total": 309.0287888031006,
-      "reason": "Taking profits at 3.0%",
-      "gainLossPercent": 3.008772197522615
-    },
-    {
-      "date": "2025-12-17",
-      "symbol": "SO",
-      "action": "SELL",
-      "shares": 3.568,
-      "price": 87.02999877929688,
-      "total": 310.52303564453126,
-      "reason": "Taking profits at 3.5%",
-      "gainLossPercent": 3.5085595670772394
-    },
-    {
-      "date": "2025-12-17",
-      "symbol": "TMUS",
-      "action": "SELL",
-      "shares": 3.0719,
-      "price": 199.3800048828125,
-      "total": 612.4754369995117,
-      "reason": "Taking profits at 2.1%",
-      "gainLossPercent": 2.0786388523191137
-    },
-    {
-      "date": "2025-12-17",
-      "symbol": "CNP",
-      "action": "SELL",
-      "shares": 16.0086,
-      "price": 38.310001373291016,
-      "total": 613.2894879844666,
-      "reason": "Taking profits at 2.2%",
-      "gainLossPercent": 2.2145193201492863
-    },
-    {
-      "date": "2025-12-17",
-      "symbol": "VICI",
-      "action": "SELL",
-      "shares": 1.753,
-      "price": 28.389999389648438,
-      "total": 49.76766893005371,
-      "reason": "Taking profits at 2.3%",
-      "gainLossPercent": 2.2694494076809946
-    },
-    {
-      "date": "2025-12-17",
-      "symbol": "EURAUD=X",
-      "action": "SELL",
-      "shares": 45.8409,
-      "price": 1.7713899612426758,
-      "total": 81.20211007432937,
-      "reason": "Weak signal (0.004)",
-      "gainLossPercent": 1.048478121582443
-    },
-    {
-      "date": "2025-12-17",
-      "symbol": "HBAR-USD",
-      "action": "SELL",
-      "shares": 293.8184,
-      "price": 0.1096469983458519,
-      "total": 32.21630561878085,
-      "reason": "Stop loss at -4.0%",
-      "gainLossPercent": -3.9784561488398844
-    },
-    {
-      "date": "2025-12-17",
-      "symbol": "XRP-USD",
-      "action": "SELL",
-      "shares": 11.202,
-      "price": 1.8618379831314087,
-      "total": 20.85630908703804,
-      "reason": "Stop loss at -3.5%",
-      "gainLossPercent": -3.535360522811162
-    },
-    {
-      "date": "2025-12-17",
-      "symbol": "HBAR-USD",
-      "action": "BUY",
-      "shares": 11107.542,
-      "price": 0.1096469983458519,
-      "total": 1217.9086393004804,
-      "reason": "STRONG_BUY: 0.60",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-17",
-      "symbol": "MKR-USD",
-      "action": "BUY",
-      "shares": 0.4726,
-      "price": 1338.8875732421875,
-      "total": 632.7582671142578,
-      "reason": "STRONG_BUY: 0.59",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-17",
-      "symbol": "TT",
-      "action": "BUY",
-      "shares": 0.6674,
-      "price": 382.29998779296875,
-      "total": 255.14701185302735,
-      "reason": "STRONG_BUY: 0.59",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-17",
-      "symbol": "VET-USD",
-      "action": "BUY",
-      "shares": 10188.3555,
-      "price": 0.010251999832689762,
-      "total": 104.45101888138382,
-      "reason": "STRONG_BUY: 0.59",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-17",
-      "symbol": "LTC-USD",
-      "action": "BUY",
-      "shares": 0.5625,
-      "price": 75.92557525634766,
-      "total": 42.70813608169556,
-      "reason": "STRONG_BUY: 0.59",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-17",
-      "symbol": "COST",
-      "action": "BUY",
-      "shares": 0.0203,
-      "price": 862.6500244140625,
-      "total": 17.51179549560547,
-      "reason": "STRONG_BUY: 0.58",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-18",
-      "symbol": "PPL",
-      "action": "SELL",
-      "shares": 1.1275,
-      "price": 34.75,
-      "total": 39.180625,
-      "reason": "Taking profits at 4.5%",
-      "gainLossPercent": 4.479860955080504
-    },
-    {
-      "date": "2025-12-18",
-      "symbol": "KR",
-      "action": "SELL",
-      "shares": 1.2247,
-      "price": 62.790000915527344,
-      "total": 76.89891412124634,
-      "reason": "Taking profits at 2.5%",
-      "gainLossPercent": 2.531024158357522
-    },
-    {
-      "date": "2025-12-18",
-      "symbol": "DUK",
-      "action": "SELL",
-      "shares": 1.3158,
-      "price": 117.55000305175781,
-      "total": 154.67229401550293,
-      "reason": "Taking profits at 3.1%",
-      "gainLossPercent": 3.1140377646998356
-    },
-    {
-      "date": "2025-12-18",
-      "symbol": "SO",
-      "action": "SELL",
-      "shares": 1.784,
-      "price": 87.22000122070312,
-      "total": 155.60048217773436,
-      "reason": "Taking profits at 3.7%",
-      "gainLossPercent": 3.7345377274821714
-    },
-    {
-      "date": "2025-12-18",
-      "symbol": "TMUS",
-      "action": "SELL",
-      "shares": 1.536,
-      "price": 200.27000427246094,
-      "total": 307.6147265625,
-      "reason": "Taking profits at 2.5%",
-      "gainLossPercent": 2.5343010253043396
-    },
-    {
-      "date": "2025-12-18",
-      "symbol": "CNP",
-      "action": "SELL",
-      "shares": 8.0042,
-      "price": 38.2400016784668,
-      "total": 306.08062143478395,
-      "reason": "Taking profits at 2.0%",
-      "gainLossPercent": 2.027753856757709
-    },
-    {
-      "date": "2025-12-18",
-      "symbol": "ORLY",
-      "action": "SELL",
-      "shares": 0.4802,
-      "price": 91.79000091552734,
-      "total": 44.077558439636235,
-      "reason": "Stop loss at -2.5%",
-      "gainLossPercent": -2.465199957260474
-    },
-    {
-      "date": "2025-12-18",
-      "symbol": "HBAR-USD",
-      "action": "SELL",
-      "shares": 11107.542,
-      "price": 0.10497099906206131,
-      "total": 1165.9697808638066,
-      "reason": "Stop loss at -4.3%",
-      "gainLossPercent": -4.26459397369129
-    },
-    {
-      "date": "2025-12-18",
-      "symbol": "VET-USD",
-      "action": "SELL",
-      "shares": 10188.3555,
-      "price": 0.009793000295758247,
-      "total": 99.77456842479016,
-      "reason": "Stop loss at -4.5%",
-      "gainLossPercent": -4.477170741536088
-    },
-    {
-      "date": "2025-12-18",
-      "symbol": "LTC-USD",
-      "action": "SELL",
-      "shares": 0.5625,
-      "price": 74.28631591796875,
-      "total": 41.78605270385742,
-      "reason": "Stop loss at -2.2%",
-      "gainLossPercent": -2.159034466112732
-    },
-    {
-      "date": "2025-12-18",
-      "symbol": "ORLY",
-      "action": "BUY",
-      "shares": 13.3016,
-      "price": 91.79000091552734,
-      "total": 1220.9538761779786,
-      "reason": "STRONG_BUY: 0.60",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-18",
-      "symbol": "HBAR-USD",
-      "action": "BUY",
-      "shares": 6766.5903,
-      "price": 0.10497099906206131,
-      "total": 710.2957440346531,
-      "reason": "STRONG_BUY: 0.60",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-18",
-      "symbol": "XRP-USD",
-      "action": "BUY",
-      "shares": 156.56,
-      "price": 1.8077770471572876,
-      "total": 283.02557450294495,
-      "reason": "STRONG_BUY: 0.60",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-18",
-      "symbol": "LH",
-      "action": "BUY",
-      "shares": 0.4458,
-      "price": 252.02999877929688,
-      "total": 112.35497345581054,
-      "reason": "STRONG_BUY: 0.59",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-18",
-      "symbol": "VET-USD",
-      "action": "BUY",
-      "shares": 4668.3885,
-      "price": 0.009793000295758247,
-      "total": 45.7175299612144,
-      "reason": "STRONG_BUY: 0.59",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-18",
-      "symbol": "ATOM-USD",
-      "action": "BUY",
-      "shares": 10.082,
-      "price": 1.8522709608078003,
-      "total": 18.674595826864245,
-      "reason": "STRONG_BUY: 0.59",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-19",
-      "symbol": "PPL",
-      "action": "SELL",
-      "shares": 0.5637,
-      "price": 34.290000915527344,
-      "total": 19.329273516082765,
-      "reason": "Taking profits at 3.1%",
-      "gainLossPercent": 3.096820943996548
-    },
-    {
-      "date": "2025-12-19",
-      "symbol": "BZ=F",
-      "action": "SELL",
-      "shares": 0.4667,
-      "price": 60.470001220703125,
-      "total": 28.22134956970215,
-      "reason": "Taking profits at 2.6%",
-      "gainLossPercent": 2.63069093673999
-    },
-    {
-      "date": "2025-12-19",
-      "symbol": "MKR-USD",
-      "action": "SELL",
-      "shares": 0.2363,
-      "price": 1402.8865966796875,
-      "total": 331.50210279541017,
-      "reason": "Taking profits at 4.8%",
-      "gainLossPercent": 4.780014746310847
-    },
-    {
-      "date": "2025-12-19",
-      "symbol": "HBAR-USD",
-      "action": "SELL",
-      "shares": 3383.2952,
-      "price": 0.11199499666690826,
-      "total": 378.91213464716674,
-      "reason": "Taking profits at 6.7%",
-      "gainLossPercent": 6.6913696807765
-    },
-    {
-      "date": "2025-12-19",
-      "symbol": "XRP-USD",
-      "action": "SELL",
-      "shares": 78.28,
-      "price": 1.9073920249938965,
-      "total": 149.31064771652223,
-      "reason": "Taking profits at 5.5%",
-      "gainLossPercent": 5.5103574853576385
-    },
-    {
-      "date": "2025-12-19",
-      "symbol": "VET-USD",
-      "action": "SELL",
-      "shares": 2334.1943,
-      "price": 0.010730000212788582,
-      "total": 25.045905335689895,
-      "reason": "Taking profits at 9.6%",
-      "gainLossPercent": 9.568057681323545
-    },
-    {
-      "date": "2025-12-19",
-      "symbol": "ATOM-USD",
-      "action": "SELL",
-      "shares": 5.041,
-      "price": 1.9637919664382935,
-      "total": 9.899475302815437,
-      "reason": "Taking profits at 6.0%",
-      "gainLossPercent": 6.02077169000465
-    },
-    {
-      "date": "2025-12-19",
+      "date": "2025-12-26",
       "symbol": "LEN",
       "action": "BUY",
-      "shares": 5.1725,
-      "price": 107.98999786376953,
-      "total": 558.578263950348,
-      "reason": "STRONG_BUY: 0.58",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-19",
-      "symbol": "MPC",
-      "action": "BUY",
-      "shares": 1.2119,
-      "price": 168.32000732421875,
-      "total": 203.9870168762207,
-      "reason": "STRONG_BUY: 0.51",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-19",
-      "symbol": "SHW",
-      "action": "BUY",
-      "shares": 0.3052,
-      "price": 320.8599853515625,
-      "total": 97.92646752929689,
-      "reason": "STRONG_BUY: 0.51",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-19",
-      "symbol": "NOW",
-      "action": "BUY",
-      "shares": 0.3075,
-      "price": 155.30999755859375,
-      "total": 47.75782424926758,
-      "reason": "STRONG_BUY: 0.50",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-19",
-      "symbol": "ZBH",
-      "action": "BUY",
-      "shares": 0.2606,
-      "price": 89.12999725341797,
-      "total": 23.227277284240724,
-      "reason": "BUY: 0.49",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-22",
-      "symbol": "PPL",
-      "action": "SELL",
-      "shares": 0.2819,
-      "price": 34.68000030517578,
-      "total": 9.776292086029052,
-      "reason": "Taking profits at 4.3%",
-      "gainLossPercent": 4.2693988433644625
-    },
-    {
-      "date": "2025-12-22",
-      "symbol": "DUK",
-      "action": "SELL",
-      "shares": 0.6579,
-      "price": 116.30000305175781,
-      "total": 76.51377200775147,
-      "reason": "Taking profits at 2.0%",
-      "gainLossPercent": 2.01754653662966
-    },
-    {
-      "date": "2025-12-22",
-      "symbol": "BZ=F",
-      "action": "SELL",
-      "shares": 0.2334,
-      "price": 62.06999969482422,
-      "total": 14.487137928771972,
-      "reason": "Taking profits at 5.3%",
-      "gainLossPercent": 5.3462349351177725
-    },
-    {
-      "date": "2025-12-22",
-      "symbol": "MKR-USD",
-      "action": "SELL",
-      "shares": 0.1182,
-      "price": 1566.9334716796875,
-      "total": 185.21153635253907,
-      "reason": "Taking profits at 17.0%",
-      "gainLossPercent": 17.032490479038113
-    },
-    {
-      "date": "2025-12-22",
-      "symbol": "HBAR-USD",
-      "action": "SELL",
-      "shares": 1691.6476,
-      "price": 0.11407099664211273,
-      "total": 192.96792769923806,
-      "reason": "Taking profits at 8.7%",
-      "gainLossPercent": 8.669058750856786
-    },
-    {
-      "date": "2025-12-22",
-      "symbol": "XRP-USD",
-      "action": "SELL",
-      "shares": 39.14,
-      "price": 1.9027639627456665,
-      "total": 74.47418150186539,
-      "reason": "Taking profits at 5.3%",
-      "gainLossPercent": 5.254349021509314
-    },
-    {
-      "date": "2025-12-22",
-      "symbol": "VET-USD",
-      "action": "SELL",
-      "shares": 1167.0971,
-      "price": 0.010604999959468842,
-      "total": 12.377064698196202,
-      "reason": "Taking profits at 8.3%",
-      "gainLossPercent": 8.291633199095324
-    },
-    {
-      "date": "2025-12-22",
-      "symbol": "ATOM-USD",
-      "action": "SELL",
-      "shares": 2.5205,
-      "price": 1.9484679698944092,
-      "total": 4.911113518118858,
-      "reason": "Taking profits at 5.2%",
-      "gainLossPercent": 5.193463112149428
-    },
-    {
-      "date": "2025-12-22",
-      "symbol": "MPC",
-      "action": "SELL",
-      "shares": 1.2119,
-      "price": 164.77000427246094,
-      "total": 199.6847681777954,
-      "reason": "Stop loss at -2.1%",
-      "gainLossPercent": -2.109079668063334
-    },
-    {
-      "date": "2025-12-22",
-      "symbol": "MPC",
-      "action": "BUY",
-      "shares": 2.4806,
-      "price": 164.77000427246094,
-      "total": 408.7284725982666,
-      "reason": "STRONG_BUY: 0.51",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-22",
-      "symbol": "XEL",
-      "action": "BUY",
-      "shares": 2.6305,
-      "price": 73.8499984741211,
-      "total": 194.26242098617553,
-      "reason": "STRONG_BUY: 0.50",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-22",
-      "symbol": "SHIB-USD",
-      "action": "BUY",
-      "shares": 13748480.4851,
-      "price": 0.000007000000096013537,
-      "total": 96.23936471574024,
-      "reason": "STRONG_BUY: 0.50",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-22",
-      "symbol": "KMB",
-      "action": "BUY",
-      "shares": 0.4698,
-      "price": 99.77999877929688,
-      "total": 46.876643426513674,
-      "reason": "BUY: 0.49",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-22",
-      "symbol": "POOL",
-      "action": "BUY",
-      "shares": 0.1022,
-      "price": 232.3000030517578,
-      "total": 23.741060311889647,
-      "reason": "BUY: 0.49",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "PPL",
-      "action": "SELL",
-      "shares": 0.1409,
-      "price": 34.810001373291016,
-      "total": 4.904729193496704,
-      "reason": "Taking profits at 4.7%",
-      "gainLossPercent": 4.660261966262063
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "DUK",
-      "action": "SELL",
-      "shares": 0.3289,
-      "price": 116.79000091552734,
-      "total": 38.41223130111695,
-      "reason": "Taking profits at 2.4%",
-      "gainLossPercent": 2.447369224146793
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "SO",
-      "action": "SELL",
-      "shares": 0.892,
-      "price": 86.38999938964844,
-      "total": 77.0598794555664,
-      "reason": "Taking profits at 2.7%",
-      "gainLossPercent": 2.747380480836954
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "REG",
-      "action": "SELL",
-      "shares": 4.7399,
-      "price": 69.12000274658203,
-      "total": 327.6219010185241,
-      "reason": "Taking profits at 2.0%",
-      "gainLossPercent": 2.0070846627444046
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "CPB",
-      "action": "SELL",
-      "shares": 17.4693,
-      "price": 27.68000030517578,
-      "total": 483.5502293312073,
-      "reason": "Stop loss at -2.1%",
-      "gainLossPercent": -2.0870185462832613
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "BZ=F",
-      "action": "SELL",
-      "shares": 0.1167,
-      "price": 62.380001068115234,
-      "total": 7.279746124649048,
-      "reason": "Taking profits at 5.9%",
-      "gainLossPercent": 5.872374417339288
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "MKR-USD",
-      "action": "SELL",
-      "shares": 0.0591,
-      "price": 1511.226318359375,
-      "total": 89.31347541503906,
-      "reason": "Taking profits at 12.9%",
-      "gainLossPercent": 12.871786142570588
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "TT",
-      "action": "SELL",
-      "shares": 0.3337,
-      "price": 393.739990234375,
-      "total": 131.39103474121094,
-      "reason": "Taking profits at 3.0%",
-      "gainLossPercent": 2.992415068451816
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "HBAR-USD",
-      "action": "SELL",
-      "shares": 845.8237,
-      "price": 0.11042100191116333,
-      "total": 93.39670039420724,
-      "reason": "Taking profits at 5.2%",
-      "gainLossPercent": 5.1919129071829175
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "XRP-USD",
-      "action": "SELL",
-      "shares": 19.57,
-      "price": 1.872817039489746,
-      "total": 36.65102946281433,
-      "reason": "Taking profits at 3.6%",
-      "gainLossPercent": 3.5977883685785956
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "VET-USD",
-      "action": "SELL",
-      "shares": 583.5486,
-      "price": 0.010509000159800053,
-      "total": 6.132512330651097,
-      "reason": "Taking profits at 7.3%",
-      "gainLossPercent": 7.311343229019755
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "ATOM-USD",
-      "action": "SELL",
-      "shares": 1.2603,
-      "price": 1.9694499969482422,
-      "total": 2.4820978311538697,
-      "reason": "Taking profits at 6.3%",
-      "gainLossPercent": 6.326236205168305
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "LEN",
-      "action": "SELL",
-      "shares": 5.1725,
-      "price": 104.73999786376953,
-      "total": 541.767638950348,
-      "reason": "Stop loss at -3.0%",
-      "gainLossPercent": -3.0095379797117023
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "LEN",
-      "action": "BUY",
-      "shares": 10.4162,
-      "price": 104.73999786376953,
-      "total": 1090.9927657485962,
-      "reason": "STRONG_BUY: 0.59",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "HPQ",
-      "action": "BUY",
-      "shares": 18.9686,
-      "price": 22.93000030517578,
-      "total": 434.9500037887573,
-      "reason": "STRONG_BUY: 0.56",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "UBER",
-      "action": "BUY",
-      "shares": 2.1841,
-      "price": 80.97000122070312,
-      "total": 176.8465796661377,
-      "reason": "STRONG_BUY: 0.52",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "KHC",
-      "action": "BUY",
-      "shares": 3.5453,
-      "price": 23.700000762939453,
-      "total": 84.02361270484924,
-      "reason": "STRONG_BUY: 0.52",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "COIN",
-      "action": "BUY",
-      "shares": 0.1647,
-      "price": 242.3000030517578,
-      "total": 39.906810502624516,
-      "reason": "STRONG_BUY: 0.51",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-23",
-      "symbol": "ADA-USD",
-      "action": "BUY",
-      "shares": 53.243,
-      "price": 0.36285200715065,
-      "total": 19.31932941672206,
-      "reason": "STRONG_BUY: 0.51",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "PPL",
-      "action": "SELL",
-      "shares": 0.0705,
-      "price": 34.970001220703125,
-      "total": 2.46538508605957,
-      "reason": "Taking profits at 5.1%",
-      "gainLossPercent": 5.141319860088
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "KR",
-      "action": "SELL",
-      "shares": 0.6123,
-      "price": 62.93000030517578,
-      "total": 38.53203918685913,
-      "reason": "Taking profits at 2.8%",
-      "gainLossPercent": 2.7596319078861513
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "DUK",
-      "action": "SELL",
-      "shares": 0.1645,
-      "price": 117.4800033569336,
-      "total": 19.325460552215578,
-      "reason": "Taking profits at 3.1%",
-      "gainLossPercent": 3.0526345236259593
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "SO",
-      "action": "SELL",
-      "shares": 0.446,
-      "price": 87.16999816894531,
-      "total": 38.87781918334961,
-      "reason": "Taking profits at 3.7%",
-      "gainLossPercent": 3.675066925069148
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "CNP",
-      "action": "SELL",
-      "shares": 8.0043,
-      "price": 38.20000076293945,
-      "total": 305.7642661067963,
-      "reason": "Weak signal (0.010)",
-      "gainLossPercent": 1.9210278268326906
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "REG",
-      "action": "SELL",
-      "shares": 4.7398,
-      "price": 69.55000305175781,
-      "total": 329.65310446472165,
-      "reason": "Weak signal (-0.015)",
-      "gainLossPercent": 2.6416777731626597
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "BZ=F",
-      "action": "SELL",
-      "shares": 0.0583,
-      "price": 62.2400016784668,
-      "total": 3.628592097854614,
-      "reason": "Taking profits at 5.6%",
-      "gainLossPercent": 5.634765126777181
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "MKR-USD",
-      "action": "SELL",
-      "shares": 0.0295,
-      "price": 1583.69287109375,
-      "total": 46.718939697265625,
-      "reason": "Taking profits at 18.3%",
-      "gainLossPercent": 18.284231084373534
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "TT",
-      "action": "SELL",
-      "shares": 0.1669,
-      "price": 393.17999267578125,
-      "total": 65.62174077758789,
-      "reason": "Taking profits at 2.8%",
-      "gainLossPercent": 2.8459338818248856
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "HBAR-USD",
-      "action": "SELL",
-      "shares": 422.9119,
-      "price": 0.10927999764680862,
-      "total": 46.215811436807364,
-      "reason": "Taking profits at 4.1%",
-      "gainLossPercent": 4.104941958492492
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "XRP-USD",
-      "action": "SELL",
-      "shares": 9.785,
-      "price": 1.861171007156372,
-      "total": 18.2115583050251,
-      "reason": "Taking profits at 3.0%",
-      "gainLossPercent": 2.9535699705362433
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "VET-USD",
-      "action": "SELL",
-      "shares": 291.7743,
-      "price": 0.010580999776721,
-      "total": 3.087263803152926,
-      "reason": "Taking profits at 8.0%",
-      "gainLossPercent": 8.046558329055381
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "ATOM-USD",
-      "action": "SELL",
-      "shares": 0.6301,
-      "price": 1.9798109531402588,
-      "total": 1.247478881573677,
-      "reason": "Taking profits at 6.9%",
-      "gainLossPercent": 6.885601244692439
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "GNRC",
-      "action": "BUY",
-      "shares": 4.2827,
-      "price": 140.80999755859375,
-      "total": 603.0469765441895,
+      "shares": 11.4395,
+      "price": 104.9000015258789,
+      "total": 1200.0035674552919,
       "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "SOL-USD",
-      "action": "BUY",
-      "shares": 1.4074,
-      "price": 122.45860290527344,
-      "total": 172.34823772888183,
-      "reason": "STRONG_BUY: 0.51",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "LTC-USD",
-      "action": "BUY",
-      "shares": 1.0922,
-      "price": 75.74249267578125,
-      "total": 82.72595050048828,
-      "reason": "STRONG_BUY: 0.51",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "AAVE-USD",
-      "action": "BUY",
-      "shares": 0.273,
-      "price": 148.46575927734375,
-      "total": 40.53115228271485,
-      "reason": "STRONG_BUY: 0.51",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-24",
-      "symbol": "NEAR-USD",
-      "action": "BUY",
-      "shares": 13.5079,
-      "price": 1.4534870386123657,
-      "total": 19.633557568871975,
-      "reason": "STRONG_BUY: 0.50",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-26",
-      "symbol": "PPL",
-      "action": "SELL",
-      "shares": 0.0704,
-      "price": 35.08000183105469,
-      "total": 2.46963212890625,
-      "reason": "Weak signal (-0.063)",
-      "gainLossPercent": 5.472049312591747
-    },
-    {
-      "date": "2025-12-26",
-      "symbol": "KR",
-      "action": "SELL",
-      "shares": 0.3062,
-      "price": 63.25,
-      "total": 19.367150000000002,
-      "reason": "Taking profits at 3.3%",
-      "gainLossPercent": 3.2821656865498725
-    },
-    {
-      "date": "2025-12-26",
-      "symbol": "DUK",
-      "action": "SELL",
-      "shares": 0.0822,
-      "price": 117.18000030517578,
-      "total": 9.632196025085449,
-      "reason": "Taking profits at 2.8%",
-      "gainLossPercent": 2.78947395190858
-    },
-    {
-      "date": "2025-12-26",
-      "symbol": "SO",
-      "action": "SELL",
-      "shares": 0.223,
-      "price": 87.16999816894531,
-      "total": 19.438909591674804,
-      "reason": "Taking profits at 3.7%",
-      "gainLossPercent": 3.675066925069148
-    },
-    {
-      "date": "2025-12-26",
-      "symbol": "TMUS",
-      "action": "SELL",
-      "shares": 0.7679,
-      "price": 201,
-      "total": 154.3479,
-      "reason": "Taking profits at 2.9%",
-      "gainLossPercent": 2.908044472040606
-    },
-    {
-      "date": "2025-12-26",
-      "symbol": "BZ=F",
-      "action": "SELL",
-      "shares": 0.0292,
-      "price": 60.63999938964844,
-      "total": 1.7706879821777344,
-      "reason": "Taking profits at 2.9%",
-      "gainLossPercent": 2.919214654031809
-    },
-    {
-      "date": "2025-12-26",
-      "symbol": "MKR-USD",
-      "action": "SELL",
-      "shares": 0.0148,
-      "price": 1457.008056640625,
-      "total": 21.56371923828125,
-      "reason": "Taking profits at 8.8%",
-      "gainLossPercent": 8.822285437484677
-    },
-    {
-      "date": "2025-12-26",
-      "symbol": "TT",
-      "action": "SELL",
-      "shares": 0.0834,
-      "price": 392.5899963378906,
-      "total": 32.74200569458008,
-      "reason": "Taking profits at 2.7%",
-      "gainLossPercent": 2.6916057738652976
-    },
-    {
-      "date": "2025-12-26",
-      "symbol": "HBAR-USD",
-      "action": "SELL",
-      "shares": 211.4559,
-      "price": 0.11163000017404556,
-      "total": 23.604822153802964,
-      "reason": "Taking profits at 6.3%",
-      "gainLossPercent": 6.343657935509689
-    },
-    {
-      "date": "2025-12-26",
-      "symbol": "VET-USD",
-      "action": "SELL",
-      "shares": 145.8871,
-      "price": 0.010544000193476677,
-      "total": 1.5382336106257513,
-      "reason": "Taking profits at 7.7%",
-      "gainLossPercent": 7.668741703640289
-    },
-    {
-      "date": "2025-12-26",
-      "symbol": "ATOM-USD",
-      "action": "SELL",
-      "shares": 0.3151,
-      "price": 2.044856071472168,
-      "total": 0.6443341481208801,
-      "reason": "Taking profits at 10.4%",
-      "gainLossPercent": 10.39724288396654
-    },
-    {
-      "date": "2025-12-26",
-      "symbol": "COIN",
-      "action": "SELL",
-      "shares": 0.1647,
-      "price": 236.89999389648438,
-      "total": 39.01742899475098,
-      "reason": "Stop loss at -2.2%",
-      "gainLossPercent": -2.2286459295338674
-    },
-    {
-      "date": "2025-12-26",
-      "symbol": "ADA-USD",
-      "action": "SELL",
-      "shares": 53.243,
-      "price": 0.3495819866657257,
-      "total": 18.612793716043235,
-      "reason": "Stop loss at -3.7%",
-      "gainLossPercent": -3.657144021092552
-    },
-    {
-      "date": "2025-12-26",
-      "symbol": "AAVE-USD",
-      "action": "SELL",
-      "shares": 0.1365,
-      "price": 154.10276794433594,
-      "total": 21.03502782440186,
-      "reason": "Taking profits at 3.8%",
-      "gainLossPercent": 3.796840897477166
-    },
-    {
-      "date": "2025-12-26",
-      "symbol": "NEAR-USD",
-      "action": "SELL",
-      "shares": 6.754,
-      "price": 1.5177420377731323,
-      "total": 10.250829723119734,
-      "reason": "Taking profits at 4.4%",
-      "gainLossPercent": 4.420747998008322
     },
     {
       "date": "2025-12-26",
       "symbol": "USDCHF=X",
       "action": "BUY",
-      "shares": 291.2183,
+      "shares": 1522.746,
       "price": 0.7880499958992004,
-      "total": 229.49458012077213,
-      "reason": "STRONG_BUY: 0.58",
+      "total": 1199.999979055524,
+      "reason": "STRONG_BUY: 0.64",
+      "gainLossPercent": 0
+    },
+    {
+      "date": "2025-12-26",
+      "symbol": "USDCNY=X",
+      "action": "BUY",
+      "shares": 170.7456,
+      "price": 7.0279998779296875,
+      "total": 1200.0000559570312,
+      "reason": "STRONG_BUY: 0.64",
+      "gainLossPercent": 0
+    },
+    {
+      "date": "2025-12-26",
+      "symbol": "USDZAR=X",
+      "action": "BUY",
+      "shares": 72.1709,
+      "price": 16.627199172973633,
+      "total": 1199.9999287927628,
+      "reason": "STRONG_BUY: 0.63",
+      "gainLossPercent": 0
+    },
+    {
+      "date": "2025-12-26",
+      "symbol": "ORLY",
+      "action": "BUY",
+      "shares": 13.0081,
+      "price": 92.25,
+      "total": 1199.997225,
+      "reason": "STRONG_BUY: 0.54",
+      "gainLossPercent": 0
+    },
+    {
+      "date": "2025-12-26",
+      "symbol": "UBER",
+      "action": "BUY",
+      "shares": 14.7674,
+      "price": 81.26000213623047,
+      "total": 1199.99895554657,
+      "reason": "STRONG_BUY: 0.54",
+      "gainLossPercent": 0
+    },
+    {
+      "date": "2025-12-26",
+      "symbol": "AZO",
+      "action": "BUY",
+      "shares": 0.348,
+      "price": 3448.699951171875,
+      "total": 1200.1475830078125,
+      "reason": "STRONG_BUY: 0.54",
+      "gainLossPercent": 0
+    },
+    {
+      "date": "2025-12-26",
+      "symbol": "MPC",
+      "action": "BUY",
+      "shares": 5.3084,
+      "price": 163.69000244140625,
+      "total": 868.9320089599609,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2025-12-26",
       "symbol": "COIN",
       "action": "BUY",
-      "shares": 0.3603,
+      "shares": 1.6755,
       "price": 236.89999389648438,
-      "total": 85.35506780090333,
-      "reason": "STRONG_BUY: 0.51",
+      "total": 396.92593977355955,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2025-12-26",
       "symbol": "ADA-USD",
       "action": "BUY",
-      "shares": 118.1932,
+      "shares": 518.4791,
       "price": 0.3495819866657257,
-      "total": 41.31821366637946,
-      "reason": "STRONG_BUY: 0.51",
+      "total": 181.25095382265746,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2025-12-26",
-      "symbol": "DOT-USD",
+      "symbol": "AAVE-USD",
       "action": "BUY",
-      "shares": 11.4445,
-      "price": 1.7221879959106445,
-      "total": 19.70958051919937,
-      "reason": "STRONG_BUY: 0.50",
+      "shares": 0.5373,
+      "price": 154.10276794433594,
+      "total": 82.7994172164917,
+      "reason": "STRONG_BUY: 0.54",
+      "gainLossPercent": 0
+    },
+    {
+      "date": "2025-12-26",
+      "symbol": "NOW",
+      "action": "BUY",
+      "shares": 0.2459,
+      "price": 153.88999938964844,
+      "total": 37.841550849914555,
+      "reason": "STRONG_BUY: 0.54",
+      "gainLossPercent": 0
+    },
+    {
+      "date": "2025-12-26",
+      "symbol": "GNRC",
+      "action": "BUY",
+      "shares": 0.1235,
+      "price": 140.55999755859375,
+      "total": 17.359159698486327,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2025-12-29",
-      "symbol": "PPL",
+      "symbol": "AAVE-USD",
       "action": "SELL",
-      "shares": 2.220446049250313e-16,
-      "price": 35.220001220703125,
-      "total": 7.820411256510146e-15,
-      "reason": "Weak signal (-0.141)",
-      "gainLossPercent": 5.892973536023831
-    },
-    {
-      "date": "2025-12-29",
-      "symbol": "KR",
-      "action": "SELL",
-      "shares": 0.1531,
-      "price": 62.709999084472656,
-      "total": 9.600900859832764,
-      "reason": "Taking profits at 2.4%",
-      "gainLossPercent": 2.4003875991445955
-    },
-    {
-      "date": "2025-12-29",
-      "symbol": "DUK",
-      "action": "SELL",
-      "shares": 0.0411,
-      "price": 117.5199966430664,
-      "total": 4.830071862030029,
-      "reason": "Taking profits at 3.1%",
-      "gainLossPercent": 3.087716353567023
-    },
-    {
-      "date": "2025-12-29",
-      "symbol": "SO",
-      "action": "SELL",
-      "shares": 0.1115,
-      "price": 87.54000091552734,
-      "total": 9.7607101020813,
-      "reason": "Taking profits at 4.1%",
-      "gainLossPercent": 4.115127270602314
-    },
-    {
-      "date": "2025-12-29",
-      "symbol": "TMUS",
-      "action": "SELL",
-      "shares": 0.384,
-      "price": 203.14999389648438,
-      "total": 78.00959765625001,
-      "reason": "Taking profits at 4.0%",
-      "gainLossPercent": 4.008799036787024
-    },
-    {
-      "date": "2025-12-29",
-      "symbol": "BZ=F",
-      "action": "SELL",
-      "shares": 0.0146,
-      "price": 61.939998626708984,
-      "total": 0.9043239799499512,
-      "reason": "Taking profits at 5.1%",
-      "gainLossPercent": 5.125594962009706
-    },
-    {
-      "date": "2025-12-29",
-      "symbol": "MKR-USD",
-      "action": "SELL",
-      "shares": 0.0074,
-      "price": 1441.6224365234375,
-      "total": 10.668006030273437,
-      "reason": "Taking profits at 7.7%",
-      "gainLossPercent": 7.673150855562283
-    },
-    {
-      "date": "2025-12-29",
-      "symbol": "TT",
-      "action": "SELL",
-      "shares": 0.0417,
-      "price": 394.19000244140625,
-      "total": 16.43772310180664,
-      "reason": "Taking profits at 3.1%",
-      "gainLossPercent": 3.1101268710676586
-    },
-    {
-      "date": "2025-12-29",
-      "symbol": "HBAR-USD",
-      "action": "SELL",
-      "shares": 105.728,
-      "price": 0.11267100274562836,
-      "total": 11.912479778289795,
-      "reason": "Taking profits at 7.3%",
-      "gainLossPercent": 7.335362864379927
-    },
-    {
-      "date": "2025-12-29",
-      "symbol": "XRP-USD",
-      "action": "SELL",
-      "shares": 4.8925,
-      "price": 1.8477239608764648,
-      "total": 9.039989478588105,
-      "reason": "Taking profits at 2.2%",
-      "gainLossPercent": 2.209725683927307
-    },
-    {
-      "date": "2025-12-29",
-      "symbol": "VET-USD",
-      "action": "SELL",
-      "shares": 72.9436,
-      "price": 0.010883999988436699,
-      "total": 0.7939181415565312,
-      "reason": "Taking profits at 11.1%",
-      "gainLossPercent": 11.140607165620208
-    },
-    {
-      "date": "2025-12-29",
-      "symbol": "ATOM-USD",
-      "action": "SELL",
-      "shares": 0.1575,
-      "price": 1.963394045829773,
-      "total": 0.30923456221818924,
-      "reason": "Taking profits at 6.0%",
-      "gainLossPercent": 5.999288839118353
-    },
-    {
-      "date": "2025-12-29",
-      "symbol": "KHC",
-      "action": "SELL",
-      "shares": 1.7727,
-      "price": 24.25,
-      "total": 42.987975,
-      "reason": "Taking profits at 2.3%",
-      "gainLossPercent": 2.3206718116254264
-    },
-    {
-      "date": "2025-12-29",
-      "symbol": "LTC-USD",
-      "action": "SELL",
-      "shares": 0.5461,
-      "price": 78.2764892578125,
-      "total": 42.74679078369141,
-      "reason": "Taking profits at 3.3%",
-      "gainLossPercent": 3.3455415745004893
-    },
-    {
-      "date": "2025-12-29",
-      "symbol": "NEAR-USD",
-      "action": "SELL",
-      "shares": 3.377,
-      "price": 1.5221259593963623,
-      "total": 5.140219364881515,
-      "reason": "Taking profits at 4.7%",
-      "gainLossPercent": 4.722362082397769
-    },
-    {
-      "date": "2025-12-29",
-      "symbol": "DOT-USD",
-      "action": "SELL",
-      "shares": 5.7223,
-      "price": 1.8222349882125854,
-      "total": 10.427375273048877,
-      "reason": "Taking profits at 5.8%",
-      "gainLossPercent": 5.809295648297611
+      "shares": 0.5373,
+      "price": 149.23760986328125,
+      "total": 80.18536777954101,
+      "reason": "Stop loss at -3.2%",
+      "gainLossPercent": -3.1570867583715625
     },
     {
       "date": "2025-12-29",
       "symbol": "LW",
       "action": "BUY",
-      "shares": 3.7877,
+      "shares": 1.4444,
       "price": 41.84000015258789,
-      "total": 158.47736857795715,
-      "reason": "STRONG_BUY: 0.58",
+      "total": 60.43369622039795,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2025-12-29",
-      "symbol": "SWKS",
+      "symbol": "USDMXN=X",
       "action": "BUY",
-      "shares": 0.8773,
-      "price": 64.0199966430664,
-      "total": 56.16474305496216,
-      "reason": "BUY: 0.49",
+      "shares": 1.2252,
+      "price": 17.896459579467773,
+      "total": 21.926742276763918,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-29",
-      "symbol": "USDCAD=X",
-      "action": "BUY",
-      "shares": 20.7375,
-      "price": 1.3668299913406372,
-      "total": 28.344636945426466,
-      "reason": "BUY: 0.48",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "WEC",
-      "action": "SELL",
-      "shares": 5.7882,
-      "price": 106.08999633789062,
-      "total": 614.0701168029785,
-      "reason": "Taking profits at 2.3%",
-      "gainLossPercent": 2.3441950510652743
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "KR",
-      "action": "SELL",
-      "shares": 0.0765,
-      "price": 62.68000030517578,
-      "total": 4.7950200233459475,
-      "reason": "Taking profits at 2.4%",
-      "gainLossPercent": 2.3514020039867445
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "DUK",
-      "action": "SELL",
-      "shares": 0.0411,
-      "price": 117.68000030517578,
-      "total": 4.8366480125427245,
-      "reason": "Weak signal (-0.073)",
-      "gainLossPercent": 3.2280704431366507
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "SO",
-      "action": "SELL",
-      "shares": 0.1115,
-      "price": 87.56999969482422,
-      "total": 9.7640549659729,
-      "reason": "Weak signal (-0.079)",
-      "gainLossPercent": 4.150806122461943
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "TMUS",
-      "action": "SELL",
-      "shares": 0.192,
-      "price": 203.8000030517578,
-      "total": 39.1296005859375,
-      "reason": "Taking profits at 4.3%",
-      "gainLossPercent": 4.341590932598528
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "VICI",
-      "action": "SELL",
-      "shares": 1.753,
-      "price": 28.34000015258789,
-      "total": 49.68002026748657,
-      "reason": "Weak signal (-0.068)",
-      "gainLossPercent": 2.0893368837317796
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "T",
-      "action": "SELL",
-      "shares": 1.4756,
-      "price": 24.809999465942383,
-      "total": 36.60963521194458,
-      "reason": "Taking profits at 2.1%",
-      "gainLossPercent": 2.0567668078334833
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "BZ=F",
-      "action": "SELL",
-      "shares": 0.0073,
-      "price": 61.91999816894531,
-      "total": 0.4520159866333008,
-      "reason": "Taking profits at 5.1%",
-      "gainLossPercent": 5.091649852734035
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "MKR-USD",
-      "action": "SELL",
-      "shares": 0.0037,
-      "price": 1418.3944091796875,
-      "total": 5.248059313964844,
-      "reason": "Taking profits at 5.9%",
-      "gainLossPercent": 5.938275739237012
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "TT",
-      "action": "SELL",
-      "shares": 0.0209,
-      "price": 391.7099914550781,
-      "total": 8.186738821411133,
-      "reason": "Taking profits at 2.5%",
-      "gainLossPercent": 2.4614187712727005
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "HBAR-USD",
-      "action": "SELL",
-      "shares": 52.864,
-      "price": 0.11173799633979797,
-      "total": 5.9069174385070795,
-      "reason": "Taking profits at 6.4%",
-      "gainLossPercent": 6.4465398426243965
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "XRP-USD",
-      "action": "SELL",
-      "shares": 2.4463,
-      "price": 1.8754940032958984,
-      "total": 4.5880209802627565,
-      "reason": "Taking profits at 3.7%",
-      "gainLossPercent": 3.745868786479788
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "VET-USD",
-      "action": "SELL",
-      "shares": 36.4718,
-      "price": 0.010831000283360481,
-      "total": 0.39502607613466684,
-      "reason": "Taking profits at 10.6%",
-      "gainLossPercent": 10.599407293511822
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "ATOM-USD",
-      "action": "SELL",
-      "shares": 0.0788,
-      "price": 1.965973973274231,
-      "total": 0.15491874909400938,
-      "reason": "Taking profits at 6.1%",
-      "gainLossPercent": 6.138573398399727
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "SHW",
-      "action": "SELL",
-      "shares": 0.3052,
-      "price": 326.1600036621094,
-      "total": 99.5440331176758,
-      "reason": "Weak signal (-0.067)",
-      "gainLossPercent": 1.6518165407069092
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "KHC",
-      "action": "SELL",
-      "shares": 0.8863,
-      "price": 24.43000030517578,
-      "total": 21.652309270477293,
-      "reason": "Taking profits at 3.1%",
-      "gainLossPercent": 3.0801667457237167
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "GNRC",
-      "action": "SELL",
-      "shares": 4.2827,
-      "price": 137.86000061035156,
-      "total": 590.4130246139526,
-      "reason": "Stop loss at -2.1%",
-      "gainLossPercent": -2.095019529429817
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "SOL-USD",
-      "action": "SELL",
-      "shares": 0.7037,
-      "price": 124.93132019042969,
-      "total": 87.91417001800536,
-      "reason": "Taking profits at 2.0%",
-      "gainLossPercent": 2.01922709102683
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "LTC-USD",
-      "action": "SELL",
-      "shares": 0.2731,
-      "price": 78.76162719726562,
-      "total": 21.509800387573243,
-      "reason": "Taking profits at 4.0%",
-      "gainLossPercent": 3.986051177913962
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "NEAR-USD",
-      "action": "SELL",
-      "shares": 1.6885,
-      "price": 1.514543056488037,
-      "total": 2.5573059508800506,
-      "reason": "Taking profits at 4.2%",
-      "gainLossPercent": 4.200657883675465
     },
     {
       "date": "2025-12-30",
       "symbol": "COIN",
       "action": "SELL",
-      "shares": 0.3603,
+      "shares": 1.6755,
       "price": 231.60000610351562,
-      "total": 83.44548219909669,
+      "total": 388.04581022644044,
       "reason": "Stop loss at -2.2%",
       "gainLossPercent": -2.2372258039333794
     },
     {
       "date": "2025-12-30",
-      "symbol": "DOT-USD",
-      "action": "SELL",
-      "shares": 2.8611,
-      "price": 1.810837984085083,
-      "total": 5.180988556265831,
-      "reason": "Taking profits at 5.1%",
-      "gainLossPercent": 5.147520966638886
+      "symbol": "ZS",
+      "action": "BUY",
+      "shares": 0.9589,
+      "price": 227.4199981689453,
+      "total": 218.07303624420166,
+      "reason": "STRONG_BUY: 0.54",
+      "gainLossPercent": 0
     },
     {
       "date": "2025-12-30",
       "symbol": "COIN",
       "action": "BUY",
-      "shares": 3.8362,
+      "shares": 0.4281,
       "price": 231.60000610351562,
-      "total": 888.4639434143066,
-      "reason": "STRONG_BUY: 0.51",
+      "total": 99.14796261291504,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2025-12-30",
-      "symbol": "GNRC",
+      "symbol": "AAVE-USD",
       "action": "BUY",
-      "shares": 3.0605,
-      "price": 137.86000061035156,
-      "total": 421.92053186798097,
-      "reason": "STRONG_BUY: 0.50",
+      "shares": 0.3028,
+      "price": 149.29501342773438,
+      "total": 45.206530065917974,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2025-12-30",
       "symbol": "SMCI",
       "action": "BUY",
-      "shares": 6.9938,
+      "shares": 0.6954,
       "price": 29.649999618530273,
-      "total": 207.36616733207703,
-      "reason": "BUY: 0.50",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "EURCHF=X",
-      "action": "BUY",
-      "shares": 99.7125,
-      "price": 0.9287700057029724,
-      "total": 92.60997919365764,
-      "reason": "BUY: 0.44",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "MTCH",
-      "action": "BUY",
-      "shares": 1.592,
-      "price": 32.15999984741211,
-      "total": 51.19871975708008,
-      "reason": "BUY: 0.44",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-30",
-      "symbol": "CDNS",
-      "action": "BUY",
-      "shares": 0.0902,
-      "price": 315.6000061035156,
-      "total": 28.46712055053711,
-      "reason": "BUY: 0.44",
+      "total": 20.618609734725954,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2025-12-31",
-      "symbol": "WEC",
+      "symbol": "LEN",
       "action": "SELL",
-      "shares": 5.7881,
-      "price": 105.45999908447266,
-      "total": 610.4130207008362,
-      "reason": "Weak signal (-0.054)",
-      "gainLossPercent": 1.736441596346605
-    },
-    {
-      "date": "2025-12-31",
-      "symbol": "KR",
-      "action": "SELL",
-      "shares": 0.0383,
-      "price": 62.47999954223633,
-      "total": 2.3929839824676513,
-      "reason": "Taking profits at 2.0%",
-      "gainLossPercent": 2.024816835048421
-    },
-    {
-      "date": "2025-12-31",
-      "symbol": "DUK",
-      "action": "SELL",
-      "shares": 2.498001805406602e-16,
-      "price": 117.20999908447266,
-      "total": 2.927907893247189e-14,
-      "reason": "Weak signal (-0.073)",
-      "gainLossPercent": 2.8157886705900492
-    },
-    {
-      "date": "2025-12-31",
-      "symbol": "TMUS",
-      "action": "SELL",
-      "shares": 0.192,
-      "price": 203.0399932861328,
-      "total": 38.983678710937504,
-      "reason": "Weak signal (-0.219)",
-      "gainLossPercent": 3.952480889015828
-    },
-    {
-      "date": "2025-12-31",
-      "symbol": "ZS",
-      "action": "SELL",
-      "shares": 5.2596,
-      "price": 224.9199981689453,
-      "total": 1182.9892223693848,
-      "reason": "Stop loss at -2.3%",
-      "gainLossPercent": -2.3403236710456543
-    },
-    {
-      "date": "2025-12-31",
-      "symbol": "T",
-      "action": "SELL",
-      "shares": 1.4756,
-      "price": 24.84000015258789,
-      "total": 36.65390422515869,
-      "reason": "Weak signal (-0.079)",
-      "gainLossPercent": 2.180175640842871
-    },
-    {
-      "date": "2025-12-31",
-      "symbol": "BZ=F",
-      "action": "SELL",
-      "shares": 0.0036,
-      "price": 60.849998474121094,
-      "total": 0.21905999450683594,
-      "reason": "Taking profits at 3.3%",
-      "gainLossPercent": 3.2756285898749695
-    },
-    {
-      "date": "2025-12-31",
-      "symbol": "VET-USD",
-      "action": "SELL",
-      "shares": 18.2359,
-      "price": 0.01041099987924099,
-      "total": 0.18985395269785077,
-      "reason": "Taking profits at 6.3%",
-      "gainLossPercent": 6.310625598065421
-    },
-    {
-      "date": "2025-12-31",
-      "symbol": "ATOM-USD",
-      "action": "SELL",
-      "shares": 0.0394,
-      "price": 1.926895022392273,
-      "total": 0.07591966388225554,
-      "reason": "Taking profits at 4.0%",
-      "gainLossPercent": 4.028787535055243
-    },
-    {
-      "date": "2025-12-31",
-      "symbol": "HPQ",
-      "action": "SELL",
-      "shares": 18.9686,
-      "price": 22.280000686645508,
-      "total": 422.62042102470394,
-      "reason": "Stop loss at -2.8%",
-      "gainLossPercent": -2.8347126466612167
-    },
-    {
-      "date": "2025-12-31",
-      "symbol": "KHC",
-      "action": "SELL",
-      "shares": 0.4432,
-      "price": 24.25,
-      "total": 10.7476,
-      "reason": "Taking profits at 2.3%",
-      "gainLossPercent": 2.3206718116254264
-    },
-    {
-      "date": "2025-12-31",
-      "symbol": "NEAR-USD",
-      "action": "SELL",
-      "shares": 0.8442,
-      "price": 1.5120949745178223,
-      "total": 1.2765105774879455,
-      "reason": "Taking profits at 4.0%",
-      "gainLossPercent": 4.032229689602815
+      "shares": 11.4395,
+      "price": 102.80000305175781,
+      "total": 1175.9806349105836,
+      "reason": "Stop loss at -2.0%",
+      "gainLossPercent": -2.00190509396992
     },
     {
       "date": "2025-12-31",
       "symbol": "ADA-USD",
       "action": "SELL",
-      "shares": 118.1932,
+      "shares": 518.4791,
       "price": 0.332830011844635,
-      "total": 39.338244155955316,
+      "total": 172.56540499419572,
       "reason": "Stop loss at -4.8%",
       "gainLossPercent": -4.792001722076466
     },
     {
       "date": "2025-12-31",
-      "symbol": "DOT-USD",
+      "symbol": "GNRC",
       "action": "SELL",
-      "shares": 1.4306,
-      "price": 1.7891989946365356,
-      "total": 2.5596280817270283,
-      "reason": "Taking profits at 3.9%",
-      "gainLossPercent": 3.891038544282593
+      "shares": 0.1235,
+      "price": 136.3699951171875,
+      "total": 16.841694396972656,
+      "reason": "Stop loss at -3.0%",
+      "gainLossPercent": -2.9809351979104926
     },
     {
       "date": "2025-12-31",
       "symbol": "COIN",
       "action": "SELL",
-      "shares": 3.8362,
+      "shares": 0.4281,
       "price": 226.13999938964844,
-      "total": 867.5182656585692,
+      "total": 96.81053373870849,
       "reason": "Stop loss at -2.4%",
       "gainLossPercent": -2.3575157901450097
     },
     {
       "date": "2025-12-31",
-      "symbol": "HPQ",
+      "symbol": "AAVE-USD",
+      "action": "SELL",
+      "shares": 0.3028,
+      "price": 146.15785217285156,
+      "total": 44.25659763793946,
+      "reason": "Stop loss at -2.1%",
+      "gainLossPercent": -2.1013168376191897
+    },
+    {
+      "date": "2025-12-31",
+      "symbol": "LEN",
       "action": "BUY",
-      "shares": 55.1808,
-      "price": 22.280000686645508,
-      "total": 1229.4282618896484,
-      "reason": "STRONG_BUY: 0.56",
+      "shares": 9.4547,
+      "price": 102.80000305175781,
+      "total": 971.9431888534547,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2025-12-31",
-      "symbol": "ZS",
+      "symbol": "HPQ",
       "action": "BUY",
-      "shares": 4.6835,
-      "price": 224.9199981689453,
-      "total": 1053.4128114242556,
-      "reason": "STRONG_BUY: 0.52",
+      "shares": 15.6899,
+      "price": 22.280000686645508,
+      "total": 349.57098277339935,
+      "reason": "STRONG_BUY: 0.63",
       "gainLossPercent": 0
     },
     {
       "date": "2025-12-31",
       "symbol": "ETN",
       "action": "BUY",
-      "shares": 1.578,
+      "shares": 0.3458,
       "price": 318.510009765625,
-      "total": 502.6087954101563,
-      "reason": "STRONG_BUY: 0.52",
+      "total": 110.14076137695312,
+      "reason": "STRONG_BUY: 0.54",
+      "gainLossPercent": 0
+    },
+    {
+      "date": "2025-12-31",
+      "symbol": "LH",
+      "action": "BUY",
+      "shares": 0.2,
+      "price": 250.8800048828125,
+      "total": 50.176000976562506,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2025-12-31",
       "symbol": "COIN",
       "action": "BUY",
-      "shares": 1.0623,
+      "shares": 0.1013,
       "price": 226.13999938964844,
-      "total": 240.22852135162353,
-      "reason": "STRONG_BUY: 0.51",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-31",
-      "symbol": "RMD",
-      "action": "BUY",
-      "shares": 0.4796,
-      "price": 240.8699951171875,
-      "total": 115.52124965820313,
-      "reason": "STRONG_BUY: 0.51",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-31",
-      "symbol": "CDW",
-      "action": "BUY",
-      "shares": 0.4137,
-      "price": 136.1999969482422,
-      "total": 56.34593873748779,
-      "reason": "STRONG_BUY: 0.51",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2025-12-31",
-      "symbol": "GPC",
-      "action": "BUY",
-      "shares": 0.2178,
-      "price": 122.95999908447266,
-      "total": 26.780687800598145,
-      "reason": "BUY: 0.49",
+      "total": 22.907981938171385,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-02",
-      "symbol": "KR",
+      "symbol": "ORLY",
       "action": "SELL",
-      "shares": 0.0191,
-      "price": 62.959999084472656,
-      "total": 1.2025359825134276,
-      "reason": "Taking profits at 2.8%",
-      "gainLossPercent": 2.8086175030440024
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "NFLX",
-      "action": "SELL",
-      "shares": 2.0474,
-      "price": 90.98999786376953,
-      "total": 186.29292162628175,
-      "reason": "Stop loss at -3.0%",
-      "gainLossPercent": -2.964699668145328
+      "shares": 13.0081,
+      "price": 90.33999633789062,
+      "total": 1175.151706362915,
+      "reason": "Stop loss at -2.1%",
+      "gainLossPercent": -2.070464674373306
     },
     {
       "date": "2026-01-02",
       "symbol": "AZO",
       "action": "SELL",
-      "shares": 0.0414,
+      "shares": 0.348,
       "price": 3303.820068359375,
-      "total": 136.77815083007812,
-      "reason": "Stop loss at -3.3%",
-      "gainLossPercent": -3.3241409049110175
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "BZ=F",
-      "action": "SELL",
-      "shares": 0.0018,
-      "price": 60.75,
-      "total": 0.10935,
-      "reason": "Taking profits at 3.1%",
-      "gainLossPercent": 3.1059095178642044
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "MKR-USD",
-      "action": "SELL",
-      "shares": 0.0018,
-      "price": 1485.4571533203125,
-      "total": 2.6738228759765623,
-      "reason": "Taking profits at 10.9%",
-      "gainLossPercent": 10.947116323082973
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "TT",
-      "action": "SELL",
-      "shares": 0.0104,
-      "price": 398,
-      "total": 4.1392,
-      "reason": "Taking profits at 4.1%",
-      "gainLossPercent": 4.106725793445083
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "HBAR-USD",
-      "action": "SELL",
-      "shares": 52.864,
-      "price": 0.12154799699783325,
-      "total": 6.4255133132934565,
-      "reason": "Weak signal (-0.145)",
-      "gainLossPercent": 15.791978816902786
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "XRP-USD",
-      "action": "SELL",
-      "shares": 2.4462,
-      "price": 2.00581693649292,
-      "total": 4.906629390048981,
-      "reason": "Weak signal (-0.147)",
-      "gainLossPercent": 10.954884599682698
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "VET-USD",
-      "action": "SELL",
-      "shares": 18.2358,
-      "price": 0.011683999560773373,
-      "total": 0.2130670791903511,
-      "reason": "Weak signal (-0.162)",
-      "gainLossPercent": 19.30970292969556
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "ATOM-USD",
-      "action": "SELL",
-      "shares": 0.0393,
-      "price": 2.164829969406128,
-      "total": 0.08507781779766083,
-      "reason": "Weak signal (-0.139)",
-      "gainLossPercent": 16.874367477100456
+      "total": 1149.7293837890625,
+      "reason": "Stop loss at -4.2%",
+      "gainLossPercent": -4.200999938056935
     },
     {
       "date": "2026-01-02",
       "symbol": "NOW",
       "action": "SELL",
-      "shares": 0.3075,
+      "shares": 0.2459,
       "price": 147.4499969482422,
-      "total": 45.34087406158447,
-      "reason": "Stop loss at -5.1%",
-      "gainLossPercent": -5.060846522379362
+      "total": 36.257954249572755,
+      "reason": "Stop loss at -4.2%",
+      "gainLossPercent": -4.184808932970496
     },
     {
       "date": "2026-01-02",
-      "symbol": "XEL",
+      "symbol": "ZS",
       "action": "SELL",
-      "shares": 2.6305,
-      "price": 74.68000030517578,
-      "total": 196.4457408027649,
-      "reason": "Weak signal (-0.014)",
-      "gainLossPercent": 1.1239022995315853
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "SHIB-USD",
-      "action": "SELL",
-      "shares": 13748480.4851,
-      "price": 0.000007999999979801942,
-      "total": 109.98784360310738,
-      "reason": "Weak signal (-0.005)",
-      "gainLossPercent": 14.285712429602675
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "UBER",
-      "action": "SELL",
-      "shares": 1.0921,
-      "price": 82.86000061035156,
-      "total": 90.49140666656494,
-      "reason": "Taking profits at 2.3%",
-      "gainLossPercent": 2.3341970620659764
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "KHC",
-      "action": "SELL",
-      "shares": 0.2216,
-      "price": 24.389999389648438,
-      "total": 5.404823864746094,
-      "reason": "Taking profits at 2.9%",
-      "gainLossPercent": 2.9113865168644217
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "SOL-USD",
-      "action": "SELL",
-      "shares": 0.7037,
-      "price": 132.1336669921875,
-      "total": 92.98246146240234,
-      "reason": "Weak signal (-0.159)",
-      "gainLossPercent": 7.900681419988195
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "LTC-USD",
-      "action": "SELL",
-      "shares": 0.273,
-      "price": 81.82328033447266,
-      "total": 22.337755531311036,
-      "reason": "Weak signal (-0.164)",
-      "gainLossPercent": 8.028238105023107
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "AAVE-USD",
-      "action": "SELL",
-      "shares": 0.0683,
-      "price": 165.01084899902344,
-      "total": 11.2702409866333,
-      "reason": "Taking profits at 11.1%",
-      "gainLossPercent": 11.144044123178851
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "NEAR-USD",
-      "action": "SELL",
-      "shares": 0.8442,
-      "price": 1.6900980472564697,
-      "total": 1.4267807714939116,
-      "reason": "Weak signal (-0.166)",
-      "gainLossPercent": 16.278852329498232
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "DOT-USD",
-      "action": "SELL",
-      "shares": 1.4305,
-      "price": 2.1611979007720947,
-      "total": 3.091593597054482,
-      "reason": "Weak signal (-0.167)",
-      "gainLossPercent": 25.491404301033587
-    },
-    {
-      "date": "2026-01-02",
-      "symbol": "GNRC",
-      "action": "SELL",
-      "shares": 1.5303,
-      "price": 141.10000610351562,
-      "total": 215.92533934020997,
-      "reason": "Taking profits at 2.4%",
-      "gainLossPercent": 2.3502143325253826
+      "shares": 0.9589,
+      "price": 220.57000732421875,
+      "total": 211.50458002319334,
+      "reason": "Stop loss at -3.0%",
+      "gainLossPercent": -3.0120441913106757
     },
     {
       "date": "2026-01-02",
       "symbol": "SMCI",
       "action": "SELL",
-      "shares": 3.4969,
+      "shares": 0.3477,
       "price": 30.959999084472656,
-      "total": 108.26402079849244,
+      "total": 10.764791681671143,
       "reason": "Taking profits at 4.4%",
       "gainLossPercent": 4.418210734558244
     },
@@ -2820,9 +542,9 @@
       "date": "2026-01-02",
       "symbol": "ETN",
       "action": "SELL",
-      "shares": 0.789,
+      "shares": 0.1729,
       "price": 327.30999755859375,
-      "total": 258.24758807373047,
+      "total": 56.59189857788086,
       "reason": "Taking profits at 2.8%",
       "gainLossPercent": 2.7628606709861976
     },
@@ -2830,189 +552,99 @@
       "date": "2026-01-02",
       "symbol": "COIN",
       "action": "SELL",
-      "shares": 0.5312,
+      "shares": 0.0507,
       "price": 236.52999877929688,
-      "total": 125.6447353515625,
+      "total": 11.992070938110352,
       "reason": "Taking profits at 4.6%",
       "gainLossPercent": 4.594498725431605
     },
     {
       "date": "2026-01-02",
-      "symbol": "CDW",
-      "action": "SELL",
-      "shares": 0.4137,
-      "price": 133.16000366210938,
-      "total": 55.08829351501465,
-      "reason": "Stop loss at -2.2%",
-      "gainLossPercent": -2.232006868023683
-    },
-    {
-      "date": "2026-01-02",
       "symbol": "PAYC",
       "action": "BUY",
-      "shares": 6.7107,
+      "shares": 7.8063,
       "price": 152.39999389648438,
-      "total": 1022.7106390411377,
-      "reason": "STRONG_BUY: 0.60",
+      "total": 1189.680072354126,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-02",
       "symbol": "WDAY",
       "action": "BUY",
-      "shares": 1.9823,
+      "shares": 4.5995,
       "price": 205.7899932861328,
-      "total": 407.9375036911011,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 946.5310741195678,
+      "reason": "STRONG_BUY: 0.64",
+      "gainLossPercent": 0
+    },
+    {
+      "date": "2026-01-02",
+      "symbol": "ZS",
+      "action": "BUY",
+      "shares": 1.5464,
+      "price": 220.57000732421875,
+      "total": 341.0894593261719,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-02",
       "symbol": "GDDY",
       "action": "BUY",
-      "shares": 1.3861,
+      "shares": 1.0427,
       "price": 118.5199966430664,
-      "total": 164.28056734695437,
-      "reason": "STRONG_BUY: 0.58",
+      "total": 123.58080049972534,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-02",
       "symbol": "PGR",
       "action": "BUY",
-      "shares": 0.32,
+      "shares": 0.211,
       "price": 212.1199951171875,
-      "total": 67.8783984375,
-      "reason": "STRONG_BUY: 0.58",
+      "total": 44.75731896972656,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-02",
       "symbol": "NOW",
       "action": "BUY",
-      "shares": 0.1919,
+      "shares": 0.1103,
       "price": 147.4499969482422,
-      "total": 28.295654414367675,
-      "reason": "STRONG_BUY: 0.57",
+      "total": 16.263734663391112,
+      "reason": "STRONG_BUY: 0.63",
       "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-05",
-      "symbol": "USDZAR=X",
-      "action": "SELL",
-      "shares": 6.805,
-      "price": 16.49650001525879,
-      "total": 112.25868260383605,
-      "reason": "Stop loss at -2.1%",
-      "gainLossPercent": -2.1077981298324056
-    },
-    {
-      "date": "2026-01-05",
-      "symbol": "BZ=F",
-      "action": "SELL",
-      "shares": 0.0009,
-      "price": 61.7599983215332,
-      "total": 0.05558399848937988,
-      "reason": "Taking profits at 4.8%",
-      "gainLossPercent": 4.820095452896257
-    },
-    {
-      "date": "2026-01-05",
-      "symbol": "MKR-USD",
-      "action": "SELL",
-      "shares": 0.0009,
-      "price": 1514.1470947265625,
-      "total": 1.3627323852539062,
-      "reason": "Taking profits at 13.1%",
-      "gainLossPercent": 13.089935629171217
-    },
-    {
-      "date": "2026-01-05",
-      "symbol": "TT",
-      "action": "SELL",
-      "shares": 0.0052,
-      "price": 390.9700012207031,
-      "total": 2.033044006347656,
-      "reason": "Taking profits at 2.3%",
-      "gainLossPercent": 2.2678560566498227
-    },
-    {
-      "date": "2026-01-05",
-      "symbol": "ATOM-USD",
-      "action": "SELL",
-      "shares": 2.2898349882893854e-16,
-      "price": 2.3691179752349854,
-      "total": 5.424889231078375e-16,
-      "reason": "Weak signal (-0.279)",
-      "gainLossPercent": 27.903423708687907
-    },
-    {
-      "date": "2026-01-05",
-      "symbol": "ZBH",
-      "action": "SELL",
-      "shares": 0.2606,
-      "price": 92.6500015258789,
-      "total": 24.14459039764404,
-      "reason": "Weak signal (-0.015)",
-      "gainLossPercent": 3.9492924727156904
     },
     {
       "date": "2026-01-05",
       "symbol": "MPC",
       "action": "SELL",
-      "shares": 1.2403,
+      "shares": 2.6542,
       "price": 174.94000244140625,
-      "total": 216.97808502807615,
-      "reason": "Taking profits at 6.2%",
-      "gainLossPercent": 6.172238820925424
+      "total": 464.32575447998045,
+      "reason": "Taking profits at 6.9%",
+      "gainLossPercent": 6.872747163668105
     },
     {
       "date": "2026-01-05",
-      "symbol": "AAVE-USD",
+      "symbol": "LEN",
       "action": "SELL",
-      "shares": 0.0682,
-      "price": 171.07595825195312,
-      "total": 11.667380352783203,
-      "reason": "Weak signal (-0.227)",
-      "gainLossPercent": 15.229234730394667
-    },
-    {
-      "date": "2026-01-05",
-      "symbol": "NEAR-USD",
-      "action": "SELL",
-      "shares": 2.220446049250313e-16,
-      "price": 1.778324007987976,
-      "total": 3.9486725178238837e-16,
-      "reason": "Weak signal (-0.306)",
-      "gainLossPercent": 22.348803996610112
-    },
-    {
-      "date": "2026-01-05",
-      "symbol": "GNRC",
-      "action": "SELL",
-      "shares": 0.7651,
-      "price": 148.67999267578125,
-      "total": 113.75506239624023,
-      "reason": "Taking profits at 7.8%",
-      "gainLossPercent": 7.848536208853927
-    },
-    {
-      "date": "2026-01-05",
-      "symbol": "CDNS",
-      "action": "SELL",
-      "shares": 0.0902,
-      "price": 301.2200012207031,
-      "total": 27.170044110107423,
-      "reason": "Stop loss at -4.6%",
-      "gainLossPercent": -4.556401966005005
+      "shares": 4.7274,
+      "price": 105.4000015258789,
+      "total": 498.26796721344,
+      "reason": "Taking profits at 2.5%",
+      "gainLossPercent": 2.5291813199772424
     },
     {
       "date": "2026-01-05",
       "symbol": "HPQ",
       "action": "SELL",
-      "shares": 55.1808,
+      "shares": 15.6899,
       "price": 21.65999984741211,
-      "total": 1195.2161195800782,
+      "total": 339.8432316059112,
       "reason": "Stop loss at -2.8%",
       "gainLossPercent": -2.782768492484935
     },
@@ -3020,9 +652,9 @@
       "date": "2026-01-05",
       "symbol": "COIN",
       "action": "SELL",
-      "shares": 0.2656,
+      "shares": 0.0253,
       "price": 254.9199981689453,
-      "total": 67.70675151367188,
+      "total": 6.449475953674316,
       "reason": "Taking profits at 12.7%",
       "gainLossPercent": 12.72662901608475
     },
@@ -3030,209 +662,129 @@
       "date": "2026-01-05",
       "symbol": "CPB",
       "action": "BUY",
-      "shares": 40.4527,
+      "shares": 31.678,
       "price": 26.670000076293945,
-      "total": 1078.8735120862962,
-      "reason": "STRONG_BUY: 0.60",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-05",
-      "symbol": "USDZAR=X",
-      "action": "BUY",
-      "shares": 25.0087,
-      "price": 16.49650001525879,
-      "total": 412.5560199316025,
-      "reason": "STRONG_BUY: 0.58",
+      "total": 844.8522624168396,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-05",
       "symbol": "HPQ",
       "action": "BUY",
-      "shares": 7.9387,
+      "shares": 13.8637,
       "price": 21.65999984741211,
-      "total": 171.9522407886505,
-      "reason": "STRONG_BUY: 0.57",
+      "total": 300.28773988456726,
+      "reason": "STRONG_BUY: 0.63",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-05",
       "symbol": "SJM",
       "action": "BUY",
-      "shares": 0.7777,
+      "shares": 1.1595,
       "price": 94.55999755859375,
-      "total": 73.53931010131835,
-      "reason": "STRONG_BUY: 0.56",
+      "total": 109.64231716918945,
+      "reason": "STRONG_BUY: 0.63",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-05",
       "symbol": "CDNS",
       "action": "BUY",
-      "shares": 0.099,
+      "shares": 0.1148,
       "price": 301.2200012207031,
-      "total": 29.820780120849612,
-      "reason": "STRONG_BUY: 0.52",
+      "total": 34.58005614013672,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
-      "date": "2026-01-06",
-      "symbol": "BZ=F",
-      "action": "SELL",
-      "shares": 0.0005,
-      "price": 60.70000076293945,
-      "total": 0.030350000381469726,
-      "reason": "Taking profits at 3.0%",
-      "gainLossPercent": 3.021049981858822
-    },
-    {
-      "date": "2026-01-06",
-      "symbol": "MKR-USD",
-      "action": "SELL",
-      "shares": 0.0005,
-      "price": 1496.6763916015625,
-      "total": 0.7483381958007813,
-      "reason": "Taking profits at 11.8%",
-      "gainLossPercent": 11.785068553387271
-    },
-    {
-      "date": "2026-01-06",
-      "symbol": "COST",
-      "action": "SELL",
-      "shares": 0.0203,
-      "price": 889.0999755859375,
-      "total": 18.04872950439453,
-      "reason": "Weak signal (-0.141)",
-      "gainLossPercent": 3.0661276790481273
-    },
-    {
-      "date": "2026-01-06",
-      "symbol": "LH",
-      "action": "SELL",
-      "shares": 0.4458,
-      "price": 260.3999938964844,
-      "total": 116.08631727905272,
-      "reason": "Weak signal (0.006)",
-      "gainLossPercent": 3.3210312890240976
-    },
-    {
-      "date": "2026-01-06",
-      "symbol": "MPC",
-      "action": "SELL",
-      "shares": 0.6202,
-      "price": 170.4199981689453,
-      "total": 105.69448286437988,
-      "reason": "Taking profits at 3.4%",
-      "gainLossPercent": 3.429018480294289
-    },
-    {
-      "date": "2026-01-06",
-      "symbol": "KMB",
-      "action": "SELL",
-      "shares": 0.4698,
-      "price": 97.63999938964844,
-      "total": 45.87127171325684,
-      "reason": "Stop loss at -2.1%",
-      "gainLossPercent": -2.144717794978026
-    },
-    {
-      "date": "2026-01-06",
-      "symbol": "POOL",
-      "action": "SELL",
-      "shares": 0.1022,
-      "price": 239.3800048828125,
-      "total": 24.464636499023438,
-      "reason": "Weak signal (0.004)",
-      "gainLossPercent": 3.047783787362767
+      "date": "2026-01-05",
+      "symbol": "CDW",
+      "action": "BUY",
+      "shares": 0.1174,
+      "price": 133.61000061035156,
+      "total": 15.685814071655274,
+      "reason": "STRONG_BUY: 0.54",
+      "gainLossPercent": 0
     },
     {
       "date": "2026-01-06",
       "symbol": "UBER",
       "action": "SELL",
-      "shares": 1.092,
+      "shares": 14.7674,
       "price": 85.54000091552734,
-      "total": 93.40968099975586,
-      "reason": "Weak signal (-0.073)",
-      "gainLossPercent": 5.644065241357216
+      "total": 1263.2034095199585,
+      "reason": "Weak signal (-0.034)",
+      "gainLossPercent": 5.267042415432821
     },
     {
       "date": "2026-01-06",
-      "symbol": "AAVE-USD",
+      "symbol": "MPC",
       "action": "SELL",
-      "shares": 1.3877787807814457e-17,
-      "price": 176.257080078125,
-      "total": 2.4460583569491795e-15,
-      "reason": "Weak signal (-0.305)",
-      "gainLossPercent": 18.719010319992535
-    },
-    {
-      "date": "2026-01-06",
-      "symbol": "SWKS",
-      "action": "SELL",
-      "shares": 0.4387,
-      "price": 66.2699966430664,
-      "total": 29.07264752731323,
-      "reason": "Taking profits at 3.5%",
-      "gainLossPercent": 3.514526894689681
-    },
-    {
-      "date": "2026-01-06",
-      "symbol": "GNRC",
-      "action": "SELL",
-      "shares": 0.3826,
-      "price": 145.27000427246094,
-      "total": 55.580303634643556,
-      "reason": "Taking profits at 5.4%",
-      "gainLossPercent": 5.375020766939541
+      "shares": 1.3271,
+      "price": 170.4199981689453,
+      "total": 226.16437957000733,
+      "reason": "Taking profits at 4.1%",
+      "gainLossPercent": 4.111427470928227
     },
     {
       "date": "2026-01-06",
       "symbol": "SMCI",
       "action": "SELL",
-      "shares": 1.7485,
+      "shares": 0.1739,
       "price": 30.540000915527344,
-      "total": 53.39919160079956,
+      "total": 5.310906159210205,
       "reason": "Taking profits at 3.0%",
       "gainLossPercent": 3.001690753617578
     },
     {
       "date": "2026-01-06",
+      "symbol": "LEN",
+      "action": "SELL",
+      "shares": 2.3637,
+      "price": 106.36000061035156,
+      "total": 251.40313344268802,
+      "reason": "Taking profits at 3.5%",
+      "gainLossPercent": 3.463032541741619
+    },
+    {
+      "date": "2026-01-06",
       "symbol": "ETN",
       "action": "SELL",
-      "shares": 0.3945,
+      "shares": 0.0865,
       "price": 332.9700012207031,
-      "total": 131.35666548156738,
+      "total": 28.80190510559082,
       "reason": "Taking profits at 4.5%",
       "gainLossPercent": 4.53988603551847
     },
     {
       "date": "2026-01-06",
+      "symbol": "LH",
+      "action": "SELL",
+      "shares": 0.2,
+      "price": 260.3999938964844,
+      "total": 52.07999877929688,
+      "reason": "Weak signal (0.001)",
+      "gainLossPercent": 3.7946384041720327
+    },
+    {
+      "date": "2026-01-06",
       "symbol": "COIN",
       "action": "SELL",
-      "shares": 0.1328,
+      "shares": 0.0127,
       "price": 250.55999755859375,
-      "total": 33.27436767578125,
+      "total": 3.1821119689941404,
       "reason": "Taking profits at 10.8%",
       "gainLossPercent": 10.798619543139141
     },
     {
       "date": "2026-01-06",
-      "symbol": "RMD",
-      "action": "SELL",
-      "shares": 0.2398,
-      "price": 249.19000244140625,
-      "total": 59.75576258544922,
-      "reason": "Taking profits at 3.5%",
-      "gainLossPercent": 3.454148500385413
-    },
-    {
-      "date": "2026-01-06",
       "symbol": "PAYC",
       "action": "SELL",
-      "shares": 3.3554,
+      "shares": 3.9032,
       "price": 156.5500030517578,
-      "total": 525.2878802398682,
+      "total": 611.0459719116211,
       "reason": "Taking profits at 2.7%",
       "gainLossPercent": 2.7231032293165804
     },
@@ -3240,9 +792,9 @@
       "date": "2026-01-06",
       "symbol": "WDAY",
       "action": "SELL",
-      "shares": 0.9912,
+      "shares": 2.2998,
       "price": 210.3000030517578,
-      "total": 208.44936302490234,
+      "total": 483.6479470184326,
       "reason": "Taking profits at 2.2%",
       "gainLossPercent": 2.1915593142345995
     },
@@ -3250,9 +802,9 @@
       "date": "2026-01-06",
       "symbol": "HPQ",
       "action": "SELL",
-      "shares": 3.9694,
+      "shares": 6.9319,
       "price": 22.149999618530273,
-      "total": 87.92220848579406,
+      "total": 153.54158235569,
       "reason": "Taking profits at 2.3%",
       "gainLossPercent": 2.262233492936558
     },
@@ -3260,9 +812,9 @@
       "date": "2026-01-06",
       "symbol": "CDNS",
       "action": "SELL",
-      "shares": 0.0495,
+      "shares": 0.0574,
       "price": 314.6400146484375,
-      "total": 15.574680725097657,
+      "total": 18.060336840820312,
       "reason": "Taking profits at 4.5%",
       "gainLossPercent": 4.455219896869187
     },
@@ -3270,179 +822,109 @@
       "date": "2026-01-06",
       "symbol": "AZO",
       "action": "BUY",
-      "shares": 0.3025,
+      "shares": 0.3682,
       "price": 3244.919921875,
-      "total": 981.5882763671875,
-      "reason": "STRONG_BUY: 0.60",
+      "total": 1194.7795152343751,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-06",
       "symbol": "GIS",
       "action": "BUY",
-      "shares": 8.5879,
+      "shares": 27.2499,
       "price": 43.84000015258789,
-      "total": 376.4935373104095,
-      "reason": "STRONG_BUY: 0.58",
+      "total": 1194.6356201580047,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-06",
       "symbol": "MO",
       "action": "BUY",
-      "shares": 2.8434,
+      "shares": 8.2975,
       "price": 55.15999984741211,
-      "total": 156.8419435661316,
-      "reason": "STRONG_BUY: 0.57",
+      "total": 457.69009873390195,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-06",
-      "symbol": "CDW",
+      "symbol": "ORLY",
       "action": "BUY",
-      "shares": 0.4442,
-      "price": 134.33999633789062,
-      "total": 59.673826373291014,
-      "reason": "STRONG_BUY: 0.51",
+      "shares": 1.5746,
+      "price": 90.38999938964844,
+      "total": 142.32809303894044,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-06",
       "symbol": "PEP",
       "action": "BUY",
-      "shares": 0.2053,
+      "shares": 0.4681,
       "price": 138.9600067138672,
-      "total": 28.528489378356934,
-      "reason": "STRONG_BUY: 0.50",
+      "total": 65.04717914276124,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
-      "date": "2026-01-07",
-      "symbol": "KR",
-      "action": "SELL",
-      "shares": 0.0191,
-      "price": 59.279998779296875,
-      "total": 1.1322479766845703,
-      "reason": "Stop loss at -3.2%",
-      "gainLossPercent": -3.200527180682782
-    },
-    {
-      "date": "2026-01-07",
-      "symbol": "MKR-USD",
-      "action": "SELL",
-      "shares": 0.0002,
-      "price": 1442.0345458984375,
-      "total": 0.28840690917968753,
-      "reason": "Taking profits at 7.7%",
-      "gainLossPercent": 7.70393083912745
-    },
-    {
-      "date": "2026-01-07",
-      "symbol": "MPC",
-      "action": "SELL",
-      "shares": 0.3101,
-      "price": 172.50999450683594,
-      "total": 53.49534929656982,
-      "reason": "Taking profits at 4.7%",
-      "gainLossPercent": 4.6974510127318325
-    },
-    {
-      "date": "2026-01-07",
-      "symbol": "KHC",
-      "action": "SELL",
-      "shares": 0.2215,
-      "price": 23.010000228881836,
-      "total": 5.096715050697327,
-      "reason": "Stop loss at -2.9%",
-      "gainLossPercent": -2.9113945647486896
+      "date": "2026-01-06",
+      "symbol": "CAG",
+      "action": "BUY",
+      "shares": 1.7712,
+      "price": 16.850000381469727,
+      "total": 29.844720675659183,
+      "reason": "STRONG_BUY: 0.54",
+      "gainLossPercent": 0
     },
     {
       "date": "2026-01-07",
       "symbol": "USDCHF=X",
       "action": "SELL",
-      "shares": 291.2183,
+      "shares": 1522.746,
       "price": 0.7954999804496765,
-      "total": 231.66415195658803,
-      "reason": "Weak signal (-0.026)",
+      "total": 1211.3444132298232,
+      "reason": "Weak signal (-0.005)",
       "gainLossPercent": 0.9453695310251612
+    },
+    {
+      "date": "2026-01-07",
+      "symbol": "MPC",
+      "action": "SELL",
+      "shares": 0.6636,
+      "price": 172.50999450683594,
+      "total": 114.47763235473633,
+      "reason": "Taking profits at 5.4%",
+      "gainLossPercent": 5.388228929000629
     },
     {
       "date": "2026-01-07",
       "symbol": "LW",
       "action": "SELL",
-      "shares": 3.7877,
+      "shares": 1.4444,
       "price": 40.290000915527344,
-      "total": 152.60643646774292,
+      "total": 58.19487732238769,
       "reason": "Stop loss at -3.7%",
       "gainLossPercent": -3.704587073154387
     },
     {
       "date": "2026-01-07",
-      "symbol": "SWKS",
-      "action": "SELL",
-      "shares": 0.4386,
-      "price": 59.81999969482422,
-      "total": 26.2370518661499,
-      "reason": "Stop loss at -6.6%",
-      "gainLossPercent": -6.560445436538558
-    },
-    {
-      "date": "2026-01-07",
-      "symbol": "USDCAD=X",
-      "action": "SELL",
-      "shares": 20.7375,
-      "price": 1.3815499544143677,
-      "total": 28.64989217966795,
-      "reason": "Weak signal (-0.024)",
-      "gainLossPercent": 1.0769417679584705
-    },
-    {
-      "date": "2026-01-07",
-      "symbol": "GNRC",
-      "action": "SELL",
-      "shares": 0.1913,
-      "price": 141.86000061035156,
-      "total": 27.137818116760254,
-      "reason": "Taking profits at 2.9%",
-      "gainLossPercent": 2.9014942567029482
-    },
-    {
-      "date": "2026-01-07",
-      "symbol": "ZS",
-      "action": "SELL",
-      "shares": 2.3418,
-      "price": 231.16000366210938,
-      "total": 541.3304965759278,
-      "reason": "Taking profits at 2.8%",
-      "gainLossPercent": 2.774322222996363
-    },
-    {
-      "date": "2026-01-07",
       "symbol": "COIN",
       "action": "SELL",
-      "shares": 0.0664,
+      "shares": 0.0063,
       "price": 245.92999267578125,
-      "total": 16.329751513671876,
+      "total": 1.549358953857422,
       "reason": "Taking profits at 8.8%",
       "gainLossPercent": 8.751213115568222
     },
     {
       "date": "2026-01-07",
-      "symbol": "RMD",
-      "action": "SELL",
-      "shares": 0.1199,
-      "price": 248.2100067138672,
-      "total": 29.760379804992677,
-      "reason": "Taking profits at 3.0%",
-      "gainLossPercent": 3.047291794525359
-    },
-    {
-      "date": "2026-01-07",
       "symbol": "PAYC",
       "action": "SELL",
-      "shares": 1.6777,
+      "shares": 1.9516,
       "price": 156.82000732421875,
-      "total": 263.09692628784177,
+      "total": 306.0499262939453,
       "reason": "Taking profits at 2.9%",
       "gainLossPercent": 2.9002713941948115
     },
@@ -3450,19 +932,29 @@
       "date": "2026-01-07",
       "symbol": "WDAY",
       "action": "SELL",
-      "shares": 0.4956,
+      "shares": 1.1499,
       "price": 211.13999938964844,
-      "total": 104.64098369750977,
+      "total": 242.78988529815672,
       "reason": "Taking profits at 2.6%",
       "gainLossPercent": 2.599740647290325
     },
     {
       "date": "2026-01-07",
+      "symbol": "ZS",
+      "action": "SELL",
+      "shares": 0.7732,
+      "price": 231.16000366210938,
+      "total": 178.73291483154296,
+      "reason": "Taking profits at 4.8%",
+      "gainLossPercent": 4.8011950792222855
+    },
+    {
+      "date": "2026-01-07",
       "symbol": "NOW",
       "action": "SELL",
-      "shares": 0.0959,
+      "shares": 0.0552,
       "price": 150.89999389648438,
-      "total": 14.471309414672852,
+      "total": 8.329679663085937,
       "reason": "Taking profits at 2.3%",
       "gainLossPercent": 2.339774174056581
     },
@@ -3470,9 +962,9 @@
       "date": "2026-01-07",
       "symbol": "HPQ",
       "action": "SELL",
-      "shares": 3.9693,
+      "shares": 6.9318,
       "price": 21.09000015258789,
-      "total": 83.71253760566711,
+      "total": 146.19166305770875,
       "reason": "Stop loss at -2.6%",
       "gainLossPercent": -2.631577556969933
     },
@@ -3480,19 +972,29 @@
       "date": "2026-01-07",
       "symbol": "CDNS",
       "action": "SELL",
-      "shares": 0.0248,
+      "shares": 0.0287,
       "price": 320.5400085449219,
-      "total": 7.949392211914062,
+      "total": 9.199498245239258,
       "reason": "Taking profits at 6.4%",
       "gainLossPercent": 6.41391914412185
     },
     {
       "date": "2026-01-07",
+      "symbol": "CDW",
+      "action": "SELL",
+      "shares": 0.1174,
+      "price": 129.5399932861328,
+      "total": 15.207995211791992,
+      "reason": "Stop loss at -3.0%",
+      "gainLossPercent": -3.0461846460791215
+    },
+    {
+      "date": "2026-01-07",
       "symbol": "AZO",
       "action": "SELL",
-      "shares": 0.1513,
+      "shares": 0.1841,
       "price": 3318.080078125,
-      "total": 502.0255158203125,
+      "total": 610.8585423828125,
       "reason": "Taking profits at 2.3%",
       "gainLossPercent": 2.2546059074310265
     },
@@ -3500,189 +1002,129 @@
       "date": "2026-01-07",
       "symbol": "GIS",
       "action": "SELL",
-      "shares": 8.5879,
+      "shares": 27.2499,
       "price": 42.95000076293945,
-      "total": 368.8503115520477,
+      "total": 1170.3832257900237,
       "reason": "Stop loss at -2.0%",
       "gainLossPercent": -2.0301080897598958
     },
     {
       "date": "2026-01-07",
-      "symbol": "CDW",
+      "symbol": "CAG",
       "action": "SELL",
-      "shares": 0.4442,
-      "price": 129.5399932861328,
-      "total": 57.54166501770019,
-      "reason": "Stop loss at -3.6%",
-      "gainLossPercent": -3.5730260403498098
+      "shares": 1.7712,
+      "price": 16.079999923706055,
+      "total": 28.480895864868167,
+      "reason": "Stop loss at -4.6%",
+      "gainLossPercent": -4.5697355509288675
     },
     {
       "date": "2026-01-07",
       "symbol": "SWKS",
       "action": "BUY",
-      "shares": 20.7101,
+      "shares": 20.1901,
       "price": 59.81999969482422,
-      "total": 1238.8781756797791,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 1207.7717758384706,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-07",
       "symbol": "CDW",
       "action": "BUY",
-      "shares": 5.9586,
+      "shares": 9.3235,
       "price": 129.5399932861328,
-      "total": 771.8770039947509,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 1207.7661274032591,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-07",
       "symbol": "ARB-USD",
       "action": "BUY",
-      "shares": 349448.4431,
+      "shares": 1215462.7498,
       "price": 0.0008989999769255519,
-      "total": 314.15414228357,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 1092.700984024068,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-07",
       "symbol": "LW",
       "action": "BUY",
-      "shares": 3.1885,
+      "shares": 9.7977,
       "price": 40.290000915527344,
-      "total": 128.46466791915893,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 394.7493419700623,
+      "reason": "STRONG_BUY: 0.64",
+      "gainLossPercent": 0
+    },
+    {
+      "date": "2026-01-07",
+      "symbol": "KHC",
+      "action": "BUY",
+      "shares": 6.2087,
+      "price": 23.010000228881836,
+      "total": 142.86218842105868,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-07",
       "symbol": "EURAUD=X",
       "action": "BUY",
-      "shares": 30.484,
+      "shares": 29.8552,
       "price": 1.7345999479293823,
-      "total": 52.8775448126793,
-      "reason": "STRONG_BUY: 0.58",
+      "total": 51.78682836542129,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-07",
       "symbol": "CAG",
       "action": "BUY",
-      "shares": 1.3674,
+      "shares": 1.1678,
       "price": 16.079999923706055,
-      "total": 21.98779189567566,
-      "reason": "STRONG_BUY: 0.58",
+      "total": 18.77822391090393,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-08",
-      "symbol": "KR",
-      "action": "SELL",
-      "shares": 1.3877787807814457e-16,
-      "price": 59.790000915527344,
-      "total": 8.297529457347206e-15,
-      "reason": "Stop loss at -2.4%",
-      "gainLossPercent": -2.3677346884353567
-    },
-    {
-      "date": "2026-01-08",
-      "symbol": "BZ=F",
-      "action": "SELL",
-      "shares": 0.0004,
-      "price": 61.9900016784668,
-      "total": 0.02479600067138672,
-      "reason": "Weak signal (-0.016)",
-      "gainLossPercent": 5.210460972382679
     },
     {
       "date": "2026-01-08",
       "symbol": "MPC",
       "action": "SELL",
-      "shares": 0.31,
+      "shares": 0.6635,
       "price": 177.07000732421875,
-      "total": 54.891702270507814,
-      "reason": "Weak signal (0.007)",
-      "gainLossPercent": 7.464952802585799
+      "total": 117.48594985961914,
+      "reason": "Weak signal (0.001)",
+      "gainLossPercent": 8.173990276285778
     },
     {
       "date": "2026-01-08",
       "symbol": "LEN",
       "action": "SELL",
-      "shares": 5.2081,
+      "shares": 1.1818,
       "price": 109.55000305175781,
-      "total": 570.5473708938598,
-      "reason": "Taking profits at 4.6%",
-      "gainLossPercent": 4.592328896401575
-    },
-    {
-      "date": "2026-01-08",
-      "symbol": "GNRC",
-      "action": "SELL",
-      "shares": 0.0956,
-      "price": 148.7899932861328,
-      "total": 14.224323358154297,
-      "reason": "Taking profits at 7.9%",
-      "gainLossPercent": 7.928327743646147
-    },
-    {
-      "date": "2026-01-08",
-      "symbol": "EURCHF=X",
-      "action": "SELL",
-      "shares": 99.7125,
-      "price": 0.9314000010490417,
-      "total": 92.87222260460258,
-      "reason": "Weak signal (-0.012)",
-      "gainLossPercent": 0.2831697115454036
-    },
-    {
-      "date": "2026-01-08",
-      "symbol": "ZS",
-      "action": "SELL",
-      "shares": 2.3417,
-      "price": 220.32000732421875,
-      "total": 515.923361151123,
-      "reason": "Stop loss at -2.0%",
-      "gainLossPercent": -2.0451675627666277
+      "total": 129.46619360656737,
+      "reason": "Taking profits at 6.6%",
+      "gainLossPercent": 6.566147664997156
     },
     {
       "date": "2026-01-08",
       "symbol": "COIN",
       "action": "SELL",
-      "shares": 0.0332,
+      "shares": 0.0032,
       "price": 245.58999633789062,
-      "total": 8.15358787841797,
+      "total": 0.7858879882812501,
       "reason": "Taking profits at 8.6%",
       "gainLossPercent": 8.600865393445522
     },
     {
       "date": "2026-01-08",
-      "symbol": "RMD",
-      "action": "SELL",
-      "shares": 0.1199,
-      "price": 250.9199981689453,
-      "total": 30.085307780456546,
-      "reason": "Weak signal (-0.024)",
-      "gainLossPercent": 4.172376491670666
-    },
-    {
-      "date": "2026-01-08",
-      "symbol": "GPC",
-      "action": "SELL",
-      "shares": 0.1089,
-      "price": 126.7300033569336,
-      "total": 13.800897365570068,
-      "reason": "Taking profits at 3.1%",
-      "gainLossPercent": 3.0660412333534346
-    },
-    {
-      "date": "2026-01-08",
       "symbol": "PAYC",
       "action": "SELL",
-      "shares": 0.8388,
+      "shares": 0.9758,
       "price": 157.8000030517578,
-      "total": 132.36264255981445,
+      "total": 153.98124297790528,
       "reason": "Taking profits at 3.5%",
       "gainLossPercent": 3.5433132359187103
     },
@@ -3690,9 +1132,9 @@
       "date": "2026-01-08",
       "symbol": "GDDY",
       "action": "SELL",
-      "shares": 1.3861,
+      "shares": 1.0427,
       "price": 115.5999984741211,
-      "total": 160.23315788497925,
+      "total": 120.53611840896606,
       "reason": "Stop loss at -2.5%",
       "gainLossPercent": -2.4637177283586573
     },
@@ -3700,9 +1142,9 @@
       "date": "2026-01-08",
       "symbol": "SJM",
       "action": "SELL",
-      "shares": 0.3888,
+      "shares": 0.5798,
       "price": 97.81999969482422,
-      "total": 38.03241588134765,
+      "total": 56.71603582305908,
       "reason": "Taking profits at 3.4%",
       "gainLossPercent": 3.447548879440718
     },
@@ -3710,9 +1152,9 @@
       "date": "2026-01-08",
       "symbol": "CDNS",
       "action": "SELL",
-      "shares": 0.0124,
+      "shares": 0.0144,
       "price": 318.79998779296875,
-      "total": 3.9531198486328125,
+      "total": 4.59071982421875,
       "reason": "Taking profits at 5.8%",
       "gainLossPercent": 5.836261370766284
     },
@@ -3720,9 +1162,9 @@
       "date": "2026-01-08",
       "symbol": "AZO",
       "action": "SELL",
-      "shares": 0.0756,
+      "shares": 0.0921,
       "price": 3313.989990234375,
-      "total": 250.53764326171876,
+      "total": 305.21847810058597,
       "reason": "Taking profits at 2.1%",
       "gainLossPercent": 2.12856002682077
     },
@@ -3730,9 +1172,9 @@
       "date": "2026-01-08",
       "symbol": "CDW",
       "action": "SELL",
-      "shares": 2.9793,
+      "shares": 4.6617,
       "price": 132.52999877929688,
-      "total": 394.84662536315915,
+      "total": 617.8150953094482,
       "reason": "Taking profits at 2.3%",
       "gainLossPercent": 2.308171721577618
     },
@@ -3740,9 +1182,9 @@
       "date": "2026-01-08",
       "symbol": "LW",
       "action": "SELL",
-      "shares": 1.5943,
+      "shares": 4.8989,
       "price": 41.29999923706055,
-      "total": 65.84458878364563,
+      "total": 202.32456626243592,
       "reason": "Taking profits at 2.5%",
       "gainLossPercent": 2.506821292088778
     },
@@ -3750,9 +1192,9 @@
       "date": "2026-01-08",
       "symbol": "CAG",
       "action": "SELL",
-      "shares": 0.6837,
+      "shares": 0.5839,
       "price": 16.579999923706055,
-      "total": 11.335745947837829,
+      "total": 9.681061955451964,
       "reason": "Taking profits at 3.1%",
       "gainLossPercent": 3.1094527510716676
     },
@@ -3760,149 +1202,79 @@
       "date": "2026-01-08",
       "symbol": "KR",
       "action": "BUY",
-      "shares": 20.6574,
+      "shares": 18.5045,
       "price": 59.790000915527344,
-      "total": 1235.1059649124145,
-      "reason": "STRONG_BUY: 0.60",
+      "total": 1106.3840719413759,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-08",
       "symbol": "GIS",
       "action": "BUY",
-      "shares": 15.0239,
+      "shares": 9.0279,
       "price": 43.91999816894531,
-      "total": 659.8496604904175,
-      "reason": "STRONG_BUY: 0.58",
+      "total": 396.50535146942144,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-08",
       "symbol": "TFX",
       "action": "BUY",
-      "shares": 2.5079,
+      "shares": 1.3088,
       "price": 110.01000213623047,
-      "total": 275.89408435745236,
-      "reason": "STRONG_BUY: 0.58",
+      "total": 143.98109079589844,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-08",
       "symbol": "HPQ",
       "action": "BUY",
-      "shares": 5.3865,
+      "shares": 2.4446,
       "price": 21.389999389648438,
-      "total": 115.2172317123413,
-      "reason": "STRONG_BUY: 0.57",
+      "total": 52.28999250793457,
+      "reason": "STRONG_BUY: 0.63",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-08",
       "symbol": "GDDY",
       "action": "BUY",
-      "shares": 0.3816,
+      "shares": 0.1411,
       "price": 115.5999984741211,
-      "total": 44.11295941772461,
-      "reason": "STRONG_BUY: 0.50",
+      "total": 16.311159784698486,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-08",
-      "symbol": "SBAC",
-      "action": "BUY",
-      "shares": 0.12,
-      "price": 181.36000061035156,
-      "total": 21.763200073242185,
-      "reason": "STRONG_BUY: 0.50",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-09",
-      "symbol": "BZ=F",
-      "action": "SELL",
-      "shares": 1.1221492485224971e-17,
-      "price": 63.34000015258789,
-      "total": 7.107693357264135e-16,
-      "reason": "Weak signal (-0.156)",
-      "gainLossPercent": 7.501700816365958
-    },
-    {
-      "date": "2026-01-09",
-      "symbol": "MKR-USD",
-      "action": "SELL",
-      "shares": 0.0002,
-      "price": 1305.1607666015625,
-      "total": 0.2610321533203125,
-      "reason": "Stop loss at -2.5%",
-      "gainLossPercent": -2.519017079152788
-    },
-    {
-      "date": "2026-01-09",
-      "symbol": "ORLY",
-      "action": "SELL",
-      "shares": 13.3016,
-      "price": 93.80000305175781,
-      "total": 1247.6901205932618,
-      "reason": "Weak signal (-0.144)",
-      "gainLossPercent": 2.1897833273585396
     },
     {
       "date": "2026-01-09",
       "symbol": "LEN",
       "action": "SELL",
-      "shares": 5.2081,
+      "shares": 1.1818,
       "price": 119.25,
-      "total": 621.065925,
-      "reason": "Weak signal (-0.167)",
-      "gainLossPercent": 13.853353477343925
-    },
-    {
-      "date": "2026-01-09",
-      "symbol": "GNRC",
-      "action": "SELL",
-      "shares": 0.0956,
-      "price": 152.77999877929688,
-      "total": 14.605767883300782,
-      "reason": "Weak signal (-0.285)",
-      "gainLossPercent": 10.822572249303333
-    },
-    {
-      "date": "2026-01-09",
-      "symbol": "ZS",
-      "action": "SELL",
-      "shares": 4.440892098500626e-16,
-      "price": 216.72999572753906,
-      "total": 9.624745255345027e-14,
-      "reason": "Stop loss at -3.6%",
-      "gainLossPercent": -3.641295797652662
+      "total": 140.92965,
+      "reason": "Weak signal (-0.133)",
+      "gainLossPercent": 16.00194208161641
     },
     {
       "date": "2026-01-09",
       "symbol": "COIN",
       "action": "SELL",
-      "shares": 0.0166,
+      "shares": 0.0016,
       "price": 240.77999877929688,
-      "total": 3.996947979736328,
+      "total": 0.38524799804687504,
       "reason": "Taking profits at 6.5%",
       "gainLossPercent": 6.4738654944555485
     },
     {
       "date": "2026-01-09",
-      "symbol": "GPC",
-      "action": "SELL",
-      "shares": 0.1089,
-      "price": 128.33999633789062,
-      "total": 13.976225601196289,
-      "reason": "Weak signal (-0.018)",
-      "gainLossPercent": 4.375404435162649
-    },
-    {
-      "date": "2026-01-09",
       "symbol": "PAYC",
       "action": "SELL",
-      "shares": 0.4194,
+      "shares": 0.4879,
       "price": 157.1699981689453,
-      "total": 65.91709723205567,
+      "total": 76.68324210662841,
       "reason": "Taking profits at 3.1%",
       "gainLossPercent": 3.129924188645899
     },
@@ -3910,9 +1282,9 @@
       "date": "2026-01-09",
       "symbol": "NOW",
       "action": "SELL",
-      "shares": 0.096,
+      "shares": 0.0551,
       "price": 141.8000030517578,
-      "total": 13.61280029296875,
+      "total": 7.813180168151856,
       "reason": "Stop loss at -3.8%",
       "gainLossPercent": -3.8318033322629583
     },
@@ -3920,29 +1292,29 @@
       "date": "2026-01-09",
       "symbol": "SJM",
       "action": "SELL",
-      "shares": 0.3889,
+      "shares": 0.5797,
       "price": 100.58000183105469,
-      "total": 39.11556271209717,
-      "reason": "Weak signal (-0.028)",
+      "total": 58.3062270614624,
+      "reason": "Weak signal (-0.006)",
       "gainLossPercent": 6.36633293981492
     },
     {
       "date": "2026-01-09",
       "symbol": "CDNS",
       "action": "SELL",
-      "shares": 0.0123,
+      "shares": 0.0143,
       "price": 327.30999755859375,
-      "total": 4.025912969970703,
-      "reason": "Weak signal (-0.130)",
+      "total": 4.680532965087891,
+      "reason": "Weak signal (-0.126)",
       "gainLossPercent": 8.661442212389659
     },
     {
       "date": "2026-01-09",
       "symbol": "AZO",
       "action": "SELL",
-      "shares": 0.0378,
+      "shares": 0.046,
       "price": 3421.169921875,
-      "total": 129.32022304687501,
+      "total": 157.37381640625,
       "reason": "Taking profits at 5.4%",
       "gainLossPercent": 5.431567010694
     },
@@ -3950,19 +1322,29 @@
       "date": "2026-01-09",
       "symbol": "MO",
       "action": "SELL",
-      "shares": 1.4217,
+      "shares": 4.1488,
       "price": 57.529998779296875,
-      "total": 81.79039926452637,
+      "total": 238.68045893554685,
       "reason": "Taking profits at 4.3%",
       "gainLossPercent": 4.296589808630967
     },
     {
       "date": "2026-01-09",
+      "symbol": "ORLY",
+      "action": "SELL",
+      "shares": 1.5746,
+      "price": 93.80000305175781,
+      "total": 147.69748480529785,
+      "reason": "Weak signal (-0.128)",
+      "gainLossPercent": 3.772545287238814
+    },
+    {
+      "date": "2026-01-09",
       "symbol": "CDW",
       "action": "SELL",
-      "shares": 1.4897,
+      "shares": 2.3309,
       "price": 133.49000549316406,
-      "total": 198.8600611831665,
+      "total": 311.1518538040161,
       "reason": "Taking profits at 3.0%",
       "gainLossPercent": 3.049260777948563
     },
@@ -3970,9 +1352,9 @@
       "date": "2026-01-09",
       "symbol": "LW",
       "action": "SELL",
-      "shares": 0.7971,
+      "shares": 2.4494,
       "price": 41.369998931884766,
-      "total": 32.97602614860535,
+      "total": 101.33167538375854,
       "reason": "Taking profits at 2.7%",
       "gainLossPercent": 2.680560912921702
     },
@@ -3980,9 +1362,9 @@
       "date": "2026-01-09",
       "symbol": "CAG",
       "action": "SELL",
-      "shares": 0.3419,
+      "shares": 0.292,
       "price": 16.940000534057617,
-      "total": 5.791786182594299,
+      "total": 4.9464801559448235,
       "reason": "Taking profits at 5.3%",
       "gainLossPercent": 5.348262527561959
     },
@@ -3990,9 +1372,9 @@
       "date": "2026-01-09",
       "symbol": "TFX",
       "action": "SELL",
-      "shares": 1.2539,
+      "shares": 0.6544,
       "price": 112.80999755859375,
-      "total": 141.4524559387207,
+      "total": 73.82286240234374,
       "reason": "Taking profits at 2.5%",
       "gainLossPercent": 2.545218950996763
     },
@@ -4000,119 +1382,79 @@
       "date": "2026-01-09",
       "symbol": "CSGP",
       "action": "BUY",
-      "shares": 21.3493,
+      "shares": 14.653,
       "price": 58.4900016784668,
-      "total": 1248.7205928340911,
-      "reason": "STRONG_BUY: 0.60",
+      "total": 857.053994594574,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-09",
       "symbol": "ADSK",
       "action": "BUY",
-      "shares": 2.9779,
+      "shares": 1.1127,
       "price": 276.0199890136719,
-      "total": 821.9599252838135,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 307.1274417755127,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-09",
       "symbol": "NFLX",
       "action": "BUY",
-      "shares": 3.6472,
+      "shares": 1.2332,
       "price": 89.45999908447266,
-      "total": 326.2785086608887,
-      "reason": "STRONG_BUY: 0.58",
+      "total": 110.32207087097169,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-09",
       "symbol": "AIG",
       "action": "BUY",
-      "shares": 1.6449,
+      "shares": 0.4553,
       "price": 75.43000030517578,
-      "total": 124.07480750198364,
-      "reason": "STRONG_BUY: 0.52",
+      "total": 34.343279138946535,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-09",
-      "symbol": "ADBE",
+      "symbol": "SBAC",
       "action": "BUY",
-      "shares": 0.1526,
-      "price": 333.95001220703125,
-      "total": 50.960771862792974,
-      "reason": "BUY: 0.44",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-09",
-      "symbol": "DPZ",
-      "action": "BUY",
-      "shares": 0.0683,
-      "price": 405.0899963378906,
-      "total": 27.667646749877928,
-      "reason": "BUY: 0.43",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-09",
-      "symbol": "NOW",
-      "action": "BUY",
-      "shares": 0.1097,
-      "price": 141.8000030517578,
-      "total": 15.555460334777832,
-      "reason": "BUY: 0.43",
+      "shares": 0.0859,
+      "price": 181.1999969482422,
+      "total": 15.565079737854004,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-12",
-      "symbol": "DTE",
+      "symbol": "LEN",
       "action": "SELL",
-      "shares": 9.2812,
-      "price": 130.30999755859375,
-      "total": 1209.4331493408204,
-      "reason": "Weak signal (-0.070)",
-      "gainLossPercent": 0.3929079313138205
-    },
-    {
-      "date": "2026-01-12",
-      "symbol": "MKR-USD",
-      "action": "SELL",
-      "shares": 1.1221492485224971e-17,
-      "price": 1302.0528564453125,
-      "total": 1.4610976343966782e-14,
-      "reason": "Stop loss at -2.8%",
-      "gainLossPercent": -2.751143377010944
-    },
-    {
-      "date": "2026-01-12",
-      "symbol": "GNRC",
-      "action": "SELL",
-      "shares": 2.220446049250313e-16,
-      "price": 156.60000610351562,
-      "total": 3.477218648651262e-14,
-      "reason": "Weak signal (-0.284)",
-      "gainLossPercent": 13.593504577249307
+      "shares": 4.440892098500626e-16,
+      "price": 120.9000015258789,
+      "total": 5.369038614849893e-14,
+      "reason": "Weak signal (-0.260)",
+      "gainLossPercent": 17.607001884044784
     },
     {
       "date": "2026-01-12",
       "symbol": "ETN",
       "action": "SELL",
-      "shares": 0.3945,
+      "shares": 0.0864,
       "price": 329.1000061035156,
-      "total": 129.8299524078369,
-      "reason": "Weak signal (-0.071)",
+      "total": 28.43424052734375,
+      "reason": "Weak signal (-0.033)",
       "gainLossPercent": 3.324855110733648
     },
     {
       "date": "2026-01-12",
       "symbol": "COIN",
       "action": "SELL",
-      "shares": 0.0083,
+      "shares": 0.0007,
       "price": 242.97999572753906,
-      "total": 2.0167339645385742,
+      "total": 0.17008599700927735,
       "reason": "Taking profits at 7.4%",
       "gainLossPercent": 7.446712825392125
     },
@@ -4120,9 +1462,9 @@
       "date": "2026-01-12",
       "symbol": "PAYC",
       "action": "SELL",
-      "shares": 0.2097,
+      "shares": 0.2439,
       "price": 158.94000244140625,
-      "total": 33.32971851196289,
+      "total": 38.76546659545899,
       "reason": "Taking profits at 4.3%",
       "gainLossPercent": 4.2913443614466855
     },
@@ -4130,49 +1472,39 @@
       "date": "2026-01-12",
       "symbol": "PGR",
       "action": "SELL",
-      "shares": 0.16,
+      "shares": 0.1055,
       "price": 216.5,
-      "total": 34.64,
+      "total": 22.84075,
       "reason": "Taking profits at 2.1%",
       "gainLossPercent": 2.0648712915502045
     },
     {
       "date": "2026-01-12",
-      "symbol": "CDNS",
-      "action": "SELL",
-      "shares": 3.469446951953614e-18,
-      "price": 325.510009765625,
-      "total": 1.1293397112117388e-15,
-      "reason": "Weak signal (-0.010)",
-      "gainLossPercent": 8.063876384863516
-    },
-    {
-      "date": "2026-01-12",
       "symbol": "AZO",
       "action": "SELL",
-      "shares": 0.0378,
+      "shares": 0.046,
       "price": 3523,
-      "total": 133.1694,
-      "reason": "Weak signal (-0.150)",
+      "total": 162.058,
+      "reason": "Weak signal (-0.129)",
       "gainLossPercent": 8.56970541092176
     },
     {
       "date": "2026-01-12",
       "symbol": "MO",
       "action": "SELL",
-      "shares": 1.4217,
+      "shares": 4.1487,
       "price": 58.540000915527344,
-      "total": 83.22631930160522,
-      "reason": "Weak signal (-0.017)",
+      "total": 242.86490179824827,
+      "reason": "Weak signal (-0.003)",
       "gainLossPercent": 6.127630669806485
     },
     {
       "date": "2026-01-12",
       "symbol": "CDW",
       "action": "SELL",
-      "shares": 0.7448,
+      "shares": 1.1654,
       "price": 133.5,
-      "total": 99.4308,
+      "total": 155.58089999999999,
       "reason": "Taking profits at 3.1%",
       "gainLossPercent": 3.056976161115105
     },
@@ -4180,9 +1512,9 @@
       "date": "2026-01-12",
       "symbol": "LW",
       "action": "SELL",
-      "shares": 0.3985,
+      "shares": 1.2247,
       "price": 41.43000030517578,
-      "total": 16.50985512161255,
+      "total": 50.73932137374877,
       "reason": "Taking profits at 2.8%",
       "gainLossPercent": 2.8294846456781633
     },
@@ -4190,9 +1522,9 @@
       "date": "2026-01-12",
       "symbol": "CAG",
       "action": "SELL",
-      "shares": 0.1709,
+      "shares": 0.146,
       "price": 16.690000534057617,
-      "total": 2.8523210912704466,
+      "total": 2.436740077972412,
       "reason": "Taking profits at 3.8%",
       "gainLossPercent": 3.793536152026125
     },
@@ -4200,9 +1532,9 @@
       "date": "2026-01-12",
       "symbol": "KR",
       "action": "SELL",
-      "shares": 10.3287,
+      "shares": 9.2523,
       "price": 61.11000061035156,
-      "total": 631.1868633041381,
+      "total": 565.4080586471557,
       "reason": "Taking profits at 2.2%",
       "gainLossPercent": 2.207726500437998
     },
@@ -4210,9 +1542,9 @@
       "date": "2026-01-12",
       "symbol": "GDDY",
       "action": "SELL",
-      "shares": 0.3816,
+      "shares": 0.1411,
       "price": 112.23999786376953,
-      "total": 42.83078318481445,
+      "total": 15.83706369857788,
       "reason": "Stop loss at -2.9%",
       "gainLossPercent": -2.9065749608152047
     },
@@ -4220,129 +1552,69 @@
       "date": "2026-01-12",
       "symbol": "SBAC",
       "action": "SELL",
-      "shares": 0.06,
+      "shares": 0.043,
       "price": 185,
-      "total": 11.1,
-      "reason": "Taking profits at 2.0%",
-      "gainLossPercent": 2.007057442323738
-    },
-    {
-      "date": "2026-01-12",
-      "symbol": "DPZ",
-      "action": "SELL",
-      "shares": 0.0342,
-      "price": 415.95001220703125,
-      "total": 14.225490417480469,
-      "reason": "Taking profits at 2.7%",
-      "gainLossPercent": 2.6808896707689
+      "total": 7.954999999999999,
+      "reason": "Taking profits at 2.1%",
+      "gainLossPercent": 2.097131962338411
     },
     {
       "date": "2026-01-12",
       "symbol": "GDDY",
       "action": "BUY",
-      "shares": 11.2326,
+      "shares": 7.4166,
       "price": 112.23999786376953,
-      "total": 1260.7470000045776,
-      "reason": "STRONG_BUY: 0.58",
+      "total": 832.4391681564331,
+      "reason": "STRONG_BUY: 0.64",
+      "gainLossPercent": 0
+    },
+    {
+      "date": "2026-01-12",
+      "symbol": "NOW",
+      "action": "BUY",
+      "shares": 2.1073,
+      "price": 142.63999938964844,
+      "total": 300.58527071380615,
+      "reason": "STRONG_BUY: 0.63",
+      "gainLossPercent": 0
+    },
+    {
+      "date": "2026-01-12",
+      "symbol": "ADBE",
+      "action": "BUY",
+      "shares": 0.288,
+      "price": 327.6499938964844,
+      "total": 94.3631982421875,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-12",
       "symbol": "MKR-USD",
       "action": "BUY",
-      "shares": 0.4265,
+      "shares": 0.0311,
       "price": 1302.0528564453125,
-      "total": 555.3255432739257,
-      "reason": "BUY: 0.46",
+      "total": 40.49384383544922,
+      "reason": "STRONG_BUY: 0.51",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-12",
       "symbol": "DASH",
       "action": "BUY",
-      "shares": 1.3144,
+      "shares": 0.0799,
       "price": 214.8699951171875,
-      "total": 282.42512158203124,
-      "reason": "BUY: 0.44",
+      "total": 17.168112609863282,
+      "reason": "BUY: 0.45",
       "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-12",
-      "symbol": "HPE",
-      "action": "BUY",
-      "shares": 6.7856,
-      "price": 22.100000381469727,
-      "total": 149.96176258850096,
-      "reason": "BUY: 0.41",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-12",
-      "symbol": "PODD",
-      "action": "BUY",
-      "shares": 0.2952,
-      "price": 278.54998779296875,
-      "total": 82.22795639648437,
-      "reason": "BUY: 0.38",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-12",
-      "symbol": "PTC",
-      "action": "BUY",
-      "shares": 0.2955,
-      "price": 171.42999267578125,
-      "total": 50.657562835693355,
-      "reason": "BUY: 0.38",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-12",
-      "symbol": "PYPL",
-      "action": "BUY",
-      "shares": 0.5489,
-      "price": 57.290000915527344,
-      "total": 31.44648150253296,
-      "reason": "BUY: 0.38",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-12",
-      "symbol": "ZS",
-      "action": "BUY",
-      "shares": 0.0877,
-      "price": 216.6300048828125,
-      "total": 18.998451428222655,
-      "reason": "BUY: 0.37",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-13",
-      "symbol": "CMS",
-      "action": "SELL",
-      "shares": 0.461,
-      "price": 70.55999755859375,
-      "total": 32.52815887451172,
-      "reason": "Weak signal (0.006)",
-      "gainLossPercent": 1.1757954114452518
-    },
-    {
-      "date": "2026-01-13",
-      "symbol": "TT",
-      "action": "SELL",
-      "shares": 0.0026,
-      "price": 391.0799865722656,
-      "total": 1.0168079650878905,
-      "reason": "Taking profits at 2.3%",
-      "gainLossPercent": 2.29662544066091
     },
     {
       "date": "2026-01-13",
       "symbol": "SMCI",
       "action": "SELL",
-      "shares": 1.7484,
+      "shares": 0.1738,
       "price": 28.600000381469727,
-      "total": 50.00424066696167,
+      "total": 4.970680066299439,
       "reason": "Stop loss at -3.5%",
       "gainLossPercent": -3.541312818109893
     },
@@ -4350,19 +1622,19 @@
       "date": "2026-01-13",
       "symbol": "COIN",
       "action": "SELL",
-      "shares": 0.0082,
+      "shares": 0.0008,
       "price": 252.69000244140625,
-      "total": 2.0720580200195315,
-      "reason": "Weak signal (-0.019)",
+      "total": 0.20215200195312502,
+      "reason": "Weak signal (-0.004)",
       "gainLossPercent": 11.74051610657833
     },
     {
       "date": "2026-01-13",
       "symbol": "PAYC",
       "action": "SELL",
-      "shares": 0.1049,
+      "shares": 0.122,
       "price": 157.5,
-      "total": 16.521749999999997,
+      "total": 19.215,
       "reason": "Taking profits at 3.3%",
       "gainLossPercent": 3.3464608318683626
     },
@@ -4370,9 +1642,9 @@
       "date": "2026-01-13",
       "symbol": "WDAY",
       "action": "SELL",
-      "shares": 0.4955,
+      "shares": 1.1498,
       "price": 199.5500030517578,
-      "total": 98.87702651214599,
+      "total": 229.44259350891113,
       "reason": "Stop loss at -3.0%",
       "gainLossPercent": -3.0322126624003745
     },
@@ -4380,9 +1652,9 @@
       "date": "2026-01-13",
       "symbol": "PGR",
       "action": "SELL",
-      "shares": 0.16,
+      "shares": 0.1055,
       "price": 205.05999755859375,
-      "total": 32.809599609375,
+      "total": 21.63382974243164,
       "reason": "Stop loss at -3.3%",
       "gainLossPercent": -3.328303658829237
     },
@@ -4390,19 +1662,29 @@
       "date": "2026-01-13",
       "symbol": "CPB",
       "action": "SELL",
-      "shares": 40.4527,
+      "shares": 31.678,
       "price": 26.110000610351562,
-      "total": 1056.2200216903686,
+      "total": 827.1125993347168,
       "reason": "Stop loss at -2.1%",
       "gainLossPercent": -2.099735524336002
     },
     {
       "date": "2026-01-13",
+      "symbol": "AZO",
+      "action": "SELL",
+      "shares": 1.3877787807814457e-17,
+      "price": 3505.75,
+      "total": 4.865205460724553e-14,
+      "reason": "Weak signal (-0.002)",
+      "gainLossPercent": 8.038105235407027
+    },
+    {
+      "date": "2026-01-13",
       "symbol": "PEP",
       "action": "SELL",
-      "shares": 0.1027,
+      "shares": 0.2341,
       "price": 143.47999572753906,
-      "total": 14.735395561218262,
+      "total": 33.588666999816894,
       "reason": "Taking profits at 3.3%",
       "gainLossPercent": 3.252726536620708
     },
@@ -4410,9 +1692,9 @@
       "date": "2026-01-13",
       "symbol": "SWKS",
       "action": "SELL",
-      "shares": 20.7101,
+      "shares": 20.1901,
       "price": 58.5,
-      "total": 1211.54085,
+      "total": 1181.12085,
       "reason": "Stop loss at -2.2%",
       "gainLossPercent": -2.206619360679182
     },
@@ -4420,9 +1702,9 @@
       "date": "2026-01-13",
       "symbol": "CDW",
       "action": "SELL",
-      "shares": 0.3724,
+      "shares": 0.5827,
       "price": 134.60000610351562,
-      "total": 50.12504227294922,
+      "total": 78.43142355651855,
       "reason": "Taking profits at 3.9%",
       "gainLossPercent": 3.90613947787234
     },
@@ -4430,19 +1712,29 @@
       "date": "2026-01-13",
       "symbol": "LW",
       "action": "SELL",
-      "shares": 0.1993,
+      "shares": 0.6124,
       "price": 41.869998931884766,
-      "total": 8.344690787124634,
+      "total": 25.641187345886234,
       "reason": "Taking profits at 3.9%",
       "gainLossPercent": 3.9215636149278597
     },
     {
       "date": "2026-01-13",
+      "symbol": "KHC",
+      "action": "SELL",
+      "shares": 3.1044,
+      "price": 23.510000228881836,
+      "total": 72.98444471054077,
+      "reason": "Taking profits at 2.2%",
+      "gainLossPercent": 2.1729682530485457
+    },
+    {
+      "date": "2026-01-13",
       "symbol": "CAG",
       "action": "SELL",
-      "shares": 0.0855,
+      "shares": 0.073,
       "price": 16.56999969482422,
-      "total": 1.4167349739074708,
+      "total": 1.2096099777221678,
       "reason": "Taking profits at 3.0%",
       "gainLossPercent": 3.0472622726557255
     },
@@ -4450,9 +1742,9 @@
       "date": "2026-01-13",
       "symbol": "KR",
       "action": "SELL",
-      "shares": 5.1644,
+      "shares": 4.6261,
       "price": 61.470001220703125,
-      "total": 317.4556743041992,
+      "total": 284.36637264709475,
       "reason": "Taking profits at 2.8%",
       "gainLossPercent": 2.8098348878591315
     },
@@ -4460,29 +1752,19 @@
       "date": "2026-01-13",
       "symbol": "TFX",
       "action": "SELL",
-      "shares": 1.254,
+      "shares": 0.6544,
       "price": 103.9000015258789,
-      "total": 130.29060191345215,
+      "total": 67.99216099853516,
       "reason": "Stop loss at -5.6%",
       "gainLossPercent": -5.554040988732339
     },
     {
       "date": "2026-01-13",
-      "symbol": "SBAC",
-      "action": "SELL",
-      "shares": 0.03,
-      "price": 188.0399932861328,
-      "total": 5.641199798583984,
-      "reason": "Taking profits at 3.7%",
-      "gainLossPercent": 3.683277819420107
-    },
-    {
-      "date": "2026-01-13",
       "symbol": "CSGP",
       "action": "SELL",
-      "shares": 10.6747,
+      "shares": 7.3265,
       "price": 61.81999969482422,
-      "total": 659.90995074234,
+      "total": 452.9242277641296,
       "reason": "Taking profits at 5.7%",
       "gainLossPercent": 5.693277347918707
     },
@@ -4490,49 +1772,59 @@
       "date": "2026-01-13",
       "symbol": "AIG",
       "action": "SELL",
-      "shares": 1.6449,
+      "shares": 0.4553,
       "price": 72.29000091552734,
-      "total": 118.90982250595093,
+      "total": 32.9136374168396,
       "reason": "Stop loss at -4.2%",
       "gainLossPercent": -4.162799120965905
     },
     {
       "date": "2026-01-13",
-      "symbol": "ADBE",
+      "symbol": "SBAC",
       "action": "SELL",
-      "shares": 0.1526,
-      "price": 309.92999267578125,
-      "total": 47.29531688232422,
-      "reason": "Stop loss at -7.2%",
-      "gainLossPercent": -7.192699102630626
-    },
-    {
-      "date": "2026-01-13",
-      "symbol": "NOW",
-      "action": "SELL",
-      "shares": 0.1097,
-      "price": 138.19000244140625,
-      "total": 15.159443267822267,
-      "reason": "Stop loss at -2.5%",
-      "gainLossPercent": -2.545839585795983
+      "shares": 0.0215,
+      "price": 188.0399932861328,
+      "total": 4.042859855651855,
+      "reason": "Taking profits at 3.8%",
+      "gainLossPercent": 3.774832479629895
     },
     {
       "date": "2026-01-13",
       "symbol": "GDDY",
       "action": "SELL",
-      "shares": 11.2326,
+      "shares": 7.4166,
       "price": 109.27999877929688,
-      "total": 1227.49851428833,
+      "total": 810.4860389465332,
       "reason": "Stop loss at -2.6%",
       "gainLossPercent": -2.6372052216762634
     },
     {
       "date": "2026-01-13",
+      "symbol": "NOW",
+      "action": "SELL",
+      "shares": 2.1073,
+      "price": 138.19000244140625,
+      "total": 291.2077921447754,
+      "reason": "Stop loss at -3.1%",
+      "gainLossPercent": -3.1197398817187105
+    },
+    {
+      "date": "2026-01-13",
+      "symbol": "ADBE",
+      "action": "SELL",
+      "shares": 0.288,
+      "price": 309.92999267578125,
+      "total": 89.259837890625,
+      "reason": "Stop loss at -5.4%",
+      "gainLossPercent": -5.4082104534698905
+    },
+    {
+      "date": "2026-01-13",
       "symbol": "MKR-USD",
       "action": "SELL",
-      "shares": 0.2133,
+      "shares": 0.0156,
       "price": 1402.7164306640625,
-      "total": 299.1994146606445,
+      "total": 21.882376318359373,
       "reason": "Taking profits at 7.7%",
       "gainLossPercent": 7.731143457076542
     },
@@ -4540,129 +1832,109 @@
       "date": "2026-01-13",
       "symbol": "ADBE",
       "action": "BUY",
-      "shares": 4.0726,
+      "shares": 3.9423,
       "price": 309.92999267578125,
-      "total": 1262.2208881713868,
-      "reason": "STRONG_BUY: 0.60",
+      "total": 1221.8370101257324,
+      "reason": "STRONG_BUY: 0.64",
+      "gainLossPercent": 0
+    },
+    {
+      "date": "2026-01-13",
+      "symbol": "PYPL",
+      "action": "BUY",
+      "shares": 21.6025,
+      "price": 56.560001373291016,
+      "total": 1221.837429666519,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-13",
       "symbol": "V",
       "action": "BUY",
-      "shares": 3.8497,
+      "shares": 3.7265,
       "price": 327.8800048828125,
-      "total": 1262.2396547973633,
-      "reason": "STRONG_BUY: 0.59",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-13",
-      "symbol": "WDAY",
-      "action": "BUY",
-      "shares": 6.3254,
-      "price": 199.5500030517578,
-      "total": 1262.2335893035888,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 1221.8448381958008,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-13",
       "symbol": "INTU",
       "action": "BUY",
-      "shares": 1.6013,
+      "shares": 0.9562,
       "price": 605.280029296875,
-      "total": 969.2349109130859,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 578.7687640136719,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-13",
       "symbol": "GDDY",
       "action": "BUY",
-      "shares": 3.5993,
+      "shares": 1.9104,
       "price": 109.27999877929688,
-      "total": 393.33149960632323,
-      "reason": "STRONG_BUY: 0.58",
+      "total": 208.76850966796877,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-13",
       "symbol": "CPB",
       "action": "BUY",
-      "shares": 6.2654,
+      "shares": 2.8992,
       "price": 26.110000610351562,
-      "total": 163.58959782409667,
-      "reason": "STRONG_BUY: 0.58",
+      "total": 75.69811376953125,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-13",
       "symbol": "PGR",
       "action": "BUY",
-      "shares": 0.3308,
+      "shares": 0.1338,
       "price": 205.05999755859375,
-      "total": 67.8338471923828,
-      "reason": "STRONG_BUY: 0.58",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-13",
-      "symbol": "NOW",
-      "action": "BUY",
-      "shares": 0.2043,
-      "price": 138.19000244140625,
-      "total": 28.2322174987793,
-      "reason": "STRONG_BUY: 0.57",
+      "total": 27.437027673339845,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-14",
-      "symbol": "KHC",
+      "symbol": "WDAY",
       "action": "SELL",
       "shares": 2.220446049250313e-16,
-      "price": 24.31999969482422,
-      "total": 5.400124724014126e-15,
-      "reason": "Taking profits at 2.6%",
-      "gainLossPercent": 2.616029164244924
+      "price": 193.99000549316406,
+      "total": 4.307443412913427e-14,
+      "reason": "Stop loss at -5.7%",
+      "gainLossPercent": -5.733994935585575
     },
     {
       "date": "2026-01-14",
-      "symbol": "SMCI",
+      "symbol": "ZS",
       "action": "SELL",
-      "shares": 2.220446049250313e-16,
-      "price": 28.270000457763672,
-      "total": 6.277201082874589e-15,
-      "reason": "Stop loss at -4.7%",
-      "gainLossPercent": -4.654297398048354
-    },
-    {
-      "date": "2026-01-14",
-      "symbol": "COIN",
-      "action": "SELL",
-      "shares": 1.0408340855860843e-17,
-      "price": 255.86000061035156,
-      "total": 2.6630780977333023e-15,
-      "reason": "Weak signal (-0.019)",
-      "gainLossPercent": 13.142301804597759
+      "shares": 0.7732,
+      "price": 214.27000427246094,
+      "total": 165.6735673034668,
+      "reason": "Stop loss at -2.9%",
+      "gainLossPercent": -2.856237404252952
     },
     {
       "date": "2026-01-14",
       "symbol": "PEP",
       "action": "SELL",
-      "shares": 0.1026,
+      "shares": 0.234,
       "price": 145.9199981689453,
-      "total": 14.971391812133788,
-      "reason": "Weak signal (-0.009)",
+      "total": 34.1452795715332,
+      "reason": "Weak signal (-0.002)",
       "gainLossPercent": 5.00862918739595
     },
     {
       "date": "2026-01-14",
       "symbol": "CDW",
       "action": "SELL",
-      "shares": 0.1862,
+      "shares": 0.2914,
       "price": 132.16000366210938,
-      "total": 24.608192681884766,
+      "total": 38.511425067138674,
       "reason": "Taking profits at 2.0%",
       "gainLossPercent": 2.02254941467334
     },
@@ -4670,19 +1942,29 @@
       "date": "2026-01-14",
       "symbol": "LW",
       "action": "SELL",
-      "shares": 0.1993,
+      "shares": 0.3062,
       "price": 43.279998779296875,
-      "total": 8.625703756713868,
-      "reason": "Weak signal (0.011)",
+      "total": 13.252335626220704,
+      "reason": "Taking profits at 7.4%",
       "gainLossPercent": 7.421190855861255
+    },
+    {
+      "date": "2026-01-14",
+      "symbol": "KHC",
+      "action": "SELL",
+      "shares": 1.5522,
+      "price": 24.31999969482422,
+      "total": 37.74950352630615,
+      "reason": "Taking profits at 5.7%",
+      "gainLossPercent": 5.693174502006695
     },
     {
       "date": "2026-01-14",
       "symbol": "CAG",
       "action": "SELL",
-      "shares": 0.0427,
+      "shares": 0.0365,
       "price": 17.1200008392334,
-      "total": 0.7310240358352661,
+      "total": 0.624880030632019,
       "reason": "Taking profits at 6.5%",
       "gainLossPercent": 6.467667415807105
     },
@@ -4690,9 +1972,9 @@
       "date": "2026-01-14",
       "symbol": "KR",
       "action": "SELL",
-      "shares": 2.5822,
+      "shares": 2.3131,
       "price": 62.459999084472656,
-      "total": 161.2842096359253,
+      "total": 144.4762238822937,
       "reason": "Taking profits at 4.5%",
       "gainLossPercent": 4.465626573108011
     },
@@ -4700,9 +1982,9 @@
       "date": "2026-01-14",
       "symbol": "GIS",
       "action": "SELL",
-      "shares": 7.512,
+      "shares": 4.514,
       "price": 45.619998931884766,
-      "total": 342.69743197631834,
+      "total": 205.92867517852784,
       "reason": "Taking profits at 3.9%",
       "gainLossPercent": 3.8706758511239636
     },
@@ -4710,29 +1992,19 @@
       "date": "2026-01-14",
       "symbol": "HPQ",
       "action": "SELL",
-      "shares": 5.3865,
+      "shares": 2.4446,
       "price": 20.770000457763672,
-      "total": 111.87760746574402,
+      "total": 50.77434311904907,
       "reason": "Stop loss at -2.9%",
       "gainLossPercent": -2.8985458138199407
     },
     {
       "date": "2026-01-14",
-      "symbol": "SBAC",
-      "action": "SELL",
-      "shares": 0.03,
-      "price": 192.05999755859375,
-      "total": 5.761799926757813,
-      "reason": "Weak signal (-0.011)",
-      "gainLossPercent": 5.899865963956916
-    },
-    {
-      "date": "2026-01-14",
       "symbol": "CSGP",
       "action": "SELL",
-      "shares": 5.3373,
+      "shares": 3.6633,
       "price": 63.869998931884766,
-      "total": 340.89334529914856,
+      "total": 233.97496708717347,
       "reason": "Taking profits at 9.2%",
       "gainLossPercent": 9.198148570747305
     },
@@ -4740,49 +2012,39 @@
       "date": "2026-01-14",
       "symbol": "ADSK",
       "action": "SELL",
-      "shares": 2.9779,
+      "shares": 1.1127,
       "price": 261.2799987792969,
-      "total": 778.0657083648682,
+      "total": 290.72625464172364,
       "reason": "Stop loss at -5.3%",
       "gainLossPercent": -5.3401894141967
     },
     {
       "date": "2026-01-14",
+      "symbol": "SBAC",
+      "action": "SELL",
+      "shares": 0.0214,
+      "price": 192.05999755859375,
+      "total": 4.110083947753906,
+      "reason": "Weak signal (-0.002)",
+      "gainLossPercent": 5.993377921222374
+    },
+    {
+      "date": "2026-01-14",
       "symbol": "MKR-USD",
       "action": "SELL",
-      "shares": 0.1066,
+      "shares": 0.0078,
       "price": 1422.2432861328125,
-      "total": 151.6111343017578,
+      "total": 11.093497631835938,
       "reason": "Taking profits at 9.2%",
       "gainLossPercent": 9.230841059373546
     },
     {
       "date": "2026-01-14",
-      "symbol": "PTC",
-      "action": "SELL",
-      "shares": 0.2955,
-      "price": 166.52999877929688,
-      "total": 49.20961463928222,
-      "reason": "Stop loss at -2.9%",
-      "gainLossPercent": -2.8583060758519307
-    },
-    {
-      "date": "2026-01-14",
-      "symbol": "WDAY",
-      "action": "SELL",
-      "shares": 6.3254,
-      "price": 193.99000549316406,
-      "total": 1227.06438074646,
-      "reason": "Stop loss at -2.8%",
-      "gainLossPercent": -2.786267839420498
-    },
-    {
-      "date": "2026-01-14",
       "symbol": "INTU",
       "action": "SELL",
-      "shares": 1.6013,
+      "shares": 0.9562,
       "price": 566.5999755859375,
-      "total": 907.2965409057617,
+      "total": 541.7828966552735,
       "reason": "Stop loss at -6.4%",
       "gainLossPercent": -6.390439439389778
     },
@@ -4790,129 +2052,109 @@
       "date": "2026-01-14",
       "symbol": "CPB",
       "action": "SELL",
-      "shares": 3.1327,
+      "shares": 1.4496,
       "price": 26.809999465942383,
-      "total": 83.9876853269577,
+      "total": 38.863775225830075,
       "reason": "Taking profits at 2.7%",
       "gainLossPercent": 2.680960701752335
     },
     {
       "date": "2026-01-14",
-      "symbol": "NOW",
-      "action": "SELL",
-      "shares": 0.2043,
-      "price": 134.61000061035156,
-      "total": 27.500823124694826,
-      "reason": "Stop loss at -2.6%",
-      "gainLossPercent": -2.5906373600164305
-    },
-    {
-      "date": "2026-01-14",
       "symbol": "ADSK",
       "action": "BUY",
-      "shares": 4.841,
+      "shares": 4.4706,
       "price": 261.2799987792969,
-      "total": 1264.8564740905763,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 1168.0783625427246,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-14",
       "symbol": "WDAY",
       "action": "BUY",
-      "shares": 6.5202,
+      "shares": 2.1717,
       "price": 193.99000549316406,
-      "total": 1264.8536338165284,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 421.2880949295044,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-14",
       "symbol": "MSFT",
       "action": "BUY",
-      "shares": 2.2222,
+      "shares": 0.331,
       "price": 459.3800048828125,
-      "total": 1020.8342468505859,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 152.05478161621093,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-14",
       "symbol": "INTU",
       "action": "BUY",
-      "shares": 0.7359,
+      "shares": 0.0969,
       "price": 566.5999755859375,
-      "total": 416.9609220336914,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 54.90353763427734,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-14",
       "symbol": "HPQ",
       "action": "BUY",
-      "shares": 7.9495,
+      "shares": 0.9489,
       "price": 20.770000457763672,
-      "total": 165.1111186389923,
-      "reason": "STRONG_BUY: 0.57",
+      "total": 19.708653434371946,
+      "reason": "STRONG_BUY: 0.63",
       "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-14",
-      "symbol": "NOW",
-      "action": "BUY",
-      "shares": 0.528,
-      "price": 134.61000061035156,
-      "total": 71.07408032226563,
-      "reason": "STRONG_BUY: 0.57",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-14",
-      "symbol": "DDOG",
-      "action": "BUY",
-      "shares": 0.2303,
-      "price": 122.41000366210938,
-      "total": 28.19102384338379,
-      "reason": "STRONG_BUY: 0.52",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-15",
-      "symbol": "PEP",
-      "action": "SELL",
-      "shares": 1.3877787807814457e-17,
-      "price": 146.57000732421875,
-      "total": 2.0340674606353186e-15,
-      "reason": "Weak signal (-0.009)",
-      "gainLossPercent": 5.476396259839947
     },
     {
       "date": "2026-01-15",
       "symbol": "CDW",
       "action": "SELL",
-      "shares": 0.0931,
+      "shares": 0.1457,
       "price": 132.2899932861328,
-      "total": 12.316198374938965,
+      "total": 19.27465202178955,
       "reason": "Taking profits at 2.1%",
       "gainLossPercent": 2.1228965126821464
     },
     {
       "date": "2026-01-15",
+      "symbol": "LW",
+      "action": "SELL",
+      "shares": 0.1531,
+      "price": 43.93000030517578,
+      "total": 6.725683046722413,
+      "reason": "Taking profits at 9.0%",
+      "gainLossPercent": 9.034498155708953
+    },
+    {
+      "date": "2026-01-15",
+      "symbol": "KHC",
+      "action": "SELL",
+      "shares": 0.7761,
+      "price": 24.239999771118164,
+      "total": 18.812663822364808,
+      "reason": "Taking profits at 5.3%",
+      "gainLossPercent": 5.345499913087569
+    },
+    {
+      "date": "2026-01-15",
       "symbol": "CAG",
       "action": "SELL",
-      "shares": 0.0427,
+      "shares": 0.0364,
       "price": 17.3700008392334,
-      "total": 0.7416990358352662,
-      "reason": "Weak signal (-0.030)",
+      "total": 0.6322680305480958,
+      "reason": "Weak signal (-0.006)",
       "gainLossPercent": 8.022393791342939
     },
     {
       "date": "2026-01-15",
       "symbol": "KR",
       "action": "SELL",
-      "shares": 1.2911,
+      "shares": 1.1565,
       "price": 62.4900016784668,
-      "total": 80.68084116706848,
+      "total": 72.26968694114686,
       "reason": "Taking profits at 4.5%",
       "gainLossPercent": 4.515806525499263
     },
@@ -4920,9 +2162,9 @@
       "date": "2026-01-15",
       "symbol": "GIS",
       "action": "SELL",
-      "shares": 3.756,
+      "shares": 2.257,
       "price": 45.599998474121094,
-      "total": 171.27359426879883,
+      "total": 102.91919655609131,
       "reason": "Taking profits at 3.8%",
       "gainLossPercent": 3.8251374663391164
     },
@@ -4930,19 +2172,29 @@
       "date": "2026-01-15",
       "symbol": "CSGP",
       "action": "SELL",
-      "shares": 2.6687,
+      "shares": 1.8316,
       "price": 63.380001068115234,
-      "total": 169.1422088504791,
+      "total": 116.08680995635986,
       "reason": "Taking profits at 8.4%",
       "gainLossPercent": 8.360402204345807
     },
     {
       "date": "2026-01-15",
+      "symbol": "SBAC",
+      "action": "SELL",
+      "shares": 1.0408340855860843e-17,
+      "price": 191.99000549316406,
+      "total": 1.998297418091447e-15,
+      "reason": "Weak signal (-0.002)",
+      "gainLossPercent": 5.9547509528953935
+    },
+    {
+      "date": "2026-01-15",
       "symbol": "MKR-USD",
       "action": "SELL",
-      "shares": 0.0533,
+      "shares": 0.0039,
       "price": 1405.9912109375,
-      "total": 74.93933154296874,
+      "total": 5.4833657226562496,
       "reason": "Taking profits at 8.0%",
       "gainLossPercent": 7.982652468959352
     },
@@ -4950,39 +2202,19 @@
       "date": "2026-01-15",
       "symbol": "DASH",
       "action": "SELL",
-      "shares": 1.3144,
+      "shares": 0.0799,
       "price": 210.11000061035156,
-      "total": 276.1685848022461,
+      "total": 16.787789048767088,
       "reason": "Stop loss at -2.2%",
       "gainLossPercent": -2.2152904616765565
     },
     {
       "date": "2026-01-15",
-      "symbol": "PODD",
-      "action": "SELL",
-      "shares": 0.1476,
-      "price": 286.489990234375,
-      "total": 42.285922558593754,
-      "reason": "Taking profits at 2.9%",
-      "gainLossPercent": 2.8504766790037084
-    },
-    {
-      "date": "2026-01-15",
-      "symbol": "ZS",
-      "action": "SELL",
-      "shares": 0.0877,
-      "price": 210.5800018310547,
-      "total": 18.467866160583498,
-      "reason": "Stop loss at -2.8%",
-      "gainLossPercent": -2.7927816624620414
-    },
-    {
-      "date": "2026-01-15",
       "symbol": "CPB",
       "action": "SELL",
-      "shares": 1.5664,
+      "shares": 0.7248,
       "price": 26.899999618530273,
-      "total": 42.13615940246582,
+      "total": 19.497119723510743,
       "reason": "Taking profits at 3.0%",
       "gainLossPercent": 3.0256567970569415
     },
@@ -4990,119 +2222,99 @@
       "date": "2026-01-15",
       "symbol": "INTU",
       "action": "SELL",
-      "shares": 0.7359,
+      "shares": 0.0969,
       "price": 554.5800170898438,
-      "total": 408.115434576416,
+      "total": 53.73880365600586,
       "reason": "Stop loss at -2.1%",
       "gainLossPercent": -2.121418816452218
     },
     {
       "date": "2026-01-15",
-      "symbol": "NOW",
-      "action": "SELL",
-      "shares": 0.528,
-      "price": 131.1699981689453,
-      "total": 69.25775903320313,
-      "reason": "Stop loss at -2.6%",
-      "gainLossPercent": -2.5555325947615457
-    },
-    {
-      "date": "2026-01-15",
       "symbol": "BSX",
       "action": "BUY",
-      "shares": 9.2818,
+      "shares": 3.1569,
       "price": 90.02999877929688,
-      "total": 835.6404426696778,
-      "reason": "STRONG_BUY: 0.60",
+      "total": 284.2157031463623,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-15",
       "symbol": "INTU",
       "action": "BUY",
-      "shares": 0.5908,
+      "shares": 0.1835,
       "price": 554.5800170898438,
-      "total": 327.6458740966797,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 101.76543313598633,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-15",
       "symbol": "ZS",
       "action": "BUY",
-      "shares": 0.6333,
+      "shares": 0.1744,
       "price": 210.5800018310547,
-      "total": 133.36031515960693,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 36.72515231933594,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-15",
-      "symbol": "TFX",
-      "action": "BUY",
-      "shares": 0.5219,
-      "price": 104.61000061035156,
-      "total": 54.595959318542484,
-      "reason": "STRONG_BUY: 0.58",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-15",
-      "symbol": "NOW",
-      "action": "BUY",
-      "shares": 0.1735,
-      "price": 131.1699981689453,
-      "total": 22.75799468231201,
-      "reason": "STRONG_BUY: 0.57",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-16",
-      "symbol": "USDMXN=X",
-      "action": "SELL",
-      "shares": 15.0497,
-      "price": 17.65329933166504,
-      "total": 265.67685895175936,
-      "reason": "Stop loss at -2.1%",
-      "gainLossPercent": -2.0976610265588573
-    },
-    {
-      "date": "2026-01-16",
-      "symbol": "MTCH",
-      "action": "SELL",
-      "shares": 1.592,
-      "price": 31.334999084472656,
-      "total": 49.88531854248047,
-      "reason": "Stop loss at -2.6%",
-      "gainLossPercent": -2.5653008919583073
     },
     {
       "date": "2026-01-16",
       "symbol": "PAYC",
       "action": "SELL",
-      "shares": 0.1048,
+      "shares": 0.1219,
       "price": 148.41000366210938,
-      "total": 15.553368383789064,
+      "total": 18.091179446411132,
       "reason": "Stop loss at -2.6%",
       "gainLossPercent": -2.6181039331833222
     },
     {
       "date": "2026-01-16",
+      "symbol": "LW",
+      "action": "SELL",
+      "shares": 0.0765,
+      "price": 43.33000183105469,
+      "total": 3.3147451400756833,
+      "reason": "Taking profits at 7.5%",
+      "gainLossPercent": 7.545298700541253
+    },
+    {
+      "date": "2026-01-16",
+      "symbol": "KHC",
+      "action": "SELL",
+      "shares": 0.388,
+      "price": 23.530000686645508,
+      "total": 9.129640266418457,
+      "reason": "Taking profits at 2.3%",
+      "gainLossPercent": 2.25988897258234
+    },
+    {
+      "date": "2026-01-16",
+      "symbol": "CAG",
+      "action": "SELL",
+      "shares": 6.938893903907228e-18,
+      "price": 16.959999084472656,
+      "total": 1.176836342575195e-16,
+      "reason": "Taking profits at 5.5%",
+      "gainLossPercent": 5.472631622772936
+    },
+    {
+      "date": "2026-01-16",
       "symbol": "KR",
       "action": "SELL",
-      "shares": 1.291,
+      "shares": 1.1565,
       "price": 63.189998626708984,
-      "total": 81.57828822708129,
-      "reason": "Weak signal (0.004)",
+      "total": 73.07923341178895,
+      "reason": "Weak signal (0.001)",
       "gainLossPercent": 5.686565745307871
     },
     {
       "date": "2026-01-16",
       "symbol": "CSGP",
       "action": "SELL",
-      "shares": 1.3343,
+      "shares": 0.9158,
       "price": 65.33999633789062,
-      "total": 87.18315711364747,
+      "total": 59.838368646240234,
       "reason": "Taking profits at 11.7%",
       "gainLossPercent": 11.711394191916508
     },
@@ -5110,39 +2322,19 @@
       "date": "2026-01-16",
       "symbol": "MKR-USD",
       "action": "SELL",
-      "shares": 0.0533,
+      "shares": 0.0038,
       "price": 1525.5980224609375,
-      "total": 81.31437459716797,
-      "reason": "Weak signal (0.009)",
+      "total": 5.797272485351563,
+      "reason": "Weak signal (0.002)",
       "gainLossPercent": 17.16867060419633
-    },
-    {
-      "date": "2026-01-16",
-      "symbol": "HPE",
-      "action": "SELL",
-      "shares": 6.7856,
-      "price": 21.440000534057617,
-      "total": 145.48326762390136,
-      "reason": "Stop loss at -3.0%",
-      "gainLossPercent": -2.9864245973746772
-    },
-    {
-      "date": "2026-01-16",
-      "symbol": "PODD",
-      "action": "SELL",
-      "shares": 0.0738,
-      "price": 287.70001220703125,
-      "total": 21.232260900878906,
-      "reason": "Taking profits at 3.3%",
-      "gainLossPercent": 3.2848769754257616
     },
     {
       "date": "2026-01-16",
       "symbol": "ADBE",
       "action": "SELL",
-      "shares": 4.0726,
+      "shares": 3.9423,
       "price": 296.1199951171875,
-      "total": 1205.978292114258,
+      "total": 1167.3938567504883,
       "reason": "Stop loss at -4.5%",
       "gainLossPercent": -4.455844185767601
     },
@@ -5150,9 +2342,9 @@
       "date": "2026-01-16",
       "symbol": "GDDY",
       "action": "SELL",
-      "shares": 3.5993,
+      "shares": 1.9104,
       "price": 104.45999908447266,
-      "total": 375.9828747047424,
+      "total": 199.56038225097657,
       "reason": "Stop loss at -4.4%",
       "gainLossPercent": -4.4106879105651755
     },
@@ -5160,119 +2352,79 @@
       "date": "2026-01-16",
       "symbol": "WDAY",
       "action": "SELL",
-      "shares": 6.5202,
+      "shares": 2.1717,
       "price": 186.86000061035156,
-      "total": 1218.3645759796143,
+      "total": 405.80386332550046,
       "reason": "Stop loss at -3.7%",
       "gainLossPercent": -3.675449600966041
     },
     {
       "date": "2026-01-16",
-      "symbol": "DDOG",
-      "action": "SELL",
-      "shares": 0.2303,
-      "price": 119.0199966430664,
-      "total": 27.410305226898195,
-      "reason": "Stop loss at -2.8%",
-      "gainLossPercent": -2.7693872376643895
-    },
-    {
-      "date": "2026-01-16",
       "symbol": "BSX",
       "action": "SELL",
-      "shares": 9.2818,
+      "shares": 3.1569,
       "price": 88.06999969482422,
-      "total": 817.4481231674195,
+      "total": 278.0281820365906,
       "reason": "Stop loss at -2.2%",
       "gainLossPercent": -2.177051106351202
     },
     {
       "date": "2026-01-16",
-      "symbol": "NOW",
-      "action": "SELL",
-      "shares": 0.1735,
-      "price": 127.30999755859375,
-      "total": 22.088284576416015,
-      "reason": "Stop loss at -2.9%",
-      "gainLossPercent": -2.9427465611304884
-    },
-    {
-      "date": "2026-01-16",
       "symbol": "ADBE",
       "action": "BUY",
-      "shares": 4.2104,
+      "shares": 4.0976,
       "price": 296.1199951171875,
-      "total": 1246.7836274414062,
-      "reason": "STRONG_BUY: 0.60",
+      "total": 1213.3812919921875,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-16",
       "symbol": "WDAY",
       "action": "BUY",
-      "shares": 6.6723,
+      "shares": 3.5138,
       "price": 186.86000061035156,
-      "total": 1246.7859820724486,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 656.5886701446533,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-16",
       "symbol": "TRMB",
       "action": "BUY",
-      "shares": 15.5324,
+      "shares": 3.2079,
       "price": 73.88999938964844,
-      "total": 1147.6890265197756,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 237.03172904205323,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-16",
       "symbol": "GDDY",
       "action": "BUY",
-      "shares": 4.4177,
+      "shares": 0.8169,
       "price": 104.45999908447266,
-      "total": 461.47293795547483,
-      "reason": "STRONG_BUY: 0.58",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-16",
-      "symbol": "USDMXN=X",
-      "action": "BUY",
-      "shares": 10.8661,
-      "price": 17.65329933166504,
-      "total": 191.82251586780546,
-      "reason": "STRONG_BUY: 0.58",
+      "total": 85.3333732521057,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-16",
       "symbol": "TMUS",
       "action": "BUY",
-      "shares": 0.4301,
+      "shares": 0.166,
       "price": 186.32000732421875,
-      "total": 80.13623515014648,
-      "reason": "STRONG_BUY: 0.58",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-16",
-      "symbol": "CRM",
-      "action": "BUY",
-      "shares": 0.1463,
-      "price": 227.11000061035156,
-      "total": 33.22619308929443,
-      "reason": "STRONG_BUY: 0.58",
+      "total": 30.929121215820313,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-20",
       "symbol": "PAYC",
       "action": "SELL",
-      "shares": 2.220446049250313e-16,
+      "shares": 2.3592239273284576e-16,
       "price": 147.47999572753906,
-      "total": 3.2747137385666716e-14,
+      "total": 3.4793833472270886e-14,
       "reason": "Stop loss at -3.2%",
       "gainLossPercent": -3.2283453845064813
     },
@@ -5280,29 +2432,39 @@
       "date": "2026-01-20",
       "symbol": "CDW",
       "action": "SELL",
-      "shares": 0.0931,
+      "shares": 0.1457,
       "price": 124.76000213623047,
-      "total": 11.615156198883057,
+      "total": 18.17753231124878,
       "reason": "Stop loss at -3.7%",
       "gainLossPercent": -3.6899732882833485
     },
     {
       "date": "2026-01-20",
-      "symbol": "KR",
+      "symbol": "LW",
       "action": "SELL",
-      "shares": 2.220446049250313e-16,
-      "price": 63.150001525878906,
-      "total": 1.4022117139828906e-14,
-      "reason": "Weak signal (0.005)",
-      "gainLossPercent": 5.619669775718263
+      "shares": 0.0765,
+      "price": 43.5099983215332,
+      "total": 3.32851487159729,
+      "reason": "Weak signal (-0.032)",
+      "gainLossPercent": 7.992050962612181
+    },
+    {
+      "date": "2026-01-20",
+      "symbol": "KHC",
+      "action": "SELL",
+      "shares": 0.194,
+      "price": 23.760000228881836,
+      "total": 4.609440044403076,
+      "reason": "Taking profits at 3.3%",
+      "gainLossPercent": 3.2594523795728185
     },
     {
       "date": "2026-01-20",
       "symbol": "CSGP",
       "action": "SELL",
-      "shares": 0.6672,
+      "shares": 0.4579,
       "price": 63.81999969482422,
-      "total": 42.58070379638672,
+      "total": 29.22317786026001,
       "reason": "Taking profits at 9.1%",
       "gainLossPercent": 9.112665179354355
     },
@@ -5310,49 +2472,39 @@
       "date": "2026-01-20",
       "symbol": "NFLX",
       "action": "SELL",
-      "shares": 3.6472,
+      "shares": 1.2332,
       "price": 87.26000213623047,
-      "total": 318.2546797912598,
+      "total": 107.60903463439942,
       "reason": "Stop loss at -2.5%",
       "gainLossPercent": -2.4591962561556024
     },
     {
       "date": "2026-01-20",
-      "symbol": "DPZ",
+      "symbol": "MKR-USD",
       "action": "SELL",
-      "shares": 0.0341,
-      "price": 387.6400146484375,
-      "total": 13.218524499511718,
-      "reason": "Stop loss at -4.3%",
-      "gainLossPercent": -4.307680230863533
-    },
-    {
-      "date": "2026-01-20",
-      "symbol": "PODD",
-      "action": "SELL",
-      "shares": 0.0369,
-      "price": 284.25,
-      "total": 10.488825,
-      "reason": "Taking profits at 2.0%",
-      "gainLossPercent": 2.046315726736905
+      "shares": 4.336808689942018e-19,
+      "price": 1476.564208984375,
+      "total": 6.403576492780799e-16,
+      "reason": "Taking profits at 13.4%",
+      "gainLossPercent": 13.402785583950076
     },
     {
       "date": "2026-01-20",
       "symbol": "PYPL",
       "action": "SELL",
-      "shares": 0.5489,
+      "shares": 21.6025,
       "price": 55.08000183105469,
-      "total": 30.23341300506592,
-      "reason": "Stop loss at -3.9%",
-      "gainLossPercent": -3.85756510587466
+      "total": 1189.865739555359,
+      "reason": "Stop loss at -2.6%",
+      "gainLossPercent": -2.61668936757703
     },
     {
       "date": "2026-01-20",
       "symbol": "ADSK",
       "action": "SELL",
-      "shares": 4.841,
+      "shares": 4.4706,
       "price": 253.8699951171875,
-      "total": 1228.9846463623048,
+      "total": 1134.9512001708986,
       "reason": "Stop loss at -2.8%",
       "gainLossPercent": -2.8360393817854397
     },
@@ -5360,9 +2512,9 @@
       "date": "2026-01-20",
       "symbol": "HPQ",
       "action": "SELL",
-      "shares": 7.9495,
+      "shares": 0.9489,
       "price": 19.799999237060547,
-      "total": 157.40009393501282,
+      "total": 18.788219276046753,
       "reason": "Stop loss at -4.7%",
       "gainLossPercent": -4.6702031744084325
     },
@@ -5370,9 +2522,9 @@
       "date": "2026-01-20",
       "symbol": "INTU",
       "action": "SELL",
-      "shares": 0.5908,
+      "shares": 0.1835,
       "price": 528.9500122070312,
-      "total": 312.50366721191403,
+      "total": 97.06232723999024,
       "reason": "Stop loss at -4.6%",
       "gainLossPercent": -4.6215161190455145
     },
@@ -5380,29 +2532,19 @@
       "date": "2026-01-20",
       "symbol": "ZS",
       "action": "SELL",
-      "shares": 0.6333,
+      "shares": 0.1744,
       "price": 206.32000732421875,
-      "total": 130.66246063842772,
+      "total": 35.98220927734375,
       "reason": "Stop loss at -2.0%",
       "gainLossPercent": -2.022981512866388
     },
     {
       "date": "2026-01-20",
-      "symbol": "TFX",
-      "action": "SELL",
-      "shares": 0.5219,
-      "price": 100.33999633789062,
-      "total": 52.36744408874512,
-      "reason": "Stop loss at -4.1%",
-      "gainLossPercent": -4.08183180149834
-    },
-    {
-      "date": "2026-01-20",
       "symbol": "WDAY",
       "action": "SELL",
-      "shares": 6.6723,
+      "shares": 3.5138,
       "price": 182.99000549316406,
-      "total": 1220.9642136520386,
+      "total": 642.9902813018798,
       "reason": "Stop loss at -2.1%",
       "gainLossPercent": -2.0710666298548177
     },
@@ -5410,149 +2552,109 @@
       "date": "2026-01-20",
       "symbol": "TRMB",
       "action": "SELL",
-      "shares": 15.5324,
+      "shares": 3.2079,
       "price": 69.58999633789062,
-      "total": 1080.8996591186524,
+      "total": 223.23774925231933,
       "reason": "Stop loss at -5.8%",
       "gainLossPercent": -5.819465539690095
     },
     {
       "date": "2026-01-20",
-      "symbol": "CRM",
-      "action": "SELL",
-      "shares": 0.1463,
-      "price": 220.07000732421875,
-      "total": 32.196242071533206,
-      "reason": "Stop loss at -3.1%",
-      "gainLossPercent": -3.0998165061921683
-    },
-    {
-      "date": "2026-01-20",
       "symbol": "PTC",
       "action": "BUY",
-      "shares": 7.6775,
+      "shares": 7.5008,
       "price": 161.11000061035156,
-      "total": 1236.9220296859742,
-      "reason": "STRONG_BUY: 0.60",
+      "total": 1208.453892578125,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-20",
       "symbol": "PYPL",
       "action": "BUY",
-      "shares": 22.4567,
+      "shares": 21.94,
       "price": 55.08000183105469,
-      "total": 1236.9150771194459,
-      "reason": "STRONG_BUY: 0.60",
+      "total": 1208.45524017334,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-20",
       "symbol": "DELL",
       "action": "BUY",
-      "shares": 11.1364,
+      "shares": 6.3702,
       "price": 111.06999969482422,
-      "total": 1236.9199446014404,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 707.5381120559692,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-20",
       "symbol": "CDW",
       "action": "BUY",
-      "shares": 4.5408,
+      "shares": 2.0441,
       "price": 124.76000213623047,
-      "total": 566.5102177001953,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 255.02192036666867,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-20",
       "symbol": "WDAY",
       "action": "BUY",
-      "shares": 1.2615,
+      "shares": 0.5029,
       "price": 182.99000549316406,
-      "total": 230.84189192962648,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 92.02567376251221,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-20",
       "symbol": "TRMB",
       "action": "BUY",
-      "shares": 1.3517,
+      "shares": 0.4774,
       "price": 69.58999633789062,
-      "total": 94.06479804992675,
-      "reason": "STRONG_BUY: 0.59",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-20",
-      "symbol": "DPZ",
-      "action": "BUY",
-      "shares": 0.0984,
-      "price": 387.6400146484375,
-      "total": 38.14377744140625,
-      "reason": "STRONG_BUY: 0.59",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-20",
-      "symbol": "MA",
-      "action": "BUY",
-      "shares": 0.0293,
-      "price": 531.739990234375,
-      "total": 15.579981713867188,
-      "reason": "STRONG_BUY: 0.59",
+      "total": 33.222264251708985,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-21",
-      "symbol": "TT",
+      "symbol": "LW",
       "action": "SELL",
-      "shares": 0.0026,
-      "price": 395.3299865722656,
-      "total": 1.0278579650878905,
-      "reason": "Weak signal (-0.020)",
-      "gainLossPercent": 3.4083178643346326
+      "shares": 6.938893903907228e-16,
+      "price": 44.31999969482422,
+      "total": 3.07531775703586e-14,
+      "reason": "Weak signal (-0.032)",
+      "gainLossPercent": 10.002478748377879
     },
     {
       "date": "2026-01-21",
-      "symbol": "ARB-USD",
+      "symbol": "KHC",
       "action": "SELL",
-      "shares": 349448.4431,
-      "price": 0.0008989999769255519,
-      "total": 314.15414228357,
-      "reason": "Weak signal (-0.048)",
-      "gainLossPercent": 0
+      "shares": 0.194,
+      "price": 22.399999618530273,
+      "total": 4.345599925994873,
+      "reason": "Stop loss at -2.7%",
+      "gainLossPercent": -2.651023921268363
     },
     {
       "date": "2026-01-21",
       "symbol": "CSGP",
       "action": "SELL",
-      "shares": 0.3336,
+      "shares": 0.229,
       "price": 64.7699966430664,
-      "total": 21.607270880126954,
+      "total": 14.832329231262207,
       "reason": "Taking profits at 10.7%",
       "gainLossPercent": 10.736869181714525
     },
     {
       "date": "2026-01-21",
-      "symbol": "PODD",
-      "action": "SELL",
-      "shares": 0.0185,
-      "price": 284.9599914550781,
-      "total": 5.271759841918945,
-      "reason": "Taking profits at 2.3%",
-      "gainLossPercent": 2.301204072165886
-    },
-    {
-      "date": "2026-01-21",
       "symbol": "MSFT",
       "action": "SELL",
-      "shares": 2.2222,
+      "shares": 0.331,
       "price": 444.1099853515625,
-      "total": 986.9012094482422,
+      "total": 147.0004051513672,
       "reason": "Stop loss at -3.3%",
       "gainLossPercent": -3.324049668889131
     },
@@ -5560,89 +2662,69 @@
       "date": "2026-01-21",
       "symbol": "CDW",
       "action": "SELL",
-      "shares": 2.2704,
+      "shares": 1.022,
       "price": 127.62000274658203,
-      "total": 289.74845423583986,
+      "total": 130.42764280700683,
       "reason": "Taking profits at 2.3%",
       "gainLossPercent": 2.2924018606769603
     },
     {
       "date": "2026-01-21",
-      "symbol": "DPZ",
-      "action": "SELL",
-      "shares": 0.0492,
-      "price": 398.9200134277344,
-      "total": 19.626864660644532,
-      "reason": "Taking profits at 2.9%",
-      "gainLossPercent": 2.909915992425872
+      "symbol": "MSFT",
+      "action": "BUY",
+      "shares": 0.4537,
+      "price": 444.1099853515625,
+      "total": 201.49270035400392,
+      "reason": "STRONG_BUY: 0.64",
+      "gainLossPercent": 0
     },
     {
       "date": "2026-01-21",
-      "symbol": "MSFT",
+      "symbol": "MA",
       "action": "BUY",
-      "shares": 2.1962,
-      "price": 444.1099853515625,
-      "total": 975.3543498291016,
-      "reason": "STRONG_BUY: 0.59",
+      "shares": 0.1377,
+      "price": 527.5700073242188,
+      "total": 72.64639000854491,
+      "reason": "STRONG_BUY: 0.64",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-21",
       "symbol": "HPQ",
       "action": "BUY",
-      "shares": 19.6602,
+      "shares": 1.3394,
       "price": 19.530000686645508,
-      "total": 383.963719499588,
-      "reason": "STRONG_BUY: 0.57",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-21",
-      "symbol": "AON",
-      "action": "BUY",
-      "shares": 0.4933,
-      "price": 332.760009765625,
-      "total": 164.1505128173828,
-      "reason": "STRONG_BUY: 0.57",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-21",
-      "symbol": "AIG",
-      "action": "BUY",
-      "shares": 0.9106,
-      "price": 71.88999938964844,
-      "total": 65.46303344421386,
-      "reason": "STRONG_BUY: 0.52",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-21",
-      "symbol": "ALL",
-      "action": "BUY",
-      "shares": 0.1619,
-      "price": 193.66000366210938,
-      "total": 31.353554592895506,
-      "reason": "STRONG_BUY: 0.52",
+      "total": 26.158482919692993,
+      "reason": "STRONG_BUY: 0.63",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-22",
-      "symbol": "TT",
+      "symbol": "USDZAR=X",
       "action": "SELL",
-      "shares": 3.469446951953614e-18,
-      "price": 390.1300048828125,
-      "total": 1.3535353563063224e-15,
-      "reason": "Taking profits at 2.0%",
-      "gainLossPercent": 2.0481342767094275
+      "shares": 72.1709,
+      "price": 16.262710571289062,
+      "total": 1173.6944583694458,
+      "reason": "Stop loss at -2.2%",
+      "gainLossPercent": -2.1921226653555785
+    },
+    {
+      "date": "2026-01-22",
+      "symbol": "USDMXN=X",
+      "action": "SELL",
+      "shares": 1.2252,
+      "price": 17.482500076293945,
+      "total": 21.419559093475343,
+      "reason": "Stop loss at -2.3%",
+      "gainLossPercent": -2.3130804242910425
     },
     {
       "date": "2026-01-22",
       "symbol": "CSGP",
       "action": "SELL",
-      "shares": 0.1668,
+      "shares": 0.1145,
       "price": 66.26000213623047,
-      "total": 11.052168356323243,
+      "total": 7.586770244598389,
       "reason": "Taking profits at 13.3%",
       "gainLossPercent": 13.284322507763257
     },
@@ -5650,9 +2732,9 @@
       "date": "2026-01-22",
       "symbol": "PTC",
       "action": "SELL",
-      "shares": 3.8388,
+      "shares": 3.7504,
       "price": 164.7100067138672,
-      "total": 632.2887737731934,
+      "total": 617.7284091796874,
       "reason": "Taking profits at 2.2%",
       "gainLossPercent": 2.234501948902804
     },
@@ -5660,9 +2742,9 @@
       "date": "2026-01-22",
       "symbol": "PYPL",
       "action": "SELL",
-      "shares": 11.2284,
+      "shares": 10.97,
       "price": 57.150001525878906,
-      "total": 641.7030771331788,
+      "total": 626.9355167388917,
       "reason": "Taking profits at 3.8%",
       "gainLossPercent": 3.758169255646486
     },
@@ -5670,9 +2752,9 @@
       "date": "2026-01-22",
       "symbol": "DELL",
       "action": "SELL",
-      "shares": 5.5682,
+      "shares": 3.1851,
       "price": 117.16999816894531,
-      "total": 652.4259838043213,
+      "total": 373.1981611679077,
       "reason": "Taking profits at 5.5%",
       "gainLossPercent": 5.492030693149762
     },
@@ -5680,9 +2762,9 @@
       "date": "2026-01-22",
       "symbol": "CDW",
       "action": "SELL",
-      "shares": 1.1352,
+      "shares": 0.511,
       "price": 129.30999755859375,
-      "total": 146.79270922851563,
+      "total": 66.07740875244141,
       "reason": "Taking profits at 3.6%",
       "gainLossPercent": 3.6469985127083904
     },
@@ -5690,9 +2772,9 @@
       "date": "2026-01-22",
       "symbol": "WDAY",
       "action": "SELL",
-      "shares": 0.6308,
+      "shares": 0.2515,
       "price": 188.17999267578125,
-      "total": 118.70393937988281,
+      "total": 47.32726815795898,
       "reason": "Taking profits at 2.8%",
       "gainLossPercent": 2.836213468943291
     },
@@ -5700,129 +2782,99 @@
       "date": "2026-01-22",
       "symbol": "TRMB",
       "action": "SELL",
-      "shares": 0.6758,
+      "shares": 0.2387,
       "price": 71.4800033569336,
-      "total": 48.30618626861572,
+      "total": 17.062276801300047,
       "reason": "Taking profits at 2.7%",
       "gainLossPercent": 2.715917687171785
     },
     {
       "date": "2026-01-22",
-      "symbol": "DPZ",
-      "action": "SELL",
-      "shares": 0.0246,
-      "price": 405.3299865722656,
-      "total": 9.971117669677735,
-      "reason": "Taking profits at 4.6%",
-      "gainLossPercent": 4.563505122109671
+      "symbol": "USDMXN=X",
+      "action": "BUY",
+      "shares": 68.3784,
+      "price": 17.482500076293945,
+      "total": 1195.4253832168579,
+      "reason": "STRONG_BUY: 0.63",
+      "gainLossPercent": 0
     },
     {
       "date": "2026-01-22",
       "symbol": "BSX",
       "action": "BUY",
-      "shares": 13.1261,
+      "shares": 10.5678,
       "price": 91.29000091552734,
-      "total": 1198.2816810173033,
-      "reason": "STRONG_BUY: 0.52",
+      "total": 964.7344716751098,
+      "reason": "STRONG_BUY: 0.54",
+      "gainLossPercent": 0
+    },
+    {
+      "date": "2026-01-22",
+      "symbol": "AIG",
+      "action": "BUY",
+      "shares": 6.0658,
+      "price": 72.30999755859375,
+      "total": 438.617983190918,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-22",
       "symbol": "ADSK",
       "action": "BUY",
-      "shares": 2.0871,
+      "shares": 0.7398,
       "price": 269.7699890136719,
-      "total": 563.0369440704345,
-      "reason": "STRONG_BUY: 0.52",
+      "total": 199.57583787231445,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-22",
       "symbol": "FIS",
       "action": "BUY",
-      "shares": 4.3396,
+      "shares": 1.4798,
       "price": 61.29999923706055,
-      "total": 266.01747668914794,
-      "reason": "STRONG_BUY: 0.50",
+      "total": 90.7117388710022,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-22",
       "symbol": "LTC-USD",
       "action": "BUY",
-      "shares": 1.8951,
+      "shares": 0.6088,
       "price": 68.12567138671875,
-      "total": 129.1049598449707,
-      "reason": "BUY: 0.49",
+      "total": 41.474908740234376,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-22",
       "symbol": "GEN",
       "action": "BUY",
-      "shares": 2.5968,
+      "shares": 0.7586,
       "price": 25.219999313354492,
-      "total": 65.49129421691894,
-      "reason": "BUY: 0.49",
+      "total": 19.13189147911072,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-22",
-      "symbol": "CEG",
-      "action": "BUY",
-      "shares": 0.1095,
-      "price": 287.3500061035156,
-      "total": 31.46482566833496,
-      "reason": "BUY: 0.46",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-22",
-      "symbol": "INTU",
-      "action": "BUY",
-      "shares": 0.0303,
-      "price": 547.6900024414062,
-      "total": 16.59500707397461,
-      "reason": "BUY: 0.45",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-23",
-      "symbol": "USDZAR=X",
-      "action": "SELL",
-      "shares": 25.0087,
-      "price": 16.12579917907715,
-      "total": 403.2852739297867,
-      "reason": "Stop loss at -2.2%",
-      "gainLossPercent": -2.247148400198545
     },
     {
       "date": "2026-01-23",
       "symbol": "CSGP",
       "action": "SELL",
-      "shares": 0.0834,
+      "shares": 0.0572,
       "price": 65.5999984741211,
-      "total": 5.4710398727417,
+      "total": 3.7523199127197264,
       "reason": "Taking profits at 12.2%",
       "gainLossPercent": 12.155918262303377
     },
     {
       "date": "2026-01-23",
-      "symbol": "PODD",
-      "action": "SELL",
-      "shares": 0.0184,
-      "price": 271.6000061035156,
-      "total": 4.997440112304687,
-      "reason": "Stop loss at -2.5%",
-      "gainLossPercent": -2.495057258670093
-    },
-    {
-      "date": "2026-01-23",
       "symbol": "CPB",
       "action": "SELL",
-      "shares": 0.7831,
+      "shares": 0.3624,
       "price": 26.790000915527344,
-      "total": 20.979249716949464,
+      "total": 9.70869633178711,
       "reason": "Taking profits at 2.6%",
       "gainLossPercent": 2.6043672511680773
     },
@@ -5830,9 +2882,9 @@
       "date": "2026-01-23",
       "symbol": "PYPL",
       "action": "SELL",
-      "shares": 5.6142,
+      "shares": 5.485,
       "price": 56.619998931884766,
-      "total": 317.87599800338745,
+      "total": 310.56069414138796,
       "reason": "Taking profits at 2.8%",
       "gainLossPercent": 2.795927831581537
     },
@@ -5840,9 +2892,9 @@
       "date": "2026-01-23",
       "symbol": "DELL",
       "action": "SELL",
-      "shares": 2.7841,
+      "shares": 1.5926,
       "price": 115.43000030517578,
-      "total": 321.3686638496399,
+      "total": 183.83381848602295,
       "reason": "Taking profits at 3.9%",
       "gainLossPercent": 3.9254529776997336
     },
@@ -5850,9 +2902,9 @@
       "date": "2026-01-23",
       "symbol": "WDAY",
       "action": "SELL",
-      "shares": 0.3154,
+      "shares": 0.1257,
       "price": 189.25999450683594,
-      "total": 59.69260226745606,
+      "total": 23.78998130950928,
       "reason": "Taking profits at 3.4%",
       "gainLossPercent": 3.4264106374411263
     },
@@ -5860,112 +2912,82 @@
       "date": "2026-01-23",
       "symbol": "TRMB",
       "action": "SELL",
-      "shares": 0.3379,
+      "shares": 0.1194,
       "price": 71.19000244140625,
-      "total": 24.05510182495117,
+      "total": 8.500086291503907,
       "reason": "Taking profits at 2.3%",
       "gainLossPercent": 2.2991898084702838
     },
     {
       "date": "2026-01-23",
-      "symbol": "DPZ",
-      "action": "SELL",
-      "shares": 0.0123,
-      "price": 411.5,
-      "total": 5.06145,
-      "reason": "Taking profits at 6.2%",
-      "gainLossPercent": 6.1551915307819405
-    },
-    {
-      "date": "2026-01-23",
       "symbol": "MSFT",
       "action": "SELL",
-      "shares": 1.0981,
+      "shares": 0.2269,
       "price": 465.95001220703125,
-      "total": 511.65970840454105,
+      "total": 105.72405776977538,
       "reason": "Taking profits at 4.9%",
       "gainLossPercent": 4.917706778914223
     },
     {
       "date": "2026-01-23",
       "symbol": "INTU",
-      "action": "SELL",
-      "shares": 0.0152,
+      "action": "BUY",
+      "shares": 0.6373,
       "price": 563.969970703125,
-      "total": 8.5723435546875,
-      "reason": "Taking profits at 3.0%",
-      "gainLossPercent": 2.97247862643986
+      "total": 359.41806232910153,
+      "reason": "STRONG_BUY: 0.54",
+      "gainLossPercent": 0
     },
     {
       "date": "2026-01-23",
       "symbol": "BRK-B",
       "action": "BUY",
-      "shares": 1.8209,
+      "shares": 0.3431,
       "price": 478.9700012207031,
-      "total": 872.1564752227783,
-      "reason": "STRONG_BUY: 0.51",
+      "total": 164.33460741882325,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-23",
       "symbol": "TFX",
       "action": "BUY",
-      "shares": 4.0166,
+      "shares": 0.7237,
       "price": 103.4000015258789,
-      "total": 415.31644612884526,
-      "reason": "BUY: 0.50",
+      "total": 74.83058110427856,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-23",
       "symbol": "CRM",
       "action": "BUY",
-      "shares": 0.9082,
+      "shares": 0.1508,
       "price": 228.0500030517578,
-      "total": 207.11501277160644,
-      "reason": "BUY: 0.50",
+      "total": 34.389940460205075,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     },
     {
       "date": "2026-01-23",
       "symbol": "NOW",
       "action": "BUY",
-      "shares": 0.7702,
+      "shares": 0.1186,
       "price": 133.11000061035156,
-      "total": 102.52132247009277,
-      "reason": "BUY: 0.49",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-23",
-      "symbol": "BR",
-      "action": "BUY",
-      "shares": 0.2506,
-      "price": 207.5399932861328,
-      "total": 52.00952231750488,
-      "reason": "BUY: 0.49",
-      "gainLossPercent": 0
-    },
-    {
-      "date": "2026-01-23",
-      "symbol": "WST",
-      "action": "BUY",
-      "shares": 0.101,
-      "price": 236.66000366210938,
-      "total": 23.902660369873047,
-      "reason": "BUY: 0.44",
+      "total": 15.786846072387695,
+      "reason": "STRONG_BUY: 0.54",
       "gainLossPercent": 0
     }
   ],
   "summary": {
-    "totalReturn": 3.032764830806209,
-    "spyReturn": 0.2414260550705512,
-    "alpha": 2.7913387757356576,
-    "winRate": 76.72634271099744,
-    "sharpe": 1.8128188185029748,
-    "maxDrawdown": 4.374678167022024,
-    "totalTrades": 569,
-    "wins": 300,
-    "losses": 91
+    "totalReturn": 0.6703229743232078,
+    "spyReturn": -0.15645392557886226,
+    "alpha": 0.82677689990207,
+    "winRate": 68.18181818181817,
+    "sharpe": 0.4477882760080599,
+    "maxDrawdown": 2.6629076469398294,
+    "totalTrades": 280,
+    "wins": 120,
+    "losses": 56
   }
 }
