@@ -57,7 +57,7 @@ export default function PortfolioDashboard({ portfolio, onStockSelect }: Portfol
       </div>
 
       {/* Holdings */}
-      <h2 style={{ marginTop: '1.5rem' }}>Holdings</h2>
+      <h2 style={{ marginTop: '1.5rem', borderBottom: 'none', paddingBottom: 0 }}>Holdings</h2>
       {portfolio.holdings.length === 0 ? (
         <div className="empty-state">
           <p>No positions yet</p>

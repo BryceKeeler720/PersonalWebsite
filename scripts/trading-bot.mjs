@@ -51,9 +51,11 @@ const FUTURES_SYMBOLS = [
 ];
 
 const SP500_SYMBOLS = [
-  // Mega cap & top holdings
+  // Mega Cap Tech
   'NVDA', 'AAPL', 'MSFT', 'AMZN', 'GOOGL', 'GOOG', 'META', 'AVGO', 'TSLA',
+  // Financials & Healthcare Leaders
   'BRK-B', 'LLY', 'WMT', 'JPM', 'V', 'XOM', 'JNJ', 'ORCL', 'MA', 'MU', 'COST',
+  // Tech
   'AMD', 'PLTR', 'ABBV', 'HD', 'BAC', 'NFLX', 'PG', 'CVX', 'UNH', 'KO',
   'GE', 'CSCO', 'CAT', 'MS', 'GS', 'LRCX', 'IBM', 'PM', 'WFC', 'MRK',
   'RTX', 'AMAT', 'AXP', 'TMO', 'INTC', 'MCD', 'CRM', 'LIN', 'TMUS', 'KLAC',
@@ -62,36 +64,48 @@ const SP500_SYMBOLS = [
   'VZ', 'QCOM', 'DHR', 'BKNG', 'SPGI', 'INTU', 'LOW', 'ADI', 'PFE', 'HON',
   'NOW', 'DE', 'BSX', 'LMT', 'UNP', 'COF', 'SYK', 'NEM', 'MDT', 'ETN',
   'WELL', 'PANW', 'ADBE', 'COP', 'PGR', 'VRTX', 'CB', 'PLD', 'PH', 'BX',
-  // More S&P 500
-  'MMC', 'ADP', 'FI', 'SO', 'ICE', 'CME', 'ITW', 'DUK', 'TT', 'MCK',
-  'CL', 'EMR', 'EOG', 'APD', 'CDNS', 'SNPS', 'CEG', 'MSI', 'REGN', 'NOC',
-  'FDX', 'GM', 'CSX', 'SLB', 'PNC', 'OXY', 'USB', 'ORLY', 'GD', 'CARR',
-  'NSC', 'TDG', 'AJG', 'FTNT', 'HCA', 'TFC', 'FCX', 'SRE', 'AFL', 'AEP',
-  'BK', 'PSX', 'MPC', 'ABNB', 'PCAR', 'VLO', 'JCI', 'AIG', 'ROP', 'FICO',
-  'DLR', 'SPG', 'KMI', 'CMI', 'ALL', 'AZO', 'WMB', 'D', 'FAST', 'URI',
-  'AMP', 'PAYX', 'PCG', 'O', 'PWR', 'CTAS', 'DHI', 'AME', 'RSG', 'KHC',
-  'LHX', 'OKE', 'PRU', 'DXCM', 'CTVA', 'IDXX', 'F', 'HLT', 'A', 'OTIS',
-  'YUM', 'MSCI', 'NUE', 'VRSK', 'KR', 'HPQ', 'EA', 'EL', 'SYY', 'GEHC',
-  'DD', 'EXC', 'ODFL', 'XEL', 'GIS', 'VICI', 'MLM', 'VMC', 'BKR', 'HSY',
-  'CCI', 'DOW', 'CBRE', 'RCL', 'ED', 'IRM', 'HAL', 'EW', 'MTD', 'RMD',
-  'WEC', 'PPG', 'STZ', 'KEYS', 'AVB', 'TSCO', 'ANSS', 'WTW', 'XYL', 'WAB',
-  'TROW', 'DVN', 'ROK', 'EQR', 'MPWR', 'CHD', 'HPE', 'BR', 'GPN', 'FANG',
-  'IT', 'DOV', 'FTV', 'EFX', 'FITB', 'VLTO', 'HBAN', 'MTB', 'PPL', 'WY',
-  'SBAC', 'NTAP', 'ES', 'LYV', 'AWK', 'IFF', 'EQT', 'HUBB', 'STT', 'OMC',
-  'LVS', 'CLX', 'DTE', 'RF', 'WAT', 'WDC', 'STE', 'ZBH', 'BAX', 'K',
-  'CAH', 'CINF', 'BALL', 'TDY', 'CFG', 'EBAY', 'FE', 'ATO', 'PKG', 'MKC',
-  'MOH', 'IP', 'TRGP', 'APTV', 'J', 'TSN', 'SWK', 'NTRS', 'LDOS', 'KEY',
-  'TER', 'DGX', 'NRG', 'ETR', 'AXON', 'MAA', 'VTR', 'PFG', 'CBOE', 'CMS',
-  'KDP', 'EXPD', 'AES', 'CNP', 'LNT', 'CF', 'EVRG', 'TXT', 'BBY', 'L',
-  'MOS', 'SNA', 'JBHT', 'UDR', 'DRI', 'CPT', 'BRO', 'HST', 'IEX', 'POOL',
-  'HOLX', 'AKAM', 'ARE', 'EMN', 'COO', 'SWKS', 'IPG', 'TAP', 'KIM', 'NDSN',
-  'BEN', 'REG', 'PEAK', 'AIZ', 'WYNN', 'MGM', 'CPB', 'ALLE', 'HII', 'CZR',
-  'RL', 'FMC', 'BWA', 'PARA', 'AAL', 'NCLH', 'MHK', 'VFC', 'GNRC', 'CRL',
-  'WBA', 'SEE', 'HRL', 'NWS', 'NWSA', 'BIO', 'MTCH', 'DAL', 'LUV', 'UAL',
-  'CCL', 'RHI', 'TECH', 'PNR', 'GL', 'MKTX', 'CE', 'ALB', 'AOS', 'FRT',
-  'CHRW', 'HAS', 'BBWI', 'DVA', 'IVZ', 'ZION', 'CTLT', 'PNW', 'HSIC',
-  'XRAY', 'LKQ', 'CMA', 'NWL', 'BG', 'FFIV', 'QRVO', 'FOXA', 'FOX',
-  'PAYC', 'DXC', 'WHR', 'SEDG', 'DISH',
+  'CRWD', 'BMY', 'SBUX', 'KKR', 'HCA', 'CMCSA', 'CVS', 'CEG', 'ADP', 'MO',
+  'CME', 'MCK', 'ICE', 'GD', 'SO', 'NKE', 'HOOD', 'NOC', 'SNPS', 'MCO',
+  'WM', 'UPS', 'DUK', 'MRSH', 'DASH', 'PNC', 'FCX', 'CDNS', 'HWM', 'SHW',
+  'MMM', 'USB', 'MAR', 'TT', 'ORLY', 'AMT', 'EMR', 'ELV', 'CRH', 'BK',
+  'WDC', 'ABNB', 'TDG', 'MNST', 'GLW', 'ECL', 'WMB', 'REGN', 'APO', 'CMI',
+  'RCL', 'EQIX', 'CTAS', 'DELL', 'STX', 'MDLZ', 'ITW', 'CI', 'GM', 'SLB',
+  'AON', 'FDX', 'WBD', 'PWR', 'CL', 'JCI', 'HLT', 'COR', 'CSX', 'RSG',
+  'CVNA', 'MSI', 'LHX', 'KMI', 'TEL', 'AJG', 'NSC', 'PCAR', 'TFC', 'AEP',
+  'AZO', 'ROST', 'FTNT', 'TRV', 'SPG', 'EOG', 'NXPI', 'COIN', 'URI', 'APD',
+  'BDX', 'ADSK', 'VLO', 'PSX', 'AFL', 'SRE', 'NDAQ', 'O', 'IDXX', 'DLR',
+  'ZTS', 'VST', 'CMG', 'F', 'BKR', 'PYPL', 'MPC', 'EA', 'MPWR', 'D',
+  'AME', 'ALL', 'FAST', 'CBRE', 'GWW', 'MET', 'WDAY', 'PSA', 'CAH', 'OKE',
+  'TGT', 'AXON', 'EW', 'CTVA', 'CARR', 'ROK', 'AMP', 'DDOG', 'TTWO', 'EXC',
+  'DAL', 'XEL', 'MSCI', 'FANG', 'ROP', 'DHI', 'OXY', 'YUM', 'EL', 'EBAY',
+  'ETR', 'NUE', 'TRGP', 'KR', 'CTSH', 'LVS', 'MCHP', 'CPRT', 'IQV', 'GRMN',
+  'VMC', 'FIX', 'WAB', 'MLM', 'PEG', 'AIG', 'HSY', 'A', 'PAYX', 'KDP',
+  'CCI', 'PRU', 'ED', 'CCL', 'RMD', 'FICO', 'KEYS', 'SYY', 'ODFL', 'FISV',
+  'GEHC', 'VTR', 'TER', 'HIG', 'WEC', 'OTIS', 'STT', 'UAL', 'EQT', 'IBKR',
+  'IR', 'XYL', 'ARES', 'LYV', 'KVUE', 'KMB', 'ACGL', 'FITB', 'RJF', 'EXPE',
+  'MTB', 'PCG', 'ADM', 'DG', 'HUM', 'FIS', 'EME', 'WTW', 'VICI', 'ULTA',
+  'VRSK', 'ROL', 'EXR', 'CBOE', 'TSCO', 'MTD', 'TDY', 'NRG', 'HAL', 'DXCM',
+  'DOV', 'HPE', 'DTE', 'CSGP', 'NTRS', 'IRM', 'LEN', 'SYF', 'STZ', 'KHC',
+  'HBAN', 'BRO', 'FE', 'CFG', 'PPL', 'ATO', 'TPR', 'STLD', 'ES', 'EXE',
+  'FSLR', 'HUBB', 'JBL', 'EFX', 'DLTR', 'WRB', 'STE', 'CNP', 'AWK', 'AVB',
+  'PPG', 'BIIB', 'VLTO', 'OMC', 'ON', 'CHTR', 'CINF', 'LDOS', 'WSM', 'PHM',
+  'DVN', 'BR', 'TPL', 'RF', 'GIS', 'DRI', 'EQR', 'EIX', 'WAT', 'KEY',
+  'VRSN', 'TROW', 'SW', 'IP', 'CNC', 'CPAY', 'LULU', 'ALB', 'RL', 'CHD',
+  'LH', 'BG', 'TSN', 'LUV', 'CMS', 'EXPD', 'GPN', 'L', 'NVR', 'CTRA',
+  'CHRW', 'NI', 'AMCR', 'PKG', 'DGX', 'DOW', 'PFG', 'INCY', 'SBAC', 'JBHT',
+  'NTAP', 'PTC', 'WY', 'SNA', 'GPC', 'PODD', 'MRNA', 'SMCI', 'IFF', 'TYL',
+  'DD', 'LII', 'HPQ', 'TTD', 'PNR', 'EVRG', 'FTV', 'LNT', 'ZBH', 'WST',
+  'TRMB', 'HOLX', 'TXT', 'INVH', 'APTV', 'HII', 'LYB', 'CDW', 'ESS', 'MKC',
+  'J', 'TKO', 'COO', 'MAA', 'GEN', 'FOX', 'BALL', 'VTRS', 'FOXA', 'NDSN',
+  'FFIV', 'IEX', 'AES', 'ALGN', 'AOS', 'ARE', 'AWI', 'BAX', 'BBWI', 'BEN',
+  'BWA', 'CAG', 'CE', 'CF', 'CPB', 'CPT', 'CRL', 'CZR', 'DAY', 'DECK',
+  'DFS', 'DPZ', 'ENPH', 'EPAM', 'ERIE', 'ETSY', 'FBIN', 'FDS', 'FFBC',
+  'FMC', 'FRT', 'GDDY', 'GL', 'GNRC', 'HAS', 'HSIC', 'HST', 'HRL', 'HWE',
+  'IPG', 'IVZ', 'JKHY', 'K', 'KIM', 'KMX', 'LEG', 'LEVI', 'LPLA', 'LW',
+  'MAS', 'MGM', 'MHK', 'MKTX', 'MOH', 'MOS', 'MRO', 'MTCH', 'MTN', 'NCLH',
+  'NWS', 'NWSA', 'PAYC', 'PEAK', 'PENN', 'POOL', 'REG', 'RVTY', 'SJM',
+  'SPB', 'SWKS', 'TAP', 'TECH', 'TFX', 'TFS', 'TPH', 'UDR', 'UHS', 'UTHR',
+  'VFC', 'WYNN', 'XPO', 'ZS',
 ];
 
 // Popular ETFs for broader market coverage
@@ -105,18 +119,189 @@ const ETF_SYMBOLS = [
   'DGRO', 'DVY', 'HDV', 'VYM', 'NOBL', 'MTUM', 'QUAL', 'VLUE', 'SIZE', 'USMV',
 ];
 
-// Additional growth & mid-cap stocks
-const ADDITIONAL_STOCKS = [
-  'CRWD', 'SNOW', 'DDOG', 'ZS', 'NET', 'OKTA', 'MDB', 'BILL', 'HUBS', 'TTD',
-  'ROKU', 'SNAP', 'PINS', 'SQ', 'SHOP', 'SE', 'MELI', 'RIVN', 'LCID', 'NIO',
-  'XPEV', 'LI', 'COIN', 'HOOD', 'SOFI', 'AFRM', 'UPST', 'IONQ', 'RGTI', 'QUBT',
-  'RKLB', 'LUNR', 'ASTS', 'MNTS', 'SPCE', 'JOBY', 'ACHR', 'LILM', 'SMCI', 'MRVL',
-  'ON', 'WOLF', 'CEVA', 'ARM', 'CFLT', 'ESTC', 'DOCN', 'GTLB', 'PATH', 'AI',
-  'SOUN', 'BBAI', 'U', 'RBLX', 'DASH', 'LYFT', 'GRAB',
-  'CPNG', 'DUOL', 'MNDY', 'ZI', 'TWLO', 'SPLK', 'VEEV', 'PCOR', 'ALNY', 'MRNA',
-  'BNTX', 'NVAX', 'ZM', 'DOCU', 'FIVN', 'ASAN', 'DKNG', 'PENN', 'CHWY', 'ETSY',
-  'W', 'OPEN', 'RDFN', 'Z', 'ZG', 'CVNA', 'CARG', 'BROS', 'CELH', 'MNST',
-  'ENPH', 'FSLR', 'RUN', 'NOVA', 'ARRY', 'PLUG', 'BE', 'CHPT', 'BLNK', 'EVGO',
+// NASDAQ Additional stocks (matches frontend dropdown)
+const NASDAQ_ADDITIONAL = [
+  // NASDAQ-100 Core (not in S&P 500)
+  'MELI', 'TEAM', 'LCID', 'RIVN', 'OKTA', 'ZM', 'DOCU', 'ROKU', 'NET',
+  'CRSP', 'ASML', 'MRVL', 'PDD', 'JD', 'BIDU', 'NTES', 'TCOM',
+  // Growth & Momentum Stocks
+  'SOFI', 'UPST', 'AFRM', 'PATH', 'SNOW', 'DKNG', 'RBLX', 'U', 'BILL',
+  'HUBS', 'TWLO', 'MDB', 'CFLT', 'GTLB', 'S', 'DUOL', 'PINS', 'SNAP',
+  'SPOT', 'LYFT', 'GRAB', 'SE', 'SHOP', 'SQ', 'FUBO',
+  // Biotech & Pharma
+  'BNTX', 'NVAX', 'SGEN', 'EXAS', 'ALNY', 'SRPT', 'RARE', 'BMRN',
+  'NBIX', 'IONS', 'HALO', 'LEGN', 'PCVX', 'KRYS', 'ARWR', 'BGNE',
+  'VXRT', 'INO', 'SAVA', 'MGNX', 'NTLA', 'EDIT', 'BEAM', 'PRTA',
+  'VCNX', 'IMVT', 'CCCC', 'RCKT', 'RVNC', 'FATE', 'GTHX', 'FOLD',
+  'APLS', 'DCPH', 'ROIV', 'XNCR', 'ARQT', 'KROS', 'ARVN', 'CYTK',
+  'DAWN', 'EWTX', 'HLVX', 'IMCR', 'INSM', 'ITCI', 'LGND', 'MDGL',
+  'MIRM', 'NUVB', 'PTCT', 'RGNX', 'RCUS', 'SRRK', 'VCEL', 'VKTX',
+  'VRNA', 'XENE', 'ZLAB', 'ACAD', 'AGEN', 'AKRO', 'ANAB', 'ARDX',
+  'AUPH', 'BBIO', 'CLDX', 'CPRX', 'DVAX', 'ENTA', 'EXEL', 'FGEN',
+  'GERN', 'HRTX', 'IMGN', 'IOVA', 'IRWD', 'JAZZ', 'KURA', 'MCRB',
+  'NKTX', 'OLINK', 'PRAX', 'SAGE', 'TGTX', 'TVTX', 'VCYT', 'XERS',
+  // Tech & AI/ML
+  'ARM', 'IONQ', 'RGTI', 'AI', 'SOUN', 'BBAI', 'UPWK', 'FVRR', 'WIX',
+  'ZI', 'ESTC', 'NEWR', 'ASAN', 'MNDY', 'DOCN', 'FSLY', 'AKAM', 'DBX',
+  'BOX', 'SPLK', 'DOMO', 'YEXT', 'ZUO', 'APPN', 'BIGC', 'COUP',
+  'FROG', 'NCNO', 'QLYS', 'TENB', 'VRNS', 'ZEN', 'CRDO', 'CWAN',
+  'DLO', 'ENVX', 'GCT', 'GENI', 'IOT', 'LSPD', 'MGNI', 'NXST',
+  'PAYO', 'PRFT', 'PSTG', 'QLGN', 'RPD', 'SMAR', 'SPSC', 'TASK',
+  'TDOC', 'TTEC', 'VERX', 'VTEX', 'WEAV', 'WK', 'YOU', 'ZETA',
+  'BASE', 'BRZE', 'CRNC', 'DV', 'EVTC', 'FRSH', 'INFA', 'JAMF',
+  'LSCC', 'MANH', 'NTNX', 'PCOR', 'PEGA', 'PLAN', 'RELY', 'SEMR',
+  'TOST', 'WULF', 'XPRO', 'APGE', 'AVPT', 'CLSK', 'COTY', 'CPRT',
+  // Semiconductors
+  'WOLF', 'ACLS', 'ALGM', 'AMKR', 'AOSL', 'ASPN', 'ATOM', 'AXTI',
+  'CAMT', 'CRUS', 'DIOD', 'FORM', 'INDI', 'IPGP', 'ISSI', 'ITOS',
+  'KLIC', 'LEDS', 'LITE', 'MASI', 'MKSI', 'MTSI', 'NOVT', 'NXPI',
+  'OLED', 'ONTO', 'PLAB', 'POWI', 'QRVO', 'RMBS', 'SITM', 'SLAB',
+  'SMTC', 'SYNA', 'TER', 'UCTT', 'VECO', 'VIAV', 'VSH', 'WRAP',
+  // Consumer & Retail
+  'FIVE', 'OLLI', 'RH', 'W', 'CHWY', 'CPNG', 'BABA', 'BGFV', 'BIRD',
+  'BOOT', 'BROS', 'CAKE', 'CARS', 'CASA', 'CATO', 'CONN', 'COUR',
+  'CURV', 'EAT', 'ELF', 'EVRI', 'FIZZ', 'FOXF', 'FRPT', 'FTDR',
+  'GOOS', 'GPRO', 'HAIN', 'HIBB', 'HZO', 'IMKTA', 'JACK', 'LANC',
+  'LCUT', 'LEVI', 'LOVE', 'MCBC', 'MED', 'MNST', 'NATH',
+  'NCLH', 'ONON', 'ORLY', 'PTON', 'REAL', 'RMNI', 'SABR', 'SAVE',
+  'SCVL', 'SHAK', 'SITE', 'SFIX', 'SKYW', 'SNBR', 'SPTN', 'SSYS',
+  'STNE', 'SWBI', 'TACO', 'TAST', 'TNET', 'TRIP', 'TXRH', 'VIR',
+  'VRNT', 'VSCO', 'WINA', 'WING', 'WOOF', 'WW', 'YELP', 'YETI',
+  // EV & Clean Energy
+  'NIO', 'XPEV', 'LI', 'FSR', 'GOEV', 'WKHS', 'HYLN', 'CHPT', 'BLNK',
+  'EVGO', 'QS', 'PLUG', 'FCEL', 'BE', 'SEDG', 'RUN', 'ARRY', 'BLDP',
+  'CLNE', 'ENVX', 'EVEX', 'FLNC', 'FREY', 'GEVO', 'HYZN', 'LEV',
+  'LILM', 'MVST', 'NKLA', 'NOVA', 'OUST', 'PTRA', 'REE', 'RMO',
+  'SHLS', 'SLDP', 'SPWR', 'STEM', 'VLD', 'XL', 'AEHR', 'AMPX',
+  'AMPS', 'ARBE', 'ARVL', 'BEEM', 'CALX', 'DRIV', 'EOSE', 'FFIE',
+  'FUV', 'LAZR', 'MULN', 'PLTK', 'PODD', 'PRCH', 'SLDP',
+  // Fintech & Financial
+  'MSTR', 'VIRT', 'ALLY', 'AX', 'BFAM', 'BL', 'BSIG', 'CACC',
+  'CASH', 'CBSH', 'CFFN', 'COOP', 'CUBI', 'CWCO', 'CZFS', 'DCOM',
+  'DFIN', 'DNLI', 'ENVA', 'ESNT', 'EQBK', 'FBIZ', 'FCBP', 'FCNCA',
+  'FFIC', 'FISI', 'FMBH', 'FNLC', 'FRHC', 'FRME', 'FSBW', 'GBCI',
+  'GNW', 'HFWA', 'HOPE', 'HTLF', 'IBTX', 'INBK', 'INDB', 'ITIC',
+  'KREF', 'LADR', 'LC', 'LMND', 'LOAN', 'LPRO', 'LX', 'MCBS',
+  'MKTW', 'ML', 'NBHC', 'NCR', 'NWBI', 'NYCB', 'OZK', 'PACW',
+  'PATK', 'PFSI', 'PNFP', 'PRDO', 'PRSP', 'RKT', 'RILY', 'SBNY',
+  'SIVB', 'SLQT', 'SNEX', 'SYF', 'TFSL', 'TREE', 'TRUP', 'UBSI',
+  'UFPI', 'VBTX', 'VLY', 'VRTS', 'WABC', 'WAFD', 'WAL', 'WBS',
+  'WRLD', 'WSBC', 'WTBA', 'WTFC', 'XNCR',
+  // Media & Entertainment
+  'PARA', 'BMBL', 'ATVI', 'CARG', 'CHDN', 'CNK', 'CPRI', 'CROX',
+  'CWST', 'DXPE', 'EYE', 'FOSL', 'GIII', 'GRPN', 'HAFC', 'HLI',
+  'IMAX', 'INSW', 'LAUR', 'LINC', 'LIND', 'LNW', 'LPTH', 'LSXMA',
+  'LSXMK', 'MARA', 'NAVI', 'NXGN', 'OPRA', 'PENN', 'PLYA', 'PRGS',
+  'QNST', 'RCII', 'RIOT', 'SIRI', 'SONO', 'SPHR', 'STAA', 'STRA',
+  'STRR', 'TARS', 'TME', 'TRMK', 'TUYA', 'WMG', 'WWE', 'XMTR', 'ZUMZ',
+  // Communications & Telecom
+  'LUMN', 'FYBR', 'USM', 'SATS', 'GSAT', 'IRDM', 'ASTS', 'BAND',
+  'BCOV', 'CALX', 'CASA', 'CCOI', 'CIEN', 'CIIG', 'CLFD', 'CNSL',
+  'COMM', 'CRNT', 'CTL', 'DZSI', 'EXTR', 'GILT', 'GOGO', 'HLIT',
+  'IDCC', 'INFN', 'INSG', 'LILA', 'LILAK', 'LTRX', 'LUMEN', 'MAXR',
+  'MTCR', 'NTGR', 'OOMA', 'PDCO', 'RBBN', 'RDWR', 'SIFY', 'SPTN',
+  'SWIR', 'TZOO', 'UBNT', 'UI', 'UTI', 'VSAT', 'WSTC', 'ZGID',
+  // Industrial & Transportation
+  'SAIA', 'LSTR', 'WERN', 'KNX', 'SNDR', 'AAWW', 'ABUS', 'ACHC',
+  'ACLE', 'ACMR', 'AEIS', 'AGYS', 'AIMC', 'ALEX', 'ALGT',
+  'AMRC', 'AMSC', 'AMWD', 'ANGI', 'ANIP', 'APEI', 'APOG', 'ARCB',
+  'ARGO', 'AROC', 'ATEC', 'ATGE', 'ATLC', 'ATNI', 'AVAV',
+  'AVID', 'AXGN', 'AY', 'AZPN', 'BANF', 'BCO', 'BECN', 'BJRI',
+  'BKNG', 'BLD', 'BLDR', 'BLX', 'BMI', 'BRP', 'BRSP',
+  'CALM', 'CASY', 'CBZ', 'CDNA', 'CFX', 'CGNX', 'CHCO', 'CHE',
+  'CHTR', 'CIR', 'CLAR', 'CLBK', 'CMCO', 'CMT',
+  'COHU', 'COLM', 'CPSI', 'CRAI', 'CRI', 'CSL', 'CSOD', 'CVCO',
+  'CVLT', 'CYRX', 'DAN', 'DENN', 'DGII', 'DHC',
+  'DLB', 'DNKN', 'DOOR', 'DY', 'ECHO', 'EEFT', 'EGBN',
+  'EHTH', 'EIGI', 'ENSG', 'EQH', 'ESE', 'ESGR', 'ETON',
+  'EVTV', 'EXLS', 'EXPO', 'FA', 'FARO', 'FCFS', 'FCN',
+  'FHN', 'FIGS', 'FLGT', 'FLO', 'FLWS', 'FMAO', 'FN', 'FNKO',
+  'FNV', 'FRO', 'FRPH', 'FTI',
+  'FWRD', 'GBX', 'GDOT', 'GFF', 'GLBE', 'GLDD', 'GLNG',
+  'GLOB', 'GLPI', 'GLW', 'GNTX', 'GO', 'GRBK', 'GRFS', 'GSHD',
+  'GTBIF', 'GTX', 'GVA', 'HA', 'HBB', 'HBNC', 'HEES',
+  'HGV', 'HLNE', 'HLX', 'HMN', 'HMST', 'HNI', 'HRMY', 'HSC',
+  'HTLD', 'HUBG', 'HURN', 'HWC', 'HWKN', 'HZNP', 'IAA', 'IART',
+  'ICAD', 'ICFI', 'ICUI', 'IDYA', 'IEP', 'IGT', 'IIIN', 'IIIV',
+  'IMXI', 'INGN', 'INMD', 'INST', 'INT', 'IOSP', 'IPAR', 'IRBT',
+  'ISBC', 'ISSC', 'ITRI', 'IVA', 'JBSS', 'JBTX', 'JBT', 'JCOM',
+  'JJSF', 'JKHY', 'JNPR', 'JOE', 'JRVR', 'JTPY', 'KALU',
+  'KAMN', 'KBAL', 'KELYA', 'KEQU', 'KFRC', 'KIDS', 'KLXE', 'KMDA',
+  'KODK', 'KTOS', 'LAMR', 'LAWS', 'LBC', 'LDI',
+  'LFST', 'LGIH', 'LIVN', 'LKFN', 'LLNW', 'LMAT', 'LNDC',
+  'LNTH', 'LOB', 'LOGI', 'LQDA', 'LUNA',
+  'LXRX', 'MATW', 'MAXN', 'MBUU', 'MBWM', 'MCRI',
+  'MDRX', 'MEDS', 'MESA', 'MGEE', 'MGPI', 'MGRC', 'MIDD',
+  'MLCO', 'MMSI', 'MNTV', 'MOD', 'MODV', 'MOGO', 'MORF', 'MORN',
+  'MRCY', 'MRSN', 'MRUS', 'MSEX', 'MSGS', 'MTLS', 'MTX',
+  'NARI', 'NATR', 'NBEV', 'NBTB', 'NCMI', 'NEO',
+  'NEOG', 'NGVC', 'NINE', 'NMIH', 'NMRK', 'NNBR', 'NOVN', 'NPTN',
+  'NRDS', 'NSIT', 'NSTG', 'NTCT', 'NTRA', 'NUVA', 'NVCR', 'NVT',
+  'NVTR', 'NWPX', 'NX', 'OABI', 'OAS',
+  'OCFC', 'OCGN', 'ODP', 'OFIX', 'OFLX', 'OGS', 'OMCL', 'OMER',
+  'ONB', 'OPCH', 'OPI', 'ORBC', 'ORIC', 'OSG', 'OSUR', 'OTTR',
+  'ATRO', 'OVBC', 'OVID', 'PACB', 'PAGS', 'PATI', 'PAYA',
+  'PAYS', 'PBCT', 'PBH', 'PBYI', 'PCTY', 'PDCE', 'PDFS',
+  'PETQ', 'PFGC', 'PGEN', 'PGNY', 'PINC', 'PKE',
+  'PLAY', 'PLBY', 'PLCE', 'PLUS', 'PMVP', 'PNRG', 'PNTG',
+  'PPBI', 'PPC', 'PRAA', 'PRMW', 'PROS',
+  'PRSC', 'PRVB', 'PSFE', 'PSMT', 'PSN', 'PSTL', 'PTGX', 'PUBM',
+  'PXLW', 'QDEL', 'QRTEA', 'QTRX', 'QTWO', 'QUIK', 'RAMP',
+  'RAPT', 'RDNT', 'RDUS', 'RDVT',
+  'REGI', 'RELL', 'REPH', 'REPL', 'RETO', 'REVG', 'RGC',
+  'RGLD', 'RICK', 'RIGL', 'RIVE', 'RNET', 'RNR', 'ROCC',
+  'ROCK', 'ROG', 'ROLL', 'RPAY', 'RPRX', 'RRX', 'RSSS', 'RTLR',
+  'RTRX', 'RUBY', 'RUSHA', 'RUSHB', 'RUTH', 'RVMD', 'RVPH',
+  'RYAM', 'SAIL', 'SAM', 'SANA', 'SANM', 'SBCF', 'SBFG', 'SBGI',
+  'SBRA', 'SCHL', 'SCHN', 'SCOR', 'SCSC', 'SCWX', 'SDGR', 'SEAT',
+  'SENEA', 'SFBS', 'SFNC', 'SGMO', 'SGMS', 'SHBI', 'SHEN', 'SHIP',
+  'SHOO', 'SHV', 'SIBN', 'SIG', 'SILC', 'SILK', 'SIM',
+  'SITC', 'SJW', 'SKIN', 'SKWD', 'SLDB',
+  'SLP', 'SMBC', 'SMID', 'SMMT', 'SMPL', 'SMSI', 'SMTX',
+  'SNCR', 'SNDX', 'SNV', 'SNWV', 'SONM', 'SP', 'SPCB', 'SPFI',
+  'SPNE', 'SPNT', 'SPOK', 'SPRO', 'SPWH',
+  'SPXC', 'SRCE', 'SRDX', 'SREV', 'SRNE', 'SSB', 'SSRM', 'SSTI',
+  'SSTK', 'STAG', 'STBA', 'STFC', 'STLD', 'STMP', 'STNG', 'STOK',
+  'STRL', 'STRS', 'STXS', 'SUPN', 'SUSC', 'SVRA', 'SWAV',
+  'SWTX', 'SYBX', 'SYBT', 'SYNC', 'SYNH', 'SYNL',
+  'TBBK', 'TBI', 'TCBI', 'TCBK', 'TCMD', 'TELL',
+  'TEN', 'TERN', 'TESS', 'TFII', 'TGNA', 'TH', 'THRY',
+  'TILE', 'TITN', 'TLND', 'TLYS', 'TMDX', 'TNAV', 'TNDM',
+  'TNXP', 'TOPS', 'TPHS', 'TPTX', 'TR', 'TRDA', 'TRIB', 'TRHC',
+  'TRM', 'TRNO', 'TRS', 'TRUE', 'TRVN',
+  'TTGT', 'TTM', 'TWNK', 'TXG', 'TXMD', 'UCBI',
+  'UEIC', 'UFCS', 'UFPT', 'UG', 'UHAL', 'UHT',
+  'UIHC', 'ULH', 'UMBF', 'UNIT', 'UNTY', 'UPLD', 'URGN',
+  'USAK', 'USAP', 'USAU', 'USCR', 'USIO', 'USNA', 'USPH', 'UTMD',
+  'VBF', 'VCRA', 'VEON', 'VERA', 'VERI', 'VERU',
+  'VICR', 'VIE', 'VIEW', 'VINC', 'VIRC', 'VIRI',
+  'VIS', 'VITL', 'VIVO', 'VLDR', 'VMEO', 'VNCE',
+  'VNDA', 'VNE', 'VNET', 'VOXX', 'VOYA', 'VRA', 'VRRM',
+  'VSEC', 'VSTM', 'VTS', 'VTVT',
+  'WASH', 'WATT', 'WDAY', 'WDFC',
+  'WETF', 'WEYS', 'WHF', 'WKSP', 'WLDN', 'WLK',
+  'WMK', 'WNEB', 'WOR', 'WPRT', 'WRBY',
+  'WSBF', 'WSC', 'WSTG', 'WTRG', 'WVVI', 'WWD', 'WWW',
+  'XBIT', 'XELA', 'XNET', 'XOG',
+  'XOMA', 'XONE', 'XPEL', 'XPER', 'YGTY', 'YMAB', 'YORW',
+  'YRCW', 'YSG', 'YY', 'ZBRA', 'ZEAL', 'ZEUS', 'ZIMV', 'ZION',
+  'ZIXI', 'ZNTL', 'ZTO', 'ZVO',
+  // Real Estate & REITs
+  'REXR', 'COLD', 'IIPR', 'ADC', 'AHH', 'AIRC', 'APLE',
+  'BDN', 'BNL', 'BRX', 'BXP', 'CIO', 'CLPR', 'CMCT', 'CTRE',
+  'CUBE', 'CUZ', 'DEA', 'DEI', 'DGRW', 'DOC', 'EGP',
+  'ELME', 'EPR', 'ESRT', 'FAT', 'FCPT', 'FPI', 'FR', 'FSP',
+  'GNL', 'GOOD', 'GPMT', 'GTY', 'HT', 'ILPT', 'INN', 'IRT',
+  'JBGS', 'KRC', 'LAND', 'LTC', 'MAC', 'MDRR', 'MFA',
+  'MGP', 'MPW', 'NHI', 'NNN', 'NSA', 'NXRT', 'NYT', 'OFC',
+  'OFFS', 'OHI', 'OUT', 'PGRE', 'PK', 'PLYM', 'QTS',
+  'RC', 'RLGT', 'RLJ', 'RYN', 'SAFE', 'SKT', 'SLG',
+  'SNDE', 'SRC', 'STAR', 'STOR', 'SUI', 'SVC',
+  'TRTX', 'UBFO', 'UBA', 'UE', 'VER', 'VNO',
+  'VRE', 'VSTA', 'WPC', 'WRI', 'WTRE', 'XHR',
+  // Additional growth stocks from old list
+  'QUBT', 'RKLB', 'LUNR', 'MNTS', 'SPCE', 'JOBY', 'ACHR', 'CEVA',
+  'VEEV', 'FIVN', 'OPEN', 'RDFN', 'Z', 'ZG', 'CELH',
 ];
 
 // Initialize Redis
@@ -347,7 +532,7 @@ function calculateRSI(data, period = 14) {
 }
 
 function calculateMomentumSignal(data) {
-  if (data.length < 50) return { name: 'momentum', score: 0, confidence: 0, reason: 'Insufficient data' };
+  if (data.length < 50) return { name: 'Momentum', score: 0, confidence: 0, reason: 'Insufficient data' };
 
   const currentPrice = data[data.length - 1].close;
   const sma20 = calculateSMA(data, 20);
@@ -370,33 +555,52 @@ function calculateMomentumSignal(data) {
   if (ema12 > ema26) { score += 0.25; reasons.push('MACD bullish'); }
   else { score -= 0.25; reasons.push('MACD bearish'); }
 
-  return { name: 'momentum', score: Math.max(-1, Math.min(1, score)), confidence: 0.7, reason: reasons.slice(0, 2).join(', ') };
+  return { name: 'Momentum', score: Math.max(-1, Math.min(1, score)), confidence: 0.7, reason: reasons.slice(0, 2).join(', ') };
 }
 
 function calculateMeanReversionSignal(data) {
-  if (data.length < 20) return { name: 'meanReversion', score: 0, confidence: 0, reason: 'Insufficient data' };
+  if (data.length < 50) return { name: 'Mean Reversion', score: 0, confidence: 0, reason: 'Insufficient data' };
 
   const currentPrice = data[data.length - 1].close;
-  const sma20 = calculateSMA(data, 20);
-  const prices = data.slice(-20).map(d => d.close);
-  const mean = prices.reduce((a, b) => a + b, 0) / prices.length;
-  const stdDev = Math.sqrt(prices.reduce((sum, p) => sum + Math.pow(p - mean, 2), 0) / prices.length);
 
-  const zScore = stdDev > 0 ? (currentPrice - sma20) / stdDev : 0;
+  // Use longer lookback for mean reversion detection
+  // With minute candles, 200 bars ≈ 3.3 hours, giving meaningful mean to revert to
+  const longPeriod = Math.min(200, data.length);
+  const pricesLong = data.slice(-longPeriod).map(d => d.close);
+  const meanLong = pricesLong.reduce((a, b) => a + b, 0) / pricesLong.length;
+  const stdDevLong = Math.sqrt(pricesLong.reduce((sum, p) => sum + Math.pow(p - meanLong, 2), 0) / pricesLong.length);
+
+  // Short-term z-score (20-period Bollinger Band style)
+  const prices20 = data.slice(-20).map(d => d.close);
+  const mean20 = prices20.reduce((a, b) => a + b, 0) / prices20.length;
+  const stdDev20 = Math.sqrt(prices20.reduce((sum, p) => sum + Math.pow(p - mean20, 2), 0) / prices20.length);
+  const shortZ = stdDev20 > 0 ? (currentPrice - mean20) / stdDev20 : 0;
+
+  // Long-term z-score (how far from longer average)
+  const longZ = stdDevLong > 0 ? (currentPrice - meanLong) / stdDevLong : 0;
+
+  // Combine: weight toward long-term (true mean reversion) with short-term confirmation
+  const zScore = longZ * 0.7 + shortZ * 0.3;
+  const pctFromMean = meanLong > 0 ? ((currentPrice - meanLong) / meanLong * 100).toFixed(1) : '0.0';
+
   let score = 0;
   let reason = '';
 
-  if (zScore < -2) { score = 0.8; reason = 'Extremely oversold (z < -2)'; }
-  else if (zScore < -1) { score = 0.4; reason = 'Oversold (z < -1)'; }
-  else if (zScore > 2) { score = -0.8; reason = 'Extremely overbought (z > 2)'; }
-  else if (zScore > 1) { score = -0.4; reason = 'Overbought (z > 1)'; }
-  else { score = 0; reason = 'Near mean'; }
+  if (zScore < -2) { score = 0.8; reason = `Extremely oversold (z=${zScore.toFixed(2)}, ${pctFromMean}% from mean)`; }
+  else if (zScore < -1.5) { score = 0.6; reason = `Very oversold (z=${zScore.toFixed(2)}, ${pctFromMean}% from mean)`; }
+  else if (zScore < -1) { score = 0.4; reason = `Oversold (z=${zScore.toFixed(2)})`; }
+  else if (zScore < -0.5) { score = 0.2; reason = `Slightly below mean (z=${zScore.toFixed(2)})`; }
+  else if (zScore > 2) { score = -0.8; reason = `Extremely overbought (z=${zScore.toFixed(2)}, +${pctFromMean}% from mean)`; }
+  else if (zScore > 1.5) { score = -0.6; reason = `Very overbought (z=${zScore.toFixed(2)})`; }
+  else if (zScore > 1) { score = -0.4; reason = `Overbought (z=${zScore.toFixed(2)})`; }
+  else if (zScore > 0.5) { score = -0.2; reason = `Slightly above mean (z=${zScore.toFixed(2)})`; }
+  else { score = 0; reason = `Near mean (z=${zScore.toFixed(2)})`; }
 
-  return { name: 'meanReversion', score, confidence: 0.6, reason };
+  return { name: 'Mean Reversion', score, confidence: 0.6, reason };
 }
 
 function calculateTechnicalSignal(data) {
-  if (data.length < 20) return { name: 'technical', score: 0, confidence: 0, reason: 'Insufficient data' };
+  if (data.length < 20) return { name: 'Technical', score: 0, confidence: 0, reason: 'Insufficient data' };
 
   const rsi = calculateRSI(data);
   let score = 0;
@@ -418,13 +622,13 @@ function calculateTechnicalSignal(data) {
     else { score -= 0.25; reasons.push('High volume downtrend'); }
   }
 
-  return { name: 'technical', score: Math.max(-1, Math.min(1, score)), confidence: 0.65, reason: reasons.join(', ') };
+  return { name: 'Technical', score: Math.max(-1, Math.min(1, score)), confidence: 0.65, reason: reasons.join(', ') };
 }
 
 function calculateSentimentSignal() {
   // Simplified sentiment (would need real news API for proper implementation)
   const score = (Math.random() - 0.5) * 0.4;
-  return { name: 'sentiment', score, confidence: 0.3, reason: 'Market sentiment analysis' };
+  return { name: 'Sentiment', score, confidence: 0.3, reason: 'Market sentiment analysis' };
 }
 
 function combineSignals(symbol, momentum, meanReversion, sentiment, technical, weights) {
@@ -493,7 +697,11 @@ async function main() {
 
   let assetsToAnalyze = [...CRYPTO_SYMBOLS];
   if (!isWeekend) {
-    assetsToAnalyze.push(...SP500_SYMBOLS, ...ETF_SYMBOLS, ...ADDITIONAL_STOCKS, ...FOREX_SYMBOLS, ...FUTURES_SYMBOLS);
+    assetsToAnalyze.push(...SP500_SYMBOLS, ...ETF_SYMBOLS, ...NASDAQ_ADDITIONAL, ...FOREX_SYMBOLS, ...FUTURES_SYMBOLS);
+  }
+  // Always include current holdings so we can generate signals and make sell decisions
+  for (const holding of portfolio.holdings) {
+    assetsToAnalyze.push(holding.symbol);
   }
   // Deduplicate
   assetsToAnalyze = [...new Set(assetsToAnalyze)];
@@ -519,7 +727,21 @@ async function main() {
     }));
 
     for (const { symbol, signal } of results) {
-      if (signal) allSignals[symbol] = signal;
+      if (signal) {
+        allSignals[symbol] = signal;
+      } else {
+        // Store a placeholder signal so the frontend always shows something
+        allSignals[symbol] = {
+          symbol,
+          timestamp: new Date().toISOString(),
+          momentum: { name: 'Momentum', score: 0, confidence: 0, reason: 'No market data available' },
+          meanReversion: { name: 'Mean Reversion', score: 0, confidence: 0, reason: 'No market data available' },
+          sentiment: { name: 'Sentiment', score: 0, confidence: 0, reason: 'No market data available' },
+          technical: { name: 'Technical', score: 0, confidence: 0, reason: 'No market data available' },
+          combined: 0,
+          recommendation: 'HOLD',
+        };
+      }
     }
 
     if (i + BATCH_SIZE < assetsToAnalyze.length) {
