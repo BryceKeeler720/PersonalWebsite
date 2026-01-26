@@ -139,7 +139,7 @@ export async function addPortfolioSnapshot(snapshot: PortfolioSnapshot): Promise
   try {
     const history = await getPortfolioHistory();
     history.push(snapshot);
-    // Keep last 1000 snapshots (about 16 hours at 1 per minute)
+    // Keep last 1000 snapshots (about 7 days at 1 per 10 minutes)
     const trimmed = history.slice(-1000);
     await redis.set(KEYS.HISTORY, trimmed);
   } catch (error) {

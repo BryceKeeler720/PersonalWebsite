@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /**
  * Trading Bot Script - Self-hosted continuous service
- * Runs as a daemon with configurable intervals for high-frequency trading
+ * Runs as a daemon analyzing hourly candles every 10 minutes
  */
 
 import { Redis } from '@upstash/redis';
 
 // Service Configuration
-const RUN_INTERVAL_MS = parseInt(process.env.RUN_INTERVAL_MS || '60000', 10); // Default: 1 minute
+const RUN_INTERVAL_MS = parseInt(process.env.RUN_INTERVAL_MS || '600000', 10); // Default: 10 minutes
 const RUN_ONCE = process.env.RUN_ONCE === 'true'; // For GitHub Actions compatibility
 let isShuttingDown = false;
 let currentRunPromise = null;
@@ -470,9 +470,9 @@ async function fetchYahooQuote(symbol) {
 
 async function fetchYahooHistorical(symbol) {
   try {
-    // Use 1-minute candles so signals change every run for responsive trading
+    // Hourly candles over 3 months: SMA-20=3 days, SMA-50=~8 days, standard TA timeframes
     const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=5d&interval=1m`,
+      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=3mo&interval=1h`,
       { headers: { 'User-Agent': 'Mozilla/5.0 (compatible)' } }
     );
     const data = await response.json();
@@ -532,68 +532,73 @@ function calculateRSI(data, period = 14) {
 }
 
 function calculateMomentumSignal(data) {
-  if (data.length < 200) return { name: 'Momentum', score: 0, confidence: 0, reason: 'Insufficient data' };
+  // With hourly candles: need 50 bars = ~8 trading days minimum
+  if (data.length < 50) return { name: 'Momentum', score: 0, confidence: 0, reason: 'Insufficient data' };
 
   const currentPrice = data[data.length - 1].close;
 
-  // With minute candles: SMA-200 ≈ 3.3hrs, SMA-500 ≈ 1 trading day
-  const smaShort = calculateSMA(data, 200);
-  const smaLong = calculateSMA(data, Math.min(500, data.length));
-  // EMA-100 ≈ 1.7hrs, EMA-200 ≈ 3.3hrs
-  const emaShort = calculateEMA(data, 100);
-  const emaLong = calculateEMA(data, 200);
+  // Standard periods now meaningful with hourly candles:
+  // SMA-20 = 20 hours ≈ 3 trading days, SMA-50 = 50 hours ≈ 8 trading days
+  const sma20 = calculateSMA(data, 20);
+  const sma50 = calculateSMA(data, 50);
+  // EMA-12/26 = standard MACD timeframes (12h ≈ 2 days, 26h ≈ 4 days)
+  const ema12 = calculateEMA(data, 12);
+  const ema26 = calculateEMA(data, 26);
 
   let score = 0;
   const reasons = [];
 
-  // Price vs short-term average: graded by distance
-  if (smaShort) {
-    const pctAboveShort = ((currentPrice - smaShort) / smaShort) * 100;
-    if (pctAboveShort > 1.0) { score += 0.25; reasons.push(`+${pctAboveShort.toFixed(1)}% vs SMA200`); }
-    else if (pctAboveShort > 0.3) { score += 0.15; reasons.push(`Above SMA200`); }
-    else if (pctAboveShort > -0.3) { score += 0; reasons.push('Near SMA200'); }
-    else if (pctAboveShort > -1.0) { score -= 0.15; reasons.push(`Below SMA200`); }
-    else { score -= 0.25; reasons.push(`${pctAboveShort.toFixed(1)}% vs SMA200`); }
+  // Price vs SMA-20 (short-term trend): graded by distance
+  if (sma20) {
+    const pctAbove = ((currentPrice - sma20) / sma20) * 100;
+    if (pctAbove > 2.0) { score += 0.25; reasons.push(`+${pctAbove.toFixed(1)}% vs SMA20`); }
+    else if (pctAbove > 0.5) { score += 0.15; reasons.push('Above SMA20'); }
+    else if (pctAbove > -0.5) { score += 0; reasons.push('Near SMA20'); }
+    else if (pctAbove > -2.0) { score -= 0.15; reasons.push('Below SMA20'); }
+    else { score -= 0.25; reasons.push(`${pctAbove.toFixed(1)}% vs SMA20`); }
   }
 
-  // Price vs long-term average: graded by distance
-  if (smaLong) {
-    const pctAboveLong = ((currentPrice - smaLong) / smaLong) * 100;
-    if (pctAboveLong > 2.0) { score += 0.25; reasons.push(`+${pctAboveLong.toFixed(1)}% vs SMA500`); }
-    else if (pctAboveLong > 0.5) { score += 0.15; reasons.push('Above SMA500'); }
-    else if (pctAboveLong > -0.5) { score += 0; }
-    else if (pctAboveLong > -2.0) { score -= 0.15; reasons.push('Below SMA500'); }
-    else { score -= 0.25; reasons.push(`${pctAboveLong.toFixed(1)}% vs SMA500`); }
+  // Price vs SMA-50 (medium-term trend): graded by distance
+  if (sma50) {
+    const pctAbove = ((currentPrice - sma50) / sma50) * 100;
+    if (pctAbove > 3.0) { score += 0.25; reasons.push(`+${pctAbove.toFixed(1)}% vs SMA50`); }
+    else if (pctAbove > 1.0) { score += 0.15; reasons.push('Above SMA50'); }
+    else if (pctAbove > -1.0) { score += 0; }
+    else if (pctAbove > -3.0) { score -= 0.15; reasons.push('Below SMA50'); }
+    else { score -= 0.25; reasons.push(`${pctAbove.toFixed(1)}% vs SMA50`); }
   }
 
-  // Moving average crossover (trend direction)
-  if (smaShort && smaLong) {
-    const crossPct = ((smaShort - smaLong) / smaLong) * 100;
-    if (crossPct > 0.5) { score += 0.2; reasons.push('Bullish MA cross'); }
+  // Golden/death cross: SMA-20 vs SMA-50
+  if (sma20 && sma50) {
+    const crossPct = ((sma20 - sma50) / sma50) * 100;
+    if (crossPct > 1.0) { score += 0.2; reasons.push('Bullish MA cross'); }
     else if (crossPct > 0) { score += 0.1; }
-    else if (crossPct > -0.5) { score -= 0.1; }
+    else if (crossPct > -1.0) { score -= 0.1; }
     else { score -= 0.2; reasons.push('Bearish MA cross'); }
   }
 
-  // MACD-style (EMA crossover) with graded scoring
-  if (emaShort && emaLong) {
-    const macdPct = ((emaShort - emaLong) / emaLong) * 100;
-    if (macdPct > 0.5) { score += 0.2; reasons.push('Strong MACD bullish'); }
+  // MACD (EMA-12 vs EMA-26) with graded scoring
+  if (ema12 && ema26) {
+    const macdPct = ((ema12 - ema26) / ema26) * 100;
+    if (macdPct > 1.0) { score += 0.2; reasons.push('Strong MACD bullish'); }
     else if (macdPct > 0) { score += 0.1; reasons.push('MACD bullish'); }
-    else if (macdPct > -0.5) { score -= 0.1; reasons.push('MACD bearish'); }
+    else if (macdPct > -1.0) { score -= 0.1; reasons.push('MACD bearish'); }
     else { score -= 0.2; reasons.push('Strong MACD bearish'); }
   }
 
-  // Rate of change over last hour (60 bars) and last 4 hours (240 bars)
-  const roc60 = data.length > 60 ? ((currentPrice - data[data.length - 60].close) / data[data.length - 60].close) * 100 : 0;
-  const roc240 = data.length > 240 ? ((currentPrice - data[data.length - 240].close) / data[data.length - 240].close) * 100 : 0;
+  // Rate of change: 5 bars = 5 hours (intraday), 20 bars = ~3 days (short-term trend)
+  if (data.length > 5) {
+    const roc5 = ((currentPrice - data[data.length - 5].close) / data[data.length - 5].close) * 100;
+    if (roc5 > 1.0) { score += 0.05; }
+    else if (roc5 < -1.0) { score -= 0.05; }
+  }
+  if (data.length > 20) {
+    const roc20 = ((currentPrice - data[data.length - 20].close) / data[data.length - 20].close) * 100;
+    if (roc20 > 3.0) { score += 0.05; }
+    else if (roc20 < -3.0) { score -= 0.05; }
+  }
 
-  if (roc60 > 0.5) { score += 0.05; }
-  else if (roc60 < -0.5) { score -= 0.05; }
-  if (roc240 > 1.0) { score += 0.05; }
-  else if (roc240 < -1.0) { score -= 0.05; }
-
-  const confidence = data.length >= 500 ? 0.7 : 0.5;
+  const confidence = data.length >= 200 ? 0.7 : 0.5;
   return { name: 'Momentum', score: Math.max(-1, Math.min(1, score)), confidence, reason: reasons.slice(0, 3).join(', ') };
 }
 
@@ -602,8 +607,7 @@ function calculateMeanReversionSignal(data) {
 
   const currentPrice = data[data.length - 1].close;
 
-  // Use longer lookback for mean reversion detection
-  // With minute candles, 200 bars ≈ 3.3 hours, giving meaningful mean to revert to
+  // With hourly candles: 200 bars ≈ 30 trading days, 20 bars ≈ 3 trading days
   const longPeriod = Math.min(200, data.length);
   const pricesLong = data.slice(-longPeriod).map(d => d.close);
   const meanLong = pricesLong.reduce((a, b) => a + b, 0) / pricesLong.length;
