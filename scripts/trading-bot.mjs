@@ -20,7 +20,7 @@ const DEFAULT_CONFIG = {
   maxPositionSize: 0.12,
   maxPositions: 50,
   minTradeValue: 15,
-  targetCashRatio: 0.10,
+  targetCashRatio: 0,
   strategyWeights: {
     momentum: 0.30,
     meanReversion: 0.25,

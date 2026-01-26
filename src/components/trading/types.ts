@@ -114,7 +114,7 @@ export const DEFAULT_CONFIG: TradingConfig = {
   maxPositionSize: 0.12, // 12% max per position (larger positions to deploy cash)
   maxPositions: 50, // Allow more simultaneous positions
   minTradeValue: 15, // Lower minimum for more frequent smaller trades
-  targetCashRatio: 0.10, // Keep ~10% in cash ($1k of $10k)
+  targetCashRatio: 0, // No cash reserve - sell proceeds fund new buys
   strategyWeights: {
     momentum: 0.30,
     meanReversion: 0.25,

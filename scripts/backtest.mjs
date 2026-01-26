@@ -16,7 +16,7 @@ const DEFAULT_CONFIG = {
   maxPositionSize: 0.12,
   maxPositions: 50,
   minTradeValue: 15,
-  targetCashRatio: 0.10,
+  targetCashRatio: 0,
   buyThreshold: 0.02,
   weakSignalSell: 0.02,
   stopLoss: -2,
