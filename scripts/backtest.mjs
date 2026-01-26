@@ -75,8 +75,8 @@ function loadAllSymbols() {
     }
   }
 
-  // Always include SPY for benchmark
-  symbols.add('SPY');
+  // Always include S&P 500 index for benchmark
+  symbols.add('^GSPC');
 
   const allSymbols = [...symbols];
   return allSymbols.slice(0, MAX_SYMBOLS);
@@ -92,7 +92,7 @@ async function fetchHistoricalDaily(symbol) {
   try {
     // Fetch 2 years of daily data (need 252+ candles warmup for long-term momentum + backtest period)
     const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=2y&interval=1d`,
+      `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=2y&interval=1d`,
       { headers: { 'User-Agent': 'Mozilla/5.0 (compatible)' } }
     );
     const data = await response.json();
@@ -307,6 +307,7 @@ function precomputeAllSignals(allData, symbols, backtestDates) {
     pricesByDate[date] = {};
 
     for (const symbol of symbols) {
+      if (symbol === '^GSPC') continue; // benchmark only, not tradeable
       const symbolData = allData[symbol];
       if (!symbolData) continue;
 
@@ -677,8 +678,8 @@ async function runBacktest() {
     process.exit(1);
   }
 
-  // Step 2: Build timeline (use SPY's dates as the trading calendar)
-  const spyData = allData['SPY'] || allData[symbols[0]];
+  // Step 2: Build timeline (use S&P 500's dates as the trading calendar)
+  const spyData = allData['^GSPC'] || allData[symbols[0]];
   const allDates = spyData.map(d => d.date);
 
   // Determine backtest window: need warmup + train + test
@@ -752,7 +753,7 @@ async function runBacktest() {
   const portfolioHistory = [];
   const dailyReturns = [];
 
-  // Track SPY for benchmark
+  // Track S&P 500 for benchmark
   const spyStart = spyData.find(d => d.date === backtestDates[0])?.close;
   const spyBenchmark = [];
 

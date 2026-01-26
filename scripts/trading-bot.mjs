@@ -365,7 +365,7 @@ async function addPortfolioSnapshot(snapshot) {
   await redis.set(KEYS.HISTORY, history.slice(-1000));
 }
 
-// SPY Benchmark caching (runs from LXC to avoid Vercel IP blocks)
+// S&P 500 Benchmark caching (runs from LXC to avoid Vercel IP blocks)
 async function updateSPYBenchmark() {
   try {
     // Always fetch at least 90 days to ensure we have enough data points
@@ -379,7 +379,7 @@ async function updateSPYBenchmark() {
 
     // Use hourly data for intraday chart visibility (supports up to 730 days)
     const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/SPY?period1=${start}&period2=${end}&interval=1h`,
+      `https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?period1=${start}&period2=${end}&interval=1h`,
       {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -389,7 +389,7 @@ async function updateSPYBenchmark() {
     );
 
     if (!response.ok) {
-      console.log(`SPY benchmark fetch failed: ${response.status}`);
+      console.log(`S&P 500 benchmark fetch failed: ${response.status}`);
       return;
     }
 
@@ -397,7 +397,7 @@ async function updateSPYBenchmark() {
     const result = data?.chart?.result?.[0];
 
     if (!result?.timestamp || !result?.indicators?.quote?.[0]?.close) {
-      console.log('Invalid SPY response structure');
+      console.log('Invalid S&P 500 response structure');
       return;
     }
 
@@ -415,12 +415,12 @@ async function updateSPYBenchmark() {
 
     if (benchmark.length > 0) {
       await redis.set(KEYS.SPY_BENCHMARK, benchmark);
-      console.log(`SPY benchmark cached: ${benchmark.length} data points`);
+      console.log(`S&P 500 benchmark cached: ${benchmark.length} data points`);
     } else {
-      console.log('SPY benchmark: no valid data points');
+      console.log('S&P 500 benchmark: no valid data points');
     }
   } catch (error) {
-    console.log(`SPY benchmark error: ${error.message}`);
+    console.log(`S&P 500 benchmark error: ${error.message}`);
   }
 }
 
@@ -1073,7 +1073,7 @@ async function runService() {
     await redis.set(KEYS.HISTORY, []);
     await redis.set(KEYS.SPY_BENCHMARK, []);
     console.log(`Portfolio reset to $${DEFAULT_CONFIG.initialCapital}`);
-    console.log('Cleared: history, trades, signals, SPY benchmark.');
+    console.log('Cleared: history, trades, signals, S&P 500 benchmark.');
     process.exit(0);
   }
 

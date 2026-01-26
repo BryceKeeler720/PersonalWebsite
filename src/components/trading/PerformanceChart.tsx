@@ -251,7 +251,7 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
           </span>
           {hasBenchmark && (
             <span style={{ fontSize: '0.75rem', color: '#f59e0b', marginLeft: '0.5rem' }}>
-              (SPY: {spyChangePercent >= 0 ? '+' : ''}{spyChangePercent.toFixed(2)}%)
+              (S&P 500: {spyChangePercent >= 0 ? '+' : ''}{spyChangePercent.toFixed(2)}%)
             </span>
           )}
         </div>
