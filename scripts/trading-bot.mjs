@@ -13,21 +13,32 @@ let isShuttingDown = false;
 let currentRunPromise = null;
 
 // Configuration
-const BATCH_SIZE = 20;
-const BATCH_DELAY_MS = 400;
+const BATCH_SIZE = 50; // Alpaca supports multi-symbol batch requests
+const BATCH_DELAY_MS = 200;
 const DEFAULT_CONFIG = {
-  initialCapital: 10199.33,
+  initialCapital: 10199.52,
   maxPositionSize: 0.04,
   maxPositions: 50,
   minTradeValue: 15,
   targetCashRatio: 0,
+  stopLoss: -5,        // % — wider for intraday noise
+  profitTake: 5,       // % — let winners run
+  buyThreshold: 0.15,  // Only trade on strong signals
+  weakSignalSell: 0.08,
   strategyWeights: {
-    momentum: 0.08,
-    meanReversion: 0.41,
-    sentiment: 0.15,
-    technical: 0.36,
+    // Maps to: momentum → Intraday Momentum, meanReversion → VWAP Reversion,
+    //          sentiment → Gap Fade, technical → RSI + Volume
+    momentum: 0.35,
+    meanReversion: 0.25,
+    sentiment: 0.10,
+    technical: 0.30,
   },
 };
+
+// Alpaca API Configuration
+const ALPACA_API_KEY = process.env.ALPACA_API_KEY;
+const ALPACA_SECRET_KEY = process.env.ALPACA_SECRET_KEY;
+const ALPACA_DATA_URL = 'https://data.alpaca.markets';
 
 // Asset lists
 const CRYPTO_SYMBOLS = [
@@ -38,17 +49,6 @@ const CRYPTO_SYMBOLS = [
   'INJ-USD', 'RUNE-USD', 'FTM-USD',
 ];
 
-const FOREX_SYMBOLS = [
-  'EURUSD=X', 'GBPUSD=X', 'USDJPY=X', 'USDCHF=X', 'AUDUSD=X', 'USDCAD=X',
-  'NZDUSD=X', 'EURGBP=X', 'EURJPY=X', 'GBPJPY=X', 'AUDJPY=X', 'CADJPY=X',
-  'EURAUD=X', 'EURCHF=X', 'GBPCHF=X', 'USDMXN=X', 'USDZAR=X', 'USDTRY=X',
-  'USDINR=X', 'USDCNY=X',
-];
-
-const FUTURES_SYMBOLS = [
-  'ES=F', 'NQ=F', 'YM=F', 'RTY=F', 'GC=F', 'SI=F', 'CL=F', 'BZ=F', 'NG=F',
-  'HG=F', 'PL=F', 'ZC=F', 'ZW=F', 'ZS=F', 'ZB=F', 'ZN=F', '6E=F', '6B=F', '6J=F',
-];
 
 const SP500_SYMBOLS = [
   // Mega Cap Tech
@@ -469,64 +469,130 @@ async function fetchYahooQuote(symbol) {
   }
 }
 
-async function fetchYahooHistorical(symbol) {
-  try {
-    // Hourly candles over 3 months: SMA-20=3 days, SMA-50=~8 days, standard TA timeframes
-    const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=3mo&interval=1h`,
-      { headers: { 'User-Agent': 'Mozilla/5.0 (compatible)' } }
-    );
-    const data = await response.json();
-    const result = data?.chart?.result?.[0];
-    if (!result?.timestamp || !result?.indicators?.quote?.[0]) return null;
+// Alpaca Data Fetching — batch multi-symbol requests
 
-    const { timestamp, indicators } = result;
-    const quote = indicators.quote[0];
-
-    return timestamp
-      .map((ts, i) => ({
-        date: new Date(ts * 1000).toISOString(),
-        open: quote.open[i],
-        high: quote.high[i],
-        low: quote.low[i],
-        close: quote.close[i],
-        volume: quote.volume[i],
-      }))
-      .filter(d => d.open !== null && d.high !== null && d.low !== null && d.close !== null);
-  } catch (error) {
-    console.error(`Error fetching historical for ${symbol}:`, error.message);
-    return null;
-  }
+function toAlpacaCryptoSymbol(symbol) {
+  // BTC-USD → BTC/USD
+  return symbol.replace('-', '/');
 }
 
-async function fetchYahooDaily(symbol) {
-  try {
-    // 1 year of daily candles for long-term momentum calculation
-    const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1y&interval=1d`,
-      { headers: { 'User-Agent': 'Mozilla/5.0 (compatible)' } }
-    );
-    const data = await response.json();
-    const result = data?.chart?.result?.[0];
-    if (!result?.timestamp || !result?.indicators?.quote?.[0]) return null;
+function fromAlpacaCryptoSymbol(symbol) {
+  // BTC/USD → BTC-USD
+  return symbol.replace('/', '-');
+}
 
-    const { timestamp, indicators } = result;
-    const quote = indicators.quote[0];
+function isCryptoSymbol(symbol) {
+  return symbol.endsWith('-USD') && CRYPTO_SYMBOLS.includes(symbol);
+}
 
-    return timestamp
-      .map((ts, i) => ({
-        date: new Date(ts * 1000).toISOString(),
-        open: quote.open[i],
-        high: quote.high[i],
-        low: quote.low[i],
-        close: quote.close[i],
-        volume: quote.volume[i],
-      }))
-      .filter(d => d.open !== null && d.high !== null && d.low !== null && d.close !== null);
-  } catch (error) {
-    console.error(`Error fetching daily data for ${symbol}:`, error.message);
-    return null;
+function isForexOrFutures(symbol) {
+  return symbol.endsWith('=X') || symbol.endsWith('=F');
+}
+
+function parseAlpacaBars(bars) {
+  return bars.map(b => ({
+    date: b.t,
+    open: b.o,
+    high: b.h,
+    low: b.l,
+    close: b.c,
+    volume: b.v,
+    vwap: b.vw,
+  }));
+}
+
+async function fetchAlpacaBars(symbols, timeframe, days, isCrypto = false) {
+  // Batch fetch bars from Alpaca (up to 50 symbols per request)
+  const allBars = {};
+  const alpacaSymbols = isCrypto ? symbols.map(toAlpacaCryptoSymbol) : symbols;
+  const start = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+  const endpoint = isCrypto
+    ? `${ALPACA_DATA_URL}/v1beta3/crypto/us/bars`
+    : `${ALPACA_DATA_URL}/v2/stocks/bars`;
+
+  for (let i = 0; i < alpacaSymbols.length; i += BATCH_SIZE) {
+    const batch = alpacaSymbols.slice(i, i + BATCH_SIZE);
+    const symbolsParam = batch.join(',');
+
+    try {
+      let pageToken = null;
+      const symbolBars = {};
+      batch.forEach(s => { symbolBars[s] = []; });
+
+      do {
+        const url = new URL(endpoint);
+        url.searchParams.set('symbols', symbolsParam);
+        url.searchParams.set('timeframe', timeframe);
+        url.searchParams.set('start', start);
+        url.searchParams.set('limit', '10000');
+        if (pageToken) url.searchParams.set('page_token', pageToken);
+
+        const response = await fetch(url.toString(), {
+          headers: {
+            'APCA-API-KEY-ID': ALPACA_API_KEY,
+            'APCA-API-SECRET-KEY': ALPACA_SECRET_KEY,
+          },
+        });
+
+        if (!response.ok) {
+          console.error(`Alpaca bars fetch failed (${response.status}): ${await response.text()}`);
+          break;
+        }
+
+        const data = await response.json();
+        const bars = data.bars || {};
+
+        for (const [sym, barList] of Object.entries(bars)) {
+          if (!symbolBars[sym]) symbolBars[sym] = [];
+          symbolBars[sym].push(...barList);
+        }
+
+        pageToken = data.next_page_token || null;
+      } while (pageToken);
+
+      // Convert to our format and map back to original symbol names
+      for (const [alpacaSym, bars] of Object.entries(symbolBars)) {
+        const originalSym = isCrypto ? fromAlpacaCryptoSymbol(alpacaSym) : alpacaSym;
+        if (bars.length > 0) {
+          allBars[originalSym] = parseAlpacaBars(bars);
+        }
+      }
+    } catch (error) {
+      console.error(`Alpaca batch fetch error:`, error.message);
+    }
+
+    if (i + BATCH_SIZE < alpacaSymbols.length) {
+      await new Promise(r => setTimeout(r, BATCH_DELAY_MS));
+    }
   }
+
+  return allBars;
+}
+
+async function fetchAllMarketData(symbols) {
+  // Separate symbols by type
+  const stockSymbols = symbols.filter(s => !isCryptoSymbol(s) && !isForexOrFutures(s));
+  const cryptoSymbols = symbols.filter(s => isCryptoSymbol(s));
+  const skipped = symbols.filter(s => isForexOrFutures(s));
+
+  if (skipped.length > 0) {
+    console.log(`Skipping ${skipped.length} forex/futures symbols (not supported by Alpaca)`);
+  }
+
+  console.log(`Fetching Alpaca data: ${stockSymbols.length} stocks, ${cryptoSymbols.length} crypto`);
+
+  // Fetch 5-min bars (5 days) and daily bars (10 days) in parallel for both stocks and crypto
+  const [stockIntraday, stockDaily, cryptoIntraday, cryptoDaily] = await Promise.all([
+    stockSymbols.length > 0 ? fetchAlpacaBars(stockSymbols, '5Min', 5, false) : {},
+    stockSymbols.length > 0 ? fetchAlpacaBars(stockSymbols, '1Day', 10, false) : {},
+    cryptoSymbols.length > 0 ? fetchAlpacaBars(cryptoSymbols, '5Min', 5, true) : {},
+    cryptoSymbols.length > 0 ? fetchAlpacaBars(cryptoSymbols, '1Day', 10, true) : {},
+  ]);
+
+  return {
+    intraday: { ...stockIntraday, ...cryptoIntraday },
+    daily: { ...stockDaily, ...cryptoDaily },
+  };
 }
 
 // Strategy calculations
@@ -546,139 +612,262 @@ function calculateRSI(data, period = 14) {
   return 100 - (100 / (1 + rs));
 }
 
-function calculateMomentumSignal(dailyData) {
-  // Long-term momentum using daily candles (academic standard)
-  // Need at least 252 trading days (1 year) for 12-1 momentum factor
-  if (!dailyData || dailyData.length < 252) {
-    return { name: 'Momentum', score: 0, confidence: 0, reason: 'Insufficient daily data (need 1y)' };
+function calculateVWAPReversionSignal(intradayBars) {
+  // VWAP Reversion: mean reversion to volume-weighted average price
+  // Maps to 'meanReversion' weight (0.35)
+  if (!intradayBars || intradayBars.length < 12) {
+    return { name: 'VWAP Reversion', score: 0, confidence: 0, reason: 'Insufficient intraday data' };
   }
 
-  const currentPrice = dailyData[dailyData.length - 1].close;
-  const reasons = [];
-  let score = 0;
+  // Get today's bars only
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayBars = intradayBars.filter(b => new Date(b.date) >= todayStart);
 
-  // 12-1 Momentum (Jegadeesh-Titman): return from 12 months ago to 1 month ago
-  // Skips last month to avoid short-term reversal effect
-  const price12moAgo = dailyData[dailyData.length - 252].close;
-  const price1moAgo = dailyData[dailyData.length - 21].close;
-  const mom12_1 = ((price1moAgo - price12moAgo) / price12moAgo) * 100;
+  // Fall back to most recent trading session if no bars today
+  const barsToUse = todayBars.length >= 6 ? todayBars : intradayBars.slice(-78); // 78 bars ≈ 6.5 hours
 
-  // 6-month return
-  const price6moAgo = dailyData[dailyData.length - 126].close;
-  const mom6m = ((currentPrice - price6moAgo) / price6moAgo) * 100;
+  // Compute cumulative VWAP from typical price × volume
+  let cumVolPrice = 0;
+  let cumVol = 0;
+  for (const bar of barsToUse) {
+    const typicalPrice = (bar.high + bar.low + bar.close) / 3;
+    cumVolPrice += typicalPrice * bar.volume;
+    cumVol += bar.volume;
+  }
 
-  // 3-month return
-  const price3moAgo = dailyData[dailyData.length - 63].close;
-  const mom3m = ((currentPrice - price3moAgo) / price3moAgo) * 100;
+  if (cumVol === 0) {
+    return { name: 'VWAP Reversion', score: 0, confidence: 0, reason: 'No volume data' };
+  }
 
-  // 12-1 momentum scoring (~40% of total signal — the classic academic factor)
-  if (mom12_1 > 30) { score += 0.4; }
-  else if (mom12_1 > 15) { score += 0.3; }
-  else if (mom12_1 > 5) { score += 0.15; }
-  else if (mom12_1 > -5) { score += 0; }
-  else if (mom12_1 > -15) { score -= 0.15; }
-  else if (mom12_1 > -30) { score -= 0.3; }
-  else { score -= 0.4; }
-  reasons.push(`12-1: ${mom12_1 >= 0 ? '+' : ''}${mom12_1.toFixed(0)}%`);
+  const vwap = cumVolPrice / cumVol;
+  const currentPrice = barsToUse[barsToUse.length - 1].close;
 
-  // 6-month momentum scoring (~35%)
-  if (mom6m > 20) { score += 0.35; }
-  else if (mom6m > 10) { score += 0.2; }
-  else if (mom6m > 3) { score += 0.1; }
-  else if (mom6m > -3) { score += 0; }
-  else if (mom6m > -10) { score -= 0.1; }
-  else if (mom6m > -20) { score -= 0.2; }
-  else { score -= 0.35; }
-  reasons.push(`6mo: ${mom6m >= 0 ? '+' : ''}${mom6m.toFixed(0)}%`);
+  // Standard deviation of typical price around VWAP
+  const squaredDiffs = barsToUse.map(b => {
+    const tp = (b.high + b.low + b.close) / 3;
+    return Math.pow(tp - vwap, 2);
+  });
+  const variance = squaredDiffs.reduce((a, b) => a + b, 0) / squaredDiffs.length;
+  const stdDev = Math.sqrt(variance);
 
-  // 3-month momentum scoring (~25%)
-  if (mom3m > 15) { score += 0.25; }
-  else if (mom3m > 7) { score += 0.15; }
-  else if (mom3m > 2) { score += 0.05; }
-  else if (mom3m > -2) { score += 0; }
-  else if (mom3m > -7) { score -= 0.05; }
-  else if (mom3m > -15) { score -= 0.15; }
-  else { score -= 0.25; }
-  reasons.push(`3mo: ${mom3m >= 0 ? '+' : ''}${mom3m.toFixed(0)}%`);
+  if (stdDev === 0) {
+    return { name: 'VWAP Reversion', score: 0, confidence: 0.3, reason: 'No price variation' };
+  }
 
-  return {
-    name: 'Momentum',
-    score: Math.max(-1, Math.min(1, score)),
-    confidence: 0.75,
-    reason: reasons.join(', '),
-  };
-}
-
-function calculateMeanReversionSignal(data) {
-  if (data.length < 50) return { name: 'Mean Reversion', score: 0, confidence: 0, reason: 'Insufficient data' };
-
-  const currentPrice = data[data.length - 1].close;
-
-  // With hourly candles: 200 bars ≈ 30 trading days, 20 bars ≈ 3 trading days
-  const longPeriod = Math.min(200, data.length);
-  const pricesLong = data.slice(-longPeriod).map(d => d.close);
-  const meanLong = pricesLong.reduce((a, b) => a + b, 0) / pricesLong.length;
-  const stdDevLong = Math.sqrt(pricesLong.reduce((sum, p) => sum + Math.pow(p - meanLong, 2), 0) / pricesLong.length);
-
-  // Short-term z-score (20-period Bollinger Band style)
-  const prices20 = data.slice(-20).map(d => d.close);
-  const mean20 = prices20.reduce((a, b) => a + b, 0) / prices20.length;
-  const stdDev20 = Math.sqrt(prices20.reduce((sum, p) => sum + Math.pow(p - mean20, 2), 0) / prices20.length);
-  const shortZ = stdDev20 > 0 ? (currentPrice - mean20) / stdDev20 : 0;
-
-  // Long-term z-score (how far from longer average)
-  const longZ = stdDevLong > 0 ? (currentPrice - meanLong) / stdDevLong : 0;
-
-  // Combine: weight toward long-term (true mean reversion) with short-term confirmation
-  const zScore = longZ * 0.7 + shortZ * 0.3;
-  const pctFromMean = meanLong > 0 ? ((currentPrice - meanLong) / meanLong * 100).toFixed(1) : '0.0';
+  const zScore = (currentPrice - vwap) / stdDev;
+  const pctFromVWAP = ((currentPrice - vwap) / vwap * 100).toFixed(2);
 
   let score = 0;
   let reason = '';
 
-  if (zScore < -2) { score = 0.8; reason = `Extremely oversold (z=${zScore.toFixed(2)}, ${pctFromMean}% from mean)`; }
-  else if (zScore < -1.5) { score = 0.6; reason = `Very oversold (z=${zScore.toFixed(2)}, ${pctFromMean}% from mean)`; }
-  else if (zScore < -1) { score = 0.4; reason = `Oversold (z=${zScore.toFixed(2)})`; }
-  else if (zScore < -0.5) { score = 0.2; reason = `Slightly below mean (z=${zScore.toFixed(2)})`; }
-  else if (zScore > 2) { score = -0.8; reason = `Extremely overbought (z=${zScore.toFixed(2)}, +${pctFromMean}% from mean)`; }
-  else if (zScore > 1.5) { score = -0.6; reason = `Very overbought (z=${zScore.toFixed(2)})`; }
-  else if (zScore > 1) { score = -0.4; reason = `Overbought (z=${zScore.toFixed(2)})`; }
-  else if (zScore > 0.5) { score = -0.2; reason = `Slightly above mean (z=${zScore.toFixed(2)})`; }
-  else { score = 0; reason = `Near mean (z=${zScore.toFixed(2)})`; }
+  // Mean reversion: oversold below VWAP = buy, overbought above VWAP = sell
+  if (zScore < -2) { score = 0.8; reason = `Deeply below VWAP (z=${zScore.toFixed(2)}, ${pctFromVWAP}%)`; }
+  else if (zScore < -1.5) { score = 0.6; reason = `Well below VWAP (z=${zScore.toFixed(2)}, ${pctFromVWAP}%)`; }
+  else if (zScore < -1) { score = 0.4; reason = `Below VWAP (z=${zScore.toFixed(2)}, ${pctFromVWAP}%)`; }
+  else if (zScore < -0.5) { score = 0.2; reason = `Slightly below VWAP (z=${zScore.toFixed(2)})`; }
+  else if (zScore > 2) { score = -0.8; reason = `Deeply above VWAP (z=${zScore.toFixed(2)}, +${pctFromVWAP}%)`; }
+  else if (zScore > 1.5) { score = -0.6; reason = `Well above VWAP (z=${zScore.toFixed(2)})`; }
+  else if (zScore > 1) { score = -0.4; reason = `Above VWAP (z=${zScore.toFixed(2)})`; }
+  else if (zScore > 0.5) { score = -0.2; reason = `Slightly above VWAP (z=${zScore.toFixed(2)})`; }
+  else { score = 0; reason = `At VWAP (z=${zScore.toFixed(2)})`; }
 
-  return { name: 'Mean Reversion', score, confidence: 0.6, reason };
+  // Confidence scales with number of bars available
+  const confidence = Math.min(0.8, 0.3 + (barsToUse.length / 78) * 0.5);
+
+  return { name: 'VWAP Reversion', score, confidence, reason };
 }
 
-function calculateTechnicalSignal(data) {
-  if (data.length < 20) return { name: 'Technical', score: 0, confidence: 0, reason: 'Insufficient data' };
+function calculateIntradayMomentumSignal(intradayBars) {
+  // Intraday momentum: short-term price velocity normalized by ATR
+  // Maps to 'momentum' weight (0.20)
+  if (!intradayBars || intradayBars.length < 12) {
+    return { name: 'Intraday Momentum', score: 0, confidence: 0, reason: 'Insufficient intraday data' };
+  }
 
-  const rsi = calculateRSI(data);
+  const bars = intradayBars;
+  const currentPrice = bars[bars.length - 1].close;
+
+  // ATR (Average True Range) over last 14 bars for normalization
+  const atrPeriod = Math.min(14, bars.length - 1);
+  let atrSum = 0;
+  for (let i = bars.length - atrPeriod; i < bars.length; i++) {
+    const tr = Math.max(
+      bars[i].high - bars[i].low,
+      Math.abs(bars[i].high - bars[i - 1].close),
+      Math.abs(bars[i].low - bars[i - 1].close)
+    );
+    atrSum += tr;
+  }
+  const atr = atrSum / atrPeriod;
+
+  if (atr === 0) {
+    return { name: 'Intraday Momentum', score: 0, confidence: 0.3, reason: 'No price movement' };
+  }
+
+  const reasons = [];
+  let score = 0;
+
+  // 30-min momentum (6 × 5-min bars)
+  if (bars.length >= 7) {
+    const price30mAgo = bars[bars.length - 7].close;
+    const mom30m = (currentPrice - price30mAgo) / atr;
+    if (mom30m > 1.5) { score += 0.3; }
+    else if (mom30m > 0.75) { score += 0.15; }
+    else if (mom30m < -1.5) { score -= 0.3; }
+    else if (mom30m < -0.75) { score -= 0.15; }
+    reasons.push(`30m: ${mom30m >= 0 ? '+' : ''}${mom30m.toFixed(2)} ATR`);
+  }
+
+  // 1-hour momentum (12 × 5-min bars)
+  if (bars.length >= 13) {
+    const price1hAgo = bars[bars.length - 13].close;
+    const mom1h = (currentPrice - price1hAgo) / atr;
+    if (mom1h > 2) { score += 0.4; }
+    else if (mom1h > 1) { score += 0.2; }
+    else if (mom1h < -2) { score -= 0.4; }
+    else if (mom1h < -1) { score -= 0.2; }
+    reasons.push(`1h: ${mom1h >= 0 ? '+' : ''}${mom1h.toFixed(2)} ATR`);
+  }
+
+  // 2-hour momentum (24 × 5-min bars)
+  if (bars.length >= 25) {
+    const price2hAgo = bars[bars.length - 25].close;
+    const mom2h = (currentPrice - price2hAgo) / atr;
+    if (mom2h > 2.5) { score += 0.3; }
+    else if (mom2h > 1.5) { score += 0.15; }
+    else if (mom2h < -2.5) { score -= 0.3; }
+    else if (mom2h < -1.5) { score -= 0.15; }
+    reasons.push(`2h: ${mom2h >= 0 ? '+' : ''}${mom2h.toFixed(2)} ATR`);
+  }
+
+  return {
+    name: 'Intraday Momentum',
+    score: Math.max(-1, Math.min(1, score)),
+    confidence: 0.65,
+    reason: reasons.join(', '),
+  };
+}
+
+function calculateRSIVolumeSignal(intradayBars) {
+  // RSI-7 on 5-min candles + volume spike detection
+  // Maps to 'technical' weight (0.30)
+  if (!intradayBars || intradayBars.length < 20) {
+    return { name: 'RSI + Volume', score: 0, confidence: 0, reason: 'Insufficient intraday data' };
+  }
+
+  const rsi7 = calculateRSI(intradayBars, 7);
+  const rsi14 = calculateRSI(intradayBars, 14);
+
   let score = 0;
   const reasons = [];
 
-  if (rsi < 30) { score += 0.5; reasons.push(`RSI oversold (${rsi.toFixed(0)})`); }
-  else if (rsi < 40) { score += 0.25; reasons.push(`RSI low (${rsi.toFixed(0)})`); }
-  else if (rsi > 70) { score -= 0.5; reasons.push(`RSI overbought (${rsi.toFixed(0)})`); }
-  else if (rsi > 60) { score -= 0.25; reasons.push(`RSI high (${rsi.toFixed(0)})`); }
-  else { reasons.push(`RSI neutral (${rsi.toFixed(0)})`); }
+  // RSI-7 (fast, more sensitive to short-term moves)
+  if (rsi7 < 20) { score += 0.5; reasons.push(`RSI-7 deeply oversold (${rsi7.toFixed(0)})`); }
+  else if (rsi7 < 30) { score += 0.35; reasons.push(`RSI-7 oversold (${rsi7.toFixed(0)})`); }
+  else if (rsi7 < 40) { score += 0.15; reasons.push(`RSI-7 low (${rsi7.toFixed(0)})`); }
+  else if (rsi7 > 80) { score -= 0.5; reasons.push(`RSI-7 deeply overbought (${rsi7.toFixed(0)})`); }
+  else if (rsi7 > 70) { score -= 0.35; reasons.push(`RSI-7 overbought (${rsi7.toFixed(0)})`); }
+  else if (rsi7 > 60) { score -= 0.15; reasons.push(`RSI-7 high (${rsi7.toFixed(0)})`); }
+  else { reasons.push(`RSI-7 neutral (${rsi7.toFixed(0)})`); }
 
-  const recentData = data.slice(-5);
-  const avgVolume = data.slice(-20).reduce((sum, d) => sum + d.volume, 0) / 20;
-  const recentVolume = recentData.reduce((sum, d) => sum + d.volume, 0) / 5;
-
-  if (recentVolume > avgVolume * 1.5) {
-    const priceChange = (recentData[recentData.length - 1].close - recentData[0].close) / recentData[0].close;
-    if (priceChange > 0) { score += 0.25; reasons.push('High volume uptrend'); }
-    else { score -= 0.25; reasons.push('High volume downtrend'); }
+  // RSI-14 confirmation amplifies the signal
+  if ((rsi7 < 30 && rsi14 < 40) || (rsi7 > 70 && rsi14 > 60)) {
+    score *= 1.3;
+    reasons.push('RSI-14 confirms');
   }
 
-  return { name: 'Technical', score: Math.max(-1, Math.min(1, score)), confidence: 0.65, reason: reasons.join(', ') };
+  // Volume spike detection (last 30 min vs 40-bar average)
+  const recentBars = intradayBars.slice(-6);
+  const lookback = Math.min(40, intradayBars.length);
+  const avgVolume = intradayBars.slice(-lookback).reduce((sum, d) => sum + d.volume, 0) / lookback;
+  const recentVolume = recentBars.reduce((sum, d) => sum + d.volume, 0) / recentBars.length;
+
+  if (avgVolume > 0) {
+    const volumeRatio = recentVolume / avgVolume;
+    if (volumeRatio > 2.5) {
+      const priceChange = (recentBars[recentBars.length - 1].close - recentBars[0].close) / recentBars[0].close;
+      if (priceChange > 0) { score += 0.25; reasons.push(`Volume spike (${volumeRatio.toFixed(1)}x) + up`); }
+      else if (priceChange < 0) { score -= 0.25; reasons.push(`Volume spike (${volumeRatio.toFixed(1)}x) + down`); }
+      else { reasons.push(`Volume spike (${volumeRatio.toFixed(1)}x) neutral`); }
+    } else if (volumeRatio > 1.5) {
+      const priceChange = (recentBars[recentBars.length - 1].close - recentBars[0].close) / recentBars[0].close;
+      if (priceChange > 0) { score += 0.1; reasons.push(`Elevated volume (${volumeRatio.toFixed(1)}x) + up`); }
+      else if (priceChange < 0) { score -= 0.1; reasons.push(`Elevated volume (${volumeRatio.toFixed(1)}x) + down`); }
+    }
+  }
+
+  return {
+    name: 'RSI + Volume',
+    score: Math.max(-1, Math.min(1, score)),
+    confidence: 0.7,
+    reason: reasons.join(', '),
+  };
 }
 
-function calculateSentimentSignal() {
-  // Simplified sentiment (would need real news API for proper implementation)
-  const score = (Math.random() - 0.5) * 0.4;
-  return { name: 'Sentiment', score, confidence: 0.3, reason: 'Market sentiment analysis' };
+function calculateGapFadeSignal(intradayBars, dailyBars) {
+  // Overnight gap fading: large gaps tend to mean-revert during the day
+  // Maps to 'sentiment' weight (0.15)
+  if (!dailyBars || dailyBars.length < 2 || !intradayBars || intradayBars.length < 6) {
+    return { name: 'Gap Fade', score: 0, confidence: 0, reason: 'Insufficient data for gap analysis' };
+  }
+
+  // Previous close from daily bars
+  const previousClose = dailyBars[dailyBars.length - 2].close;
+
+  // Today's open from intraday bars
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const todayBar = intradayBars.find(b => new Date(b.date) >= todayStart);
+  const todayOpen = todayBar?.open || intradayBars[Math.max(0, intradayBars.length - 78)]?.open;
+
+  if (!todayOpen || !previousClose) {
+    return { name: 'Gap Fade', score: 0, confidence: 0, reason: 'Cannot determine gap' };
+  }
+
+  const gapPercent = ((todayOpen - previousClose) / previousClose) * 100;
+  const currentPrice = intradayBars[intradayBars.length - 1].close;
+  const gapFillPercent = todayOpen !== previousClose
+    ? ((currentPrice - todayOpen) / (previousClose - todayOpen)) * 100
+    : 100;
+
+  // Time decay: gap fade signal strongest at open, weakens through the day
+  const marketOpen = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 30);
+  const hoursAfterOpen = Math.max(0, (now.getTime() - marketOpen.getTime()) / (1000 * 60 * 60));
+  const timeDecay = Math.max(0.2, 1 - (hoursAfterOpen / 6.5));
+
+  let score = 0;
+  let reason = '';
+
+  if (Math.abs(gapPercent) < 0.1) {
+    return { name: 'Gap Fade', score: 0, confidence: 0.2, reason: 'No significant gap' };
+  }
+
+  // Gap fade: bet against the gap direction (gaps tend to fill)
+  if (gapPercent > 2) { score = -0.6 * timeDecay; reason = `Large gap up +${gapPercent.toFixed(1)}% (fade short)`; }
+  else if (gapPercent > 1) { score = -0.4 * timeDecay; reason = `Gap up +${gapPercent.toFixed(1)}% (fade short)`; }
+  else if (gapPercent > 0.3) { score = -0.2 * timeDecay; reason = `Small gap up +${gapPercent.toFixed(1)}%`; }
+  else if (gapPercent < -2) { score = 0.6 * timeDecay; reason = `Large gap down ${gapPercent.toFixed(1)}% (fade long)`; }
+  else if (gapPercent < -1) { score = 0.4 * timeDecay; reason = `Gap down ${gapPercent.toFixed(1)}% (fade long)`; }
+  else if (gapPercent < -0.3) { score = 0.2 * timeDecay; reason = `Small gap down ${gapPercent.toFixed(1)}%`; }
+
+  // Reduce signal if gap has already filled
+  if (gapFillPercent > 80) {
+    score *= 0.3;
+    reason += ' (mostly filled)';
+  } else if (gapFillPercent > 50) {
+    score *= 0.6;
+    reason += ' (partially filled)';
+  }
+
+  reason += ` [decay: ${(timeDecay * 100).toFixed(0)}%]`;
+
+  return {
+    name: 'Gap Fade',
+    score: Math.max(-1, Math.min(1, score)),
+    confidence: 0.5 * timeDecay,
+    reason,
+  };
 }
 
 function combineSignals(symbol, momentum, meanReversion, sentiment, technical, weights) {
@@ -708,21 +897,17 @@ function combineSignals(symbol, momentum, meanReversion, sentiment, technical, w
 }
 
 
-async function analyzeStock(symbol) {
-  // Fetch hourly (for mean reversion, technical) and daily (for momentum) in parallel
-  const [historicalData, dailyData] = await Promise.all([
-    fetchYahooHistorical(symbol),
-    fetchYahooDaily(symbol),
-  ]);
-  if (!historicalData || historicalData.length < 50) return { signal: null, lastPrice: null };
+function analyzeStock(symbol, intradayBars, dailyBars) {
+  // Analyze using pre-fetched Alpaca intraday (5-min) and daily bars
+  if (!intradayBars || intradayBars.length < 12) return { signal: null, lastPrice: null };
 
-  const momentum = calculateMomentumSignal(dailyData);
-  const meanReversion = calculateMeanReversionSignal(historicalData);
-  const technical = calculateTechnicalSignal(historicalData);
-  const sentiment = calculateSentimentSignal();
+  const momentum = calculateIntradayMomentumSignal(intradayBars);
+  const meanReversion = calculateVWAPReversionSignal(intradayBars);
+  const technical = calculateRSIVolumeSignal(intradayBars);
+  const sentiment = calculateGapFadeSignal(intradayBars, dailyBars);
 
   const signal = combineSignals(symbol, momentum, meanReversion, sentiment, technical, DEFAULT_CONFIG.strategyWeights);
-  const lastPrice = historicalData[historicalData.length - 1].close;
+  const lastPrice = intradayBars[intradayBars.length - 1].close;
   return { signal, lastPrice };
 }
 
@@ -730,75 +915,68 @@ async function analyzeStock(symbol) {
 async function main() {
   console.log('Starting trading bot...');
 
-  // Check Redis connection
+  // Check credentials
   if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
     console.error('Missing Redis credentials');
+    process.exit(1);
+  }
+  if (!ALPACA_API_KEY || !ALPACA_SECRET_KEY) {
+    console.error('Missing Alpaca API credentials (ALPACA_API_KEY / ALPACA_SECRET_KEY)');
     process.exit(1);
   }
 
   let portfolio = await getPortfolio();
   const allSignals = {};
-  const priceCache = {}; // Cache prices from analysis to avoid redundant API calls
+  const priceCache = {};
 
-  // Determine assets to analyze
+  // Determine assets to analyze (no forex/futures — Alpaca doesn't support them)
   const now = new Date();
   const dayOfWeek = now.getUTCDay();
   const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
   let assetsToAnalyze = [...CRYPTO_SYMBOLS];
   if (!isWeekend) {
-    assetsToAnalyze.push(...SP500_SYMBOLS, ...ETF_SYMBOLS, ...NASDAQ_ADDITIONAL, ...FOREX_SYMBOLS, ...FUTURES_SYMBOLS);
+    assetsToAnalyze.push(...SP500_SYMBOLS, ...ETF_SYMBOLS, ...NASDAQ_ADDITIONAL);
   }
   // Always include current holdings so we can generate signals and make sell decisions
   for (const holding of portfolio.holdings) {
     assetsToAnalyze.push(holding.symbol);
   }
-  // Deduplicate
-  assetsToAnalyze = [...new Set(assetsToAnalyze)];
+  // Deduplicate and filter out unsupported symbols
+  assetsToAnalyze = [...new Set(assetsToAnalyze)].filter(s => !isForexOrFutures(s));
 
   console.log(`Analyzing ${assetsToAnalyze.length} assets (Weekend: ${isWeekend})...`);
 
-  // Process in batches
-  for (let i = 0; i < assetsToAnalyze.length; i += BATCH_SIZE) {
-    const batch = assetsToAnalyze.slice(i, i + BATCH_SIZE);
-    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
-    const totalBatches = Math.ceil(assetsToAnalyze.length / BATCH_SIZE);
+  // Batch fetch all market data from Alpaca (intraday 5-min + daily bars)
+  const marketData = await fetchAllMarketData(assetsToAnalyze);
 
-    console.log(`Batch ${batchNum}/${totalBatches}: ${batch.join(', ')}`);
+  // Analyze each symbol using pre-fetched data
+  for (const symbol of assetsToAnalyze) {
+    try {
+      const intradayBars = marketData.intraday[symbol] || [];
+      const dailyBars = marketData.daily[symbol] || [];
+      const result = analyzeStock(symbol, intradayBars, dailyBars);
 
-    const results = await Promise.all(batch.map(async (symbol) => {
-      try {
-        const result = await analyzeStock(symbol);
-        return { symbol, ...result };
-      } catch (error) {
-        console.error(`Error analyzing ${symbol}:`, error.message);
-        return { symbol, signal: null, lastPrice: null };
+      if (result.lastPrice) {
+        priceCache[symbol] = result.lastPrice;
       }
-    }));
-
-    for (const { symbol, signal, lastPrice } of results) {
-      if (lastPrice) {
-        priceCache[symbol] = lastPrice;
-      }
-      if (signal) {
-        allSignals[symbol] = { ...signal, price: lastPrice };
+      if (result.signal) {
+        allSignals[symbol] = { ...result.signal, price: result.lastPrice };
       } else {
-        // Store a placeholder signal so the frontend always shows something
+        // Placeholder signal so the frontend always shows something
         allSignals[symbol] = {
           symbol,
           timestamp: new Date().toISOString(),
-          momentum: { name: 'Momentum', score: 0, confidence: 0, reason: 'No market data available' },
-          meanReversion: { name: 'Mean Reversion', score: 0, confidence: 0, reason: 'No market data available' },
-          sentiment: { name: 'Sentiment', score: 0, confidence: 0, reason: 'No market data available' },
-          technical: { name: 'Technical', score: 0, confidence: 0, reason: 'No market data available' },
+          momentum: { name: 'Intraday Momentum', score: 0, confidence: 0, reason: 'No market data available' },
+          meanReversion: { name: 'VWAP Reversion', score: 0, confidence: 0, reason: 'No market data available' },
+          sentiment: { name: 'Gap Fade', score: 0, confidence: 0, reason: 'No market data available' },
+          technical: { name: 'RSI + Volume', score: 0, confidence: 0, reason: 'No market data available' },
           combined: 0,
           recommendation: 'HOLD',
         };
       }
-    }
-
-    if (i + BATCH_SIZE < assetsToAnalyze.length) {
-      await new Promise(r => setTimeout(r, BATCH_DELAY_MS));
+    } catch (error) {
+      console.error(`Error analyzing ${symbol}:`, error.message);
     }
   }
 
@@ -842,13 +1020,13 @@ async function main() {
     } else if (signal.recommendation === 'STRONG_SELL') {
       sellPercent = 1.0;
       sellReason = `STRONG_SELL: score ${signal.combined.toFixed(2)}`;
-    } else if (holding.gainLossPercent <= -2) {
+    } else if (holding.gainLossPercent <= DEFAULT_CONFIG.stopLoss) {
       sellPercent = 1.0;
       sellReason = `Stop loss at ${holding.gainLossPercent.toFixed(1)}%`;
-    } else if (signal.combined < 0.02) {
+    } else if (signal.combined < DEFAULT_CONFIG.weakSignalSell) {
       sellPercent = 1.0;
       sellReason = `Weak signal (${signal.combined.toFixed(3)})`;
-    } else if (holding.gainLossPercent >= 2) {
+    } else if (holding.gainLossPercent >= DEFAULT_CONFIG.profitTake) {
       sellPercent = 0.5;
       sellReason = `Taking profits at ${holding.gainLossPercent.toFixed(1)}%`;
     } else if (signal.recommendation === 'SELL') {
@@ -935,7 +1113,7 @@ async function main() {
   // Check for buys — pre-allocate cash across ALL candidates proportionally
   const openSlots = DEFAULT_CONFIG.maxPositions - portfolio.holdings.length;
   const buyCandidates = Object.values(allSignals)
-    .filter(s => s.combined > 0.02 && !portfolio.holdings.some(h => h.symbol === s.symbol))
+    .filter(s => s.combined > DEFAULT_CONFIG.buyThreshold && !portfolio.holdings.some(h => h.symbol === s.symbol))
     .sort((a, b) => b.combined - a.combined)
     .slice(0, openSlots);
 
