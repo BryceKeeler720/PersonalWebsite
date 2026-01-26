@@ -128,62 +128,68 @@ export default function TradingBot() {
   }, []);
 
   // Merge backtest history with live history for the chart
-  // Scale live data so it continues seamlessly from the backtest ending value
+  // Backtest data is the primary source for its period; live data appended after
   const combinedHistory = useMemo(() => {
     if (!backtestData?.portfolioHistory?.length) return data.history;
-    const liveStart = data.history.length > 0 ? new Date(data.history[0].timestamp).getTime() : Infinity;
-    const backtestOnly = backtestData.portfolioHistory.filter(
-      p => new Date(p.timestamp).getTime() < liveStart
+
+    // Always use all backtest data; only use live data from AFTER the backtest ends
+    const backtestEnd = new Date(
+      backtestData.portfolioHistory[backtestData.portfolioHistory.length - 1].timestamp
+    ).getTime();
+    const liveAfterBacktest = data.history.filter(
+      h => new Date(h.timestamp).getTime() > backtestEnd
     );
 
-    if (data.history.length === 0 || backtestOnly.length === 0) {
-      return [...backtestOnly, ...data.history];
+    if (liveAfterBacktest.length === 0) {
+      return backtestData.portfolioHistory;
     }
 
     // Scale live data to continue from backtest ending value
-    const backtestEndValue = backtestOnly[backtestOnly.length - 1].totalValue;
-    const liveStartValue = data.history[0].totalValue;
+    const backtestEndValue = backtestData.portfolioHistory[backtestData.portfolioHistory.length - 1].totalValue;
+    const liveStartValue = liveAfterBacktest[0].totalValue;
     const scaleFactor = liveStartValue > 0 ? backtestEndValue / liveStartValue : 1;
 
-    // Only scale if there's a meaningful difference (>1%)
     if (Math.abs(scaleFactor - 1) < 0.01) {
-      return [...backtestOnly, ...data.history];
+      return [...backtestData.portfolioHistory, ...liveAfterBacktest];
     }
 
-    const scaledLiveHistory = data.history.map(h => ({
+    const scaledLiveHistory = liveAfterBacktest.map(h => ({
       ...h,
       totalValue: Math.round(h.totalValue * scaleFactor * 100) / 100,
     }));
 
-    return [...backtestOnly, ...scaledLiveHistory];
+    return [...backtestData.portfolioHistory, ...scaledLiveHistory];
   }, [backtestData, data.history]);
 
   const combinedBenchmark = useMemo(() => {
     if (!backtestData?.spyBenchmark?.length) return data.spyBenchmark;
-    const liveStart = data.spyBenchmark.length > 0 ? new Date(data.spyBenchmark[0].timestamp).getTime() : Infinity;
-    const backtestOnly = backtestData.spyBenchmark.filter(
-      p => new Date(p.timestamp).getTime() < liveStart
+
+    const backtestEnd = new Date(
+      backtestData.spyBenchmark[backtestData.spyBenchmark.length - 1].timestamp
+    ).getTime();
+    const liveAfterBacktest = data.spyBenchmark.filter(
+      b => new Date(b.timestamp).getTime() > backtestEnd
     );
 
-    if (data.spyBenchmark.length === 0 || backtestOnly.length === 0) {
-      return [...backtestOnly, ...data.spyBenchmark];
+    if (liveAfterBacktest.length === 0) {
+      return backtestData.spyBenchmark;
     }
 
     // Scale live benchmark to continue from backtest ending value
-    const backtestEndValue = backtestOnly[backtestOnly.length - 1].value;
-    const liveStartValue = data.spyBenchmark[0].value;
+    const backtestEndValue = backtestData.spyBenchmark[backtestData.spyBenchmark.length - 1].value;
+    const liveStartValue = liveAfterBacktest[0].value;
     const scaleFactor = liveStartValue > 0 ? backtestEndValue / liveStartValue : 1;
 
     if (Math.abs(scaleFactor - 1) < 0.01) {
-      return [...backtestOnly, ...data.spyBenchmark];
+      return [...backtestData.spyBenchmark, ...liveAfterBacktest];
     }
 
-    const scaledBenchmark = data.spyBenchmark.map(b => ({
+    const scaledBenchmark = liveAfterBacktest.map(b => ({
       ...b,
       value: Math.round(b.value * scaleFactor * 100) / 100,
     }));
 
-    return [...backtestOnly, ...scaledBenchmark];
+    return [...backtestData.spyBenchmark, ...scaledBenchmark];
   }, [backtestData, data.spyBenchmark]);
 
   // Use the backtest's starting capital for the chart baseline when available
