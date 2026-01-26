@@ -13,8 +13,8 @@ let isShuttingDown = false;
 let currentRunPromise = null;
 
 // Configuration
-const BATCH_SIZE = 15;
-const BATCH_DELAY_MS = 500;
+const BATCH_SIZE = 20;
+const BATCH_DELAY_MS = 400;
 const DEFAULT_CONFIG = {
   initialCapital: 10000,
   maxPositionSize: 0.12,
@@ -51,6 +51,7 @@ const FUTURES_SYMBOLS = [
 ];
 
 const SP500_SYMBOLS = [
+  // Mega cap & top holdings
   'NVDA', 'AAPL', 'MSFT', 'AMZN', 'GOOGL', 'GOOG', 'META', 'AVGO', 'TSLA',
   'BRK-B', 'LLY', 'WMT', 'JPM', 'V', 'XOM', 'JNJ', 'ORCL', 'MA', 'MU', 'COST',
   'AMD', 'PLTR', 'ABBV', 'HD', 'BAC', 'NFLX', 'PG', 'CVX', 'UNH', 'KO',
@@ -61,6 +62,61 @@ const SP500_SYMBOLS = [
   'VZ', 'QCOM', 'DHR', 'BKNG', 'SPGI', 'INTU', 'LOW', 'ADI', 'PFE', 'HON',
   'NOW', 'DE', 'BSX', 'LMT', 'UNP', 'COF', 'SYK', 'NEM', 'MDT', 'ETN',
   'WELL', 'PANW', 'ADBE', 'COP', 'PGR', 'VRTX', 'CB', 'PLD', 'PH', 'BX',
+  // More S&P 500
+  'MMC', 'ADP', 'FI', 'SO', 'ICE', 'CME', 'ITW', 'DUK', 'TT', 'MCK',
+  'CL', 'EMR', 'EOG', 'APD', 'CDNS', 'SNPS', 'CEG', 'MSI', 'REGN', 'NOC',
+  'FDX', 'GM', 'CSX', 'SLB', 'PNC', 'OXY', 'USB', 'ORLY', 'GD', 'CARR',
+  'NSC', 'TDG', 'AJG', 'FTNT', 'HCA', 'TFC', 'FCX', 'SRE', 'AFL', 'AEP',
+  'BK', 'PSX', 'MPC', 'ABNB', 'PCAR', 'VLO', 'JCI', 'AIG', 'ROP', 'FICO',
+  'DLR', 'SPG', 'KMI', 'CMI', 'ALL', 'AZO', 'WMB', 'D', 'FAST', 'URI',
+  'AMP', 'PAYX', 'PCG', 'O', 'PWR', 'CTAS', 'DHI', 'AME', 'RSG', 'KHC',
+  'LHX', 'OKE', 'PRU', 'DXCM', 'CTVA', 'IDXX', 'F', 'HLT', 'A', 'OTIS',
+  'YUM', 'MSCI', 'NUE', 'VRSK', 'KR', 'HPQ', 'EA', 'EL', 'SYY', 'GEHC',
+  'DD', 'EXC', 'ODFL', 'XEL', 'GIS', 'VICI', 'MLM', 'VMC', 'BKR', 'HSY',
+  'CCI', 'DOW', 'CBRE', 'RCL', 'ED', 'IRM', 'HAL', 'EW', 'MTD', 'RMD',
+  'WEC', 'PPG', 'STZ', 'KEYS', 'AVB', 'TSCO', 'ANSS', 'WTW', 'XYL', 'WAB',
+  'TROW', 'DVN', 'ROK', 'EQR', 'MPWR', 'CHD', 'HPE', 'BR', 'GPN', 'FANG',
+  'IT', 'DOV', 'FTV', 'EFX', 'FITB', 'VLTO', 'HBAN', 'MTB', 'PPL', 'WY',
+  'SBAC', 'NTAP', 'ES', 'LYV', 'AWK', 'IFF', 'EQT', 'HUBB', 'STT', 'OMC',
+  'LVS', 'CLX', 'DTE', 'RF', 'WAT', 'WDC', 'STE', 'ZBH', 'BAX', 'K',
+  'CAH', 'CINF', 'BALL', 'TDY', 'CFG', 'EBAY', 'FE', 'ATO', 'PKG', 'MKC',
+  'MOH', 'IP', 'TRGP', 'APTV', 'J', 'TSN', 'SWK', 'NTRS', 'LDOS', 'KEY',
+  'TER', 'DGX', 'NRG', 'ETR', 'AXON', 'MAA', 'VTR', 'PFG', 'CBOE', 'CMS',
+  'KDP', 'EXPD', 'AES', 'CNP', 'LNT', 'CF', 'EVRG', 'TXT', 'BBY', 'L',
+  'MOS', 'SNA', 'JBHT', 'UDR', 'DRI', 'CPT', 'BRO', 'HST', 'IEX', 'POOL',
+  'HOLX', 'AKAM', 'ARE', 'EMN', 'COO', 'SWKS', 'IPG', 'TAP', 'KIM', 'NDSN',
+  'BEN', 'REG', 'PEAK', 'AIZ', 'WYNN', 'MGM', 'CPB', 'ALLE', 'HII', 'CZR',
+  'RL', 'FMC', 'BWA', 'PARA', 'AAL', 'NCLH', 'MHK', 'VFC', 'GNRC', 'CRL',
+  'WBA', 'SEE', 'HRL', 'NWS', 'NWSA', 'BIO', 'MTCH', 'DAL', 'LUV', 'UAL',
+  'CCL', 'RHI', 'TECH', 'PNR', 'GL', 'MKTX', 'CE', 'ALB', 'AOS', 'FRT',
+  'CHRW', 'HAS', 'BBWI', 'DVA', 'IVZ', 'ZION', 'CTLT', 'PNW', 'HSIC',
+  'XRAY', 'LKQ', 'CMA', 'NWL', 'BG', 'FFIV', 'QRVO', 'FOXA', 'FOX',
+  'PAYC', 'DXC', 'WHR', 'SEDG', 'DISH',
+];
+
+// Popular ETFs for broader market coverage
+const ETF_SYMBOLS = [
+  'SPY', 'QQQ', 'IWM', 'DIA', 'VTI', 'VOO', 'VEA', 'VWO', 'EFA', 'EEM',
+  'AGG', 'BND', 'LQD', 'HYG', 'TLT', 'IEF', 'SHY', 'TIP', 'GLD', 'SLV',
+  'USO', 'UNG', 'XLF', 'XLK', 'XLE', 'XLV', 'XLI', 'XLP', 'XLY', 'XLU',
+  'XLB', 'XLRE', 'XLC', 'VNQ', 'ARKK', 'ARKW', 'ARKG', 'ARKF', 'SMH', 'SOXX',
+  'IBB', 'XBI', 'KRE', 'KBE', 'XHB', 'ITB', 'HACK', 'BOTZ', 'ROBO', 'KWEB',
+  'FXI', 'EWJ', 'EWZ', 'EWY', 'INDA', 'RSX', 'VGK', 'IEMG', 'SCHD', 'VIG',
+  'DGRO', 'DVY', 'HDV', 'VYM', 'NOBL', 'MTUM', 'QUAL', 'VLUE', 'SIZE', 'USMV',
+];
+
+// Additional growth & mid-cap stocks
+const ADDITIONAL_STOCKS = [
+  'CRWD', 'SNOW', 'DDOG', 'ZS', 'NET', 'OKTA', 'MDB', 'BILL', 'HUBS', 'TTD',
+  'ROKU', 'SNAP', 'PINS', 'SQ', 'SHOP', 'SE', 'MELI', 'RIVN', 'LCID', 'NIO',
+  'XPEV', 'LI', 'COIN', 'HOOD', 'SOFI', 'AFRM', 'UPST', 'IONQ', 'RGTI', 'QUBT',
+  'RKLB', 'LUNR', 'ASTS', 'MNTS', 'SPCE', 'JOBY', 'ACHR', 'LILM', 'SMCI', 'MRVL',
+  'ON', 'WOLF', 'CEVA', 'ARM', 'CFLT', 'ESTC', 'DOCN', 'GTLB', 'PATH', 'AI',
+  'SOUN', 'BBAI', 'U', 'RBLX', 'DASH', 'LYFT', 'GRAB',
+  'CPNG', 'DUOL', 'MNDY', 'ZI', 'TWLO', 'SPLK', 'VEEV', 'PCOR', 'ALNY', 'MRNA',
+  'BNTX', 'NVAX', 'ZM', 'DOCU', 'FIVN', 'ASAN', 'DKNG', 'PENN', 'CHWY', 'ETSY',
+  'W', 'OPEN', 'RDFN', 'Z', 'ZG', 'CVNA', 'CARG', 'BROS', 'CELH', 'MNST',
+  'ENPH', 'FSLR', 'RUN', 'NOVA', 'ARRY', 'PLUG', 'BE', 'CHPT', 'BLNK', 'EVGO',
 ];
 
 // Initialize Redis
@@ -430,8 +486,10 @@ async function main() {
 
   let assetsToAnalyze = [...CRYPTO_SYMBOLS];
   if (!isWeekend) {
-    assetsToAnalyze.push(...SP500_SYMBOLS, ...FOREX_SYMBOLS, ...FUTURES_SYMBOLS);
+    assetsToAnalyze.push(...SP500_SYMBOLS, ...ETF_SYMBOLS, ...ADDITIONAL_STOCKS, ...FOREX_SYMBOLS, ...FUTURES_SYMBOLS);
   }
+  // Deduplicate
+  assetsToAnalyze = [...new Set(assetsToAnalyze)];
 
   console.log(`Analyzing ${assetsToAnalyze.length} assets (Weekend: ${isWeekend})...`);
 
