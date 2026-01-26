@@ -148,11 +148,23 @@ export default function TradingBot() {
     const backtestEnd = new Date(
       backtestData.spyBenchmark[backtestData.spyBenchmark.length - 1].timestamp
     ).getTime();
+    const backtestEndValue = backtestData.spyBenchmark[backtestData.spyBenchmark.length - 1].value;
+
     const liveAfterBacktest = data.spyBenchmark.filter(
       b => new Date(b.timestamp).getTime() > backtestEnd
     );
 
-    return [...backtestData.spyBenchmark, ...liveAfterBacktest];
+    if (liveAfterBacktest.length === 0) return backtestData.spyBenchmark;
+
+    // Re-normalize live SPY data to continue seamlessly from backtest's last value
+    const liveFirstValue = liveAfterBacktest[0].value;
+    const scale = backtestEndValue / liveFirstValue;
+    const normalizedLive = liveAfterBacktest.map(b => ({
+      timestamp: b.timestamp,
+      value: b.value * scale,
+    }));
+
+    return [...backtestData.spyBenchmark, ...normalizedLive];
   }, [backtestData, data.spyBenchmark]);
 
   // Use the backtest's starting capital for the chart baseline when available
@@ -488,7 +500,7 @@ export default function TradingBot() {
                 {strategyPerformance && strategyPerformance.length > 0 && (
                   <div className="trading-card">
                     <h2>Strategy Performance</h2>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1 }}>
                       {strategyPerformance.map(strategy => (
                         <div key={strategy.name} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>

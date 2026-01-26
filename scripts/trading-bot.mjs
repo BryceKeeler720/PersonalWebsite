@@ -377,8 +377,9 @@ async function updateSPYBenchmark() {
     const start = Math.floor(startDate.getTime() / 1000);
     const end = Math.floor(Date.now() / 1000);
 
+    // Use hourly data for intraday chart visibility (supports up to 730 days)
     const response = await fetch(
-      `https://query1.finance.yahoo.com/v8/finance/chart/SPY?period1=${start}&period2=${end}&interval=1d`,
+      `https://query1.finance.yahoo.com/v8/finance/chart/SPY?period1=${start}&period2=${end}&interval=1h`,
       {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',

@@ -131,6 +131,8 @@
   padding: 1.5rem;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .trading-card:hover {
@@ -1050,8 +1052,9 @@
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
   gap: 0.75rem;
-  margin-bottom: 1rem;
+  flex: 1;
 }
 
 .stat-box {
@@ -1059,6 +1062,9 @@
   background: rgba(255, 255, 255, 0.02);
   border-radius: 8px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .stat-box .stat-label {
