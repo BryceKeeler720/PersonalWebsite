@@ -481,6 +481,16 @@ function fromAlpacaCryptoSymbol(symbol) {
   return symbol.replace('/', '-');
 }
 
+function toAlpacaStockSymbol(symbol) {
+  // BRK-B → BRK.B (Alpaca uses dots for share classes)
+  return symbol.replace('-', '.');
+}
+
+function fromAlpacaStockSymbol(symbol) {
+  // BRK.B → BRK-B (our codebase uses Yahoo-style hyphens)
+  return symbol.replace('.', '-');
+}
+
 function isCryptoSymbol(symbol) {
   return symbol.endsWith('-USD') && CRYPTO_SYMBOLS.includes(symbol);
 }
@@ -504,7 +514,7 @@ function parseAlpacaBars(bars) {
 async function fetchAlpacaBars(symbols, timeframe, days, isCrypto = false) {
   // Batch fetch bars from Alpaca (up to 50 symbols per request)
   const allBars = {};
-  const alpacaSymbols = isCrypto ? symbols.map(toAlpacaCryptoSymbol) : symbols;
+  const alpacaSymbols = isCrypto ? symbols.map(toAlpacaCryptoSymbol) : symbols.map(toAlpacaStockSymbol);
   const start = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
   const endpoint = isCrypto
     ? `${ALPACA_DATA_URL}/v1beta3/crypto/us/bars`
@@ -552,7 +562,7 @@ async function fetchAlpacaBars(symbols, timeframe, days, isCrypto = false) {
 
       // Convert to our format and map back to original symbol names
       for (const [alpacaSym, bars] of Object.entries(symbolBars)) {
-        const originalSym = isCrypto ? fromAlpacaCryptoSymbol(alpacaSym) : alpacaSym;
+        const originalSym = isCrypto ? fromAlpacaCryptoSymbol(alpacaSym) : fromAlpacaStockSymbol(alpacaSym);
         if (bars.length > 0) {
           allBars[originalSym] = parseAlpacaBars(bars);
         }
