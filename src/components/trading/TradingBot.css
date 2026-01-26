@@ -1,5 +1,9 @@
 /* Trading Bot Styles - Following existing glassmorphism patterns */
 
+.back-link:hover {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
 .trading-bot {
   min-height: 100vh;
   background: #000000;
@@ -1040,6 +1044,88 @@
 
 .tooltip-change.negative {
   color: #ef4444;
+}
+
+/* Stats Grid for Risk Metrics and Trade Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.stat-box {
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.stat-box .stat-label {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 0.25rem;
+}
+
+.stat-box .stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.stat-box .stat-value.positive {
+  color: #22c55e;
+}
+
+.stat-box .stat-value.negative {
+  color: #ef4444;
+}
+
+/* Sector Allocation Pie Chart */
+.sector-chart {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.sector-pie {
+  flex-shrink: 0;
+}
+
+.sector-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.sector-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.sector-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.sector-name {
+  color: rgba(255, 255, 255, 0.8);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sector-percent {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
 }
 
 /* Responsive */

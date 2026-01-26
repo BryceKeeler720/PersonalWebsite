@@ -56,8 +56,8 @@ const InteractiveRoom: React.FC = () => {
       subtitle: 'Personal and Work Projects at a high level',
       items: [
         {
-          title: 'Paper Trading Bot',
-          description: 'ML-powered S&P 500 trading bot. Combines momentum, mean reversion, sentiment, and technical analysis strategies with weighted signals. Auto-executes trades with $10k paper money.',
+          title: 'Algorithmic Trading Bot',
+          description: 'ML-powered multi-asset trading bot. Combines momentum, mean reversion, sentiment, and technical analysis across 2000+ stocks, crypto, forex, and futures.',
           tags: ['React', 'TypeScript', 'ML', 'Yahoo Finance'],
           link: '/TradingBot',
         },

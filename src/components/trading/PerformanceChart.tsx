@@ -5,9 +5,15 @@ interface PortfolioSnapshot {
   totalValue: number;
 }
 
+interface BenchmarkPoint {
+  timestamp: string;
+  value: number;
+}
+
 interface PerformanceChartProps {
   history: PortfolioSnapshot[];
   initialCapital: number;
+  spyBenchmark?: BenchmarkPoint[];
 }
 
 type TimeRange = '1D' | '1W' | '1M' | 'YTD' | 'All';
@@ -20,50 +26,52 @@ interface ChartPoint {
   index: number;
 }
 
-export default function PerformanceChart({ history, initialCapital }: PerformanceChartProps) {
+export default function PerformanceChart({ history, initialCapital, spyBenchmark = [] }: PerformanceChartProps) {
   const [timeRange, setTimeRange] = useState<TimeRange>('All');
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const chartRef = useRef<HTMLDivElement>(null);
 
   const filteredHistory = useMemo(() => {
     if (history.length === 0) return [];
-
     const now = new Date();
     const cutoffDate = new Date();
 
     switch (timeRange) {
-      case '1D':
-        cutoffDate.setDate(now.getDate() - 1);
-        break;
-      case '1W':
-        cutoffDate.setDate(now.getDate() - 7);
-        break;
-      case '1M':
-        cutoffDate.setMonth(now.getMonth() - 1);
-        break;
-      case 'YTD':
-        cutoffDate.setMonth(0, 1);
-        cutoffDate.setHours(0, 0, 0, 0);
-        break;
-      case 'All':
-        return history;
+      case '1D': cutoffDate.setDate(now.getDate() - 1); break;
+      case '1W': cutoffDate.setDate(now.getDate() - 7); break;
+      case '1M': cutoffDate.setMonth(now.getMonth() - 1); break;
+      case 'YTD': cutoffDate.setMonth(0, 1); cutoffDate.setHours(0, 0, 0, 0); break;
+      case 'All': return history;
     }
-
     return history.filter(h => new Date(h.timestamp) >= cutoffDate);
   }, [history, timeRange]);
 
-  const chartData = useMemo(() => {
-    if (filteredHistory.length === 0) {
-      return null;
-    }
+  const filteredBenchmark = useMemo(() => {
+    if (spyBenchmark.length === 0) return [];
+    const now = new Date();
+    const cutoffDate = new Date();
 
-    // Dynamic scale based on actual data
-    const values = filteredHistory.map(h => h.totalValue);
-    const dataMin = Math.min(...values);
-    const dataMax = Math.max(...values);
+    switch (timeRange) {
+      case '1D': cutoffDate.setDate(now.getDate() - 1); break;
+      case '1W': cutoffDate.setDate(now.getDate() - 7); break;
+      case '1M': cutoffDate.setMonth(now.getMonth() - 1); break;
+      case 'YTD': cutoffDate.setMonth(0, 1); cutoffDate.setHours(0, 0, 0, 0); break;
+      case 'All': return spyBenchmark;
+    }
+    return spyBenchmark.filter(h => new Date(h.timestamp) >= cutoffDate);
+  }, [spyBenchmark, timeRange]);
+
+  const chartData = useMemo(() => {
+    if (filteredHistory.length === 0) return null;
+
+    const portfolioValues = filteredHistory.map(h => h.totalValue);
+    const benchmarkValues = filteredBenchmark.map(b => b.value);
+    const allValues = [...portfolioValues, ...benchmarkValues];
+
+    const dataMin = Math.min(...allValues);
+    const dataMax = Math.max(...allValues);
     const dataRange = dataMax - dataMin;
 
-    // Calculate appropriate tick increment based on range
     let tickIncrement: number;
     if (dataRange < 50) tickIncrement = 10;
     else if (dataRange < 200) tickIncrement = 50;
@@ -71,13 +79,11 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
     else if (dataRange < 5000) tickIncrement = 500;
     else tickIncrement = 1000;
 
-    // Add padding and round to nice tick values
     const padding_amount = Math.max(tickIncrement, dataRange * 0.1);
     const minValue = Math.floor((dataMin - padding_amount) / tickIncrement) * tickIncrement;
     const maxValue = Math.ceil((dataMax + padding_amount) / tickIncrement) * tickIncrement;
     const range = maxValue - minValue;
 
-    // SVG viewBox dimensions - compact
     const width = 800;
     const height = 200;
     const padding = { top: 15, right: 35, bottom: 25, left: 55 };
@@ -90,23 +96,27 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
       return { x, y, value: h.totalValue, timestamp: h.timestamp, index: i };
     });
 
+    const benchmarkPoints: ChartPoint[] = filteredBenchmark.map((b, i) => {
+      const x = padding.left + (i / (filteredBenchmark.length - 1 || 1)) * chartWidth;
+      const y = padding.top + chartHeight - ((b.value - minValue) / range) * chartHeight;
+      return { x, y, value: b.value, timestamp: b.timestamp, index: i };
+    });
+
     const pathD = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
-
+    const benchmarkPathD = benchmarkPoints.length > 1
+      ? benchmarkPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
+      : '';
     const areaD = `${pathD} L ${points[points.length - 1].x} ${padding.top + chartHeight} L ${padding.left} ${padding.top + chartHeight} Z`;
-
-    const initialY = padding.top + chartHeight - ((initialCapital - minValue) / range) * chartHeight;
 
     const currentValue = filteredHistory[filteredHistory.length - 1]?.totalValue || initialCapital;
     const isPositive = currentValue >= initialCapital;
 
-    // Generate Y-axis labels with dynamic tick increment
     const yLabels = [];
     for (let val = minValue; val <= maxValue; val += tickIncrement) {
       const y = padding.top + chartHeight - ((val - minValue) / range) * chartHeight;
       yLabels.push({ value: val, y });
     }
 
-    // Generate X-axis labels (5 evenly spaced)
     const xLabels = [];
     const numXLabels = 5;
     for (let i = 0; i < numXLabels; i++) {
@@ -117,37 +127,22 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
       }
     }
 
+    const spyCurrentValue = filteredBenchmark[filteredBenchmark.length - 1]?.value || initialCapital;
+    const spyChangePercent = ((spyCurrentValue - initialCapital) / initialCapital) * 100;
+
     return {
-      points,
-      pathD,
-      areaD,
-      initialY,
-      minValue,
-      maxValue,
-      isPositive,
-      currentValue,
-      padding,
-      chartWidth,
-      chartHeight,
-      width,
-      height,
-      yLabels,
-      xLabels,
+      points, benchmarkPoints, pathD, benchmarkPathD, areaD, minValue, maxValue, isPositive, currentValue,
+      padding, chartWidth, chartHeight, width, height, yLabels, xLabels, spyChangePercent,
     };
-  }, [filteredHistory, initialCapital]);
+  }, [filteredHistory, filteredBenchmark, initialCapital]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!chartRef.current || !chartData) return;
-
     const rect = chartRef.current.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
-
-    // Calculate which data point index we're closest to
-    const { padding, chartWidth, points } = chartData;
-
-    // Convert mouse X to percentage across the chart area
-    const chartStartX = (padding.left / chartData.width) * rect.width;
-    const chartEndX = ((padding.left + chartWidth) / chartData.width) * rect.width;
+    const { padding, chartWidth, points, width } = chartData;
+    const chartStartX = (padding.left / width) * rect.width;
+    const chartEndX = ((padding.left + chartWidth) / width) * rect.width;
 
     if (mouseX < chartStartX || mouseX > chartEndX) {
       setHoveredIndex(null);
@@ -156,56 +151,26 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
 
     const percentX = (mouseX - chartStartX) / (chartEndX - chartStartX);
     const index = Math.round(percentX * (points.length - 1));
-    const clampedIndex = Math.max(0, Math.min(points.length - 1, index));
-
-    setHoveredIndex(clampedIndex);
+    setHoveredIndex(Math.max(0, Math.min(points.length - 1, index)));
   };
 
-  const handleMouseLeave = () => {
-    setHoveredIndex(null);
-  };
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
-  const formatCurrencyPrecise = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
-  };
+  const formatCurrencyPrecise = (value: number) =>
+    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) {
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } else if (diffDays < 7) {
-      return date.toLocaleDateString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' });
-    } else {
-      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-    }
+    if (diffDays === 0) return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (diffDays < 7) return date.toLocaleDateString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
   };
 
-  const formatTooltipTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return date.toLocaleString([], {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  const formatTooltipTime = (timestamp: string) =>
+    new Date(timestamp).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 
   if (!chartData || filteredHistory.length < 2) {
     return (
@@ -222,40 +187,43 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
     );
   }
 
-  const { pathD, areaD, isPositive, currentValue, padding, chartWidth, chartHeight, width, height, yLabels, xLabels, points } = chartData;
+  const { pathD, benchmarkPathD, areaD, isPositive, currentValue, padding, chartWidth, chartHeight, width, height, yLabels, xLabels, points, spyChangePercent } = chartData;
   const changePercent = ((currentValue - initialCapital) / initialCapital) * 100;
   const hoveredPoint = hoveredIndex !== null ? points[hoveredIndex] : null;
-
   const timeRanges: TimeRange[] = ['1D', '1W', '1M', 'YTD', 'All'];
 
   return (
     <div className="performance-chart">
       <div className="chart-header">
-        <div className="chart-title">Fund Performance</div>
+        <div className="chart-title">
+          <span style={{ marginRight: '1rem' }}>Fund Performance</span>
+          {benchmarkPathD && (
+            <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)' }}>
+              <span style={{ color: isPositive ? '#22c55e' : '#ef4444' }}>● Portfolio</span>
+              <span style={{ marginLeft: '0.75rem', color: '#f59e0b' }}>● S&P 500</span>
+            </span>
+          )}
+        </div>
         <div className="chart-value-display">
           <span className="chart-current-value">{formatCurrencyPrecise(currentValue)}</span>
           <span className={`chart-change ${isPositive ? 'positive' : 'negative'}`}>
             {isPositive ? '+' : ''}{changePercent.toFixed(2)}%
           </span>
+          {benchmarkPathD && (
+            <span style={{ fontSize: '0.75rem', color: '#f59e0b', marginLeft: '0.5rem' }}>
+              (SPY: {spyChangePercent >= 0 ? '+' : ''}{spyChangePercent.toFixed(2)}%)
+            </span>
+          )}
         </div>
       </div>
       <div className="chart-time-range">
         {timeRanges.map((range) => (
-          <button
-            key={range}
-            className={`time-range-btn ${timeRange === range ? 'active' : ''}`}
-            onClick={() => setTimeRange(range)}
-          >
+          <button key={range} className={`time-range-btn ${timeRange === range ? 'active' : ''}`} onClick={() => setTimeRange(range)}>
             {range}
           </button>
         ))}
       </div>
-      <div
-        className="chart-container"
-        ref={chartRef}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-      >
+      <div className="chart-container" ref={chartRef} onMouseMove={handleMouseMove} onMouseLeave={() => setHoveredIndex(null)}>
         <svg viewBox={`0 0 ${width} ${height}`}>
           <defs>
             <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
@@ -264,103 +232,42 @@ export default function PerformanceChart({ history, initialCapital }: Performanc
             </linearGradient>
           </defs>
 
-          {/* Y-axis grid lines and labels */}
           {yLabels.map((label, i) => (
             <g key={i}>
-              <line
-                x1={padding.left}
-                y1={label.y}
-                x2={padding.left + chartWidth}
-                y2={label.y}
+              <line x1={padding.left} y1={label.y} x2={padding.left + chartWidth} y2={label.y}
                 stroke={label.value === initialCapital ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0.08)'}
-                strokeWidth="1"
-                strokeDasharray={label.value === initialCapital ? '4 4' : undefined}
-              />
-              <text
-                x={padding.left - 8}
-                y={label.y}
-                fill="rgba(255, 255, 255, 0.5)"
-                fontSize="9"
-                textAnchor="end"
-                dominantBaseline="middle"
-              >
+                strokeWidth="1" strokeDasharray={label.value === initialCapital ? '4 4' : undefined} />
+              <text x={padding.left - 8} y={label.y} fill="rgba(255, 255, 255, 0.5)" fontSize="9" textAnchor="end" dominantBaseline="middle">
                 {formatCurrency(label.value)}
               </text>
             </g>
           ))}
 
-          {/* X-axis labels */}
           {xLabels.map((label, i) => (
-            <text
-              key={i}
-              x={label.x}
-              y={height - 6}
-              fill="rgba(255, 255, 255, 0.5)"
-              fontSize="9"
-              textAnchor="middle"
-            >
+            <text key={i} x={label.x} y={height - 6} fill="rgba(255, 255, 255, 0.5)" fontSize="9" textAnchor="middle">
               {formatTime(label.timestamp)}
             </text>
           ))}
 
-          {/* Area fill */}
           <path d={areaD} fill="url(#chartGradient)" />
 
-          {/* Line */}
-          <path
-            d={pathD}
-            fill="none"
-            stroke={isPositive ? '#22c55e' : '#ef4444'}
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
+          {benchmarkPathD && (
+            <path d={benchmarkPathD} fill="none" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.7" />
+          )}
 
-          {/* Hover indicator */}
+          <path d={pathD} fill="none" stroke={isPositive ? '#22c55e' : '#ef4444'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+
           {hoveredPoint && (
             <>
-              {/* Vertical line */}
-              <line
-                x1={hoveredPoint.x}
-                y1={padding.top}
-                x2={hoveredPoint.x}
-                y2={padding.top + chartHeight}
-                stroke="rgba(255, 255, 255, 0.4)"
-                strokeWidth="1"
-              />
-              {/* Horizontal line to Y-axis */}
-              <line
-                x1={padding.left}
-                y1={hoveredPoint.y}
-                x2={hoveredPoint.x}
-                y2={hoveredPoint.y}
-                stroke="rgba(255, 255, 255, 0.2)"
-                strokeWidth="1"
-                strokeDasharray="4 4"
-              />
-              {/* Point circle */}
-              <circle
-                cx={hoveredPoint.x}
-                cy={hoveredPoint.y}
-                r="4"
-                fill={hoveredPoint.value >= initialCapital ? '#22c55e' : '#ef4444'}
-                stroke="white"
-                strokeWidth="1.5"
-              />
+              <line x1={hoveredPoint.x} y1={padding.top} x2={hoveredPoint.x} y2={padding.top + chartHeight} stroke="rgba(255, 255, 255, 0.4)" strokeWidth="1" />
+              <line x1={padding.left} y1={hoveredPoint.y} x2={hoveredPoint.x} y2={hoveredPoint.y} stroke="rgba(255, 255, 255, 0.2)" strokeWidth="1" strokeDasharray="4 4" />
+              <circle cx={hoveredPoint.x} cy={hoveredPoint.y} r="4" fill={hoveredPoint.value >= initialCapital ? '#22c55e' : '#ef4444'} stroke="white" strokeWidth="1.5" />
             </>
           )}
         </svg>
 
-        {/* Tooltip */}
         {hoveredPoint && chartRef.current && (
-          <div
-            className="chart-tooltip"
-            style={{
-              left: `${(hoveredPoint.x / width) * 100}%`,
-              top: '10px',
-              transform: hoveredPoint.x > width / 2 ? 'translateX(-110%)' : 'translateX(10%)',
-            }}
-          >
+          <div className="chart-tooltip" style={{ left: `${(hoveredPoint.x / width) * 100}%`, top: '10px', transform: hoveredPoint.x > width / 2 ? 'translateX(-110%)' : 'translateX(10%)' }}>
             <div className="tooltip-value">{formatCurrencyPrecise(hoveredPoint.value)}</div>
             <div className="tooltip-time">{formatTooltipTime(hoveredPoint.timestamp)}</div>
             <div className={`tooltip-change ${hoveredPoint.value >= initialCapital ? 'positive' : 'negative'}`}>
