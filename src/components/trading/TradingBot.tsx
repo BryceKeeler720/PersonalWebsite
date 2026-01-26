@@ -89,6 +89,7 @@ export default function TradingBot() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sectorsExpanded, setSectorsExpanded] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -509,7 +510,7 @@ export default function TradingBot() {
                       <circle cx="80" cy="80" r="35" fill="#000" />
                     </svg>
                     <div style={{ flex: 1, minWidth: '200px' }}>
-                      {sectorAllocation.slice(0, 6).map(sector => (
+                      {(sectorsExpanded ? sectorAllocation : sectorAllocation.slice(0, 6)).map(sector => (
                         <div key={sector.sector} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
                           <div style={{ width: 12, height: 12, borderRadius: 2, background: sector.color, marginRight: '0.5rem' }} />
                           <span style={{ flex: 1, fontSize: '0.8rem', color: 'rgba(255,255,255,0.8)' }}>{sector.sector}</span>
@@ -519,8 +520,11 @@ export default function TradingBot() {
                         </div>
                       ))}
                       {sectorAllocation.length > 6 && (
-                        <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.5rem' }}>
-                          +{sectorAllocation.length - 6} more sectors
+                        <div
+                          onClick={() => setSectorsExpanded(!sectorsExpanded)}
+                          style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.5rem', cursor: 'pointer' }}
+                        >
+                          {sectorsExpanded ? 'Show less' : `+${sectorAllocation.length - 6} more sectors`}
                         </div>
                       )}
                     </div>
