@@ -1,35 +1,33 @@
 name: Trading Bot Cron
 
-# Disabled - using cron-job.org for more reliable scheduling
-# To re-enable, uncomment the schedule below
 on:
-  # schedule:
-  #   - cron: '*/5 * * * *'
+  schedule:
+    # Run every 5 minutes during market hours (9:30 AM - 4:00 PM ET, Mon-Fri)
+    # Also runs 24/7 for crypto (but less frequently on weekends)
+    - cron: '*/5 9-16 * * 1-5'  # Weekday market hours
+    - cron: '0 */2 * * 0,6'     # Weekends every 2 hours for crypto
+    - cron: '0 0,4,8,12,16,20 * * 1-5' # Weekday off-hours every 4 hours
   workflow_dispatch: # Allow manual triggering
 
 jobs:
-  trigger-trading-bot:
+  run-trading-bot:
     runs-on: ubuntu-latest
+    timeout-minutes: 30  # Allow up to 30 minutes for full analysis
+
     steps:
-      - name: Trigger Trading Bot
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install @upstash/redis
+
+      - name: Run Trading Bot
         env:
-          CRON_SECRET: ${{ secrets.CRON_SECRET }}
-        run: |
-          response=$(curl -s -w "\n%{http_code}" -X GET \
-            -H "User-Agent: GitHub-Actions-Trading-Bot" \
-            -H "Authorization: Bearer $CRON_SECRET" \
-            https://brycekeeler.com/api/trading/cron)
-
-          http_code=$(echo "$response" | tail -n1)
-          body=$(echo "$response" | head -n-1)
-
-          echo "HTTP Status: $http_code"
-          echo "Response: $body"
-
-          if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
-            echo "✅ Trading bot triggered successfully"
-            exit 0
-          else
-            echo "❌ Failed to trigger trading bot"
-            exit 1
-          fi
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+        run: node scripts/trading-bot.mjs
