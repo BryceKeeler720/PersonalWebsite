@@ -19,12 +19,24 @@ async function fetchSPYBenchmark(startDate: string): Promise<BenchmarkPoint[]> {
 
     const response = await fetch(
       `https://query1.finance.yahoo.com/v8/finance/chart/SPY?period1=${start}&period2=${end}&interval=1d`,
-      { headers: { 'User-Agent': 'Mozilla/5.0 (compatible)' } }
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'application/json',
+        },
+      }
     );
+
+    if (!response.ok) {
+      console.error('Yahoo Finance API error:', response.status, response.statusText);
+      return [];
+    }
+
     const data = await response.json();
     const result = data?.chart?.result?.[0];
 
     if (!result?.timestamp || !result?.indicators?.quote?.[0]?.close) {
+      console.error('Invalid Yahoo Finance response structure');
       return [];
     }
 
@@ -38,7 +50,8 @@ async function fetchSPYBenchmark(startDate: string): Promise<BenchmarkPoint[]> {
         value: closes[i] !== null ? (closes[i] / firstValidClose) * 10000 : null,
       }))
       .filter((p: BenchmarkPoint | { value: null }) => p.value !== null);
-  } catch {
+  } catch (error) {
+    console.error('Error fetching SPY benchmark:', error);
     return [];
   }
 }
