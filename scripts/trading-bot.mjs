@@ -75,6 +75,7 @@ const KEYS = {
   SIGNALS: 'tradingbot:signals',
   LAST_RUN: 'tradingbot:lastRun',
   HISTORY: 'tradingbot:history',
+  SPY_BENCHMARK: 'tradingbot:spyBenchmark',
 };
 
 // Storage functions
@@ -121,6 +122,58 @@ async function addPortfolioSnapshot(snapshot) {
   const history = await getPortfolioHistory();
   history.push(snapshot);
   await redis.set(KEYS.HISTORY, history.slice(-1000));
+}
+
+// SPY Benchmark caching (runs from LXC to avoid Vercel IP blocks)
+async function updateSPYBenchmark() {
+  try {
+    const history = await getPortfolioHistory();
+    const startDate = history.length > 0
+      ? history[0].timestamp
+      : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    const start = Math.floor(new Date(startDate).getTime() / 1000);
+    const end = Math.floor(Date.now() / 1000);
+
+    const response = await fetch(
+      `https://query1.finance.yahoo.com/v8/finance/chart/SPY?period1=${start}&period2=${end}&interval=1d`,
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'application/json',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.log(`SPY benchmark fetch failed: ${response.status}`);
+      return;
+    }
+
+    const data = await response.json();
+    const result = data?.chart?.result?.[0];
+
+    if (!result?.timestamp || !result?.indicators?.quote?.[0]?.close) {
+      console.log('Invalid SPY response structure');
+      return;
+    }
+
+    const timestamps = result.timestamp;
+    const closes = result.indicators.quote[0].close;
+    const firstValidClose = closes.find(c => c !== null) || closes[0];
+
+    const benchmark = timestamps
+      .map((ts, i) => ({
+        timestamp: new Date(ts * 1000).toISOString(),
+        value: closes[i] !== null ? (closes[i] / firstValidClose) * 10000 : null,
+      }))
+      .filter(p => p.value !== null);
+
+    await redis.set(KEYS.SPY_BENCHMARK, benchmark);
+    console.log(`SPY benchmark cached: ${benchmark.length} data points`);
+  } catch (error) {
+    console.log(`SPY benchmark error: ${error.message}`);
+  }
 }
 
 // Yahoo Finance API functions
@@ -551,6 +604,7 @@ async function main() {
   await saveSignals(allSignals);
   await setLastRun(new Date().toISOString());
   await addPortfolioSnapshot({ timestamp: new Date().toISOString(), totalValue: portfolio.totalValue });
+  await updateSPYBenchmark();
 
   console.log(`\nCompleted! Portfolio: $${portfolio.totalValue.toFixed(2)} | Holdings: ${portfolio.holdings.length} | Cash: $${portfolio.cash.toFixed(2)}`);
 }

@@ -14,11 +14,17 @@ const KEYS = {
   SIGNALS: 'tradingbot:signals',
   LAST_RUN: 'tradingbot:lastRun',
   HISTORY: 'tradingbot:history',
+  SPY_BENCHMARK: 'tradingbot:spyBenchmark',
 };
 
 export interface PortfolioSnapshot {
   timestamp: string;
   totalValue: number;
+}
+
+export interface BenchmarkPoint {
+  timestamp: string;
+  value: number;
 }
 
 const INITIAL_PORTFOLIO: Portfolio = {
@@ -138,5 +144,15 @@ export async function addPortfolioSnapshot(snapshot: PortfolioSnapshot): Promise
     await redis.set(KEYS.HISTORY, trimmed);
   } catch (error) {
     console.error('Error adding portfolio snapshot:', error);
+  }
+}
+
+export async function getSPYBenchmark(): Promise<BenchmarkPoint[]> {
+  try {
+    const data = await redis.get<BenchmarkPoint[]>(KEYS.SPY_BENCHMARK);
+    return data || [];
+  } catch (error) {
+    console.error('Error getting SPY benchmark:', error);
+    return [];
   }
 }
