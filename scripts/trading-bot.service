@@ -1,0 +1,34 @@
+[Unit]
+Description=Trading Bot - High Frequency Algorithmic Trading
+After=network.target
+
+[Service]
+Type=simple
+User=trading
+WorkingDirectory=/opt/trading-bot
+ExecStart=/usr/bin/node /opt/trading-bot/trading-bot.mjs
+Restart=always
+RestartSec=10
+
+# Environment variables
+Environment=NODE_ENV=production
+EnvironmentFile=/opt/trading-bot/.env
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=trading-bot
+
+# Resource limits (adjust based on your LXC container)
+MemoryMax=512M
+CPUQuota=50%
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/opt/trading-bot
+
+[Install]
+WantedBy=multi-user.target

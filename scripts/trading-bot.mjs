@@ -1,10 +1,16 @@
 #!/usr/bin/env node
 /**
- * Trading Bot Script - Runs directly in GitHub Actions
- * Bypasses Vercel's timeout limits by running the analysis locally
+ * Trading Bot Script - Self-hosted continuous service
+ * Runs as a daemon with configurable intervals for high-frequency trading
  */
 
 import { Redis } from '@upstash/redis';
+
+// Service Configuration
+const RUN_INTERVAL_MS = parseInt(process.env.RUN_INTERVAL_MS || '60000', 10); // Default: 1 minute
+const RUN_ONCE = process.env.RUN_ONCE === 'true'; // For GitHub Actions compatibility
+let isShuttingDown = false;
+let currentRunPromise = null;
 
 // Configuration
 const BATCH_SIZE = 15;
@@ -547,4 +553,72 @@ async function main() {
   console.log(`\nCompleted! Portfolio: $${portfolio.totalValue.toFixed(2)} | Holdings: ${portfolio.holdings.length} | Cash: $${portfolio.cash.toFixed(2)}`);
 }
 
-main().catch(console.error);
+// Graceful shutdown handling
+function setupShutdownHandlers() {
+  const shutdown = async (signal) => {
+    console.log(`\n${signal} received. Shutting down gracefully...`);
+    isShuttingDown = true;
+
+    if (currentRunPromise) {
+      console.log('Waiting for current run to complete...');
+      await currentRunPromise;
+    }
+
+    console.log('Trading bot stopped.');
+    process.exit(0);
+  };
+
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
+}
+
+// Service loop
+async function runService() {
+  setupShutdownHandlers();
+
+  console.log('='.repeat(60));
+  console.log('Trading Bot Service Started');
+  console.log(`Interval: ${RUN_INTERVAL_MS / 1000} seconds`);
+  console.log(`Mode: ${RUN_ONCE ? 'Single Run' : 'Continuous Service'}`);
+  console.log('='.repeat(60));
+
+  while (!isShuttingDown) {
+    const startTime = Date.now();
+
+    try {
+      currentRunPromise = main();
+      await currentRunPromise;
+      currentRunPromise = null;
+    } catch (error) {
+      console.error('Run failed:', error);
+      currentRunPromise = null;
+    }
+
+    if (RUN_ONCE) {
+      console.log('Single run mode - exiting.');
+      break;
+    }
+
+    if (isShuttingDown) break;
+
+    const elapsed = Date.now() - startTime;
+    const waitTime = Math.max(0, RUN_INTERVAL_MS - elapsed);
+
+    if (waitTime > 0) {
+      console.log(`\nNext run in ${Math.round(waitTime / 1000)} seconds...`);
+      await new Promise(resolve => {
+        const timeout = setTimeout(resolve, waitTime);
+        // Allow early exit on shutdown
+        const checkShutdown = setInterval(() => {
+          if (isShuttingDown) {
+            clearTimeout(timeout);
+            clearInterval(checkShutdown);
+            resolve();
+          }
+        }, 1000);
+      });
+    }
+  }
+}
+
+runService().catch(console.error);
