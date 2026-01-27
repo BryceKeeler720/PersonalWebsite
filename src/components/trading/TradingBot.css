@@ -123,6 +123,13 @@
   gap: 1.5rem;
 }
 
+/* Sidebar */
+.sidebar {
+  align-self: start;
+  position: sticky;
+  top: 2rem;
+}
+
 /* Cards */
 .trading-card {
   background: rgba(255, 255, 255, 0.03);
@@ -1138,6 +1145,10 @@
 @media (max-width: 1024px) {
   .trading-grid {
     grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
   }
 
   .trading-header {

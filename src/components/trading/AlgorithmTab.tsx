@@ -190,13 +190,45 @@ export default function AlgorithmTab() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
           <div style={{ padding: '1rem', background: 'rgba(99,102,241,0.08)', borderRadius: '12px', border: '1px solid rgba(99,102,241,0.2)' }}>
             <div style={{ fontSize: '0.75rem', color: '#818cf8', fontWeight: 600, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Group A — Trend-Following</div>
-            <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)' }}>Trend Momentum</div>
-            <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)' }}>MACD Trend</div>
+            <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)' }}>Trend Momentum <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem' }}>(conf: 0.70)</span></div>
+            <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)' }}>MACD Trend <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem' }}>(conf: 0.60)</span></div>
           </div>
           <div style={{ padding: '1rem', background: 'rgba(168,85,247,0.08)', borderRadius: '12px', border: '1px solid rgba(168,85,247,0.2)' }}>
             <div style={{ fontSize: '0.75rem', color: '#a78bfa', fontWeight: 600, marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Group B — Mean-Reversion</div>
-            <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)' }}>BB + RSI Reversion</div>
-            <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)' }}>VWAP Reversion</div>
+            <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)' }}>BB + RSI Reversion <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem' }}>(conf: 0.70)</span></div>
+            <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.8)' }}>VWAP Reversion <span style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.75rem' }}>(conf: 0.30–0.80)</span></div>
+          </div>
+        </div>
+
+        <p style={subtext}>
+          Each strategy produces a <strong style={{ color: '#fff' }}>score</strong> (-1 to +1) and a <strong style={{ color: '#fff' }}>confidence</strong> (0 to 1).
+          Within each group, signals are combined using a confidence-weighted average. The two group scores
+          are then blended using regime-dependent weights.
+        </p>
+
+        <div style={{ ...mono, marginBottom: '1.25rem' }}>
+          <div><span style={{ color: 'rgba(255,255,255,0.4)' }}>{'// '}</span><span style={{ color: '#818cf8' }}>Step 1:</span> Within-group confidence-weighted average</div>
+          <div>groupScore = <span style={{ color: '#c084fc' }}>Σ</span>(score<sub>i</sub> × confidence<sub>i</sub>) / <span style={{ color: '#c084fc' }}>Σ</span>(confidence<sub>i</sub>)</div>
+          <div style={{ marginTop: '0.75rem' }}><span style={{ color: 'rgba(255,255,255,0.4)' }}>{'// '}</span><span style={{ color: '#818cf8' }}>Step 2:</span> Regime-weighted blend</div>
+          <div>combined = trendGroupScore × <span style={{ color: '#818cf8' }}>w<sub>trend</sub></span> + reversionGroupScore × <span style={{ color: '#a78bfa' }}>w<sub>reversion</sub></span></div>
+        </div>
+
+        <div style={{ background: 'rgba(255,255,255,0.02)', borderRadius: '12px', padding: '1rem', marginBottom: '1.25rem' }}>
+          <div style={{ fontSize: '0.75rem', color: '#f59e0b', fontWeight: 600, marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Worked Example — TRENDING_UP Regime</div>
+          <div style={{ ...mono, background: 'transparent', padding: 0 }}>
+            <div style={{ color: 'rgba(255,255,255,0.4)', marginBottom: '0.35rem' }}>{'// '}Given strategy outputs:</div>
+            <div>Trend Momentum:  score = <span style={{ color: '#22c55e' }}>+0.60</span>, confidence = 0.70</div>
+            <div>MACD Trend:      score = <span style={{ color: '#22c55e' }}>+0.30</span>, confidence = 0.60</div>
+            <div>BB+RSI Reversion: score = <span style={{ color: '#ef4444' }}>-0.20</span>, confidence = 0.70</div>
+            <div>VWAP Reversion:  score = <span style={{ color: '#ef4444' }}>-0.10</span>, confidence = 0.50</div>
+
+            <div style={{ marginTop: '0.75rem', color: 'rgba(255,255,255,0.4)' }}>{'// '}Step 1: Within-group averages</div>
+            <div><span style={{ color: '#818cf8' }}>Group A</span> = (0.60×0.70 + 0.30×0.60) / (0.70+0.60) = 0.60/1.30 = <span style={{ color: '#22c55e', fontWeight: 700 }}>+0.462</span></div>
+            <div><span style={{ color: '#a78bfa' }}>Group B</span> = (-0.20×0.70 + -0.10×0.50) / (0.70+0.50) = -0.19/1.20 = <span style={{ color: '#ef4444', fontWeight: 700 }}>-0.158</span></div>
+
+            <div style={{ marginTop: '0.75rem', color: 'rgba(255,255,255,0.4)' }}>{'// '}Step 2: Regime blend (TRENDING_UP: 80% trend, 20% reversion)</div>
+            <div>combined = 0.462 × <span style={{ color: '#818cf8' }}>0.80</span> + (-0.158) × <span style={{ color: '#a78bfa' }}>0.20</span> = 0.370 - 0.032 = <span style={{ color: '#22c55e', fontWeight: 700 }}>+0.338</span></div>
+            <div style={{ marginTop: '0.35rem', color: 'rgba(255,255,255,0.5)' }}>→ Score 0.338 {'<'} 0.35 threshold → <span style={{ color: '#94a3b8', fontWeight: 600 }}>HOLD</span> (just below BUY)</div>
           </div>
         </div>
 
@@ -290,21 +322,11 @@ export default function AlgorithmTab() {
 
       {/* Section 5: Signal Combination */}
       <div style={card}>
-        <h2 style={cardTitle}>Signal Combination</h2>
+        <h2 style={cardTitle}>Final Recommendation Thresholds</h2>
         <p style={subtext}>
-          Each strategy produces a score (-1 to +1) and a confidence (0 to 1). Within each group, signals are combined
-          as a confidence-weighted average. Then the two group scores are blended using regime-dependent weights.
+          After combining strategy group scores using the regime-weighted formula above, the final combined
+          score is mapped to a recommendation using these thresholds:
         </p>
-        <div style={{ ...mono, marginBottom: '1rem' }}>
-          <div><span style={{ color: 'rgba(255,255,255,0.4)' }}>{'// '}</span>Within-group weighted average</div>
-          <div>groupScore = <span style={{ color: '#c084fc' }}>Σ</span>(score<sub>i</sub> × confidence<sub>i</sub>) / <span style={{ color: '#c084fc' }}>Σ</span>(confidence<sub>i</sub>)</div>
-          <div style={{ marginTop: '0.5rem' }}><span style={{ color: 'rgba(255,255,255,0.4)' }}>{'// '}</span>Regime-weighted combination</div>
-          <div>combined = trendScore × <span style={{ color: '#818cf8' }}>w<sub>trend</sub></span> + reversionScore × <span style={{ color: '#a78bfa' }}>w<sub>reversion</sub></span></div>
-        </div>
-
-        <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.5rem' }}>
-          Final recommendation thresholds:
-        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.5rem' }}>
           {[
             { label: 'STRONG_BUY', threshold: '> 0.55', color: '#22c55e', bg: 'rgba(34,197,94,0.15)' },
