@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Analytics from '@vercel/analytics/astro';
 
 interface Props {
   title: string;
@@ -58,10 +59,7 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
     <main id="main-content">
       <slot />
     </main>
-    <script>
-      import { inject } from '@vercel/analytics';
-      inject();
-    </script>
+    <Analytics />
   </body>
 </html>
 
