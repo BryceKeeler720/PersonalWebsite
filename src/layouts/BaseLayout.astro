@@ -58,6 +58,10 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
     <main id="main-content">
       <slot />
     </main>
+    <script>
+      import { inject } from '@vercel/analytics';
+      inject();
+    </script>
   </body>
 </html>
 
