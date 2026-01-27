@@ -267,7 +267,7 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
     <div class="projects-grid">
       <Card
         title="Algorithmic Trading Bot"
-        description="ML-powered multi-asset trading bot combining 4 strategies: momentum (SMA crossovers, RSI), mean reversion (Bollinger Bands, Z-score), technical (MACD, volume), and sentiment analysis. Analyzes 2000+ assets across stocks, crypto, forex, and futures with automated execution."
+        description="ML-powered multi-asset trading bot combining 5 strategy groups: momentum (SMA crossovers, RSI), mean reversion (Bollinger Bands, Z-score), technical (MACD, volume), sentiment analysis (news + social), and an ML ensemble that weights them all. Scans 2000+ assets across stocks, crypto, forex, and futures — ranks by composite score, sizes positions with Kelly criterion, and executes automatically via Alpaca."
         tags={["React", "TypeScript", "ML", "Data Science", "Yahoo Finance"]}
         href="/TradingBot"
         delay={0}
@@ -365,6 +365,12 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
             <li><strong>Watchtower</strong> - Automatic Docker image updates</li>
           </ul>
         </div>
+      </div>
+
+      <div class="homelab-dashboard-link">
+        <a href="/HomeLab" class="dashboard-link">
+          View Live Dashboard &rarr;
+        </a>
       </div>
     </div>
   </Section>
@@ -742,6 +748,33 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
   .homelab-card strong {
     color: var(--text-primary);
     font-weight: 600;
+  }
+
+  .homelab-dashboard-link {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+
+  .dashboard-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+
+  .dashboard-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+    transform: translateY(-2px);
   }
 
   .contact-grid {

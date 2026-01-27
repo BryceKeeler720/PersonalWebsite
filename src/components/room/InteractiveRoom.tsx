@@ -45,9 +45,10 @@ const InteractiveRoom: React.FC = () => {
           tags: ['Pi-hole', 'Tailscale', 'Jellyfin'],
         },
         {
-          title: 'Dashboards',
-          description: 'Bash scripts for automation, Grafana dashboards to check performance',
-          tags: ['Bash', 'Linux', 'Grafana'],
+          title: 'Live Dashboard',
+          description: 'Real-time monitoring of containers, services, resource utilization, and network topology',
+          tags: ['React', 'Upstash', 'Redis'],
+          link: '/HomeLab',
         }
       ]
     },
@@ -57,8 +58,8 @@ const InteractiveRoom: React.FC = () => {
       items: [
         {
           title: 'Algorithmic Trading Bot',
-          description: 'ML-powered multi-asset trading bot. Combines momentum, mean reversion, sentiment, and technical analysis across 2000+ stocks, crypto, forex, and futures.',
-          tags: ['React', 'TypeScript', 'ML', 'Yahoo Finance'],
+          description: 'ML-powered trading bot with 5 strategy groups — momentum, mean reversion, technical, sentiment, and ML ensemble. Scans 2000+ assets, ranks by composite score, and executes via Alpaca.',
+          tags: ['React', 'TypeScript', 'ML', 'Alpaca'],
           link: '/TradingBot',
         },
         {

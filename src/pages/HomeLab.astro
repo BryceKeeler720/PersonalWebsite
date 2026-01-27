@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HomeLabDashboard from '../components/homelab/HomeLabDashboard.tsx';
+---
+
+<BaseLayout
+  title="Home Lab Dashboard | Bryce Keeler"
+  description="Live monitoring dashboard for my self-hosted Proxmox home lab — containers, services, resource utilization, and network topology."
+>
+  <HomeLabDashboard client:load />
+</BaseLayout>
+
+<style is:global>
+  body {
+    overflow-x: hidden;
+  }
+</style>
