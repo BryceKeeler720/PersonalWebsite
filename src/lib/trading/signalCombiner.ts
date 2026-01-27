@@ -76,11 +76,11 @@ export function combineSignals(
 export function getRecommendation(
   score: number
 ): 'STRONG_BUY' | 'BUY' | 'HOLD' | 'SELL' | 'STRONG_SELL' {
-  // Very low thresholds for high-frequency trading
-  if (score > 0.25) return 'STRONG_BUY';
-  if (score > 0.04) return 'BUY';
-  if (score < -0.25) return 'STRONG_SELL';
-  if (score < -0.04) return 'SELL';
+  // Regime-adaptive thresholds — higher bar to reduce noise
+  if (score > 0.55) return 'STRONG_BUY';
+  if (score > 0.35) return 'BUY';
+  if (score < -0.55) return 'STRONG_SELL';
+  if (score < -0.35) return 'SELL';
   return 'HOLD';
 }
 

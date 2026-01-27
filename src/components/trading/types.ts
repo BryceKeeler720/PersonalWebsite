@@ -19,6 +19,10 @@ export interface Holding {
   priceUpdatedAt?: string;
   dividendYield?: number;
   annualDividend?: number;
+  highWaterMark?: number;
+  entryATR?: number | null;
+  entryTimestamp?: string;
+  barsHeld?: number;
 }
 
 // Trade records
@@ -82,6 +86,7 @@ export interface SignalSnapshot {
   combined: number; // Weighted final score
   recommendation: 'STRONG_BUY' | 'BUY' | 'HOLD' | 'SELL' | 'STRONG_SELL';
   price?: number; // Current price from latest candle
+  regime?: 'TRENDING_UP' | 'TRENDING_DOWN' | 'RANGE_BOUND' | 'UNKNOWN';
 }
 
 // Configuration
@@ -92,7 +97,7 @@ export interface TradingConfig {
   minTradeValue: number; // Minimum trade value
   targetCashRatio: number; // Target cash % to maintain (e.g., 0.10 = 10%)
   strategyWeights: StrategyWeights;
-  scheduleInterval: 'hourly' | 'daily' | 'manual';
+  scheduleInterval: 'intraday' | 'hourly' | 'daily' | 'manual';
 }
 
 export interface StrategyWeights {
@@ -109,18 +114,18 @@ export interface SchedulerState {
   lastRun: string | null;
 }
 
-// Default configuration - optimized for high-frequency trading
+// Default configuration - regime-adaptive strategy
 export const DEFAULT_CONFIG: TradingConfig = {
   initialCapital: 10199.52,
-  maxPositionSize: 0.04, // 4% max per position for diversification
-  maxPositions: 50, // Allow more simultaneous positions
-  minTradeValue: 15, // Lower minimum for more frequent smaller trades
-  targetCashRatio: 0, // No cash reserve - sell proceeds fund new buys
+  maxPositionSize: 0.07, // 7% max per position — ATR-based sizing within this cap
+  maxPositions: 15, // Concentrated portfolio
+  minTradeValue: 15,
+  targetCashRatio: 0.05, // 5% cash buffer
   strategyWeights: {
-    momentum: 0.35,
-    meanReversion: 0.25,
-    sentiment: 0.10,
-    technical: 0.30,
+    momentum: 0.35, // Trend Momentum (Group A)
+    meanReversion: 0.25, // BB+RSI Reversion (Group B)
+    sentiment: 0.10, // VWAP Reversion (Group B)
+    technical: 0.30, // MACD Trend (Group A)
   },
   scheduleInterval: 'intraday',
 };

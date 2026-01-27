@@ -18,26 +18,30 @@ const BATCH_SIZE = 50; // Alpaca supports multi-symbol batch requests
 const BATCH_DELAY_MS = 350; // Free tier: 200 req/min → ~300ms minimum between requests
 const DEFAULT_CONFIG = {
   initialCapital: 10199.52,
-  maxPositionSize: 0.04,
-  maxPositions: 50,
+  maxPositionSize: 0.07,
+  maxPositions: 15,
   minTradeValue: 15,
-  targetCashRatio: 0,
-  stopLoss: -5,        // % — wider for intraday noise
-  profitTake: 5,       // % — let winners run
-  buyThreshold: 0.15,  // Only trade on strong signals
-  weakSignalSell: 0.08,
-  strategyWeights: {
-    // Maps to: momentum → Intraday Momentum, meanReversion → VWAP Reversion,
-    //          sentiment → Gap Fade, technical → RSI + Volume
-    momentum: 0.35,
-    meanReversion: 0.25,
-    sentiment: 0.10,
-    technical: 0.30,
-  },
+  targetCashRatio: 0.05,  // 5% cash buffer
+  buyThreshold: 0.35,     // Higher bar — only trade on strong signals
+  riskPerTrade: 0.01,     // 1% of portfolio risked per position
+  atrStopMultiplier: 2,   // Trailing stop = 2×ATR below high water mark
+  atrProfit1Multiplier: 3, // Sell 25% at 3×ATR gain
+  atrProfit2Multiplier: 5, // Sell 50% at 5×ATR gain
+  maxNewPositionsPerCycle: 3, // Cap new buys per analysis cycle
+  minHoldBars: 24,        // Minimum 24 bars (2 hours) before selling
+  transactionCostBps: 5,  // 5 basis points per side (0.05%)
 };
 
-// Trade cooldown: prevent buying/selling the same symbol within 30 minutes
-const TRADE_COOLDOWN_MS = 30 * 60 * 1000;
+// Regime weights: how much each strategy group contributes based on market regime
+const REGIME_WEIGHTS = {
+  TRENDING_UP:   { trend: 0.80, reversion: 0.20 },
+  TRENDING_DOWN: { trend: 0.80, reversion: 0.20 },
+  RANGE_BOUND:   { trend: 0.20, reversion: 0.80 },
+  UNKNOWN:       { trend: 0.50, reversion: 0.50 },
+};
+
+// Trade cooldown: prevent buying/selling the same symbol within 4 hours
+const TRADE_COOLDOWN_MS = 4 * 60 * 60 * 1000;
 const tradeCooldowns = new Map(); // symbol → last trade timestamp
 
 // Alpaca API Configuration
@@ -612,9 +616,9 @@ async function fetchAllMarketData(symbols) {
 
   // Fetch sequentially to avoid 429 rate limits (free tier: 200 req/min)
   const stockIntraday = stockSymbols.length > 0 ? await fetchAlpacaBars(stockSymbols, '5Min', 5, false) : {};
-  const stockDaily = stockSymbols.length > 0 ? await fetchAlpacaBars(stockSymbols, '1Day', 10, false) : {};
+  const stockDaily = stockSymbols.length > 0 ? await fetchAlpacaBars(stockSymbols, '1Day', 120, false) : {};
   const cryptoIntraday = cryptoSymbols.length > 0 ? await fetchAlpacaBars(cryptoSymbols, '5Min', 5, true) : {};
-  const cryptoDaily = cryptoSymbols.length > 0 ? await fetchAlpacaBars(cryptoSymbols, '1Day', 10, true) : {};
+  const cryptoDaily = cryptoSymbols.length > 0 ? await fetchAlpacaBars(cryptoSymbols, '1Day', 120, true) : {};
 
   return {
     intraday: { ...stockIntraday, ...cryptoIntraday },
@@ -708,37 +712,303 @@ function setCooldown(symbol) {
   tradeCooldowns.set(symbol, Date.now());
 }
 
-// Strategy calculations
-function calculateRSI(data, period = 14) {
-  if (data.length < period + 1) return 50;
-  const changes = [];
-  for (let i = 1; i < data.length; i++) {
-    changes.push(data[i].close - data[i - 1].close);
+// ═══════════════════════════════════════════════════════════
+// Phase 1: Shared Indicator Utilities
+// ═══════════════════════════════════════════════════════════
+
+function computeSMA(prices, period) {
+  if (prices.length < period) return null;
+  const slice = prices.slice(-period);
+  return slice.reduce((a, b) => a + b, 0) / period;
+}
+
+function computeEMA(prices, period) {
+  if (prices.length < period) return null;
+  const k = 2 / (period + 1);
+  let ema = prices.slice(0, period).reduce((a, b) => a + b, 0) / period;
+  for (let i = period; i < prices.length; i++) {
+    ema = prices[i] * k + ema * (1 - k);
   }
-  const recentChanges = changes.slice(-period);
-  const gains = recentChanges.filter(c => c > 0);
-  const losses = recentChanges.filter(c => c < 0).map(c => Math.abs(c));
+  return ema;
+}
+
+function computeRSI(prices, period = 14) {
+  if (prices.length < period + 1) return 50;
+  const changes = [];
+  for (let i = 1; i < prices.length; i++) {
+    changes.push(prices[i] - prices[i - 1]);
+  }
+  const recent = changes.slice(-period);
+  const gains = recent.filter(c => c > 0);
+  const losses = recent.filter(c => c < 0).map(c => Math.abs(c));
   const avgGain = gains.length ? gains.reduce((a, b) => a + b, 0) / period : 0;
   const avgLoss = losses.length ? losses.reduce((a, b) => a + b, 0) / period : 0;
   if (avgLoss === 0) return 100;
-  const rs = avgGain / avgLoss;
-  return 100 - (100 / (1 + rs));
+  return 100 - (100 / (1 + avgGain / avgLoss));
 }
 
-function calculateVWAPReversionSignal(intradayBars) {
-  // VWAP Reversion: mean reversion to volume-weighted average price
-  // Maps to 'meanReversion' weight (0.35)
+function computeMACD(prices, fastPeriod = 12, slowPeriod = 26, signalPeriod = 9) {
+  if (prices.length < slowPeriod + signalPeriod) return null;
+  // Build full MACD line to derive signal line
+  const macdLine = [];
+  const kFast = 2 / (fastPeriod + 1);
+  const kSlow = 2 / (slowPeriod + 1);
+  let emaFast = prices.slice(0, fastPeriod).reduce((a, b) => a + b, 0) / fastPeriod;
+  let emaSlow = prices.slice(0, slowPeriod).reduce((a, b) => a + b, 0) / slowPeriod;
+  for (let i = 1; i < prices.length; i++) {
+    if (i >= fastPeriod) emaFast = prices[i] * kFast + emaFast * (1 - kFast);
+    if (i >= slowPeriod) emaSlow = prices[i] * kSlow + emaSlow * (1 - kSlow);
+    if (i >= slowPeriod) macdLine.push(emaFast - emaSlow);
+  }
+  if (macdLine.length < signalPeriod) return null;
+  const kSig = 2 / (signalPeriod + 1);
+  let signal = macdLine.slice(0, signalPeriod).reduce((a, b) => a + b, 0) / signalPeriod;
+  for (let i = signalPeriod; i < macdLine.length; i++) {
+    signal = macdLine[i] * kSig + signal * (1 - kSig);
+  }
+  const macd = macdLine[macdLine.length - 1];
+  const histogram = macd - signal;
+  // Previous histogram for slope detection
+  let prevHistogram = null;
+  if (macdLine.length >= 2) {
+    const kSig2 = kSig;
+    let sig2 = macdLine.slice(0, signalPeriod).reduce((a, b) => a + b, 0) / signalPeriod;
+    for (let i = signalPeriod; i < macdLine.length - 1; i++) {
+      sig2 = macdLine[i] * kSig2 + sig2 * (1 - kSig2);
+    }
+    prevHistogram = macdLine[macdLine.length - 2] - sig2;
+  }
+  return { macd, signal, histogram, prevHistogram };
+}
+
+function computeBollingerBands(prices, period = 20, mult = 2) {
+  if (prices.length < period) return null;
+  const slice = prices.slice(-period);
+  const mean = slice.reduce((a, b) => a + b, 0) / period;
+  const variance = slice.reduce((sum, p) => sum + Math.pow(p - mean, 2), 0) / period;
+  const stdDev = Math.sqrt(variance);
+  return { upper: mean + mult * stdDev, middle: mean, lower: mean - mult * stdDev, stdDev, width: (2 * mult * stdDev) / mean };
+}
+
+function computeATR(highs, lows, closes, period = 14) {
+  if (highs.length < period + 1) return null;
+  let atrSum = 0;
+  const start = Math.max(1, highs.length - period);
+  for (let i = start; i < highs.length; i++) {
+    const tr = Math.max(
+      highs[i] - lows[i],
+      Math.abs(highs[i] - closes[i - 1]),
+      Math.abs(lows[i] - closes[i - 1])
+    );
+    atrSum += tr;
+  }
+  return atrSum / Math.min(period, highs.length - 1);
+}
+
+function computeADX(highs, lows, closes, period = 14) {
+  // Average Directional Index — measures trend strength (0-100)
+  if (highs.length < period * 2 + 1) return null;
+  const plusDM = [], minusDM = [], tr = [];
+  for (let i = 1; i < highs.length; i++) {
+    const upMove = highs[i] - highs[i - 1];
+    const downMove = lows[i - 1] - lows[i];
+    plusDM.push(upMove > downMove && upMove > 0 ? upMove : 0);
+    minusDM.push(downMove > upMove && downMove > 0 ? downMove : 0);
+    tr.push(Math.max(highs[i] - lows[i], Math.abs(highs[i] - closes[i - 1]), Math.abs(lows[i] - closes[i - 1])));
+  }
+  // Smoothed averages using Wilder's method
+  let smoothPlusDM = plusDM.slice(0, period).reduce((a, b) => a + b, 0);
+  let smoothMinusDM = minusDM.slice(0, period).reduce((a, b) => a + b, 0);
+  let smoothTR = tr.slice(0, period).reduce((a, b) => a + b, 0);
+  const dx = [];
+  for (let i = period; i < plusDM.length; i++) {
+    smoothPlusDM = smoothPlusDM - smoothPlusDM / period + plusDM[i];
+    smoothMinusDM = smoothMinusDM - smoothMinusDM / period + minusDM[i];
+    smoothTR = smoothTR - smoothTR / period + tr[i];
+    const plusDI = smoothTR > 0 ? (smoothPlusDM / smoothTR) * 100 : 0;
+    const minusDI = smoothTR > 0 ? (smoothMinusDM / smoothTR) * 100 : 0;
+    const diSum = plusDI + minusDI;
+    dx.push(diSum > 0 ? (Math.abs(plusDI - minusDI) / diSum) * 100 : 0);
+  }
+  if (dx.length < period) return null;
+  let adx = dx.slice(0, period).reduce((a, b) => a + b, 0) / period;
+  for (let i = period; i < dx.length; i++) {
+    adx = (adx * (period - 1) + dx[i]) / period;
+  }
+  return adx;
+}
+
+function computeROC(prices, period) {
+  if (prices.length <= period) return null;
+  const current = prices[prices.length - 1];
+  const past = prices[prices.length - 1 - period];
+  return past !== 0 ? ((current - past) / past) * 100 : 0;
+}
+
+// ═══════════════════════════════════════════════════════════
+// Phase 2: Market Regime Detection
+// ═══════════════════════════════════════════════════════════
+
+function detectRegime(dailyCloses, dailyHighs, dailyLows) {
+  if (dailyCloses.length < 60) return 'UNKNOWN';
+  const adx = computeADX(dailyHighs, dailyLows, dailyCloses, 14);
+  if (adx === null) return 'UNKNOWN';
+  const sma20 = computeSMA(dailyCloses, 20);
+  const sma50 = computeSMA(dailyCloses, 50);
+  if (sma20 === null || sma50 === null) return 'UNKNOWN';
+  if (adx > 25) return sma20 > sma50 ? 'TRENDING_UP' : 'TRENDING_DOWN';
+  return 'RANGE_BOUND';
+}
+
+// ═══════════════════════════════════════════════════════════
+// Phase 3: Strategy Functions
+// ═══════════════════════════════════════════════════════════
+
+// Group A — Trend-Following
+
+function trendMomentumStrategy(dailyCloses, intradayCloses) {
+  // Multi-timeframe momentum: SMA alignment + ROC + breakout
+  if (dailyCloses.length < 50 || intradayCloses.length < 20) {
+    return { name: 'Trend Momentum', score: 0, confidence: 0, reason: 'Insufficient data' };
+  }
+
+  let score = 0;
+  const reasons = [];
+
+  const sma10 = computeSMA(dailyCloses, 10);
+  const sma20 = computeSMA(dailyCloses, 20);
+  const sma50 = computeSMA(dailyCloses, 50);
+  const price = dailyCloses[dailyCloses.length - 1];
+
+  // SMA alignment: 10 > 20 > 50 = full uptrend
+  if (sma10 > sma20 && sma20 > sma50) { score += 0.4; reasons.push('SMA aligned up'); }
+  else if (sma10 < sma20 && sma20 < sma50) { score -= 0.4; reasons.push('SMA aligned down'); }
+  else if (sma10 > sma20) { score += 0.15; reasons.push('Short-term up'); }
+  else if (sma10 < sma20) { score -= 0.15; reasons.push('Short-term down'); }
+
+  // Rate of change (20-day)
+  const roc20 = computeROC(dailyCloses, 20);
+  if (roc20 !== null) {
+    if (roc20 > 10) { score += 0.3; reasons.push(`ROC20 strong +${roc20.toFixed(1)}%`); }
+    else if (roc20 > 3) { score += 0.15; reasons.push(`ROC20 +${roc20.toFixed(1)}%`); }
+    else if (roc20 < -10) { score -= 0.3; reasons.push(`ROC20 ${roc20.toFixed(1)}%`); }
+    else if (roc20 < -3) { score -= 0.15; reasons.push(`ROC20 ${roc20.toFixed(1)}%`); }
+  }
+
+  // 50-day breakout
+  const high50 = Math.max(...dailyCloses.slice(-50));
+  const low50 = Math.min(...dailyCloses.slice(-50));
+  if (price >= high50 * 0.98) { score += 0.2; reasons.push('Near 50d high'); }
+  else if (price <= low50 * 1.02) { score -= 0.2; reasons.push('Near 50d low'); }
+
+  // SMA slope (20-day) — is the trend accelerating?
+  if (dailyCloses.length >= 25) {
+    const sma20_5ago = computeSMA(dailyCloses.slice(0, -5), 20);
+    if (sma20_5ago !== null && sma20 > sma20_5ago) { score += 0.1; reasons.push('SMA20 rising'); }
+    else if (sma20_5ago !== null && sma20 < sma20_5ago) { score -= 0.1; reasons.push('SMA20 falling'); }
+  }
+
+  return {
+    name: 'Trend Momentum',
+    score: Math.max(-1, Math.min(1, score)),
+    confidence: 0.7,
+    reason: reasons.join(', '),
+  };
+}
+
+function macdTrendStrategy(intradayCloses) {
+  // MACD trend confirmation on intraday data
+  if (intradayCloses.length < 40) {
+    return { name: 'MACD Trend', score: 0, confidence: 0, reason: 'Insufficient data' };
+  }
+
+  const macd = computeMACD(intradayCloses);
+  if (!macd) return { name: 'MACD Trend', score: 0, confidence: 0, reason: 'Cannot compute MACD' };
+
+  let score = 0;
+  const reasons = [];
+
+  // Histogram direction (positive = bullish momentum)
+  if (macd.histogram > 0) { score += 0.3; reasons.push(`Hist +${macd.histogram.toFixed(3)}`); }
+  else { score -= 0.3; reasons.push(`Hist ${macd.histogram.toFixed(3)}`); }
+
+  // Histogram slope (acceleration)
+  if (macd.prevHistogram !== null) {
+    const slope = macd.histogram - macd.prevHistogram;
+    if (slope > 0 && macd.histogram > 0) { score += 0.25; reasons.push('Accelerating up'); }
+    else if (slope < 0 && macd.histogram < 0) { score -= 0.25; reasons.push('Accelerating down'); }
+    else if (slope > 0 && macd.histogram < 0) { score += 0.15; reasons.push('Bearish decelerating'); }
+    else if (slope < 0 && macd.histogram > 0) { score -= 0.15; reasons.push('Bullish decelerating'); }
+  }
+
+  // MACD vs signal line crossover
+  if (macd.macd > macd.signal) { score += 0.2; reasons.push('MACD above signal'); }
+  else { score -= 0.2; reasons.push('MACD below signal'); }
+
+  return {
+    name: 'MACD Trend',
+    score: Math.max(-1, Math.min(1, score)),
+    confidence: 0.6,
+    reason: reasons.join(', '),
+  };
+}
+
+// Group B — Mean-Reversion
+
+function bollingerRSIReversionStrategy(intradayCloses) {
+  // Bollinger Band + RSI-14 mean reversion with bandwidth filter
+  if (intradayCloses.length < 25) {
+    return { name: 'BB+RSI Reversion', score: 0, confidence: 0, reason: 'Insufficient data' };
+  }
+
+  const bb = computeBollingerBands(intradayCloses, 20, 2);
+  const rsi = computeRSI(intradayCloses, 14);
+  if (!bb) return { name: 'BB+RSI Reversion', score: 0, confidence: 0, reason: 'Cannot compute BB' };
+
+  const price = intradayCloses[intradayCloses.length - 1];
+  let score = 0;
+  const reasons = [];
+
+  // Bandwidth filter: skip if bands are too narrow (no mean to revert to)
+  if (bb.width < 0.01) {
+    return { name: 'BB+RSI Reversion', score: 0, confidence: 0.3, reason: 'BB too narrow — no reversion edge' };
+  }
+
+  // Price relative to bands
+  if (price < bb.lower) {
+    score += 0.5;
+    reasons.push('Below lower BB');
+    if (rsi < 30) { score += 0.3; reasons.push(`RSI oversold (${rsi.toFixed(0)})`); }
+    else if (rsi < 40) { score += 0.15; reasons.push(`RSI low (${rsi.toFixed(0)})`); }
+  } else if (price > bb.upper) {
+    score -= 0.5;
+    reasons.push('Above upper BB');
+    if (rsi > 70) { score -= 0.3; reasons.push(`RSI overbought (${rsi.toFixed(0)})`); }
+    else if (rsi > 60) { score -= 0.15; reasons.push(`RSI high (${rsi.toFixed(0)})`); }
+  } else {
+    // Inside bands — weaker signal
+    const position = (price - bb.lower) / (bb.upper - bb.lower);
+    if (position < 0.2) { score += 0.2; reasons.push('Near lower BB'); }
+    else if (position > 0.8) { score -= 0.2; reasons.push('Near upper BB'); }
+    else { reasons.push('Mid-band'); }
+  }
+
+  return {
+    name: 'BB+RSI Reversion',
+    score: Math.max(-1, Math.min(1, score)),
+    confidence: 0.7,
+    reason: reasons.join(', '),
+  };
+}
+
+function vwapReversionStrategy(intradayBars) {
+  // VWAP Reversion: mean reversion to volume-weighted average price (kept from original)
   if (!intradayBars || intradayBars.length < 12) {
     return { name: 'VWAP Reversion', score: 0, confidence: 0, reason: 'Insufficient intraday data' };
   }
 
-  // Get today's bars only
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const todayBars = intradayBars.filter(b => new Date(b.date) >= todayStart);
-
-  // Fall back to most recent trading session if no bars today
-  const barsToUse = todayBars.length >= 6 ? todayBars : intradayBars.slice(-78); // 78 bars ≈ 6.5 hours
+  // Use most recent session bars (up to 78 bars ≈ 6.5 hours)
+  const barsToUse = intradayBars.slice(-78);
 
   // Compute cumulative VWAP from typical price × volume
   let cumVolPrice = 0;
@@ -756,7 +1026,6 @@ function calculateVWAPReversionSignal(intradayBars) {
   const vwap = cumVolPrice / cumVol;
   const currentPrice = barsToUse[barsToUse.length - 1].close;
 
-  // Standard deviation of typical price around VWAP
   const squaredDiffs = barsToUse.map(b => {
     const tp = (b.high + b.low + b.close) / 3;
     return Math.pow(tp - vwap, 2);
@@ -769,259 +1038,129 @@ function calculateVWAPReversionSignal(intradayBars) {
   }
 
   const zScore = (currentPrice - vwap) / stdDev;
-  const pctFromVWAP = ((currentPrice - vwap) / vwap * 100).toFixed(2);
-
   let score = 0;
   let reason = '';
 
-  // Mean reversion: oversold below VWAP = buy, overbought above VWAP = sell
-  if (zScore < -2) { score = 0.8; reason = `Deeply below VWAP (z=${zScore.toFixed(2)}, ${pctFromVWAP}%)`; }
-  else if (zScore < -1.5) { score = 0.6; reason = `Well below VWAP (z=${zScore.toFixed(2)}, ${pctFromVWAP}%)`; }
-  else if (zScore < -1) { score = 0.4; reason = `Below VWAP (z=${zScore.toFixed(2)}, ${pctFromVWAP}%)`; }
+  if (zScore < -2) { score = 0.8; reason = `Deeply below VWAP (z=${zScore.toFixed(2)})`; }
+  else if (zScore < -1.5) { score = 0.6; reason = `Well below VWAP (z=${zScore.toFixed(2)})`; }
+  else if (zScore < -1) { score = 0.4; reason = `Below VWAP (z=${zScore.toFixed(2)})`; }
   else if (zScore < -0.5) { score = 0.2; reason = `Slightly below VWAP (z=${zScore.toFixed(2)})`; }
-  else if (zScore > 2) { score = -0.8; reason = `Deeply above VWAP (z=${zScore.toFixed(2)}, +${pctFromVWAP}%)`; }
+  else if (zScore > 2) { score = -0.8; reason = `Deeply above VWAP (z=${zScore.toFixed(2)})`; }
   else if (zScore > 1.5) { score = -0.6; reason = `Well above VWAP (z=${zScore.toFixed(2)})`; }
   else if (zScore > 1) { score = -0.4; reason = `Above VWAP (z=${zScore.toFixed(2)})`; }
   else if (zScore > 0.5) { score = -0.2; reason = `Slightly above VWAP (z=${zScore.toFixed(2)})`; }
   else { score = 0; reason = `At VWAP (z=${zScore.toFixed(2)})`; }
 
-  // Confidence scales with number of bars available
   const confidence = Math.min(0.8, 0.3 + (barsToUse.length / 78) * 0.5);
-
   return { name: 'VWAP Reversion', score, confidence, reason };
 }
 
-function calculateIntradayMomentumSignal(intradayBars) {
-  // Intraday momentum: short-term price velocity normalized by ATR
-  // Maps to 'momentum' weight (0.20)
-  if (!intradayBars || intradayBars.length < 12) {
-    return { name: 'Intraday Momentum', score: 0, confidence: 0, reason: 'Insufficient intraday data' };
-  }
+// ═══════════════════════════════════════════════════════════
+// Phase 4: Regime-Weighted Signal Combination
+// ═══════════════════════════════════════════════════════════
 
-  const bars = intradayBars;
-  const currentPrice = bars[bars.length - 1].close;
-
-  // ATR (Average True Range) over last 14 bars for normalization
-  const atrPeriod = Math.min(14, bars.length - 1);
-  let atrSum = 0;
-  for (let i = bars.length - atrPeriod; i < bars.length; i++) {
-    const tr = Math.max(
-      bars[i].high - bars[i].low,
-      Math.abs(bars[i].high - bars[i - 1].close),
-      Math.abs(bars[i].low - bars[i - 1].close)
-    );
-    atrSum += tr;
-  }
-  const atr = atrSum / atrPeriod;
-
-  if (atr === 0) {
-    return { name: 'Intraday Momentum', score: 0, confidence: 0.3, reason: 'No price movement' };
-  }
-
-  const reasons = [];
-  let score = 0;
-
-  // 30-min momentum (6 × 5-min bars)
-  if (bars.length >= 7) {
-    const price30mAgo = bars[bars.length - 7].close;
-    const mom30m = (currentPrice - price30mAgo) / atr;
-    if (mom30m > 1.5) { score += 0.3; }
-    else if (mom30m > 0.75) { score += 0.15; }
-    else if (mom30m < -1.5) { score -= 0.3; }
-    else if (mom30m < -0.75) { score -= 0.15; }
-    reasons.push(`30m: ${mom30m >= 0 ? '+' : ''}${mom30m.toFixed(2)} ATR`);
-  }
-
-  // 1-hour momentum (12 × 5-min bars)
-  if (bars.length >= 13) {
-    const price1hAgo = bars[bars.length - 13].close;
-    const mom1h = (currentPrice - price1hAgo) / atr;
-    if (mom1h > 2) { score += 0.4; }
-    else if (mom1h > 1) { score += 0.2; }
-    else if (mom1h < -2) { score -= 0.4; }
-    else if (mom1h < -1) { score -= 0.2; }
-    reasons.push(`1h: ${mom1h >= 0 ? '+' : ''}${mom1h.toFixed(2)} ATR`);
-  }
-
-  // 2-hour momentum (24 × 5-min bars)
-  if (bars.length >= 25) {
-    const price2hAgo = bars[bars.length - 25].close;
-    const mom2h = (currentPrice - price2hAgo) / atr;
-    if (mom2h > 2.5) { score += 0.3; }
-    else if (mom2h > 1.5) { score += 0.15; }
-    else if (mom2h < -2.5) { score -= 0.3; }
-    else if (mom2h < -1.5) { score -= 0.15; }
-    reasons.push(`2h: ${mom2h >= 0 ? '+' : ''}${mom2h.toFixed(2)} ATR`);
-  }
-
-  return {
-    name: 'Intraday Momentum',
-    score: Math.max(-1, Math.min(1, score)),
-    confidence: 0.65,
-    reason: reasons.join(', '),
-  };
-}
-
-function calculateRSIVolumeSignal(intradayBars) {
-  // RSI-7 on 5-min candles + volume spike detection
-  // Maps to 'technical' weight (0.30)
-  if (!intradayBars || intradayBars.length < 20) {
-    return { name: 'RSI + Volume', score: 0, confidence: 0, reason: 'Insufficient intraday data' };
-  }
-
-  const rsi7 = calculateRSI(intradayBars, 7);
-  const rsi14 = calculateRSI(intradayBars, 14);
-
-  let score = 0;
-  const reasons = [];
-
-  // RSI-7 (fast, more sensitive to short-term moves)
-  if (rsi7 < 20) { score += 0.5; reasons.push(`RSI-7 deeply oversold (${rsi7.toFixed(0)})`); }
-  else if (rsi7 < 30) { score += 0.35; reasons.push(`RSI-7 oversold (${rsi7.toFixed(0)})`); }
-  else if (rsi7 < 40) { score += 0.15; reasons.push(`RSI-7 low (${rsi7.toFixed(0)})`); }
-  else if (rsi7 > 80) { score -= 0.5; reasons.push(`RSI-7 deeply overbought (${rsi7.toFixed(0)})`); }
-  else if (rsi7 > 70) { score -= 0.35; reasons.push(`RSI-7 overbought (${rsi7.toFixed(0)})`); }
-  else if (rsi7 > 60) { score -= 0.15; reasons.push(`RSI-7 high (${rsi7.toFixed(0)})`); }
-  else { reasons.push(`RSI-7 neutral (${rsi7.toFixed(0)})`); }
-
-  // RSI-14 confirmation amplifies the signal
-  if ((rsi7 < 30 && rsi14 < 40) || (rsi7 > 70 && rsi14 > 60)) {
-    score *= 1.3;
-    reasons.push('RSI-14 confirms');
-  }
-
-  // Volume spike detection (last 30 min vs 40-bar average)
-  const recentBars = intradayBars.slice(-6);
-  const lookback = Math.min(40, intradayBars.length);
-  const avgVolume = intradayBars.slice(-lookback).reduce((sum, d) => sum + d.volume, 0) / lookback;
-  const recentVolume = recentBars.reduce((sum, d) => sum + d.volume, 0) / recentBars.length;
-
-  if (avgVolume > 0) {
-    const volumeRatio = recentVolume / avgVolume;
-    if (volumeRatio > 2.5) {
-      const priceChange = (recentBars[recentBars.length - 1].close - recentBars[0].close) / recentBars[0].close;
-      if (priceChange > 0) { score += 0.25; reasons.push(`Volume spike (${volumeRatio.toFixed(1)}x) + up`); }
-      else if (priceChange < 0) { score -= 0.25; reasons.push(`Volume spike (${volumeRatio.toFixed(1)}x) + down`); }
-      else { reasons.push(`Volume spike (${volumeRatio.toFixed(1)}x) neutral`); }
-    } else if (volumeRatio > 1.5) {
-      const priceChange = (recentBars[recentBars.length - 1].close - recentBars[0].close) / recentBars[0].close;
-      if (priceChange > 0) { score += 0.1; reasons.push(`Elevated volume (${volumeRatio.toFixed(1)}x) + up`); }
-      else if (priceChange < 0) { score -= 0.1; reasons.push(`Elevated volume (${volumeRatio.toFixed(1)}x) + down`); }
+function weightedAvg(signals) {
+  let totalWeight = 0;
+  let totalScore = 0;
+  for (const s of signals) {
+    if (s.confidence > 0) {
+      totalScore += s.score * s.confidence;
+      totalWeight += s.confidence;
     }
   }
-
-  return {
-    name: 'RSI + Volume',
-    score: Math.max(-1, Math.min(1, score)),
-    confidence: 0.7,
-    reason: reasons.join(', '),
-  };
+  return totalWeight > 0 ? totalScore / totalWeight : 0;
 }
 
-function calculateGapFadeSignal(intradayBars, dailyBars) {
-  // Overnight gap fading: large gaps tend to mean-revert during the day
-  // Maps to 'sentiment' weight (0.15)
-  if (!dailyBars || dailyBars.length < 2 || !intradayBars || intradayBars.length < 6) {
-    return { name: 'Gap Fade', score: 0, confidence: 0, reason: 'Insufficient data for gap analysis' };
-  }
-
-  // Previous close from daily bars
-  const previousClose = dailyBars[dailyBars.length - 2].close;
-
-  // Today's open from intraday bars
-  const now = new Date();
-  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const todayBar = intradayBars.find(b => new Date(b.date) >= todayStart);
-  const todayOpen = todayBar?.open || intradayBars[Math.max(0, intradayBars.length - 78)]?.open;
-
-  if (!todayOpen || !previousClose) {
-    return { name: 'Gap Fade', score: 0, confidence: 0, reason: 'Cannot determine gap' };
-  }
-
-  const gapPercent = ((todayOpen - previousClose) / previousClose) * 100;
-  const currentPrice = intradayBars[intradayBars.length - 1].close;
-  const gapFillPercent = todayOpen !== previousClose
-    ? ((currentPrice - todayOpen) / (previousClose - todayOpen)) * 100
-    : 100;
-
-  // Time decay: gap fade signal strongest at open, weakens through the day
-  const marketOpen = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 9, 30);
-  const hoursAfterOpen = Math.max(0, (now.getTime() - marketOpen.getTime()) / (1000 * 60 * 60));
-  const timeDecay = Math.max(0.2, 1 - (hoursAfterOpen / 6.5));
-
-  let score = 0;
-  let reason = '';
-
-  if (Math.abs(gapPercent) < 0.1) {
-    return { name: 'Gap Fade', score: 0, confidence: 0.2, reason: 'No significant gap' };
-  }
-
-  // Gap fade: bet against the gap direction (gaps tend to fill)
-  if (gapPercent > 2) { score = -0.6 * timeDecay; reason = `Large gap up +${gapPercent.toFixed(1)}% (fade short)`; }
-  else if (gapPercent > 1) { score = -0.4 * timeDecay; reason = `Gap up +${gapPercent.toFixed(1)}% (fade short)`; }
-  else if (gapPercent > 0.3) { score = -0.2 * timeDecay; reason = `Small gap up +${gapPercent.toFixed(1)}%`; }
-  else if (gapPercent < -2) { score = 0.6 * timeDecay; reason = `Large gap down ${gapPercent.toFixed(1)}% (fade long)`; }
-  else if (gapPercent < -1) { score = 0.4 * timeDecay; reason = `Gap down ${gapPercent.toFixed(1)}% (fade long)`; }
-  else if (gapPercent < -0.3) { score = 0.2 * timeDecay; reason = `Small gap down ${gapPercent.toFixed(1)}%`; }
-
-  // Reduce signal if gap has already filled
-  if (gapFillPercent > 80) {
-    score *= 0.3;
-    reason += ' (mostly filled)';
-  } else if (gapFillPercent > 50) {
-    score *= 0.6;
-    reason += ' (partially filled)';
-  }
-
-  reason += ` [decay: ${(timeDecay * 100).toFixed(0)}%]`;
-
-  return {
-    name: 'Gap Fade',
-    score: Math.max(-1, Math.min(1, score)),
-    confidence: 0.5 * timeDecay,
-    reason,
-  };
-}
-
-function combineSignals(symbol, momentum, meanReversion, sentiment, technical, weights) {
-  const combined =
-    momentum.score * weights.momentum +
-    meanReversion.score * weights.meanReversion +
-    sentiment.score * weights.sentiment +
-    technical.score * weights.technical;
+function combineSignals(symbol, trendSignals, reversionSignals, regime) {
+  const weights = REGIME_WEIGHTS[regime] || REGIME_WEIGHTS.UNKNOWN;
+  const trendScore = weightedAvg(trendSignals);
+  const reversionScore = weightedAvg(reversionSignals);
+  const combined = trendScore * weights.trend + reversionScore * weights.reversion;
 
   let recommendation;
-  if (combined > 0.5) recommendation = 'STRONG_BUY';
-  else if (combined > 0.15) recommendation = 'BUY';
-  else if (combined < -0.5) recommendation = 'STRONG_SELL';
-  else if (combined < -0.15) recommendation = 'SELL';
+  if (combined > 0.55) recommendation = 'STRONG_BUY';
+  else if (combined > 0.35) recommendation = 'BUY';
+  else if (combined < -0.55) recommendation = 'STRONG_SELL';
+  else if (combined < -0.35) recommendation = 'SELL';
   else recommendation = 'HOLD';
 
+  // Pack signals into the legacy format for frontend compatibility
   return {
     symbol,
     timestamp: new Date().toISOString(),
-    momentum,
-    meanReversion,
-    sentiment,
-    technical,
+    momentum: trendSignals[0] || { name: 'Trend Momentum', score: 0, confidence: 0, reason: 'N/A' },
+    meanReversion: reversionSignals[0] || { name: 'BB+RSI Reversion', score: 0, confidence: 0, reason: 'N/A' },
+    sentiment: reversionSignals[1] || { name: 'VWAP Reversion', score: 0, confidence: 0, reason: 'N/A' },
+    technical: trendSignals[1] || { name: 'MACD Trend', score: 0, confidence: 0, reason: 'N/A' },
     combined,
     recommendation,
+    regime,
   };
+}
+
+// ═══════════════════════════════════════════════════════════
+// Phase 5: ATR-Based Position Sizing + Risk Management
+// ═══════════════════════════════════════════════════════════
+
+function calculateATRPositionSize(portfolioValue, atr, currentPrice) {
+  if (!atr || atr <= 0 || currentPrice <= 0) return 0;
+  const riskAmount = portfolioValue * DEFAULT_CONFIG.riskPerTrade; // 1% of portfolio
+  const stopDistance = DEFAULT_CONFIG.atrStopMultiplier * atr;      // 2×ATR
+  const shares = riskAmount / stopDistance;
+  // Cap at maxPositionSize of portfolio
+  const maxShares = (portfolioValue * DEFAULT_CONFIG.maxPositionSize) / currentPrice;
+  return Math.min(shares, maxShares);
+}
+
+function checkTrailingStop(holding, currentPrice, entryATR) {
+  // Trailing stop: sell if price drops 2×ATR below high water mark
+  if (!entryATR || entryATR <= 0) return false;
+  const hwm = holding.highWaterMark || holding.avgCost;
+  const stopPrice = hwm - DEFAULT_CONFIG.atrStopMultiplier * entryATR;
+  return currentPrice <= stopPrice;
+}
+
+function checkProfitTake(holding, currentPrice, entryATR) {
+  // Tiered profit taking: 25% at 3×ATR, 50% at 5×ATR
+  if (!entryATR || entryATR <= 0) return 0;
+  const gain = currentPrice - holding.avgCost;
+  if (gain >= DEFAULT_CONFIG.atrProfit2Multiplier * entryATR) return 0.50;
+  if (gain >= DEFAULT_CONFIG.atrProfit1Multiplier * entryATR) return 0.25;
+  return 0;
 }
 
 
 function analyzeStock(symbol, intradayBars, dailyBars) {
   // Analyze using pre-fetched Alpaca intraday (5-min) and daily bars
-  if (!intradayBars || intradayBars.length < 12) return { signal: null, lastPrice: null };
+  if (!intradayBars || intradayBars.length < 12) return { signal: null, lastPrice: null, atr: null };
 
-  const momentum = calculateIntradayMomentumSignal(intradayBars);
-  const meanReversion = calculateVWAPReversionSignal(intradayBars);
-  const technical = calculateRSIVolumeSignal(intradayBars);
-  const sentiment = calculateGapFadeSignal(intradayBars, dailyBars);
+  const dailyCloses = dailyBars ? dailyBars.map(b => b.close) : [];
+  const dailyHighs = dailyBars ? dailyBars.map(b => b.high) : [];
+  const dailyLows = dailyBars ? dailyBars.map(b => b.low) : [];
+  const intradayCloses = intradayBars.map(b => b.close);
+  const intradayHighs = intradayBars.map(b => b.high);
+  const intradayLows = intradayBars.map(b => b.low);
 
-  const signal = combineSignals(symbol, momentum, meanReversion, sentiment, technical, DEFAULT_CONFIG.strategyWeights);
+  // Detect market regime from daily data
+  const regime = detectRegime(dailyCloses, dailyHighs, dailyLows);
+
+  // Group A — Trend-Following
+  const trendMomentum = trendMomentumStrategy(dailyCloses, intradayCloses);
+  const macdTrend = macdTrendStrategy(intradayCloses);
+
+  // Group B — Mean-Reversion
+  const bbRsi = bollingerRSIReversionStrategy(intradayCloses);
+  const vwap = vwapReversionStrategy(intradayBars);
+
+  // Regime-weighted combination
+  const signal = combineSignals(symbol, [trendMomentum, macdTrend], [bbRsi, vwap], regime);
   const lastPrice = intradayBars[intradayBars.length - 1].close;
-  return { signal, lastPrice };
+
+  // Compute ATR for position sizing and stop management
+  const atr = computeATR(intradayHighs, intradayLows, intradayCloses, 14) ||
+              computeATR(dailyHighs, dailyLows, dailyCloses, 14);
+
+  return { signal, lastPrice, atr };
 }
 
 // Main execution
@@ -1065,6 +1204,7 @@ async function main() {
   const marketData = await fetchAllMarketData(assetsToAnalyze);
 
   // Analyze each symbol using pre-fetched data
+  const atrCache = {}; // symbol → ATR value for position sizing
   for (const symbol of assetsToAnalyze) {
     try {
       const intradayBars = marketData.intraday[symbol] || [];
@@ -1074,19 +1214,22 @@ async function main() {
       if (result.lastPrice) {
         priceCache[symbol] = result.lastPrice;
       }
+      if (result.atr) {
+        atrCache[symbol] = result.atr;
+      }
       if (result.signal) {
         allSignals[symbol] = { ...result.signal, price: result.lastPrice };
       } else {
-        // Placeholder signal so the frontend always shows something
         allSignals[symbol] = {
           symbol,
           timestamp: new Date().toISOString(),
-          momentum: { name: 'Intraday Momentum', score: 0, confidence: 0, reason: 'No market data available' },
-          meanReversion: { name: 'VWAP Reversion', score: 0, confidence: 0, reason: 'No market data available' },
-          sentiment: { name: 'Gap Fade', score: 0, confidence: 0, reason: 'No market data available' },
-          technical: { name: 'RSI + Volume', score: 0, confidence: 0, reason: 'No market data available' },
+          momentum: { name: 'Trend Momentum', score: 0, confidence: 0, reason: 'No market data available' },
+          meanReversion: { name: 'BB+RSI Reversion', score: 0, confidence: 0, reason: 'No market data available' },
+          sentiment: { name: 'VWAP Reversion', score: 0, confidence: 0, reason: 'No market data available' },
+          technical: { name: 'MACD Trend', score: 0, confidence: 0, reason: 'No market data available' },
           combined: 0,
           recommendation: 'HOLD',
+          regime: 'UNKNOWN',
         };
       }
     } catch (error) {
@@ -1096,8 +1239,7 @@ async function main() {
 
   console.log(`Analyzed ${Object.keys(allSignals).length} assets successfully`);
 
-  // Update holding prices using cached prices from analysis (avoids rate-limiting)
-  // Only fetch fresh quotes for holdings NOT in the price cache
+  // Update holding prices and high water marks
   for (const holding of portfolio.holdings) {
     let price = priceCache[holding.symbol];
     if (!price) {
@@ -1116,44 +1258,62 @@ async function main() {
       holding.gainLoss = (price - holding.avgCost) * holding.shares;
       holding.gainLossPercent = ((price - holding.avgCost) / holding.avgCost) * 100;
       holding.priceUpdatedAt = new Date().toISOString();
+      // Update high water mark for trailing stop
+      holding.highWaterMark = Math.max(holding.highWaterMark || holding.avgCost, price);
     }
+    // Track bars held (increment each cycle — each cycle ≈ 10 min interval)
+    holding.barsHeld = (holding.barsHeld || 0) + 1;
   }
 
-  // Check for sells (uses already-cached prices, no redundant API calls)
+  // ═══════════════════════════════════════════════════════════
+  // Sell Logic — ATR trailing stops + profit tiers + min hold
+  // ═══════════════════════════════════════════════════════════
   for (const holding of portfolio.holdings) {
     const signal = allSignals[holding.symbol];
     const price = priceCache[holding.symbol] || holding.currentPrice;
     if (!price) continue;
 
-    // Stop loss always fires; other sells respect cooldown
-    const isStopLoss = holding.gainLossPercent <= DEFAULT_CONFIG.stopLoss;
-    if (!isStopLoss && isOnCooldown(holding.symbol)) continue;
+    const entryATR = holding.entryATR || atrCache[holding.symbol];
+    const barsHeld = holding.barsHeld || 0;
+
+    // ATR trailing stop always fires regardless of cooldown or hold period
+    const isTrailingStop = entryATR ? checkTrailingStop(holding, price, entryATR) : false;
+
+    // Min hold period: don't sell for non-stop reasons if held < minHoldBars
+    if (!isTrailingStop && barsHeld < DEFAULT_CONFIG.minHoldBars) continue;
+    if (!isTrailingStop && isOnCooldown(holding.symbol)) continue;
 
     let sellPercent = 0;
     let sellReason = '';
 
-    if (!signal) {
+    if (isTrailingStop) {
+      sellPercent = 1.0;
+      const hwm = holding.highWaterMark || holding.avgCost;
+      sellReason = `ATR trailing stop (HWM $${hwm.toFixed(2)}, stop $${(hwm - DEFAULT_CONFIG.atrStopMultiplier * entryATR).toFixed(2)})`;
+    } else if (!signal) {
       sellPercent = 1.0;
       sellReason = 'No signal data - rotating out';
     } else if (signal.recommendation === 'STRONG_SELL') {
       sellPercent = 1.0;
       sellReason = `STRONG_SELL: score ${signal.combined.toFixed(2)}`;
-    } else if (isStopLoss) {
-      sellPercent = 1.0;
-      sellReason = `Stop loss at ${holding.gainLossPercent.toFixed(1)}%`;
-    } else if (signal.combined < DEFAULT_CONFIG.weakSignalSell) {
-      sellPercent = 1.0;
-      sellReason = `Weak signal (${signal.combined.toFixed(3)})`;
-    } else if (holding.gainLossPercent >= DEFAULT_CONFIG.profitTake) {
-      sellPercent = 0.5;
-      sellReason = `Taking profits at ${holding.gainLossPercent.toFixed(1)}%`;
     } else if (signal.recommendation === 'SELL') {
       sellPercent = 0.75;
       sellReason = `SELL: score ${signal.combined.toFixed(2)}`;
+    } else if (entryATR) {
+      // ATR-based profit taking
+      const profitPercent = checkProfitTake(holding, price, entryATR);
+      if (profitPercent > 0) {
+        sellPercent = profitPercent;
+        const atrGain = (price - holding.avgCost) / entryATR;
+        sellReason = `Profit take ${(profitPercent * 100).toFixed(0)}% at ${atrGain.toFixed(1)}×ATR gain`;
+      }
     }
 
     if (sellPercent > 0) {
       const sharesToSell = Math.round(holding.shares * sellPercent * 10000) / 10000 || holding.shares;
+      const total = sharesToSell * price;
+      // Deduct transaction cost
+      const txCost = total * DEFAULT_CONFIG.transactionCostBps / 10000;
 
       const trade = {
         id: crypto.randomUUID(),
@@ -1162,14 +1322,14 @@ async function main() {
         action: 'SELL',
         shares: sharesToSell,
         price,
-        total: sharesToSell * price,
+        total,
         reason: sellReason,
         signals: signal || { symbol: holding.symbol, timestamp: new Date().toISOString(), momentum: {}, meanReversion: {}, sentiment: {}, technical: {}, combined: 0, recommendation: 'HOLD' },
         gainLoss: (price - holding.avgCost) * sharesToSell,
         gainLossPercent: holding.gainLossPercent,
       };
 
-      portfolio.cash += trade.total;
+      portfolio.cash += total - txCost;
 
       if (sharesToSell >= holding.shares) {
         portfolio.holdings = portfolio.holdings.filter(h => h.symbol !== holding.symbol);
@@ -1189,25 +1349,26 @@ async function main() {
   const targetCash = portfolio.totalValue * DEFAULT_CONFIG.targetCashRatio;
   const availableCash = Math.max(0, portfolio.cash - targetCash);
   const strongBuyCandidates = Object.values(allSignals)
-    .filter(s => s.combined > 0.15 && !portfolio.holdings.some(h => h.symbol === s.symbol))
+    .filter(s => s.combined > DEFAULT_CONFIG.buyThreshold && !portfolio.holdings.some(h => h.symbol === s.symbol))
     .length;
 
   if (strongBuyCandidates > 0 && (availableCash < DEFAULT_CONFIG.minTradeValue || portfolio.holdings.length >= DEFAULT_CONFIG.maxPositions)) {
-    // Find weakest holdings that we have signals for
     const holdingsWithSignals = portfolio.holdings
       .map(h => ({ holding: h, signal: allSignals[h.symbol] }))
-      .filter(h => h.signal)
+      .filter(h => h.signal && (h.holding.barsHeld || 0) >= DEFAULT_CONFIG.minHoldBars)
       .sort((a, b) => a.signal.combined - b.signal.combined);
 
-    // Sell up to 3 weakest positions to free cash
     let rotated = 0;
     for (const { holding, signal } of holdingsWithSignals) {
       if (rotated >= 3) break;
-      if (signal.combined >= 0.15) break; // Don't sell strong holdings
+      if (signal.combined >= DEFAULT_CONFIG.buyThreshold) break;
       if (isOnCooldown(holding.symbol)) continue;
 
       const rotatePrice = priceCache[holding.symbol] || holding.currentPrice;
       if (!rotatePrice) continue;
+
+      const total = holding.shares * rotatePrice;
+      const txCost = total * DEFAULT_CONFIG.transactionCostBps / 10000;
 
       const trade = {
         id: crypto.randomUUID(),
@@ -1216,14 +1377,14 @@ async function main() {
         action: 'SELL',
         shares: holding.shares,
         price: rotatePrice,
-        total: holding.shares * rotatePrice,
+        total,
         reason: `Rotation: weak signal (${signal.combined.toFixed(3)}) → stronger candidates`,
         signals: signal,
         gainLoss: (rotatePrice - holding.avgCost) * holding.shares,
         gainLossPercent: holding.gainLossPercent,
       };
 
-      portfolio.cash += trade.total;
+      portfolio.cash += total - txCost;
       portfolio.holdings = portfolio.holdings.filter(h => h.symbol !== holding.symbol);
       await addTrade(trade);
       setCooldown(trade.symbol);
@@ -1233,50 +1394,23 @@ async function main() {
     }
   }
 
-  // Check for buys — pre-allocate cash across ALL candidates proportionally
+  // ═══════════════════════════════════════════════════════════
+  // Buy Logic — ATR position sizing, capped new positions
+  // ═══════════════════════════════════════════════════════════
   const openSlots = DEFAULT_CONFIG.maxPositions - portfolio.holdings.length;
   const buyCandidates = Object.values(allSignals)
     .filter(s => s.combined > DEFAULT_CONFIG.buyThreshold && !portfolio.holdings.some(h => h.symbol === s.symbol) && !isOnCooldown(s.symbol))
     .sort((a, b) => b.combined - a.combined)
-    .slice(0, openSlots);
+    .slice(0, Math.min(openSlots, DEFAULT_CONFIG.maxNewPositionsPerCycle));
 
   if (buyCandidates.length > 0) {
-    const targetCash = portfolio.totalValue * DEFAULT_CONFIG.targetCashRatio;
-    const availableCash = Math.max(0, portfolio.cash - targetCash);
-    const maxPosition = portfolio.totalValue * DEFAULT_CONFIG.maxPositionSize;
+    const targetCashBuy = portfolio.totalValue * DEFAULT_CONFIG.targetCashRatio;
+    let cashAvailable = Math.max(0, portfolio.cash - targetCashBuy);
 
-    // Assign each candidate a share of cash proportional to signal strength
-    const totalStrength = buyCandidates.reduce((sum, s) => sum + Math.abs(s.combined), 0);
-    let allocations = buyCandidates.map(signal => {
-      const weight = Math.abs(signal.combined) / totalStrength;
-      return { signal, size: Math.min(availableCash * weight, maxPosition) };
-    });
+    console.log(`\nBuy candidates: ${buyCandidates.length} | Available cash: $${cashAvailable.toFixed(2)}`);
 
-    // If capping at maxPosition freed up cash, redistribute to uncapped positions
-    const cappedTotal = allocations.reduce((sum, a) => sum + a.size, 0);
-    if (cappedTotal < availableCash) {
-      const uncapped = allocations.filter(a => a.size < maxPosition);
-      const excess = availableCash - cappedTotal;
-      const uncappedStrength = uncapped.reduce((sum, a) => sum + Math.abs(a.signal.combined), 0);
-      if (uncappedStrength > 0) {
-        for (const alloc of uncapped) {
-          const bonus = excess * (Math.abs(alloc.signal.combined) / uncappedStrength);
-          alloc.size = Math.min(alloc.size + bonus, maxPosition);
-        }
-      }
-    }
-
-    // Scale down if total still exceeds available cash
-    const totalAllocated = allocations.reduce((sum, a) => sum + a.size, 0);
-    if (totalAllocated > availableCash) {
-      const scale = availableCash / totalAllocated;
-      allocations = allocations.map(a => ({ ...a, size: a.size * scale }));
-    }
-
-    console.log(`\nBuy candidates: ${buyCandidates.length} | Available cash: $${availableCash.toFixed(2)}`);
-
-    for (const { signal, size } of allocations) {
-      if (size < DEFAULT_CONFIG.minTradeValue) continue;
+    for (const signal of buyCandidates) {
+      if (cashAvailable < DEFAULT_CONFIG.minTradeValue) break;
 
       let buyPrice = priceCache[signal.symbol];
       if (!buyPrice) {
@@ -1286,41 +1420,65 @@ async function main() {
           priceCache[signal.symbol] = buyPrice;
         }
       }
-      if (buyPrice) {
-        const shares = Math.round((size / buyPrice) * 10000) / 10000;
-        if (shares >= 0.0001) {
-          const total = shares * buyPrice;
+      if (!buyPrice) continue;
 
-          const trade = {
-            id: crypto.randomUUID(),
-            timestamp: new Date().toISOString(),
-            symbol: signal.symbol,
-            action: 'BUY',
-            shares,
-            price: buyPrice,
-            total,
-            reason: `${signal.recommendation}: score ${signal.combined.toFixed(2)}`,
-            signals: signal,
-          };
-
-          portfolio.cash -= total;
-          portfolio.holdings.push({
-            symbol: signal.symbol,
-            shares,
-            avgCost: buyPrice,
-            currentPrice: buyPrice,
-            marketValue: total,
-            gainLoss: 0,
-            gainLossPercent: 0,
-            priceUpdatedAt: new Date().toISOString(),
-          });
-
-          await addTrade(trade);
-          setCooldown(signal.symbol);
-          await submitAlpacaOrder(signal.symbol, shares, 'buy');
-          console.log(`BUY ${shares} ${signal.symbol} @ $${buyPrice} ($${total.toFixed(2)})`);
-        }
+      // ATR-based position sizing
+      const atr = atrCache[signal.symbol];
+      let shares;
+      if (atr && atr > 0) {
+        shares = calculateATRPositionSize(portfolio.totalValue, atr, buyPrice);
+      } else {
+        // Fallback: proportional allocation capped at maxPositionSize
+        shares = (portfolio.totalValue * DEFAULT_CONFIG.maxPositionSize) / buyPrice;
       }
+      shares = Math.round(shares * 10000) / 10000;
+      const total = shares * buyPrice;
+
+      // Ensure we don't exceed available cash
+      if (total > cashAvailable) {
+        shares = Math.round((cashAvailable / buyPrice) * 10000) / 10000;
+      }
+      if (shares < 0.0001) continue;
+
+      const finalTotal = shares * buyPrice;
+      if (finalTotal < DEFAULT_CONFIG.minTradeValue) continue;
+
+      // Deduct transaction cost
+      const txCost = finalTotal * DEFAULT_CONFIG.transactionCostBps / 10000;
+
+      const trade = {
+        id: crypto.randomUUID(),
+        timestamp: new Date().toISOString(),
+        symbol: signal.symbol,
+        action: 'BUY',
+        shares,
+        price: buyPrice,
+        total: finalTotal,
+        reason: `${signal.recommendation}: score ${signal.combined.toFixed(2)} [${signal.regime || 'UNKNOWN'}]`,
+        signals: signal,
+      };
+
+      portfolio.cash -= finalTotal + txCost;
+      cashAvailable -= finalTotal + txCost;
+      portfolio.holdings.push({
+        symbol: signal.symbol,
+        shares,
+        avgCost: buyPrice,
+        currentPrice: buyPrice,
+        marketValue: finalTotal,
+        gainLoss: 0,
+        gainLossPercent: 0,
+        priceUpdatedAt: new Date().toISOString(),
+        highWaterMark: buyPrice,
+        entryATR: atr || null,
+        entryTimestamp: new Date().toISOString(),
+        barsHeld: 0,
+      });
+
+      await addTrade(trade);
+      setCooldown(signal.symbol);
+      await submitAlpacaOrder(signal.symbol, shares, 'buy');
+      console.log(`BUY ${shares} ${signal.symbol} @ $${buyPrice} ($${finalTotal.toFixed(2)}) [ATR: ${atr ? atr.toFixed(3) : 'N/A'}]`);
     }
   }
 
