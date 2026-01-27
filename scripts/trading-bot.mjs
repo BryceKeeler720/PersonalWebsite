@@ -1299,6 +1299,34 @@ function analyzeStock(symbol, intradayBars, dailyBars) {
   return { signal, lastPrice, atr };
 }
 
+// Dynamic NASDAQ symbol discovery via Alpaca assets API
+async function fetchNasdaqSymbols() {
+  try {
+    const response = await fetch(`${ALPACA_PAPER_URL}/v2/assets?status=active`, {
+      headers: {
+        'APCA-API-KEY-ID': ALPACA_API_KEY,
+        'APCA-API-SECRET-KEY': ALPACA_SECRET_KEY,
+      },
+    });
+
+    if (!response.ok) {
+      console.error(`Alpaca assets API failed: ${response.status}`);
+      return [];
+    }
+
+    const assets = await response.json();
+    const nasdaqSymbols = assets
+      .filter(a => a.tradable && a.exchange === 'NASDAQ' && a.asset_class === 'us_equity')
+      .map(a => a.symbol);
+
+    console.log(`Discovered ${nasdaqSymbols.length} active NASDAQ symbols from Alpaca`);
+    return nasdaqSymbols;
+  } catch (error) {
+    console.error('Failed to fetch NASDAQ symbols:', error.message);
+    return [];
+  }
+}
+
 // Main execution
 async function main() {
   console.log('Starting trading bot...');
@@ -1323,9 +1351,13 @@ async function main() {
   const dayOfWeek = now.getUTCDay();
   const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
+  // Dynamically discover full NASDAQ listing from Alpaca
+  const dynamicNasdaq = await fetchNasdaqSymbols();
+  const nasdaqSymbols = dynamicNasdaq.length > 0 ? dynamicNasdaq : NASDAQ_ADDITIONAL;
+
   let assetsToAnalyze = [...CRYPTO_SYMBOLS];
   if (!isWeekend) {
-    assetsToAnalyze.push(...SP500_SYMBOLS, ...ETF_SYMBOLS, ...NASDAQ_ADDITIONAL);
+    assetsToAnalyze.push(...SP500_SYMBOLS, ...ETF_SYMBOLS, ...nasdaqSymbols);
     assetsToAnalyze.push(...FOREX_SYMBOLS, ...FUTURES_SYMBOLS);
   }
   // Always include current holdings so we can generate signals and make sell decisions

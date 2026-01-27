@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import type { SignalSnapshot, StrategySignal } from './types';
 import {
   CRYPTO_SYMBOLS,
@@ -7,16 +7,53 @@ import {
   SP500_SYMBOLS,
   NASDAQ_ADDITIONAL,
   getAssetInfo,
+  getAssetType,
 } from '../../lib/trading/assets';
 
-// Group assets by category for the dropdown
-const assetCategories = [
+// Pre-computed search entry for fast lookups
+interface SearchEntry {
+  symbol: string;
+  symbolLower: string;
+  name: string;
+  nameLower: string;
+  category: string;
+}
+
+// Static category definitions
+const STATIC_CATEGORIES = [
   { label: 'Crypto (24/7)', symbols: [...CRYPTO_SYMBOLS].sort() },
   { label: 'Forex', symbols: [...FOREX_SYMBOLS].sort() },
   { label: 'Futures', symbols: [...FUTURES_SYMBOLS].sort() },
   { label: 'S&P 500', symbols: [...SP500_SYMBOLS].sort() },
   { label: 'NASDAQ', symbols: [...NASDAQ_ADDITIONAL].sort() },
 ];
+
+// Pre-build search index from static symbols (computed once at module load)
+const staticSymbolSet = new Set<string>();
+const staticSearchIndex: SearchEntry[] = [];
+
+for (const category of STATIC_CATEGORIES) {
+  for (const symbol of category.symbols) {
+    if (staticSymbolSet.has(symbol)) continue; // skip duplicates
+    staticSymbolSet.add(symbol);
+    const info = getAssetInfo(symbol);
+    staticSearchIndex.push({
+      symbol,
+      symbolLower: symbol.toLowerCase(),
+      name: info.name,
+      nameLower: info.name.toLowerCase(),
+      category: category.label,
+    });
+  }
+}
+
+function getCategoryLabel(symbol: string): string {
+  const type = getAssetType(symbol);
+  if (type === 'crypto') return 'Crypto (24/7)';
+  if (type === 'forex') return 'Forex';
+  if (type === 'futures') return 'Futures';
+  return 'Stocks';
+}
 
 interface StrategySignalsProps {
   signals: Map<string, SignalSnapshot>;
@@ -78,6 +115,7 @@ export default function StrategySignals({
   const [isOpen, setIsOpen] = useState(false);
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -93,11 +131,116 @@ export default function StrategySignals({
         setIsOpen(false);
         setExpandedCategory(null);
         setSearchTerm('');
+        setDebouncedSearch('');
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Debounce search input (100ms)
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchTerm), 100);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Build full search index including dynamically discovered symbols from signals
+  const fullSearchIndex = useMemo(() => {
+    const index = [...staticSearchIndex];
+    // Add any symbols from signals that aren't in static arrays
+    for (const symbol of signals.keys()) {
+      if (!staticSymbolSet.has(symbol)) {
+        const info = getAssetInfo(symbol);
+        index.push({
+          symbol,
+          symbolLower: symbol.toLowerCase(),
+          name: info.name,
+          nameLower: info.name.toLowerCase(),
+          category: getCategoryLabel(symbol),
+        });
+      }
+    }
+    return index;
+  }, [signals]);
+
+  // Build categories including dynamic symbols
+  const assetCategories = useMemo(() => {
+    const dynamicStocks: string[] = [];
+    for (const symbol of signals.keys()) {
+      if (!staticSymbolSet.has(symbol)) {
+        dynamicStocks.push(symbol);
+      }
+    }
+
+    const categories = [...STATIC_CATEGORIES];
+    if (dynamicStocks.length > 0) {
+      categories.push({ label: 'Other Analyzed', symbols: dynamicStocks.sort() });
+    }
+    return categories;
+  }, [signals]);
+
+  // Ranked search results (only when searching)
+  const searchResults = useMemo(() => {
+    if (!debouncedSearch) return null;
+
+    const query = debouncedSearch.toLowerCase();
+
+    const scored: (SearchEntry & { score: number })[] = [];
+    for (const entry of fullSearchIndex) {
+      let score = 0;
+
+      // Exact symbol match
+      if (entry.symbolLower === query) {
+        score = 100;
+      // Symbol starts with query
+      } else if (entry.symbolLower.startsWith(query)) {
+        score = 80;
+      // Name starts with query (word boundary)
+      } else if (entry.nameLower.startsWith(query)) {
+        score = 70;
+      // Name contains query at word boundary
+      } else if (entry.nameLower.includes(' ' + query)) {
+        score = 60;
+      // Symbol contains query
+      } else if (entry.symbolLower.includes(query)) {
+        score = 40;
+      // Name contains query
+      } else if (entry.nameLower.includes(query)) {
+        score = 20;
+      } else {
+        continue; // No match
+      }
+
+      // Boost symbols that have signal data
+      if (signals.has(entry.symbol)) {
+        score += 5;
+      }
+
+      scored.push({ ...entry, score });
+    }
+
+    // Sort by score descending, then alphabetically
+    scored.sort((a, b) => b.score - a.score || a.symbol.localeCompare(b.symbol));
+
+    // Limit to top 50 for rendering performance
+    return scored.slice(0, 50);
+  }, [debouncedSearch, fullSearchIndex, signals]);
+
+  // Filter categories for browsing mode (no search or category expansion)
+  const filteredCategories = useMemo(() => {
+    if (!debouncedSearch) return assetCategories;
+
+    const query = debouncedSearch.toLowerCase();
+    return assetCategories
+      .map(category => ({
+        ...category,
+        symbols: category.symbols.filter((symbol: string) => {
+          const info = getAssetInfo(symbol);
+          return symbol.toLowerCase().includes(query) || info.name.toLowerCase().includes(query);
+        }),
+      }))
+      .filter(category => category.symbols.length > 0);
+  }, [debouncedSearch, assetCategories]);
 
   const handleSelect = (symbol: string) => {
     setLocalSelected(symbol);
@@ -105,6 +248,7 @@ export default function StrategySignals({
     setIsOpen(false);
     setExpandedCategory(null);
     setSearchTerm('');
+    setDebouncedSearch('');
   };
 
   const handleCategoryClick = (categoryLabel: string) => {
@@ -115,16 +259,6 @@ export default function StrategySignals({
     setExpandedCategory(null);
   };
 
-  // Filter categories and symbols based on search
-  const filteredCategories = assetCategories.map(category => ({
-    ...category,
-    symbols: category.symbols.filter((symbol: string) => {
-      const info = getAssetInfo(symbol);
-      const search = searchTerm.toLowerCase();
-      return symbol.toLowerCase().includes(search) || info.name.toLowerCase().includes(search);
-    }),
-  })).filter(category => category.symbols.length > 0);
-
   // Get the currently expanded category's filtered symbols
   const expandedCategoryData = expandedCategory
     ? filteredCategories.find(c => c.label === expandedCategory)
@@ -132,6 +266,9 @@ export default function StrategySignals({
 
   const currentSignal = signals.get(localSelected);
   const assetInfo = getAssetInfo(localSelected);
+
+  // Determine if we should show flat search results vs category browser
+  const showFlatResults = searchResults !== null && !expandedCategory;
 
   return (
     <div className="trading-card">
@@ -159,7 +296,7 @@ export default function StrategySignals({
               ref={inputRef}
               type="text"
               className="stock-dropdown-search"
-              placeholder="Search assets..."
+              placeholder="Search by symbol or name..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
@@ -176,7 +313,23 @@ export default function StrategySignals({
               </button>
             )}
             <div className="stock-dropdown-list">
-              {expandedCategory && expandedCategoryData ? (
+              {showFlatResults ? (
+                <>
+                  {searchResults.map(result => (
+                    <button
+                      key={result.symbol}
+                      className={`stock-dropdown-item ${result.symbol === localSelected ? 'selected' : ''}`}
+                      onClick={() => handleSelect(result.symbol)}
+                    >
+                      <span className="stock-symbol">{result.symbol}</span>
+                      <span className="stock-name">{result.name}</span>
+                    </button>
+                  ))}
+                  {searchResults.length === 0 && (
+                    <div className="stock-dropdown-empty">No assets found</div>
+                  )}
+                </>
+              ) : expandedCategory && expandedCategoryData ? (
                 <>
                   {expandedCategoryData.symbols.map((symbol: string) => {
                     const info = getAssetInfo(symbol);
