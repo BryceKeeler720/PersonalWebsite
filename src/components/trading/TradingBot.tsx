@@ -3,6 +3,7 @@ import PortfolioDashboard from './PortfolioDashboard';
 import TradeLog from './TradeLog';
 import StrategySignals from './StrategySignals';
 import PerformanceChart from './PerformanceChart';
+import AlgorithmTab from './AlgorithmTab';
 import type { Portfolio, Trade, SignalSnapshot } from './types';
 import { DEFAULT_CONFIG } from './types';
 import { getAssetInfo } from '../../lib/trading/assets';
@@ -18,7 +19,7 @@ interface BenchmarkPoint {
   value: number;
 }
 
-type TabType = 'overview' | 'signals' | 'log';
+type TabType = 'overview' | 'signals' | 'log' | 'algorithm';
 
 interface TradingData {
   portfolio: Portfolio;
@@ -427,6 +428,9 @@ export default function TradingBot() {
             <button className={activeTab === 'log' ? 'active' : ''} onClick={() => setActiveTab('log')}>
               Trade Log
             </button>
+            <button className={activeTab === 'algorithm' ? 'active' : ''} onClick={() => setActiveTab('algorithm')}>
+              Algorithm
+            </button>
           </nav>
 
           {activeTab === 'overview' && (
@@ -686,6 +690,8 @@ export default function TradingBot() {
           )}
 
           {activeTab === 'log' && <TradeLog trades={data.trades} />}
+
+          {activeTab === 'algorithm' && <AlgorithmTab />}
         </div>
       </div>
     </div>

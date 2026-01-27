@@ -19,15 +19,30 @@ export const GET: APIRoute = async () => {
       getSPYBenchmark(),
     ]);
 
+    // Append a live snapshot so the chart updates every poll (every ~60s)
+    const now = new Date();
+    const liveHistory = [...history];
+    const lastSnapshot = liveHistory[liveHistory.length - 1];
+    const lastSnapshotAge = lastSnapshot
+      ? now.getTime() - new Date(lastSnapshot.timestamp).getTime()
+      : Infinity;
+
+    if (lastSnapshotAge > 30000 && portfolio && portfolio.totalValue > 0) {
+      liveHistory.push({
+        timestamp: now.toISOString(),
+        totalValue: portfolio.totalValue,
+      });
+    }
+
     return new Response(
       JSON.stringify({
         portfolio,
         trades,
         signals,
         lastRun,
-        history,
+        history: liveHistory,
         spyBenchmark,
-        timestamp: new Date().toISOString(),
+        timestamp: now.toISOString(),
       }),
       {
         status: 200,

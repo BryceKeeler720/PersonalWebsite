@@ -289,13 +289,13 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
             </text>
           ))}
 
-          {areaD && <path d={areaD} fill="url(#chartGradient)" />}
+          {areaD && <path d={areaD} fill="url(#chartGradient)" style={{ transition: 'd 0.5s ease-in-out' }} />}
 
           {benchmarkPathD && (
-            <path d={benchmarkPathD} fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" />
+            <path d={benchmarkPathD} fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" style={{ transition: 'd 0.5s ease-in-out' }} />
           )}
 
-          {pathD && <path d={pathD} fill="none" stroke={isPositive ? '#22c55e' : '#ef4444'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />}
+          {pathD && <path d={pathD} fill="none" stroke={isPositive ? '#22c55e' : '#ef4444'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: 'd 0.5s ease-in-out' }} />}
 
           {hoveredPoint && (
             <>
