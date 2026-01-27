@@ -59,6 +59,21 @@ const CRYPTO_SYMBOLS = [
   'INJ-USD', 'RUNE-USD', 'FTM-USD',
 ];
 
+// Forex pairs (24/5 Trading - Closed weekends) — Yahoo Finance format: PAIR=X
+const FOREX_SYMBOLS = [
+  'EURUSD=X', 'GBPUSD=X', 'USDJPY=X', 'USDCHF=X', 'AUDUSD=X', 'USDCAD=X', 'NZDUSD=X',
+  'EURGBP=X', 'EURJPY=X', 'GBPJPY=X', 'AUDJPY=X', 'CADJPY=X', 'EURAUD=X', 'EURCHF=X',
+  'GBPCHF=X', 'USDMXN=X', 'USDZAR=X', 'USDTRY=X', 'USDINR=X', 'USDCNY=X',
+];
+
+// Futures — Yahoo Finance format: SYMBOL=F
+const FUTURES_SYMBOLS = [
+  'ES=F', 'NQ=F', 'YM=F', 'RTY=F',   // Index futures
+  'GC=F', 'SI=F', 'CL=F', 'BZ=F', 'NG=F', 'HG=F', 'PL=F',  // Commodity futures
+  'ZC=F', 'ZW=F', 'ZS=F',             // Agricultural futures
+  'ZB=F', 'ZN=F',                      // Bond futures
+  '6E=F', '6B=F', '6J=F',             // Currency futures
+];
 
 const SP500_SYMBOLS = [
   // Mega Cap Tech
@@ -479,6 +494,123 @@ async function fetchYahooQuote(symbol) {
   }
 }
 
+// Yahoo Finance Intraday + Daily Bar Fetching (for forex/futures not supported by Alpaca)
+
+const YAHOO_BATCH_SIZE = 5; // Yahoo requires individual requests per symbol
+const YAHOO_BATCH_DELAY_MS = 400; // Delay between requests to avoid rate limiting
+
+async function fetchYahooIntradayBars(symbols) {
+  // Fetch 5-min intraday bars from Yahoo Finance for multiple symbols
+  const allBars = {};
+
+  for (let i = 0; i < symbols.length; i += YAHOO_BATCH_SIZE) {
+    const batch = symbols.slice(i, i + YAHOO_BATCH_SIZE);
+
+    const batchResults = await Promise.all(
+      batch.map(async (symbol) => {
+        try {
+          const response = await fetch(
+            `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=5m&range=5d&includePrePost=true`,
+            { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36' } }
+          );
+          if (!response.ok) return { symbol, bars: [] };
+
+          const data = await response.json();
+          const result = data?.chart?.result?.[0];
+          if (!result?.timestamp || !result?.indicators?.quote?.[0]) return { symbol, bars: [] };
+
+          const { timestamp, indicators } = result;
+          const quote = indicators.quote[0];
+
+          const bars = timestamp
+            .map((ts, idx) => ({
+              date: new Date(ts * 1000).toISOString(),
+              open: quote.open[idx],
+              high: quote.high[idx],
+              low: quote.low[idx],
+              close: quote.close[idx],
+              volume: quote.volume?.[idx] || 0,
+            }))
+            .filter(b => b.open !== null && b.high !== null && b.low !== null && b.close !== null);
+
+          return { symbol, bars };
+        } catch (error) {
+          console.error(`Yahoo intraday error (${symbol}):`, error.message);
+          return { symbol, bars: [] };
+        }
+      })
+    );
+
+    for (const { symbol, bars } of batchResults) {
+      if (bars.length > 0) {
+        allBars[symbol] = bars;
+      }
+    }
+
+    if (i + YAHOO_BATCH_SIZE < symbols.length) {
+      await new Promise(r => setTimeout(r, YAHOO_BATCH_DELAY_MS));
+    }
+  }
+
+  return allBars;
+}
+
+async function fetchYahooDailyBars(symbols) {
+  // Fetch 3-month daily bars from Yahoo Finance for multiple symbols
+  const allBars = {};
+
+  for (let i = 0; i < symbols.length; i += YAHOO_BATCH_SIZE) {
+    const batch = symbols.slice(i, i + YAHOO_BATCH_SIZE);
+
+    const batchResults = await Promise.all(
+      batch.map(async (symbol) => {
+        try {
+          const response = await fetch(
+            `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=3mo&interval=1d`,
+            { headers: { 'User-Agent': 'Mozilla/5.0 (compatible)' } }
+          );
+          if (!response.ok) return { symbol, bars: [] };
+
+          const data = await response.json();
+          const result = data?.chart?.result?.[0];
+          if (!result?.timestamp || !result?.indicators?.quote?.[0]) return { symbol, bars: [] };
+
+          const { timestamp, indicators } = result;
+          const quote = indicators.quote[0];
+
+          const bars = timestamp
+            .map((ts, idx) => ({
+              date: new Date(ts * 1000).toISOString().split('T')[0],
+              open: quote.open[idx],
+              high: quote.high[idx],
+              low: quote.low[idx],
+              close: quote.close[idx],
+              volume: quote.volume?.[idx] || 0,
+            }))
+            .filter(b => b.open !== null && b.high !== null && b.low !== null && b.close !== null);
+
+          return { symbol, bars };
+        } catch (error) {
+          console.error(`Yahoo daily error (${symbol}):`, error.message);
+          return { symbol, bars: [] };
+        }
+      })
+    );
+
+    for (const { symbol, bars } of batchResults) {
+      if (bars.length > 0) {
+        allBars[symbol] = bars;
+      }
+    }
+
+    if (i + YAHOO_BATCH_SIZE < symbols.length) {
+      await new Promise(r => setTimeout(r, YAHOO_BATCH_DELAY_MS));
+    }
+  }
+
+  return allBars;
+}
+
 // Alpaca Data Fetching — batch multi-symbol requests
 
 function toAlpacaCryptoSymbol(symbol) {
@@ -606,23 +738,25 @@ async function fetchAllMarketData(symbols) {
   // Separate symbols by type
   const stockSymbols = symbols.filter(s => !isCryptoSymbol(s) && !isForexOrFutures(s));
   const cryptoSymbols = symbols.filter(s => isCryptoSymbol(s));
-  const skipped = symbols.filter(s => isForexOrFutures(s));
+  const forexFuturesSymbols = symbols.filter(s => isForexOrFutures(s));
 
-  if (skipped.length > 0) {
-    console.log(`Skipping ${skipped.length} forex/futures symbols (not supported by Alpaca)`);
-  }
+  console.log(`Fetching data: ${stockSymbols.length} stocks (Alpaca), ${cryptoSymbols.length} crypto (Alpaca), ${forexFuturesSymbols.length} forex/futures (Yahoo)`);
 
-  console.log(`Fetching Alpaca data: ${stockSymbols.length} stocks, ${cryptoSymbols.length} crypto`);
-
-  // Fetch sequentially to avoid 429 rate limits (free tier: 200 req/min)
+  // Fetch Alpaca data sequentially to avoid 429 rate limits (free tier: 200 req/min)
   const stockIntraday = stockSymbols.length > 0 ? await fetchAlpacaBars(stockSymbols, '5Min', 5, false) : {};
   const stockDaily = stockSymbols.length > 0 ? await fetchAlpacaBars(stockSymbols, '1Day', 120, false) : {};
   const cryptoIntraday = cryptoSymbols.length > 0 ? await fetchAlpacaBars(cryptoSymbols, '5Min', 5, true) : {};
   const cryptoDaily = cryptoSymbols.length > 0 ? await fetchAlpacaBars(cryptoSymbols, '1Day', 120, true) : {};
 
+  // Fetch Yahoo Finance data for forex/futures (not supported by Alpaca)
+  const fxFuturesIntraday = forexFuturesSymbols.length > 0 ? await fetchYahooIntradayBars(forexFuturesSymbols) : {};
+  const fxFuturesDaily = forexFuturesSymbols.length > 0 ? await fetchYahooDailyBars(forexFuturesSymbols) : {};
+
+  console.log(`Yahoo data received: ${Object.keys(fxFuturesIntraday).length} intraday, ${Object.keys(fxFuturesDaily).length} daily`);
+
   return {
-    intraday: { ...stockIntraday, ...cryptoIntraday },
-    daily: { ...stockDaily, ...cryptoDaily },
+    intraday: { ...stockIntraday, ...cryptoIntraday, ...fxFuturesIntraday },
+    daily: { ...stockDaily, ...cryptoDaily, ...fxFuturesDaily },
   };
 }
 
@@ -660,6 +794,8 @@ async function syncAlpacaPositions() {
 }
 
 async function submitAlpacaOrder(symbol, qty, side) {
+  // Forex/futures not supported by Alpaca — skip paper order (still tracked in Redis)
+  if (isForexOrFutures(symbol)) return null;
   // Don't sell what we don't hold on Alpaca (avoids short sell errors)
   if (side === 'sell' && !alpacaPositions.has(symbol)) return null;
 
@@ -1182,7 +1318,7 @@ async function main() {
   const allSignals = {};
   const priceCache = {};
 
-  // Determine assets to analyze (no forex/futures — Alpaca doesn't support them)
+  // Determine assets to analyze (Alpaca for stocks/crypto, Yahoo for forex/futures)
   const now = new Date();
   const dayOfWeek = now.getUTCDay();
   const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
@@ -1190,17 +1326,18 @@ async function main() {
   let assetsToAnalyze = [...CRYPTO_SYMBOLS];
   if (!isWeekend) {
     assetsToAnalyze.push(...SP500_SYMBOLS, ...ETF_SYMBOLS, ...NASDAQ_ADDITIONAL);
+    assetsToAnalyze.push(...FOREX_SYMBOLS, ...FUTURES_SYMBOLS);
   }
   // Always include current holdings so we can generate signals and make sell decisions
   for (const holding of portfolio.holdings) {
     assetsToAnalyze.push(holding.symbol);
   }
-  // Deduplicate and filter out unsupported symbols
-  assetsToAnalyze = [...new Set(assetsToAnalyze)].filter(s => !isForexOrFutures(s));
+  // Deduplicate
+  assetsToAnalyze = [...new Set(assetsToAnalyze)];
 
   console.log(`Analyzing ${assetsToAnalyze.length} assets (Weekend: ${isWeekend})...`);
 
-  // Batch fetch all market data from Alpaca (intraday 5-min + daily bars)
+  // Batch fetch all market data (Alpaca for stocks/crypto, Yahoo for forex/futures)
   const marketData = await fetchAllMarketData(assetsToAnalyze);
 
   // Analyze each symbol using pre-fetched data
