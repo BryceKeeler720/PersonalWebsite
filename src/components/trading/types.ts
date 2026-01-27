@@ -116,7 +116,7 @@ export interface SchedulerState {
 
 // Default configuration - regime-adaptive strategy
 export const DEFAULT_CONFIG: TradingConfig = {
-  initialCapital: 10199.52,
+  initialCapital: 10000,
   maxPositionSize: 0.07, // 7% max per position — ATR-based sizing within this cap
   maxPositions: 15, // Concentrated portfolio
   minTradeValue: 15,
