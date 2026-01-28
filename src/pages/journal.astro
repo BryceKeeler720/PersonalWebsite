@@ -35,10 +35,16 @@ const entryData = entries.map((entry: JournalEntry) => ({
       <JournalHeatmap entries={entryData} client:load />
     </section>
 
-    <!-- Knowledge Map -->
+    <!-- Knowledge Map Toggle -->
     <section class="journal-section">
-      <h2 class="section-title">Knowledge Map</h2>
-      <JournalKnowledgeMap entries={entryData} client:load />
+      <button id="knowledge-map-toggle" class="knowledge-map-btn" aria-expanded="false">
+        <span class="btn-icon">◆</span>
+        Knowledge Map
+        <span class="btn-arrow">↓</span>
+      </button>
+      <div id="knowledge-map-panel" class="knowledge-map-panel" hidden>
+        <JournalKnowledgeMap entries={entryData} client:load />
+      </div>
     </section>
 
     <!-- Entry List -->
@@ -125,6 +131,53 @@ const entryData = entries.map((entry: JournalEntry) => ({
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 1rem;
+  }
+
+  .knowledge-map-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .knowledge-map-btn:hover {
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .knowledge-map-btn[aria-expanded="true"] {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .btn-icon {
+    font-size: 0.625rem;
+    opacity: 0.5;
+  }
+
+  .btn-arrow {
+    font-size: 0.75rem;
+    transition: transform 0.2s ease;
+  }
+
+  .knowledge-map-btn[aria-expanded="true"] .btn-arrow {
+    transform: rotate(180deg);
+  }
+
+  .knowledge-map-panel {
+    margin-top: 1rem;
+    overflow: hidden;
   }
 
   .journal-entries {
@@ -269,3 +322,14 @@ const entryData = entries.map((entry: JournalEntry) => ({
     }
   }
 </style>
+
+<script>
+  const toggle = document.getElementById('knowledge-map-toggle');
+  const panel = document.getElementById('knowledge-map-panel');
+
+  toggle?.addEventListener('click', () => {
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!expanded));
+    if (panel) panel.hidden = expanded;
+  });
+</script>
