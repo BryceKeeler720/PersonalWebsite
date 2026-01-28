@@ -24,7 +24,7 @@ function formatUptime(seconds: number): string {
 function UsageBar({ used, total, color }: { used: number; total: number; color: string }) {
   const percent = total > 0 ? (used / total) * 100 : 0;
   return (
-    <div style={{ height: 4, background: 'rgba(255,255,255,0.1)', borderRadius: 2, overflow: 'hidden' }}>
+    <div style={{ height: 4, background: 'rgba(220,215,186,0.1)', borderRadius: 2, overflow: 'hidden' }}>
       <div style={{ height: '100%', width: `${Math.min(percent, 100)}%`, background: color, borderRadius: 2, transition: 'width 0.3s ease' }} />
     </div>
   );
@@ -54,10 +54,10 @@ export default function ContainerGrid({ containers }: ContainerGridProps) {
               onClick={() => setSortBy(key)}
               style={{
                 padding: '0.25rem 0.5rem',
-                background: sortBy === key ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)',
-                border: `1px solid ${sortBy === key ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.1)'}`,
+                background: sortBy === key ? 'rgba(220,215,186,0.12)' : 'rgba(220,215,186,0.05)',
+                border: `1px solid ${sortBy === key ? 'rgba(220,215,186,0.25)' : 'rgba(220,215,186,0.1)'}`,
                 borderRadius: 6,
-                color: sortBy === key ? '#fff' : 'rgba(255,255,255,0.5)',
+                color: sortBy === key ? '#fff' : 'rgba(220,215,186,0.5)',
                 fontSize: '0.7rem',
                 cursor: 'pointer',
                 fontFamily: 'inherit',
@@ -78,19 +78,19 @@ export default function ContainerGrid({ containers }: ContainerGridProps) {
           return (
             <div key={ct.vmid} style={{
               padding: '1rem',
-              background: 'rgba(255,255,255,0.02)',
+              background: 'rgba(220,215,186,0.02)',
               borderRadius: 12,
-              border: `1px solid ${isRunning ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)'}`,
+              border: `1px solid ${isRunning ? 'rgba(118,148,106,0.15)' : 'rgba(195,64,67,0.15)'}`,
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                 <div>
-                  <div style={{ fontWeight: 600, color: '#fff', fontSize: '0.9rem' }}>{ct.name}</div>
-                  <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', display: 'flex', gap: '0.5rem', marginTop: '0.15rem' }}>
+                  <div style={{ fontWeight: 600, color: 'var(--kana-fg)', fontSize: '0.9rem' }}>{ct.name}</div>
+                  <div style={{ fontSize: '0.7rem', color: 'rgba(220,215,186,0.4)', display: 'flex', gap: '0.5rem', marginTop: '0.15rem' }}>
                     <span>VMID {ct.vmid}</span>
                     <span style={{
                       padding: '0.1rem 0.35rem',
-                      background: ct.type === 'lxc' ? 'rgba(99,102,241,0.15)' : 'rgba(245,158,11,0.15)',
-                      color: ct.type === 'lxc' ? '#818cf8' : '#f59e0b',
+                      background: ct.type === 'lxc' ? 'rgba(126,156,216,0.15)' : 'rgba(192,163,110,0.15)',
+                      color: ct.type === 'lxc' ? '#7E9CD8' : '#C0A36E',
                       borderRadius: 3,
                       fontSize: '0.65rem',
                       fontWeight: 600,
@@ -102,11 +102,11 @@ export default function ContainerGrid({ containers }: ContainerGridProps) {
                 <div style={{
                   display: 'flex', alignItems: 'center', gap: '0.35rem',
                   padding: '0.2rem 0.5rem',
-                  background: isRunning ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
+                  background: isRunning ? 'rgba(118,148,106,0.15)' : 'rgba(195,64,67,0.15)',
                   borderRadius: 4,
                 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: isRunning ? '#22c55e' : '#ef4444' }} />
-                  <span style={{ fontSize: '0.7rem', color: isRunning ? '#22c55e' : '#ef4444', fontWeight: 600 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: isRunning ? '#76946A' : '#C34043' }} />
+                  <span style={{ fontSize: '0.7rem', color: isRunning ? '#76946A' : '#C34043', fontWeight: 600 }}>
                     {isRunning ? 'Running' : 'Stopped'}
                   </span>
                 </div>
@@ -115,27 +115,27 @@ export default function ContainerGrid({ containers }: ContainerGridProps) {
               {isRunning && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.2rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'rgba(220,215,186,0.5)', marginBottom: '0.2rem' }}>
                       <span>CPU</span>
                       <span>{ct.cpu.toFixed(1)}%</span>
                     </div>
-                    <UsageBar used={ct.cpu} total={100} color="#6366f1" />
+                    <UsageBar used={ct.cpu} total={100} color="#7E9CD8" />
                   </div>
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.2rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'rgba(220,215,186,0.5)', marginBottom: '0.2rem' }}>
                       <span>RAM</span>
                       <span>{formatBytes(ct.ram.used)} / {formatBytes(ct.ram.total)} ({ramPercent.toFixed(0)}%)</span>
                     </div>
-                    <UsageBar used={ct.ram.used} total={ct.ram.total} color="#22c55e" />
+                    <UsageBar used={ct.ram.used} total={ct.ram.total} color="#76946A" />
                   </div>
                   <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)', marginBottom: '0.2rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'rgba(220,215,186,0.5)', marginBottom: '0.2rem' }}>
                       <span>Disk</span>
                       <span>{formatBytes(ct.disk.used)} / {formatBytes(ct.disk.total)} ({diskPercent.toFixed(0)}%)</span>
                     </div>
-                    <UsageBar used={ct.disk.used} total={ct.disk.total} color="#f59e0b" />
+                    <UsageBar used={ct.disk.used} total={ct.disk.total} color="#C0A36E" />
                   </div>
-                  <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.25rem' }}>
+                  <div style={{ fontSize: '0.7rem', color: 'rgba(220,215,186,0.4)', marginTop: '0.25rem' }}>
                     Uptime: {formatUptime(ct.uptime)}
                   </div>
                 </div>

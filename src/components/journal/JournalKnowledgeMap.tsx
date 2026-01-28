@@ -6,9 +6,9 @@ interface JournalKnowledgeMapProps {
 }
 
 const TAG_COLORS = [
-  '#22c55e', '#3b82f6', '#f59e0b', '#a855f7', '#ef4444',
-  '#06b6d4', '#f97316', '#ec4899', '#14b8a6', '#8b5cf6',
-  '#64748b', '#fbbf24',
+  '#76946A', '#7E9CD8', '#C0A36E', '#957FB8', '#C34043',
+  '#6A9589', '#FFA066', '#D27E99', '#7FB4CA', '#938AA9',
+  '#727169', '#DCA561',
 ];
 
 interface Node {
@@ -259,7 +259,7 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
 
     // Clear
     ctx.clearRect(0, 0, dimensions.width, dimensions.height);
-    ctx.fillStyle = 'rgba(255,255,255,0.015)';
+    ctx.fillStyle = 'rgba(220,215,186,0.015)';
     ctx.fillRect(0, 0, dimensions.width, dimensions.height);
 
     ctx.save();
@@ -284,7 +284,7 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
       ctx.beginPath();
       ctx.moveTo(a.x, a.y);
       ctx.lineTo(b.x, b.y);
-      ctx.strokeStyle = isHoverEdge ? '#fff' : 'rgba(255,255,255,0.5)';
+      ctx.strokeStyle = isHoverEdge ? '#DCD7BA' : 'rgba(220,215,186,0.5)';
       ctx.lineWidth = isHoverEdge ? 1.5 / transform.k : 0.5 / transform.k;
       ctx.stroke();
     }
@@ -323,7 +323,7 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
       ctx.fill();
 
       if (isHovered) {
-        ctx.strokeStyle = '#fff';
+        ctx.strokeStyle = '#DCD7BA';
         ctx.lineWidth = 1.5 / transform.k;
         ctx.stroke();
       }
@@ -334,7 +334,7 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
     // Draw hovered node title
     if (hoveredIdx !== null) {
       const node = nodes[hoveredIdx];
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = '#DCD7BA';
       ctx.font = `600 ${12 / transform.k}px "JetBrains Mono", monospace`;
       ctx.textAlign = 'center';
       ctx.globalAlpha = 0.9;

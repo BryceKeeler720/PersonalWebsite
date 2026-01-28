@@ -95,7 +95,7 @@ export default function PortfolioDashboard({ portfolio, initialCapital, onStockS
         style={{
           marginTop: '1rem',
           fontSize: '0.75rem',
-          color: 'rgba(255, 255, 255, 0.4)',
+          color: 'var(--kana-fg-muted)',
           textAlign: 'center',
         }}
       >

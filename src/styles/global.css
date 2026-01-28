@@ -1,12 +1,55 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --primary-color: #ffffff;
-  --secondary-color: #e5e5e5;
-  --accent-color: #ffffff;
-  --background-dark: #000000;
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.7);
+  /* Kanagawa Core Palette */
+  --kana-bg: #1F1F28;
+  --kana-bg-dark: #16161D;
+  --kana-bg-dim: #1A1A22;
+  --kana-bg-light: #2A2A37;
+  --kana-bg-lighter: #363646;
+  --kana-fg: #DCD7BA;
+  --kana-fg-dim: #C8C093;
+  --kana-fg-muted: #727169;
+
+  /* Kanagawa Accent Colors */
+  --kana-blue: #7E9CD8;
+  --kana-green: #76946A;
+  --kana-red: #C34043;
+  --kana-yellow: #C0A36E;
+  --kana-magenta: #957FB8;
+  --kana-cyan: #6A9589;
+  --kana-orange: #FFA066;
+  --kana-pink: #D27E99;
+  --kana-light-blue: #7FB4CA;
+  --kana-bright-green: #98BB6C;
+
+  /* Semantic Aliases */
+  --primary-color: var(--kana-fg);
+  --secondary-color: var(--kana-fg-dim);
+  --accent-color: var(--kana-blue);
+  --background-dark: var(--kana-bg);
+  --text-primary: var(--kana-fg);
+  --text-secondary: var(--kana-fg-dim);
+
+  /* Surface Tokens (glassmorphism) */
+  --surface-glass: rgba(220, 215, 186, 0.03);
+  --surface-glass-hover: rgba(220, 215, 186, 0.05);
+  --surface-elevated: rgba(220, 215, 186, 0.06);
+
+  /* Border Tokens */
+  --border-subtle: rgba(220, 215, 186, 0.08);
+  --border-default: rgba(220, 215, 186, 0.12);
+  --border-hover: rgba(220, 215, 186, 0.20);
+
+  /* Status Colors */
+  --color-positive: var(--kana-green);
+  --color-negative: var(--kana-red);
+  --color-warning: var(--kana-yellow);
+  --color-info: var(--kana-blue);
+
+  /* Scrollbar */
+  --scrollbar-thumb: rgba(220, 215, 186, 0.15);
+  --scrollbar-thumb-hover: rgba(220, 215, 186, 0.25);
 }
 
 * {
@@ -27,7 +70,7 @@ body {
 }
 
 .loading-spinner {
-  border: 3px solid rgba(255, 255, 255, 0.1);
+  border: 3px solid var(--border-default);
   border-top-color: var(--primary-color);
   border-radius: 50%;
   width: 40px;

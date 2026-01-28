@@ -19,10 +19,10 @@ interface VLAN {
 
 // Hardcoded topology — edit when network changes
 const VLANS: VLAN[] = [
-  { name: 'Management', subnet: '10.0.0.0/24', color: '#6366f1' },
-  { name: 'Servers', subnet: '10.0.10.0/24', color: '#22c55e' },
-  { name: 'IoT', subnet: '10.0.20.0/24', color: '#f59e0b' },
-  { name: 'Personal', subnet: '10.0.30.0/24', color: '#8b5cf6' },
+  { name: 'Management', subnet: '10.0.0.0/24', color: '#7E9CD8' },
+  { name: 'Servers', subnet: '10.0.10.0/24', color: '#76946A' },
+  { name: 'IoT', subnet: '10.0.20.0/24', color: '#C0A36E' },
+  { name: 'Personal', subnet: '10.0.30.0/24', color: '#957FB8' },
 ];
 
 const NODES: NetworkNode[] = [
@@ -79,7 +79,7 @@ export default function NetworkTopology() {
   return (
     <div className="homelab-card">
       <h2 className="homelab-card-title">Network Topology</h2>
-      <p style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', margin: '0 0 1.25rem' }}>
+      <p style={{ fontSize: '0.8rem', color: 'rgba(220,215,186,0.5)', margin: '0 0 1.25rem' }}>
         VLAN-segmented network with isolated zones for servers, IoT, and personal devices.
       </p>
 
@@ -95,7 +95,7 @@ export default function NetworkTopology() {
               <div style={{ width: 3, height: 20, background: vlan.color, borderRadius: 2 }} />
               <div>
                 <div style={{ fontSize: '0.8rem', fontWeight: 600, color: vlan.color }}>{vlan.name}</div>
-                <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', fontFamily: "'JetBrains Mono', monospace" }}>{vlan.subnet}</div>
+                <div style={{ fontSize: '0.65rem', color: 'rgba(220,215,186,0.4)', fontFamily: "'JetBrains Mono', monospace" }}>{vlan.subnet}</div>
               </div>
             </div>
 
@@ -106,15 +106,15 @@ export default function NetworkTopology() {
                   <div key={node.id} style={{
                     display: 'flex', alignItems: 'center', gap: '0.5rem',
                     padding: '0.5rem 0.75rem',
-                    background: 'rgba(255,255,255,0.04)',
+                    background: 'rgba(220,215,186,0.04)',
                     borderRadius: 8,
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    border: '1px solid rgba(220,215,186,0.08)',
                   }}>
                     <NodeIcon icon={node.icon} color={vlan.color} />
                     <div>
-                      <div style={{ fontSize: '0.8rem', fontWeight: 500, color: '#fff' }}>{node.label}</div>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--kana-fg)' }}>{node.label}</div>
                       {outgoing.length > 0 && (
-                        <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)' }}>
+                        <div style={{ fontSize: '0.65rem', color: 'rgba(220,215,186,0.35)' }}>
                           → {outgoing.map(l => NODES.find(n => n.id === l.to)?.label).filter(Boolean).join(', ')}
                         </div>
                       )}
@@ -127,16 +127,16 @@ export default function NetworkTopology() {
         ))}
       </div>
 
-      <div style={{ marginTop: '1.25rem', padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.02)', borderRadius: 8 }}>
-        <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>Key Connections</div>
+      <div style={{ marginTop: '1.25rem', padding: '0.75rem 1rem', background: 'rgba(220,215,186,0.02)', borderRadius: 8 }}>
+        <div style={{ fontSize: '0.7rem', color: 'rgba(220,215,186,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>Key Connections</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
           {LINKS.filter(l => l.label).map((link, i) => {
             const from = NODES.find(n => n.id === link.from);
             const to = NODES.find(n => n.id === link.to);
             if (!from || !to) return null;
             return (
-              <div key={i} style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)', padding: '0.25rem 0.5rem', background: 'rgba(255,255,255,0.04)', borderRadius: 4 }}>
-                {from.label} → {to.label} <span style={{ color: 'rgba(255,255,255,0.35)' }}>({link.label})</span>
+              <div key={i} style={{ fontSize: '0.7rem', color: 'rgba(220,215,186,0.6)', padding: '0.25rem 0.5rem', background: 'rgba(220,215,186,0.04)', borderRadius: 4 }}>
+                {from.label} → {to.label} <span style={{ color: 'rgba(220,215,186,0.35)' }}>({link.label})</span>
               </div>
             );
           })}

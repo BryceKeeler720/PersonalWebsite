@@ -15,7 +15,7 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
 ---
 
 <!doctype html>
-<html lang="en" style="background-color: #000000;">
+<html lang="en" style="background-color: #1F1F28;">
   <head>
     <meta charset="UTF-8" />
     <meta name="color-scheme" content="dark" />
@@ -69,8 +69,8 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
     position: absolute;
     top: -40px;
     left: 0;
-    background: #000;
-    color: #fff;
+    background: var(--kana-bg);
+    color: var(--kana-fg);
     padding: 8px 16px;
     z-index: 10000;
     text-decoration: none;
@@ -82,7 +82,7 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
   }
 
   *:focus-visible {
-    outline: 2px solid #fff;
+    outline: 2px solid var(--kana-blue);
     outline-offset: 2px;
   }
 </style>

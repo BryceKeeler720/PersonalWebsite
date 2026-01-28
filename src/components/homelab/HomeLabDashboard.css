@@ -2,13 +2,13 @@
 
 .homelab-dashboard {
   min-height: 100vh;
-  background: #000000;
+  background: var(--kana-bg);
   padding: 2rem;
   font-family: 'JetBrains Mono', monospace;
 }
 
 .homelab-dashboard .back-link:hover {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: rgba(220, 215, 186, 0.9) !important;
 }
 
 /* Header */
@@ -18,8 +18,8 @@
   align-items: center;
   padding: 1.5rem 2rem;
   margin-bottom: 2rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(220, 215, 186, 0.03);
+  border: 1px solid rgba(220, 215, 186, 0.1);
   border-radius: 16px;
   backdrop-filter: blur(10px);
 }
@@ -27,12 +27,12 @@
 .homelab-header-content h1 {
   font-size: clamp(1.5rem, 4vw, 2rem);
   font-weight: 700;
-  color: #ffffff;
+  color: var(--kana-fg);
   margin: 0;
 }
 
 .homelab-header-content p {
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(220, 215, 186, 0.6);
   margin: 0.25rem 0 0;
   font-size: 0.875rem;
 }
@@ -42,7 +42,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1.25rem;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(220, 215, 186, 0.05);
   border-radius: 8px;
 }
 
@@ -61,8 +61,8 @@
 
 /* Cards */
 .homelab-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(220, 215, 186, 0.03);
+  border: 1px solid rgba(220, 215, 186, 0.1);
   border-radius: 16px;
   padding: 1.5rem;
   backdrop-filter: blur(10px);
@@ -70,16 +70,16 @@
 }
 
 .homelab-card:hover {
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(220, 215, 186, 0.15);
 }
 
 .homelab-card-title {
   font-size: 1rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(220, 215, 186, 0.9);
   margin: 0 0 1rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(220, 215, 186, 0.1);
 }
 
 /* Tab Navigation — reuse .tab-nav from TradingBot.css */
@@ -91,10 +91,10 @@
 
 .homelab-main .tab-nav button {
   padding: 0.625rem 1.25rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(220, 215, 186, 0.05);
+  border: 1px solid rgba(220, 215, 186, 0.1);
   border-radius: 8px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(220, 215, 186, 0.6);
   font-weight: 500;
   font-size: 0.875rem;
   cursor: pointer;
@@ -103,14 +103,14 @@
 }
 
 .homelab-main .tab-nav button:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.8);
+  background: rgba(220, 215, 186, 0.08);
+  color: rgba(220, 215, 186, 0.8);
 }
 
 .homelab-main .tab-nav button.active {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.25);
-  color: #ffffff;
+  background: rgba(220, 215, 186, 0.1);
+  border-color: rgba(220, 215, 186, 0.25);
+  color: var(--kana-fg);
 }
 
 /* Error Banner */
@@ -120,10 +120,10 @@
   align-items: center;
   padding: 1rem 1.5rem;
   margin-bottom: 1.5rem;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(195, 64, 67, 0.1);
+  border: 1px solid rgba(195, 64, 67, 0.3);
   border-radius: 12px;
-  color: #f87171;
+  color: var(--kana-red);
 }
 
 .homelab-error p {
@@ -133,10 +133,10 @@
 
 .homelab-error button {
   padding: 0.5rem 1rem;
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(195, 64, 67, 0.2);
+  border: 1px solid rgba(195, 64, 67, 0.3);
   border-radius: 6px;
-  color: #f87171;
+  color: var(--kana-red);
   font-family: inherit;
   font-size: 0.75rem;
   font-weight: 500;
@@ -150,7 +150,7 @@
   align-items: center;
   justify-content: center;
   min-height: 50vh;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(220, 215, 186, 0.6);
 }
 
 .homelab-loading p {
@@ -161,8 +161,8 @@
 .homelab-spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top-color: rgba(255, 255, 255, 0.5);
+  border: 3px solid rgba(220, 215, 186, 0.1);
+  border-top-color: rgba(220, 215, 186, 0.5);
   border-radius: 50%;
   animation: homelab-spin 1s linear infinite;
 }
@@ -175,7 +175,7 @@
 .homelab-empty {
   text-align: center;
   padding: 2rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(220, 215, 186, 0.5);
 }
 
 .homelab-empty p {

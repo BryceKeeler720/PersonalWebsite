@@ -12,11 +12,11 @@
   align-items: center;
   gap: 2rem;
   padding: 0.75rem 1.5rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(220, 215, 186, 0.1);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--border-hover);
   border-radius: 50px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 30px rgba(22, 22, 29, 0.3);
 }
 
 .nav-logo {
@@ -46,7 +46,7 @@
 }
 
 .nav-link {
-  color: white;
+  color: var(--kana-fg);
   text-decoration: none;
   font-weight: 500;
   font-size: 0.9375rem;
@@ -68,7 +68,7 @@
 }
 
 .nav-link:hover {
-  color: white;
+  color: var(--kana-fg);
   opacity: 1;
 }
 
