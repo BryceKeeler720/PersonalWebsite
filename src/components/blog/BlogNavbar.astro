@@ -1,4 +1,10 @@
 ---
+const currentPath = Astro.url.pathname;
+const isActive = (href: string) => {
+  if (href === '/blog') return currentPath === '/blog' || currentPath.startsWith('/blog/');
+  if (href === '/journal') return currentPath === '/journal' || currentPath.startsWith('/journal/');
+  return false;
+};
 ---
 
 <nav class="navbar" aria-label="Main navigation">
@@ -20,8 +26,8 @@
       <a href="/traditional#projects" class="nav-link">Projects</a>
       <a href="/traditional#homelab" class="nav-link">Home Lab</a>
       <a href="/traditional#contact" class="nav-link">Contact</a>
-      <a href="/blog" class="nav-link nav-link-active">Blog</a>
-      <a href="/journal" class="nav-link">Journal</a>
+      <a href="/blog" class={`nav-link ${isActive('/blog') ? 'nav-link-active' : ''}`}>Blog</a>
+      <a href="/journal" class={`nav-link ${isActive('/journal') ? 'nav-link-active' : ''}`}>Journal</a>
       <a href="/terminal" class="nav-link">Terminal</a>
       <a href="/" class="nav-link-special" aria-label="View 3D interactive version">
         <span>3D Experience</span>
@@ -42,8 +48,8 @@
   <a href="/traditional#projects" class="mobile-nav-link">Projects</a>
   <a href="/traditional#homelab" class="mobile-nav-link">Home Lab</a>
   <a href="/traditional#contact" class="mobile-nav-link">Contact</a>
-  <a href="/blog" class="mobile-nav-link mobile-nav-link-active">Blog</a>
-  <a href="/journal" class="mobile-nav-link">Journal</a>
+  <a href="/blog" class={`mobile-nav-link ${isActive('/blog') ? 'mobile-nav-link-active' : ''}`}>Blog</a>
+  <a href="/journal" class={`mobile-nav-link ${isActive('/journal') ? 'mobile-nav-link-active' : ''}`}>Journal</a>
   <a href="/terminal" class="mobile-nav-link">Terminal</a>
   <a href="/" class="mobile-nav-link-special">
     <span>3D Experience</span>

@@ -16,33 +16,21 @@
   display: flex;
   align-items: center;
   padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   gap: 0.75rem;
   flex-shrink: 0;
 }
 
-.terminal-dots {
-  display: flex;
-  gap: 6px;
+.terminal-back-link {
+  text-decoration: none;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
 }
 
-.dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-.dot-red {
-  background: #ff5f57;
-}
-
-.dot-yellow {
-  background: #febc2e;
-}
-
-.dot-green {
-  background: #28c840;
+.terminal-back-link:hover {
+  opacity: 0.7;
 }
 
 .terminal-title {
@@ -58,7 +46,7 @@
 .terminal-output {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem 1.5rem;
+  padding: 25px;
   display: flex;
   flex-direction: column;
 }
@@ -117,7 +105,7 @@
   }
 
   .terminal-output {
-    padding: 0.75rem 1rem;
+    padding: 15px;
   }
 
   .ascii-line {

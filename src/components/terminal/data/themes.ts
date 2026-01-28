@@ -1,6 +1,15 @@
 import type { Theme } from '../types';
 
 export const themes: Record<string, Theme> = {
+  kanagawa: {
+    name: 'kanagawa',
+    background: '#1F1F28',
+    foreground: '#DCD7BA',
+    prompt: '#76946A',
+    accent: '#7E9CD8',
+    error: '#C34043',
+    muted: '#727169',
+  },
   dark: {
     name: 'dark',
     background: '#000000',
@@ -48,4 +57,4 @@ export const themes: Record<string, Theme> = {
   },
 };
 
-export const defaultTheme = themes.dark;
+export const defaultTheme = themes.kanagawa;

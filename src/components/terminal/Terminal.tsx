@@ -2,25 +2,22 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import type { TerminalLine, Theme, CommandContext } from './types';
 import { commandRegistry, commandNames } from './commands';
 import { defaultTheme } from './data/themes';
-import { asciiArt, welcomeMessage } from './data/ascii';
 import { HOME_DIR } from './data/filesystem';
+import { fastfetchCommand } from './commands/utils';
 import './Terminal.css';
 
 let lineCounter = 0;
 const makeId = () => `line-${lineCounter++}`;
 
 function getInitialLines(): TerminalLine[] {
-  const lines: TerminalLine[] = [];
-
-  for (const line of asciiArt) {
-    lines.push({ id: makeId(), type: 'ascii', content: line });
-  }
-
-  for (const line of welcomeMessage) {
-    lines.push({ id: makeId(), type: 'output', content: line });
-  }
-
-  return lines;
+  const ctx = {
+    history: [],
+    currentDir: HOME_DIR,
+    setCurrentDir: () => {},
+    theme: defaultTheme,
+    setTheme: () => {},
+  };
+  return fastfetchCommand.handler([], ctx);
 }
 
 const Terminal: React.FC = () => {
@@ -111,6 +108,12 @@ const Terminal: React.FC = () => {
   }, [commandHistory, currentDir, theme]);
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.ctrlKey && e.key === 'l') {
+      e.preventDefault();
+      setLines([]);
+      return;
+    }
+
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (commandHistory.length > 0) {
@@ -171,11 +174,9 @@ const Terminal: React.FC = () => {
       onClick={handleContainerClick}
     >
       <div className="terminal-header" style={{ borderBottomColor: theme.muted }}>
-        <div className="terminal-dots">
-          <span className="dot dot-red" />
-          <span className="dot dot-yellow" />
-          <span className="dot dot-green" />
-        </div>
+        <a href="/" className="terminal-back-link" style={{ color: theme.muted }}>
+          &larr; Home
+        </a>
         <span className="terminal-title" style={{ color: theme.muted }}>
           visitor@bryce: {promptDir}
         </span>

@@ -3,11 +3,22 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BlogNavbar from '../components/blog/BlogNavbar.astro';
 import { getWordCount } from '../utils/readingTime';
+import JournalHeatmap from '../components/journal/JournalHeatmap';
+import JournalKnowledgeMap from '../components/journal/JournalKnowledgeMap';
 
 type JournalEntry = CollectionEntry<'journal'>;
 
 const entries: JournalEntry[] = (await getCollection('journal', ({ data }: JournalEntry) => !data.draft))
   .sort((a: JournalEntry, b: JournalEntry) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+
+// Serialize entries for React components
+const entryData = entries.map((entry: JournalEntry) => ({
+  slug: entry.slug,
+  title: entry.data.title,
+  publishDate: entry.data.publishDate.toISOString().split('T')[0],
+  tags: entry.data.tags,
+  wordCount: getWordCount(entry.body),
+}));
 ---
 
 <BaseLayout title="Journal | Bryce Keeler" description="Quick notes, updates, and things I'm working on.">
@@ -19,36 +30,51 @@ const entries: JournalEntry[] = (await getCollection('journal', ({ data }: Journ
       <p class="journal-subtitle">Quick notes and updates</p>
     </header>
 
-    <section class="journal-entries">
-      {entries.length === 0 ? (
-        <p class="journal-empty">Nothing here yet.</p>
-      ) : (
-        entries.map((entry: JournalEntry) => {
-          const wordCount = getWordCount(entry.body);
-          const formattedDate = entry.data.publishDate.toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric',
-          });
+    <!-- Heatmap with stats and year navigation -->
+    <section class="journal-section">
+      <JournalHeatmap entries={entryData} client:load />
+    </section>
 
-          return (
-            <a href={`/journal/${entry.slug}`} class="journal-entry">
-              <span class="entry-date">{formattedDate}</span>
-              <span class="entry-title">{entry.data.title}</span>
-              <span class="entry-meta">
-                {entry.data.tags.length > 0 && (
-                  <span class="entry-tags">
-                    {entry.data.tags.map((tag: string) => (
-                      <span class="entry-tag">{tag}</span>
-                    ))}
-                  </span>
-                )}
-                <span class="entry-words">{wordCount} words</span>
-              </span>
-            </a>
-          );
-        })
-      )}
+    <!-- Knowledge Map -->
+    <section class="journal-section">
+      <h2 class="section-title">Knowledge Map</h2>
+      <JournalKnowledgeMap entries={entryData} client:load />
+    </section>
+
+    <!-- Entry List -->
+    <section class="journal-section">
+      <h2 class="section-title">All Entries</h2>
+      <div class="journal-entries">
+        {entries.length === 0 ? (
+          <p class="journal-empty">Nothing here yet.</p>
+        ) : (
+          entries.map((entry: JournalEntry) => {
+            const wordCount = getWordCount(entry.body);
+            const formattedDate = entry.data.publishDate.toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            });
+
+            return (
+              <a href={`/journal/${entry.slug}`} class="journal-entry">
+                <span class="entry-title">{entry.data.title}</span>
+                <span class="entry-right">
+                  {entry.data.tags.length > 0 && (
+                    <span class="entry-tags">
+                      {entry.data.tags.map((tag: string) => (
+                        <span class="entry-tag">{tag}</span>
+                      ))}
+                    </span>
+                  )}
+                  <span class="entry-words">{wordCount} words</span>
+                  <span class="entry-date">{formattedDate}</span>
+                </span>
+              </a>
+            );
+          })
+        )}
+      </div>
     </section>
   </main>
 
@@ -75,7 +101,7 @@ const entries: JournalEntry[] = (await getCollection('journal', ({ data }: Journ
   }
 
   .journal-header {
-    margin-bottom: 3rem;
+    margin-bottom: 2.5rem;
   }
 
   .journal-header h1 {
@@ -88,6 +114,17 @@ const entries: JournalEntry[] = (await getCollection('journal', ({ data }: Journ
   .journal-subtitle {
     color: var(--text-secondary);
     font-size: 1rem;
+  }
+
+  .journal-section {
+    margin-bottom: 3rem;
+  }
+
+  .section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
   }
 
   .journal-entries {
@@ -104,8 +141,9 @@ const entries: JournalEntry[] = (await getCollection('journal', ({ data }: Journ
   .journal-entry {
     display: flex;
     align-items: baseline;
+    justify-content: space-between;
     gap: 1.5rem;
-    padding: 1rem 0;
+    padding: 0.875rem 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     text-decoration: none;
     transition: background 0.2s ease;
@@ -119,26 +157,29 @@ const entries: JournalEntry[] = (await getCollection('journal', ({ data }: Journ
     background: rgba(255, 255, 255, 0.02);
   }
 
-  .entry-date {
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    min-width: 100px;
-    flex-shrink: 0;
-    font-variant-numeric: tabular-nums;
-  }
-
   .entry-title {
-    font-size: 1rem;
+    font-size: 0.9375rem;
     font-weight: 600;
     color: var(--text-primary);
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  .entry-meta {
+  .entry-right {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     flex-shrink: 0;
+  }
+
+  .entry-date {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 
   .entry-tags {
@@ -211,14 +252,10 @@ const entries: JournalEntry[] = (await getCollection('journal', ({ data }: Journ
     .journal-entry {
       flex-direction: column;
       gap: 0.5rem;
-      padding: 1rem 0;
+      padding: 0.875rem 0;
     }
 
-    .entry-date {
-      min-width: auto;
-    }
-
-    .entry-meta {
+    .entry-right {
       flex-wrap: wrap;
     }
 

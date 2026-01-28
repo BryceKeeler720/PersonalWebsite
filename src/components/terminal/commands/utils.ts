@@ -22,7 +22,7 @@ export const helpCommand: Command = {
       ['', ''],
       ['themes', 'List or switch terminal themes'],
       ['whoami', 'Display current user'],
-      ['neofetch', 'System info card'],
+      ['fastfetch', 'System info card'],
       ['clear', 'Clear the terminal'],
       ['history', 'Show command history'],
       ['echo', 'Echo text back'],
@@ -140,10 +140,26 @@ export const whoamiCommand: Command = {
   ],
 };
 
-export const neofetchCommand: Command = {
-  name: 'neofetch',
+export const fastfetchCommand: Command = {
+  name: 'fastfetch',
   description: 'System info card',
   handler: (): TerminalLine[] => {
+    // Kanagawa ANSI colors matching kitty theme
+    const red = '#C34043';
+    const green = '#76946A';
+    const yellow = '#C0A36E';
+    const blue = '#7E9CD8';
+    const magenta = '#957FB8';
+    const cyan = '#6A9589';
+    const white = '#DCD7BA';
+    const muted = '#727169';
+    const border = '#727169';
+
+    const lines: TerminalLine[] = [
+      { id: id(), type: 'output', content: '' },
+    ];
+
+    // ASCII art logo
     const art = [
       ' ____                        ',
       '| __ ) _ __ _   _  ___ ___  ',
@@ -153,31 +169,43 @@ export const neofetchCommand: Command = {
       '            |___/            ',
     ];
 
-    const info = [
-      `${personalInfo.name}`,
-      '------------------------------',
-      `OS:        Arch Linux (btw)`,
-      `Host:      brycekeeler.com`,
-      `Uptime:    since Jan 2025`,
-      `Shell:     zsh`,
-    ];
-
-    const lines: TerminalLine[] = [
-      { id: id(), type: 'output', content: '' },
-    ];
-
-    const maxLines = Math.max(art.length, info.length);
-
-    for (let i = 0; i < maxLines; i++) {
-      const artLine = art[i] || ' '.repeat(30);
-      const infoLine = info[i] || '';
-      lines.push({
-        id: id(),
-        type: i < art.length ? 'ascii' : 'output',
-        content: `${artLine}   ${infoLine}`,
-      });
+    for (const line of art) {
+      lines.push({ id: id(), type: 'ascii', content: line });
     }
 
+    lines.push({ id: id(), type: 'output', content: '' });
+
+    // System info box
+    lines.push({ id: id(), type: 'output', content: '  \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510', color: border });
+    lines.push({ id: id(), type: 'output', content: '    OS        : Arch Linux', color: red });
+    lines.push({ id: id(), type: 'output', content: '    Kernel    : 6.18.5-zen1-1-zen', color: red });
+    lines.push({ id: id(), type: 'output', content: '    Terminal  : kitty', color: yellow });
+    lines.push({ id: id(), type: 'output', content: '    WM        : Hyprland', color: yellow });
+    lines.push({ id: id(), type: 'output', content: '    Shell     : zsh', color: green });
+    lines.push({ id: id(), type: 'output', content: '    Editor    : Neovim', color: green });
+    lines.push({ id: id(), type: 'output', content: '  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518', color: border });
+
+    lines.push({ id: id(), type: 'output', content: '' });
+
+    // Title line
+    lines.push({ id: id(), type: 'output', content: `    ${personalInfo.name}`, color: white });
+
+    // Portfolio info box
+    lines.push({ id: id(), type: 'output', content: '  \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510', color: border });
+    lines.push({ id: id(), type: 'output', content: '    Role      : Analyst @ Huron Consulting', color: blue });
+    lines.push({ id: id(), type: 'output', content: '    School    : UT Dallas \'24 - B.S. CIS', color: blue });
+    lines.push({ id: id(), type: 'output', content: '    Studying  : MIT MicroMasters (Stats & DS)', color: magenta });
+    lines.push({ id: id(), type: 'output', content: '    Stack     : TypeScript, Python, React', color: magenta });
+    lines.push({ id: id(), type: 'output', content: `    Projects  : ${personalInfo.projects.length} active`, color: cyan });
+    lines.push({ id: id(), type: 'output', content: '    Site      : brycekeeler.com', color: cyan });
+    lines.push({ id: id(), type: 'output', content: '  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518', color: border });
+
+    // Color palette circles
+    lines.push({ id: id(), type: 'output', content: '' });
+    lines.push({ id: id(), type: 'output', content: `    ${'\u25CF'} ${'\u25CF'} ${'\u25CF'} ${'\u25CF'} ${'\u25CF'} ${'\u25CF'} ${'\u25CF'} ${'\u25CF'}`, color: muted });
+
+    lines.push({ id: id(), type: 'output', content: '' });
+    lines.push({ id: id(), type: 'output', content: '  Type "help" to see available commands.' });
     lines.push({ id: id(), type: 'output', content: '' });
 
     return lines;

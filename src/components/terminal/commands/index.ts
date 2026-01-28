@@ -17,7 +17,7 @@ import {
   dateCommand,
   welcomeCommand,
   whoamiCommand,
-  neofetchCommand,
+  fastfetchCommand,
   exitCommand,
 } from './utils';
 import { lsCommand, cdCommand, catCommand, pwdCommand } from './filesystem';
@@ -35,7 +35,7 @@ export const commandRegistry: Record<string, Command> = {
   skills: skillsCommand,
   themes: themesCommand,
   whoami: whoamiCommand,
-  neofetch: neofetchCommand,
+  fastfetch: fastfetchCommand,
   clear: clearCommand,
   history: historyCommand,
   echo: echoCommand,
