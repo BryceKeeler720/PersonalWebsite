@@ -1302,12 +1302,16 @@ function analyzeStock(symbol, intradayBars, dailyBars) {
 // Dynamic NASDAQ symbol discovery via Alpaca assets API
 async function fetchNasdaqSymbols() {
   try {
-    const response = await fetch(`${ALPACA_PAPER_URL}/v2/assets?status=active`, {
-      headers: {
-        'APCA-API-KEY-ID': ALPACA_API_KEY,
-        'APCA-API-SECRET-KEY': ALPACA_SECRET_KEY,
-      },
-    });
+    const headers = {
+      'APCA-API-KEY-ID': ALPACA_API_KEY,
+      'APCA-API-SECRET-KEY': ALPACA_SECRET_KEY,
+    };
+
+    // Fetch all active US equity assets from Alpaca
+    const response = await fetch(
+      `${ALPACA_PAPER_URL}/v2/assets?status=active&asset_class=us_equity`,
+      { headers }
+    );
 
     if (!response.ok) {
       console.error(`Alpaca assets API failed: ${response.status}`);
@@ -1315,9 +1319,32 @@ async function fetchNasdaqSymbols() {
     }
 
     const assets = await response.json();
+    console.log(`Alpaca assets API returned ${assets.length} total US equity assets`);
+
+    // Log unique exchange values for debugging
+    const exchanges = {};
+    for (const a of assets) {
+      const ex = a.exchange || 'unknown';
+      exchanges[ex] = (exchanges[ex] || 0) + 1;
+    }
+    console.log('Exchange breakdown:', JSON.stringify(exchanges));
+
+    // Filter for NASDAQ-listed stocks (case-insensitive, match any NASDAQ variant)
     const nasdaqSymbols = assets
-      .filter(a => a.tradable && a.exchange === 'NASDAQ' && a.asset_class === 'us_equity')
+      .filter(a => a.tradable && a.exchange && a.exchange.toUpperCase().includes('NASDAQ'))
       .map(a => a.symbol);
+
+    if (nasdaqSymbols.length === 0) {
+      // Fallback: if no NASDAQ exchange match, return ALL tradable equities
+      // (minus SP500/ETF which are already included separately)
+      const sp500Set = new Set(SP500_SYMBOLS);
+      const etfSet = new Set(ETF_SYMBOLS);
+      const allTradable = assets
+        .filter(a => a.tradable && !sp500Set.has(a.symbol) && !etfSet.has(a.symbol))
+        .map(a => a.symbol);
+      console.log(`No NASDAQ exchange match found; using all ${allTradable.length} tradable equities as fallback`);
+      return allTradable;
+    }
 
     console.log(`Discovered ${nasdaqSymbols.length} active NASDAQ symbols from Alpaca`);
     return nasdaqSymbols;

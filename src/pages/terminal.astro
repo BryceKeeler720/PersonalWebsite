@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Terminal from '../components/terminal/Terminal';
+---
+
+<BaseLayout title="Terminal | Bryce Keeler" description="Interactive terminal portfolio for Bryce Keeler.">
+  <Terminal client:load />
+</BaseLayout>
+
+<style is:global>
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  .skip-link {
+    display: none;
+  }
+  #main-content {
+    display: contents;
+  }
+</style>

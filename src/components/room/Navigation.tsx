@@ -16,6 +16,12 @@ const Navigation: React.FC = () => {
           <a href="/blog" className="nav-link">
             Blog
           </a>
+          <a href="/journal" className="nav-link">
+            Journal
+          </a>
+          <a href="/terminal" className="nav-link">
+            Terminal
+          </a>
         </div>
       </div>
     </nav>
