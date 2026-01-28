@@ -1,4 +1,5 @@
 import { DEFAULT_CONFIG } from './types';
+import type { LearningState } from './types';
 
 const BOT_CONFIG = {
   buyThreshold: 0.35,
@@ -134,7 +135,217 @@ function StrategyCard({ name, group, groupColor, indicators, scores, confidence 
   );
 }
 
-export default function AlgorithmTab() {
+const DEFAULT_REGIME_WEIGHTS: Record<string, { trend: number; reversion: number }> = {
+  TRENDING_UP:   { trend: 0.80, reversion: 0.20 },
+  TRENDING_DOWN: { trend: 0.80, reversion: 0.20 },
+  RANGE_BOUND:   { trend: 0.20, reversion: 0.80 },
+  UNKNOWN:       { trend: 0.50, reversion: 0.50 },
+};
+
+const PARAM_LABELS: Record<string, string> = {
+  rsiOversold: 'RSI Oversold',
+  rsiOverbought: 'RSI Overbought',
+  smaShort: 'SMA Short Period',
+  smaLong: 'SMA Long Period',
+  bollingerStdDev: 'BB Std Dev',
+  buyThreshold: 'Buy Threshold',
+  atrStopMultiplier: 'ATR Stop Mult',
+  atrProfit1Multiplier: 'ATR Profit1 Mult',
+};
+
+const PARAM_DEFAULTS: Record<string, number> = {
+  rsiOversold: 30,
+  rsiOverbought: 70,
+  smaShort: 10,
+  smaLong: 50,
+  bollingerStdDev: 2.0,
+  buyThreshold: 0.35,
+  atrStopMultiplier: 2.0,
+  atrProfit1Multiplier: 3.0,
+};
+
+function LearningSection({ learningState }: { learningState: LearningState | null }) {
+  if (!learningState) {
+    return (
+      <div style={card}>
+        <h2 style={cardTitle}>Self-Learning System</h2>
+        <p style={{ ...subtext, textAlign: 'center', padding: '2rem 0' }}>
+          Learning system not yet initialized. It will activate after the bot starts trading.
+        </p>
+      </div>
+    );
+  }
+
+  const { totalTradesAnalyzed, warmupComplete, closedTrades, regimeWeights, params, paramHistory, weightHistory } = learningState;
+  const warmupProgress = Math.min(100, (totalTradesAnalyzed / 50) * 100);
+  const recentWins = closedTrades.filter(t => t.isWin).length;
+  const winRate = closedTrades.length > 0 ? (recentWins / closedTrades.length * 100).toFixed(1) : '—';
+
+  return (
+    <>
+      {/* Learning Status */}
+      <div style={card}>
+        <h2 style={cardTitle}>Self-Learning System</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '0.75rem', marginBottom: '1.25rem' }}>
+          <div style={{ padding: '0.75rem', background: 'rgba(220,215,186,0.02)', borderRadius: '8px' }}>
+            <div style={{ fontSize: '0.7rem', color: 'var(--kana-fg-muted)', marginBottom: '0.25rem' }}>Status</div>
+            <div style={{ fontSize: '0.95rem', fontWeight: 600, color: warmupComplete ? '#76946A' : '#C0A36E' }}>
+              {warmupComplete ? 'Active' : 'Warming Up'}
+            </div>
+          </div>
+          <div style={{ padding: '0.75rem', background: 'rgba(220,215,186,0.02)', borderRadius: '8px' }}>
+            <div style={{ fontSize: '0.7rem', color: 'var(--kana-fg-muted)', marginBottom: '0.25rem' }}>Trades Analyzed</div>
+            <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--kana-fg)' }}>{totalTradesAnalyzed}</div>
+          </div>
+          <div style={{ padding: '0.75rem', background: 'rgba(220,215,186,0.02)', borderRadius: '8px' }}>
+            <div style={{ fontSize: '0.7rem', color: 'var(--kana-fg-muted)', marginBottom: '0.25rem' }}>Rolling Win Rate</div>
+            <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--kana-fg)' }}>{winRate}%</div>
+          </div>
+          <div style={{ padding: '0.75rem', background: 'rgba(220,215,186,0.02)', borderRadius: '8px' }}>
+            <div style={{ fontSize: '0.7rem', color: 'var(--kana-fg-muted)', marginBottom: '0.25rem' }}>Rolling Window</div>
+            <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--kana-fg)' }}>{closedTrades.length}/200</div>
+          </div>
+        </div>
+
+        {!warmupComplete && (
+          <div style={{ marginBottom: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--kana-fg-muted)' }}>Warmup Progress</span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--kana-fg-dim)' }}>{totalTradesAnalyzed}/50 trades</span>
+            </div>
+            <div style={{ height: '6px', background: 'rgba(220,215,186,0.08)', borderRadius: '3px', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: `${warmupProgress}%`, background: '#C0A36E', borderRadius: '3px', transition: 'width 0.3s ease' }} />
+            </div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--kana-fg-muted)', marginTop: '0.5rem' }}>
+              Using default weights and parameters until 50 trades are completed.
+            </p>
+          </div>
+        )}
+
+        <p style={subtext}>
+          The learning system adapts strategy weights and parameters based on trade outcomes.
+          It uses a rolling window of the last 200 closed trades to compute per-regime accuracy
+          and applies EMA smoothing (alpha=0.05) to prevent overfitting.
+        </p>
+      </div>
+
+      {/* Adaptive Regime Weights */}
+      <div style={card}>
+        <h2 style={cardTitle}>Learned Regime Weights</h2>
+        <p style={{ ...subtext, marginBottom: '1rem' }}>
+          {warmupComplete
+            ? 'Regime weights have been adapted based on observed strategy group accuracy per market regime.'
+            : 'Weights below are defaults. They will begin adapting after warmup completes.'}
+        </p>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+          <thead>
+            <tr style={{ borderBottom: '1px solid rgba(220,215,186,0.1)' }}>
+              <th style={{ textAlign: 'left', padding: '0.6rem 0.75rem', color: 'var(--kana-fg-muted)', fontWeight: 500 }}>Regime</th>
+              <th style={{ textAlign: 'center', padding: '0.6rem 0.75rem', color: '#7E9CD8', fontWeight: 500 }}>Trend (Default)</th>
+              <th style={{ textAlign: 'center', padding: '0.6rem 0.75rem', color: '#7E9CD8', fontWeight: 500 }}>Trend (Learned)</th>
+              <th style={{ textAlign: 'center', padding: '0.6rem 0.75rem', color: '#957FB8', fontWeight: 500 }}>Reversion (Learned)</th>
+              <th style={{ textAlign: 'center', padding: '0.6rem 0.75rem', color: 'var(--kana-fg-muted)', fontWeight: 500 }}>Delta</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(DEFAULT_REGIME_WEIGHTS).map(([regime, defaults]) => {
+              const learned = regimeWeights[regime] || defaults;
+              const delta = learned.trend - defaults.trend;
+              const deltaColor = Math.abs(delta) < 0.005 ? 'var(--kana-fg-muted)' : delta > 0 ? '#76946A' : '#C34043';
+              const regimeColors: Record<string, string> = {
+                TRENDING_UP: '#76946A', TRENDING_DOWN: '#C34043',
+                RANGE_BOUND: '#C0A36E', UNKNOWN: 'var(--kana-fg-muted)',
+              };
+              return (
+                <tr key={regime} style={{ borderBottom: '1px solid rgba(220,215,186,0.04)' }}>
+                  <td style={{ padding: '0.6rem 0.75rem' }}>
+                    <span style={{ color: regimeColors[regime] || 'var(--kana-fg)', fontWeight: 600 }}>{regime}</span>
+                  </td>
+                  <td style={{ textAlign: 'center', padding: '0.6rem 0.75rem', color: 'var(--kana-fg-muted)' }}>{(defaults.trend * 100).toFixed(0)}%</td>
+                  <td style={{ textAlign: 'center', padding: '0.6rem 0.75rem', color: 'var(--kana-fg-dim)', fontWeight: 600 }}>{(learned.trend * 100).toFixed(1)}%</td>
+                  <td style={{ textAlign: 'center', padding: '0.6rem 0.75rem', color: 'var(--kana-fg-dim)', fontWeight: 600 }}>{(learned.reversion * 100).toFixed(1)}%</td>
+                  <td style={{ textAlign: 'center', padding: '0.6rem 0.75rem', color: deltaColor, fontWeight: 600 }}>
+                    {delta > 0 ? '+' : ''}{(delta * 100).toFixed(2)}%
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        {weightHistory.length > 0 && (
+          <div style={{ marginTop: '1rem', fontSize: '0.75rem', color: 'var(--kana-fg-muted)' }}>
+            Weight updates: {weightHistory.length} snapshots recorded
+          </div>
+        )}
+      </div>
+
+      {/* Tuned Parameters */}
+      <div style={card}>
+        <h2 style={cardTitle}>Learned Parameters</h2>
+        <p style={{ ...subtext, marginBottom: '1rem' }}>
+          Parameters are tuned via hill-climbing every 50 closed trades. One parameter is randomly
+          selected and nudged in the direction that correlates with improving win rate.
+        </p>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+          <thead>
+            <tr style={{ borderBottom: '1px solid rgba(220,215,186,0.1)' }}>
+              <th style={{ textAlign: 'left', padding: '0.5rem 0.75rem', color: 'var(--kana-fg-muted)', fontWeight: 500 }}>Parameter</th>
+              <th style={{ textAlign: 'center', padding: '0.5rem 0.75rem', color: 'var(--kana-fg-muted)', fontWeight: 500 }}>Default</th>
+              <th style={{ textAlign: 'center', padding: '0.5rem 0.75rem', color: 'var(--kana-fg-dim)', fontWeight: 500 }}>Current</th>
+              <th style={{ textAlign: 'center', padding: '0.5rem 0.75rem', color: 'var(--kana-fg-muted)', fontWeight: 500 }}>Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(PARAM_DEFAULTS).map(([key, defaultVal]) => {
+              const current = params[key] ?? defaultVal;
+              const delta = current - defaultVal;
+              const deltaColor = Math.abs(delta) < 0.001 ? 'var(--kana-fg-muted)' : delta > 0 ? '#76946A' : '#C34043';
+              return (
+                <tr key={key} style={{ borderBottom: '1px solid rgba(220,215,186,0.04)' }}>
+                  <td style={{ padding: '0.5rem 0.75rem', color: 'var(--kana-fg-dim)' }}>{PARAM_LABELS[key] || key}</td>
+                  <td style={{ textAlign: 'center', padding: '0.5rem 0.75rem', color: 'var(--kana-fg-muted)' }}>{defaultVal}</td>
+                  <td style={{ textAlign: 'center', padding: '0.5rem 0.75rem', color: 'var(--kana-fg)', fontWeight: 600 }}>{current}</td>
+                  <td style={{ textAlign: 'center', padding: '0.5rem 0.75rem', color: deltaColor, fontWeight: 600 }}>
+                    {delta > 0 ? '+' : ''}{delta.toFixed(2)}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Recent Parameter Changes */}
+      {paramHistory.length > 0 && (
+        <div style={card}>
+          <h2 style={cardTitle}>Recent Parameter Adjustments</h2>
+          <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            {paramHistory.slice().reverse().slice(0, 10).map((change, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0.75rem', borderBottom: '1px solid rgba(220,215,186,0.04)', fontSize: '0.8rem' }}>
+                <div>
+                  <span style={{ color: 'var(--kana-fg-dim)', fontWeight: 600 }}>{PARAM_LABELS[change.paramName] || change.paramName}</span>
+                  <span style={{ color: 'var(--kana-fg-muted)', marginLeft: '0.5rem' }}>
+                    {change.oldValue} → {change.newValue}
+                  </span>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ color: 'var(--kana-fg-muted)', fontSize: '0.7rem' }}>
+                    WR: {(change.olderWinRate * 100).toFixed(0)}% → {(change.newerWinRate * 100).toFixed(0)}%
+                  </span>
+                  <span style={{ color: 'var(--kana-fg-muted)', fontSize: '0.7rem', marginLeft: '0.75rem' }}>
+                    @ trade #{change.tradesAnalyzed}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+export default function AlgorithmTab({ learningState }: { learningState: LearningState | null }) {
   return (
     <div style={{ display: 'grid', gap: '1.5rem' }}>
 
@@ -387,7 +598,10 @@ export default function AlgorithmTab() {
         </div>
       </div>
 
-      {/* Section 7: Current Configuration */}
+      {/* Section 7: Self-Learning System */}
+      <LearningSection learningState={learningState} />
+
+      {/* Section 8: Current Configuration */}
       <div style={card}>
         <h2 style={cardTitle}>Current Configuration</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>

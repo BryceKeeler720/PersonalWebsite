@@ -11,6 +11,12 @@ type JournalEntry = CollectionEntry<'journal'>;
 const entries: JournalEntry[] = (await getCollection('journal', ({ data }: JournalEntry) => !data.draft))
   .sort((a: JournalEntry, b: JournalEntry) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
 
+const blogEntries = await getCollection('blog', ({ data }) => !data.draft);
+
+const totalWords = [...entries, ...blogEntries].reduce((sum, entry) => sum + getWordCount(entry.body), 0);
+const siteStart = new Date('2025-12-31');
+const daysSinceLaunch = Math.floor((Date.now() - siteStart.getTime()) / (1000 * 60 * 60 * 24));
+
 // Serialize entries for React components
 const entryData = entries.map((entry: JournalEntry) => ({
   slug: entry.slug,
@@ -94,6 +100,7 @@ const entryData = entries.map((entry: JournalEntry) => ({
         <span>·</span>
         <a href="/traditional">Portfolio</a>
       </div>
+      <p class="footer-stats">{daysSinceLaunch} days · {totalWords.toLocaleString()} words</p>
     </div>
   </footer>
 </BaseLayout>
@@ -295,6 +302,12 @@ const entryData = entries.map((entry: JournalEntry) => ({
 
   .footer-links span {
     color: rgba(220, 215, 186, 0.2);
+  }
+
+  .footer-stats {
+    font-size: 0.75rem;
+    color: rgba(220, 215, 186, 0.3);
+    margin-top: 0.5rem;
   }
 
   @media (max-width: 768px) {

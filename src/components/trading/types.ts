@@ -23,6 +23,7 @@ export interface Holding {
   entryATR?: number | null;
   entryTimestamp?: string;
   barsHeld?: number;
+  entrySignals?: SignalSnapshot;
 }
 
 // Trade records
@@ -36,6 +37,7 @@ export interface Trade {
   total: number;
   reason: string;
   signals: SignalSnapshot;
+  entrySignals?: SignalSnapshot | null;
   gainLoss?: number;
   gainLossPercent?: number;
 }
@@ -112,6 +114,50 @@ export interface SchedulerState {
   isRunning: boolean;
   nextRun: string | null;
   lastRun: string | null;
+}
+
+// Self-Learning System state
+export interface RegimeWeight {
+  trend: number;
+  reversion: number;
+}
+
+export interface ClosedTradeAttribution {
+  regime: string;
+  isWin: boolean;
+  gainLossPercent: number;
+  trendGroupScore: number;
+  reversionGroupScore: number;
+  trendDominant: boolean;
+  timestamp: string;
+}
+
+export interface WeightSnapshot {
+  timestamp: string;
+  weights: Record<string, RegimeWeight>;
+  tradesAnalyzed: number;
+}
+
+export interface ParamChange {
+  timestamp: string;
+  paramName: string;
+  oldValue: number;
+  newValue: number;
+  olderWinRate: number;
+  newerWinRate: number;
+  tradesAnalyzed: number;
+}
+
+export interface LearningState {
+  regimeWeights: Record<string, RegimeWeight>;
+  params: Record<string, number>;
+  closedTrades: ClosedTradeAttribution[];
+  totalTradesAnalyzed: number;
+  warmupComplete: boolean;
+  lastParamTuneAt: number;
+  paramDirections: Record<string, number>;
+  weightHistory: WeightSnapshot[];
+  paramHistory: ParamChange[];
 }
 
 // Default configuration - regime-adaptive strategy

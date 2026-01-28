@@ -4,7 +4,7 @@ import TradeLog from './TradeLog';
 import StrategySignals from './StrategySignals';
 import PerformanceChart from './PerformanceChart';
 import AlgorithmTab from './AlgorithmTab';
-import type { Portfolio, Trade, SignalSnapshot } from './types';
+import type { Portfolio, Trade, SignalSnapshot, LearningState } from './types';
 import { DEFAULT_CONFIG } from './types';
 import { getAssetInfo } from '../../lib/trading/assets';
 import './TradingBot.css';
@@ -28,6 +28,7 @@ interface TradingData {
   lastRun: string | null;
   history: PortfolioSnapshot[];
   spyBenchmark: BenchmarkPoint[];
+  learningState: LearningState | null;
 }
 
 const INITIAL_PORTFOLIO: Portfolio = {
@@ -87,6 +88,7 @@ export default function TradingBot() {
     lastRun: null,
     history: [],
     spyBenchmark: [],
+    learningState: null,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -691,7 +693,7 @@ export default function TradingBot() {
 
           {activeTab === 'log' && <TradeLog trades={data.trades} />}
 
-          {activeTab === 'algorithm' && <AlgorithmTab />}
+          {activeTab === 'algorithm' && <AlgorithmTab learningState={data.learningState} />}
         </div>
       </div>
     </div>

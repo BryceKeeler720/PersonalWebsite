@@ -16,6 +16,7 @@ let currentRunPromise = null;
 // Configuration
 const BATCH_SIZE = 50; // Alpaca supports multi-symbol batch requests
 const BATCH_DELAY_MS = 350; // Free tier: 200 req/min → ~300ms minimum between requests
+const ANALYSIS_BATCH_SIZE = 200; // Symbols per analysis batch (keeps memory ~50MB vs 600MB+)
 const DEFAULT_CONFIG = {
   initialCapital: 10199.52,
   maxPositionSize: 0.07,
@@ -342,6 +343,7 @@ const KEYS = {
   LAST_RUN: 'tradingbot:lastRun',
   HISTORY: 'tradingbot:history',
   SPY_BENCHMARK: 'tradingbot:spyBenchmark',
+  LEARNING_STATE: 'tradingbot:learningState',
 };
 
 // Storage functions
@@ -388,6 +390,236 @@ async function addPortfolioSnapshot(snapshot) {
   const history = await getPortfolioHistory();
   history.push(snapshot);
   await redis.set(KEYS.HISTORY, history.slice(-1000));
+}
+
+// ═══════════════════════════════════════════════════════════
+// Self-Learning System — State & Configuration
+// ═══════════════════════════════════════════════════════════
+
+const TUNABLE_PARAMS = {
+  rsiOversold:          { min: 25, max: 35, step: 1, default: 30 },
+  rsiOverbought:        { min: 65, max: 75, step: 1, default: 70 },
+  smaShort:             { min: 5,  max: 25, step: 2, default: 10 },
+  smaLong:              { min: 30, max: 70, step: 5, default: 50 },
+  bollingerStdDev:      { min: 1.5, max: 2.5, step: 0.1, default: 2.0 },
+  buyThreshold:         { min: 0.20, max: 0.50, step: 0.01, default: 0.35 },
+  atrStopMultiplier:    { min: 1.5, max: 3.0, step: 0.25, default: 2.0 },
+  atrProfit1Multiplier: { min: 2.0, max: 5.0, step: 0.5, default: 3.0 },
+};
+
+const DEFAULT_LEARNING_STATE = {
+  // Adaptive regime weights (override REGIME_WEIGHTS after warmup)
+  regimeWeights: {
+    TRENDING_UP:   { trend: 0.80, reversion: 0.20 },
+    TRENDING_DOWN: { trend: 0.80, reversion: 0.20 },
+    RANGE_BOUND:   { trend: 0.20, reversion: 0.80 },
+    UNKNOWN:       { trend: 0.50, reversion: 0.50 },
+  },
+  // Tunable strategy parameters
+  params: Object.fromEntries(Object.entries(TUNABLE_PARAMS).map(([k, v]) => [k, v.default])),
+  // Rolling window of closed trades for learning
+  closedTrades: [],
+  // Counters and metadata
+  totalTradesAnalyzed: 0,
+  warmupComplete: false,
+  lastParamTuneAt: 0,
+  paramDirections: {},
+  // History for dashboard
+  weightHistory: [],
+  paramHistory: [],
+};
+
+async function getLearningState() {
+  try {
+    const data = await redis.get(KEYS.LEARNING_STATE);
+    if (!data) return JSON.parse(JSON.stringify(DEFAULT_LEARNING_STATE));
+    // Merge with defaults to handle new fields added after initial save
+    return { ...JSON.parse(JSON.stringify(DEFAULT_LEARNING_STATE)), ...data };
+  } catch (error) {
+    console.error('Error getting learning state:', error);
+    return JSON.parse(JSON.stringify(DEFAULT_LEARNING_STATE));
+  }
+}
+
+async function saveLearningState(state) {
+  try {
+    await redis.set(KEYS.LEARNING_STATE, state);
+  } catch (error) {
+    console.error('Error saving learning state:', error);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// Self-Learning System — Algorithms
+// ═══════════════════════════════════════════════════════════
+
+function computeStrategyAttribution(trade) {
+  // Determine which strategies contributed to this trade and whether they were correct
+  const signals = trade.entrySignals || trade.signals;
+  if (!signals) return null;
+
+  const isWin = (trade.gainLossPercent || 0) >= 0;
+
+  // Strategy scores at entry
+  const entryScores = {
+    trendMomentum: signals.momentum?.score || 0,
+    macdTrend:     signals.technical?.score || 0,
+    bbRsi:         signals.meanReversion?.score || 0,
+    vwap:          signals.sentiment?.score || 0,
+  };
+
+  // Determine which group was dominant
+  const trendGroupStrength = Math.abs(entryScores.trendMomentum) + Math.abs(entryScores.macdTrend);
+  const reversionGroupStrength = Math.abs(entryScores.bbRsi) + Math.abs(entryScores.vwap);
+  const trendDominant = trendGroupStrength > reversionGroupStrength;
+
+  return {
+    regime: signals.regime || 'UNKNOWN',
+    isWin,
+    gainLossPercent: trade.gainLossPercent || 0,
+    trendGroupScore: (entryScores.trendMomentum + entryScores.macdTrend) / 2,
+    reversionGroupScore: (entryScores.bbRsi + entryScores.vwap) / 2,
+    trendDominant,
+    entryScores,
+    timestamp: trade.timestamp,
+  };
+}
+
+function updateAdaptiveWeights(learningState) {
+  // Compute per-regime accuracy by strategy group and update regime weights via EMA
+  const EMA_ALPHA = 0.05; // Slow adaptation to prevent overfitting
+  const MIN_WEIGHT = 0.10; // No group drops below 10%
+
+  const regimeStats = {};
+  for (const ct of learningState.closedTrades) {
+    if (!regimeStats[ct.regime]) {
+      regimeStats[ct.regime] = { trendWins: 0, trendTotal: 0, revWins: 0, revTotal: 0 };
+    }
+    const stats = regimeStats[ct.regime];
+    if (ct.trendDominant) {
+      stats.trendTotal++;
+      if (ct.isWin) stats.trendWins++;
+    } else {
+      stats.revTotal++;
+      if (ct.isWin) stats.revWins++;
+    }
+  }
+
+  for (const [regime, stats] of Object.entries(regimeStats)) {
+    if (stats.trendTotal < 5 && stats.revTotal < 5) continue; // Not enough data
+
+    const trendAccuracy = stats.trendTotal > 0 ? stats.trendWins / stats.trendTotal : 0.5;
+    const revAccuracy = stats.revTotal > 0 ? stats.revWins / stats.revTotal : 0.5;
+    const totalAccuracy = trendAccuracy + revAccuracy;
+    if (totalAccuracy === 0) continue;
+
+    // Target weight proportional to accuracy, with floor
+    const targetTrend = Math.max(MIN_WEIGHT, trendAccuracy / totalAccuracy);
+    const targetRev = Math.max(MIN_WEIGHT, revAccuracy / totalAccuracy);
+    const targetSum = targetTrend + targetRev;
+
+    // EMA blend with current weights
+    const current = learningState.regimeWeights[regime] || REGIME_WEIGHTS[regime] || REGIME_WEIGHTS.UNKNOWN;
+    learningState.regimeWeights[regime] = {
+      trend: current.trend * (1 - EMA_ALPHA) + (targetTrend / targetSum) * EMA_ALPHA,
+      reversion: current.reversion * (1 - EMA_ALPHA) + (targetRev / targetSum) * EMA_ALPHA,
+    };
+  }
+
+  // Snapshot for dashboard history
+  learningState.weightHistory.push({
+    timestamp: new Date().toISOString(),
+    weights: JSON.parse(JSON.stringify(learningState.regimeWeights)),
+    tradesAnalyzed: learningState.totalTradesAnalyzed,
+  });
+  if (learningState.weightHistory.length > 50) {
+    learningState.weightHistory = learningState.weightHistory.slice(-50);
+  }
+}
+
+function tuneParameters(learningState) {
+  // Hill-climbing: every 50 trades, nudge one random parameter
+  const tradesSinceLastTune = learningState.totalTradesAnalyzed - learningState.lastParamTuneAt;
+  if (tradesSinceLastTune < 50) return;
+
+  learningState.lastParamTuneAt = learningState.totalTradesAnalyzed;
+
+  const trades = learningState.closedTrades;
+  if (trades.length < 40) return;
+
+  // Compare win rate of older half vs newer half
+  const mid = Math.floor(trades.length / 2);
+  const olderWinRate = trades.slice(0, mid).filter(t => t.isWin).length / mid;
+  const newerWinRate = trades.slice(mid).filter(t => t.isWin).length / (trades.length - mid);
+
+  // Pick a random parameter to tune
+  const paramNames = Object.keys(TUNABLE_PARAMS);
+  const paramName = paramNames[Math.floor(Math.random() * paramNames.length)];
+  const paramDef = TUNABLE_PARAMS[paramName];
+  const currentValue = learningState.params[paramName] ?? paramDef.default;
+
+  // Maintain direction momentum per parameter
+  if (!learningState.paramDirections) learningState.paramDirections = {};
+  const lastDir = learningState.paramDirections[paramName] || 1;
+
+  // If performance improving, keep direction; if worsening, reverse
+  const direction = newerWinRate >= olderWinRate ? lastDir : -lastDir;
+  learningState.paramDirections[paramName] = direction;
+
+  let newValue = currentValue + direction * paramDef.step;
+  newValue = Math.max(paramDef.min, Math.min(paramDef.max, newValue));
+  newValue = Math.round(newValue * 100) / 100; // Avoid floating point drift
+
+  console.log(`  Learning: ${paramName} ${currentValue} → ${newValue} (win rate ${(olderWinRate * 100).toFixed(0)}% → ${(newerWinRate * 100).toFixed(0)}%)`);
+
+  learningState.params[paramName] = newValue;
+
+  // Record for dashboard history
+  learningState.paramHistory.push({
+    timestamp: new Date().toISOString(),
+    paramName,
+    oldValue: currentValue,
+    newValue,
+    olderWinRate,
+    newerWinRate,
+    tradesAnalyzed: learningState.totalTradesAnalyzed,
+  });
+  if (learningState.paramHistory.length > 50) {
+    learningState.paramHistory = learningState.paramHistory.slice(-50);
+  }
+}
+
+async function updateLearningFromTrade(trade, learningState) {
+  // Only learn from SELL trades (closed positions)
+  if (trade.action !== 'SELL') return;
+
+  const attribution = computeStrategyAttribution(trade);
+  if (!attribution) return;
+
+  // Add to rolling window of closed trades
+  learningState.closedTrades.push(attribution);
+  if (learningState.closedTrades.length > 200) {
+    learningState.closedTrades = learningState.closedTrades.slice(-200);
+  }
+
+  learningState.totalTradesAnalyzed++;
+
+  // Only adapt after warmup period (50 trades)
+  if (learningState.totalTradesAnalyzed < 50) {
+    await saveLearningState(learningState);
+    return;
+  }
+
+  learningState.warmupComplete = true;
+
+  // Update adaptive regime weights
+  updateAdaptiveWeights(learningState);
+
+  // Attempt parameter tuning (runs every 50 trades)
+  tuneParameters(learningState);
+
+  // Persist to Redis
+  await saveLearningState(learningState);
 }
 
 // S&P 500 Benchmark caching (runs from LXC to avoid Vercel IP blocks)
@@ -734,30 +966,52 @@ async function fetchAlpacaBars(symbols, timeframe, days, isCrypto = false) {
   return allBars;
 }
 
-async function fetchAllMarketData(symbols) {
-  // Separate symbols by type
+async function fetchAndAnalyzeBatch(symbols, allSignals, priceCache, atrCache, learningState = null) {
+  // Fetch market data for this batch only, analyze, then let raw data be GC'd
   const stockSymbols = symbols.filter(s => !isCryptoSymbol(s) && !isForexOrFutures(s));
   const cryptoSymbols = symbols.filter(s => isCryptoSymbol(s));
   const forexFuturesSymbols = symbols.filter(s => isForexOrFutures(s));
 
-  console.log(`Fetching data: ${stockSymbols.length} stocks (Alpaca), ${cryptoSymbols.length} crypto (Alpaca), ${forexFuturesSymbols.length} forex/futures (Yahoo)`);
-
-  // Fetch Alpaca data sequentially to avoid 429 rate limits (free tier: 200 req/min)
+  // Fetch data only for this batch
   const stockIntraday = stockSymbols.length > 0 ? await fetchAlpacaBars(stockSymbols, '5Min', 5, false) : {};
   const stockDaily = stockSymbols.length > 0 ? await fetchAlpacaBars(stockSymbols, '1Day', 120, false) : {};
   const cryptoIntraday = cryptoSymbols.length > 0 ? await fetchAlpacaBars(cryptoSymbols, '5Min', 5, true) : {};
   const cryptoDaily = cryptoSymbols.length > 0 ? await fetchAlpacaBars(cryptoSymbols, '1Day', 120, true) : {};
-
-  // Fetch Yahoo Finance data for forex/futures (not supported by Alpaca)
   const fxFuturesIntraday = forexFuturesSymbols.length > 0 ? await fetchYahooIntradayBars(forexFuturesSymbols) : {};
   const fxFuturesDaily = forexFuturesSymbols.length > 0 ? await fetchYahooDailyBars(forexFuturesSymbols) : {};
 
-  console.log(`Yahoo data received: ${Object.keys(fxFuturesIntraday).length} intraday, ${Object.keys(fxFuturesDaily).length} daily`);
+  const batchIntraday = { ...stockIntraday, ...cryptoIntraday, ...fxFuturesIntraday };
+  const batchDaily = { ...stockDaily, ...cryptoDaily, ...fxFuturesDaily };
 
-  return {
-    intraday: { ...stockIntraday, ...cryptoIntraday, ...fxFuturesIntraday },
-    daily: { ...stockDaily, ...cryptoDaily, ...fxFuturesDaily },
-  };
+  // Analyze each symbol in this batch
+  for (const symbol of symbols) {
+    try {
+      const intradayBars = batchIntraday[symbol] || [];
+      const dailyBars = batchDaily[symbol] || [];
+      const result = analyzeStock(symbol, intradayBars, dailyBars, learningState);
+
+      if (result.lastPrice) priceCache[symbol] = result.lastPrice;
+      if (result.atr) atrCache[symbol] = result.atr;
+      if (result.signal) {
+        allSignals[symbol] = { ...result.signal, price: result.lastPrice };
+      } else {
+        allSignals[symbol] = {
+          symbol,
+          timestamp: new Date().toISOString(),
+          momentum: { name: 'Trend Momentum', score: 0, confidence: 0, reason: 'No market data available' },
+          meanReversion: { name: 'BB+RSI Reversion', score: 0, confidence: 0, reason: 'No market data available' },
+          sentiment: { name: 'VWAP Reversion', score: 0, confidence: 0, reason: 'No market data available' },
+          technical: { name: 'MACD Trend', score: 0, confidence: 0, reason: 'No market data available' },
+          combined: 0,
+          recommendation: 'HOLD',
+          regime: 'UNKNOWN',
+        };
+      }
+    } catch (error) {
+      console.error(`Error analyzing ${symbol}:`, error.message);
+    }
+  }
+  // batchIntraday and batchDaily go out of scope here, eligible for GC
 }
 
 // Alpaca Paper Trading — submit orders to mirror simulated trades
@@ -1002,18 +1256,21 @@ function detectRegime(dailyCloses, dailyHighs, dailyLows) {
 
 // Group A — Trend-Following
 
-function trendMomentumStrategy(dailyCloses, intradayCloses) {
+function trendMomentumStrategy(dailyCloses, intradayCloses, params = {}) {
   // Multi-timeframe momentum: SMA alignment + ROC + breakout
-  if (dailyCloses.length < 50 || intradayCloses.length < 20) {
+  const smaShort = params.smaShort || 10;
+  const smaLong = params.smaLong || 50;
+
+  if (dailyCloses.length < smaLong || intradayCloses.length < 20) {
     return { name: 'Trend Momentum', score: 0, confidence: 0, reason: 'Insufficient data' };
   }
 
   let score = 0;
   const reasons = [];
 
-  const sma10 = computeSMA(dailyCloses, 10);
+  const sma10 = computeSMA(dailyCloses, smaShort);
   const sma20 = computeSMA(dailyCloses, 20);
-  const sma50 = computeSMA(dailyCloses, 50);
+  const sma50 = computeSMA(dailyCloses, smaLong);
   const price = dailyCloses[dailyCloses.length - 1];
 
   // SMA alignment: 10 > 20 > 50 = full uptrend
@@ -1091,13 +1348,17 @@ function macdTrendStrategy(intradayCloses) {
 
 // Group B — Mean-Reversion
 
-function bollingerRSIReversionStrategy(intradayCloses) {
+function bollingerRSIReversionStrategy(intradayCloses, params = {}) {
   // Bollinger Band + RSI-14 mean reversion with bandwidth filter
+  const rsiOversold = params.rsiOversold || 30;
+  const rsiOverbought = params.rsiOverbought || 70;
+  const bbStdDev = params.bollingerStdDev || 2;
+
   if (intradayCloses.length < 25) {
     return { name: 'BB+RSI Reversion', score: 0, confidence: 0, reason: 'Insufficient data' };
   }
 
-  const bb = computeBollingerBands(intradayCloses, 20, 2);
+  const bb = computeBollingerBands(intradayCloses, 20, bbStdDev);
   const rsi = computeRSI(intradayCloses, 14);
   if (!bb) return { name: 'BB+RSI Reversion', score: 0, confidence: 0, reason: 'Cannot compute BB' };
 
@@ -1114,13 +1375,13 @@ function bollingerRSIReversionStrategy(intradayCloses) {
   if (price < bb.lower) {
     score += 0.5;
     reasons.push('Below lower BB');
-    if (rsi < 30) { score += 0.3; reasons.push(`RSI oversold (${rsi.toFixed(0)})`); }
-    else if (rsi < 40) { score += 0.15; reasons.push(`RSI low (${rsi.toFixed(0)})`); }
+    if (rsi < rsiOversold) { score += 0.3; reasons.push(`RSI oversold (${rsi.toFixed(0)})`); }
+    else if (rsi < rsiOversold + 10) { score += 0.15; reasons.push(`RSI low (${rsi.toFixed(0)})`); }
   } else if (price > bb.upper) {
     score -= 0.5;
     reasons.push('Above upper BB');
-    if (rsi > 70) { score -= 0.3; reasons.push(`RSI overbought (${rsi.toFixed(0)})`); }
-    else if (rsi > 60) { score -= 0.15; reasons.push(`RSI high (${rsi.toFixed(0)})`); }
+    if (rsi > rsiOverbought) { score -= 0.3; reasons.push(`RSI overbought (${rsi.toFixed(0)})`); }
+    else if (rsi > rsiOverbought - 10) { score -= 0.15; reasons.push(`RSI high (${rsi.toFixed(0)})`); }
   } else {
     // Inside bands — weaker signal
     const position = (price - bb.lower) / (bb.upper - bb.lower);
@@ -1207,8 +1468,10 @@ function weightedAvg(signals) {
   return totalWeight > 0 ? totalScore / totalWeight : 0;
 }
 
-function combineSignals(symbol, trendSignals, reversionSignals, regime) {
-  const weights = REGIME_WEIGHTS[regime] || REGIME_WEIGHTS.UNKNOWN;
+function combineSignals(symbol, trendSignals, reversionSignals, regime, learnedWeights = null) {
+  const weights = (learnedWeights && learnedWeights[regime])
+    ? learnedWeights[regime]
+    : (REGIME_WEIGHTS[regime] || REGIME_WEIGHTS.UNKNOWN);
   const trendScore = weightedAvg(trendSignals);
   const reversionScore = weightedAvg(reversionSignals);
   const combined = trendScore * weights.trend + reversionScore * weights.reversion;
@@ -1238,37 +1501,40 @@ function combineSignals(symbol, trendSignals, reversionSignals, regime) {
 // Phase 5: ATR-Based Position Sizing + Risk Management
 // ═══════════════════════════════════════════════════════════
 
-function calculateATRPositionSize(portfolioValue, atr, currentPrice) {
+function calculateATRPositionSize(portfolioValue, atr, currentPrice, atrStopMult = DEFAULT_CONFIG.atrStopMultiplier) {
   if (!atr || atr <= 0 || currentPrice <= 0) return 0;
   const riskAmount = portfolioValue * DEFAULT_CONFIG.riskPerTrade; // 1% of portfolio
-  const stopDistance = DEFAULT_CONFIG.atrStopMultiplier * atr;      // 2×ATR
+  const stopDistance = atrStopMult * atr;
   const shares = riskAmount / stopDistance;
   // Cap at maxPositionSize of portfolio
   const maxShares = (portfolioValue * DEFAULT_CONFIG.maxPositionSize) / currentPrice;
   return Math.min(shares, maxShares);
 }
 
-function checkTrailingStop(holding, currentPrice, entryATR) {
-  // Trailing stop: sell if price drops 2×ATR below high water mark
+function checkTrailingStop(holding, currentPrice, entryATR, atrStopMult = DEFAULT_CONFIG.atrStopMultiplier) {
+  // Trailing stop: sell if price drops N×ATR below high water mark
   if (!entryATR || entryATR <= 0) return false;
   const hwm = holding.highWaterMark || holding.avgCost;
-  const stopPrice = hwm - DEFAULT_CONFIG.atrStopMultiplier * entryATR;
+  const stopPrice = hwm - atrStopMult * entryATR;
   return currentPrice <= stopPrice;
 }
 
-function checkProfitTake(holding, currentPrice, entryATR) {
-  // Tiered profit taking: 25% at 3×ATR, 50% at 5×ATR
+function checkProfitTake(holding, currentPrice, entryATR, atrProfit1Mult = DEFAULT_CONFIG.atrProfit1Multiplier) {
+  // Tiered profit taking: 25% at N×ATR, 50% at 5×ATR
   if (!entryATR || entryATR <= 0) return 0;
   const gain = currentPrice - holding.avgCost;
   if (gain >= DEFAULT_CONFIG.atrProfit2Multiplier * entryATR) return 0.50;
-  if (gain >= DEFAULT_CONFIG.atrProfit1Multiplier * entryATR) return 0.25;
+  if (gain >= atrProfit1Mult * entryATR) return 0.25;
   return 0;
 }
 
 
-function analyzeStock(symbol, intradayBars, dailyBars) {
+function analyzeStock(symbol, intradayBars, dailyBars, learningState = null) {
   // Analyze using pre-fetched Alpaca intraday (5-min) and daily bars
   if (!intradayBars || intradayBars.length < 12) return { signal: null, lastPrice: null, atr: null };
+
+  const params = (learningState && learningState.warmupComplete) ? learningState.params : {};
+  const learnedWeights = (learningState && learningState.warmupComplete) ? learningState.regimeWeights : null;
 
   const dailyCloses = dailyBars ? dailyBars.map(b => b.close) : [];
   const dailyHighs = dailyBars ? dailyBars.map(b => b.high) : [];
@@ -1281,15 +1547,15 @@ function analyzeStock(symbol, intradayBars, dailyBars) {
   const regime = detectRegime(dailyCloses, dailyHighs, dailyLows);
 
   // Group A — Trend-Following
-  const trendMomentum = trendMomentumStrategy(dailyCloses, intradayCloses);
+  const trendMomentum = trendMomentumStrategy(dailyCloses, intradayCloses, params);
   const macdTrend = macdTrendStrategy(intradayCloses);
 
   // Group B — Mean-Reversion
-  const bbRsi = bollingerRSIReversionStrategy(intradayCloses);
+  const bbRsi = bollingerRSIReversionStrategy(intradayCloses, params);
   const vwap = vwapReversionStrategy(intradayBars);
 
   // Regime-weighted combination
-  const signal = combineSignals(symbol, [trendMomentum, macdTrend], [bbRsi, vwap], regime);
+  const signal = combineSignals(symbol, [trendMomentum, macdTrend], [bbRsi, vwap], regime, learnedWeights);
   const lastPrice = intradayBars[intradayBars.length - 1].close;
 
   // Compute ATR for position sizing and stop management
@@ -1396,44 +1662,48 @@ async function main() {
 
   console.log(`Analyzing ${assetsToAnalyze.length} assets (Weekend: ${isWeekend})...`);
 
-  // Batch fetch all market data (Alpaca for stocks/crypto, Yahoo for forex/futures)
-  const marketData = await fetchAllMarketData(assetsToAnalyze);
+  // Load learning state for adaptive weights and parameter tuning
+  const learningState = await getLearningState();
 
-  // Analyze each symbol using pre-fetched data
-  const atrCache = {}; // symbol → ATR value for position sizing
-  for (const symbol of assetsToAnalyze) {
-    try {
-      const intradayBars = marketData.intraday[symbol] || [];
-      const dailyBars = marketData.daily[symbol] || [];
-      const result = analyzeStock(symbol, intradayBars, dailyBars);
+  // Batched fetch + analyze: process ANALYSIS_BATCH_SIZE symbols at a time
+  // to keep memory usage under ~50MB per batch instead of ~600MB+ for all symbols
+  const atrCache = {};
 
-      if (result.lastPrice) {
-        priceCache[symbol] = result.lastPrice;
-      }
-      if (result.atr) {
-        atrCache[symbol] = result.atr;
-      }
-      if (result.signal) {
-        allSignals[symbol] = { ...result.signal, price: result.lastPrice };
-      } else {
-        allSignals[symbol] = {
-          symbol,
-          timestamp: new Date().toISOString(),
-          momentum: { name: 'Trend Momentum', score: 0, confidence: 0, reason: 'No market data available' },
-          meanReversion: { name: 'BB+RSI Reversion', score: 0, confidence: 0, reason: 'No market data available' },
-          sentiment: { name: 'VWAP Reversion', score: 0, confidence: 0, reason: 'No market data available' },
-          technical: { name: 'MACD Trend', score: 0, confidence: 0, reason: 'No market data available' },
-          combined: 0,
-          recommendation: 'HOLD',
-          regime: 'UNKNOWN',
-        };
-      }
-    } catch (error) {
-      console.error(`Error analyzing ${symbol}:`, error.message);
-    }
+  // Prioritize current holdings (always first batch so we have signals for sell decisions)
+  const holdingSymbols = portfolio.holdings.map(h => h.symbol);
+  const nonHoldingSymbols = assetsToAnalyze.filter(s => !holdingSymbols.includes(s));
+
+  if (holdingSymbols.length > 0) {
+    console.log(`Batch 0: Analyzing ${holdingSymbols.length} current holdings...`);
+    await fetchAndAnalyzeBatch(holdingSymbols, allSignals, priceCache, atrCache, learningState);
+  }
+
+  const totalBatches = Math.ceil(nonHoldingSymbols.length / ANALYSIS_BATCH_SIZE);
+  for (let i = 0; i < nonHoldingSymbols.length; i += ANALYSIS_BATCH_SIZE) {
+    const batch = nonHoldingSymbols.slice(i, i + ANALYSIS_BATCH_SIZE);
+    const batchNum = Math.floor(i / ANALYSIS_BATCH_SIZE) + 1;
+    console.log(`Batch ${batchNum}/${totalBatches}: Analyzing ${batch.length} symbols...`);
+    await fetchAndAnalyzeBatch(batch, allSignals, priceCache, atrCache, learningState);
   }
 
   console.log(`Analyzed ${Object.keys(allSignals).length} assets successfully`);
+
+  // Effective parameters: use learned values after warmup, otherwise defaults
+  const effectiveBuyThreshold = learningState.warmupComplete
+    ? (learningState.params.buyThreshold ?? DEFAULT_CONFIG.buyThreshold)
+    : DEFAULT_CONFIG.buyThreshold;
+  const effectiveAtrStop = learningState.warmupComplete
+    ? (learningState.params.atrStopMultiplier ?? DEFAULT_CONFIG.atrStopMultiplier)
+    : DEFAULT_CONFIG.atrStopMultiplier;
+  const effectiveAtrProfit1 = learningState.warmupComplete
+    ? (learningState.params.atrProfit1Multiplier ?? DEFAULT_CONFIG.atrProfit1Multiplier)
+    : DEFAULT_CONFIG.atrProfit1Multiplier;
+
+  if (learningState.warmupComplete) {
+    console.log(`Learning active: buyThreshold=${effectiveBuyThreshold}, atrStop=${effectiveAtrStop}x, atrProfit1=${effectiveAtrProfit1}x`);
+  } else {
+    console.log(`Learning warmup: ${learningState.totalTradesAnalyzed}/50 trades`);
+  }
 
   // Update holding prices and high water marks
   for (const holding of portfolio.holdings) {
@@ -1473,7 +1743,7 @@ async function main() {
     const barsHeld = holding.barsHeld || 0;
 
     // ATR trailing stop always fires regardless of cooldown or hold period
-    const isTrailingStop = entryATR ? checkTrailingStop(holding, price, entryATR) : false;
+    const isTrailingStop = entryATR ? checkTrailingStop(holding, price, entryATR, effectiveAtrStop) : false;
 
     // Min hold period: don't sell for non-stop reasons if held < minHoldBars
     if (!isTrailingStop && barsHeld < DEFAULT_CONFIG.minHoldBars) continue;
@@ -1485,7 +1755,7 @@ async function main() {
     if (isTrailingStop) {
       sellPercent = 1.0;
       const hwm = holding.highWaterMark || holding.avgCost;
-      sellReason = `ATR trailing stop (HWM $${hwm.toFixed(2)}, stop $${(hwm - DEFAULT_CONFIG.atrStopMultiplier * entryATR).toFixed(2)})`;
+      sellReason = `ATR trailing stop (HWM $${hwm.toFixed(2)}, stop $${(hwm - effectiveAtrStop * entryATR).toFixed(2)})`;
     } else if (!signal) {
       sellPercent = 1.0;
       sellReason = 'No signal data - rotating out';
@@ -1497,7 +1767,7 @@ async function main() {
       sellReason = `SELL: score ${signal.combined.toFixed(2)}`;
     } else if (entryATR) {
       // ATR-based profit taking
-      const profitPercent = checkProfitTake(holding, price, entryATR);
+      const profitPercent = checkProfitTake(holding, price, entryATR, effectiveAtrProfit1);
       if (profitPercent > 0) {
         sellPercent = profitPercent;
         const atrGain = (price - holding.avgCost) / entryATR;
@@ -1521,6 +1791,7 @@ async function main() {
         total,
         reason: sellReason,
         signals: signal || { symbol: holding.symbol, timestamp: new Date().toISOString(), momentum: {}, meanReversion: {}, sentiment: {}, technical: {}, combined: 0, recommendation: 'HOLD' },
+        entrySignals: holding.entrySignals || null,
         gainLoss: (price - holding.avgCost) * sharesToSell,
         gainLossPercent: holding.gainLossPercent,
       };
@@ -1535,6 +1806,8 @@ async function main() {
       }
 
       await addTrade(trade);
+      // Update learning system with trade outcome
+      await updateLearningFromTrade(trade, learningState);
       setCooldown(trade.symbol);
       await submitAlpacaOrder(trade.symbol, trade.shares, 'sell');
       console.log(`SELL ${trade.shares} ${trade.symbol} @ $${trade.price}: ${sellReason}`);
@@ -1545,7 +1818,7 @@ async function main() {
   const targetCash = portfolio.totalValue * DEFAULT_CONFIG.targetCashRatio;
   const availableCash = Math.max(0, portfolio.cash - targetCash);
   const strongBuyCandidates = Object.values(allSignals)
-    .filter(s => s.combined > DEFAULT_CONFIG.buyThreshold && !portfolio.holdings.some(h => h.symbol === s.symbol))
+    .filter(s => s.combined > effectiveBuyThreshold && !portfolio.holdings.some(h => h.symbol === s.symbol))
     .length;
 
   if (strongBuyCandidates > 0 && (availableCash < DEFAULT_CONFIG.minTradeValue || portfolio.holdings.length >= DEFAULT_CONFIG.maxPositions)) {
@@ -1557,7 +1830,7 @@ async function main() {
     let rotated = 0;
     for (const { holding, signal } of holdingsWithSignals) {
       if (rotated >= 3) break;
-      if (signal.combined >= DEFAULT_CONFIG.buyThreshold) break;
+      if (signal.combined >= effectiveBuyThreshold) break;
       if (isOnCooldown(holding.symbol)) continue;
 
       const rotatePrice = priceCache[holding.symbol] || holding.currentPrice;
@@ -1576,6 +1849,7 @@ async function main() {
         total,
         reason: `Rotation: weak signal (${signal.combined.toFixed(3)}) → stronger candidates`,
         signals: signal,
+        entrySignals: holding.entrySignals || null,
         gainLoss: (rotatePrice - holding.avgCost) * holding.shares,
         gainLossPercent: holding.gainLossPercent,
       };
@@ -1583,6 +1857,7 @@ async function main() {
       portfolio.cash += total - txCost;
       portfolio.holdings = portfolio.holdings.filter(h => h.symbol !== holding.symbol);
       await addTrade(trade);
+      await updateLearningFromTrade(trade, learningState);
       setCooldown(trade.symbol);
       await submitAlpacaOrder(trade.symbol, trade.shares, 'sell');
       console.log(`ROTATE OUT ${trade.shares} ${trade.symbol} @ $${trade.price} (signal: ${signal.combined.toFixed(3)})`);
@@ -1595,7 +1870,7 @@ async function main() {
   // ═══════════════════════════════════════════════════════════
   const openSlots = DEFAULT_CONFIG.maxPositions - portfolio.holdings.length;
   const buyCandidates = Object.values(allSignals)
-    .filter(s => s.combined > DEFAULT_CONFIG.buyThreshold && !portfolio.holdings.some(h => h.symbol === s.symbol) && !isOnCooldown(s.symbol))
+    .filter(s => s.combined > effectiveBuyThreshold && !portfolio.holdings.some(h => h.symbol === s.symbol) && !isOnCooldown(s.symbol))
     .sort((a, b) => b.combined - a.combined)
     .slice(0, Math.min(openSlots, DEFAULT_CONFIG.maxNewPositionsPerCycle));
 
@@ -1622,7 +1897,7 @@ async function main() {
       const atr = atrCache[signal.symbol];
       let shares;
       if (atr && atr > 0) {
-        shares = calculateATRPositionSize(portfolio.totalValue, atr, buyPrice);
+        shares = calculateATRPositionSize(portfolio.totalValue, atr, buyPrice, effectiveAtrStop);
       } else {
         // Fallback: proportional allocation capped at maxPositionSize
         shares = (portfolio.totalValue * DEFAULT_CONFIG.maxPositionSize) / buyPrice;
@@ -1669,6 +1944,7 @@ async function main() {
         entryATR: atr || null,
         entryTimestamp: new Date().toISOString(),
         barsHeld: 0,
+        entrySignals: signal,
       });
 
       await addTrade(trade);
@@ -1729,8 +2005,15 @@ async function runService() {
     await redis.set(KEYS.SIGNALS, {});
     await redis.set(KEYS.HISTORY, []);
     await redis.set(KEYS.SPY_BENCHMARK, []);
+    await redis.set(KEYS.LEARNING_STATE, JSON.parse(JSON.stringify(DEFAULT_LEARNING_STATE)));
     console.log(`Portfolio reset to $${DEFAULT_CONFIG.initialCapital}`);
-    console.log('Cleared: history, trades, signals, S&P 500 benchmark.');
+    console.log('Cleared: history, trades, signals, S&P 500 benchmark, learning state.');
+    process.exit(0);
+  }
+
+  if (process.argv.includes('--reset-learning')) {
+    await redis.set(KEYS.LEARNING_STATE, JSON.parse(JSON.stringify(DEFAULT_LEARNING_STATE)));
+    console.log('Learning state reset to defaults. Portfolio unchanged.');
     process.exit(0);
   }
 

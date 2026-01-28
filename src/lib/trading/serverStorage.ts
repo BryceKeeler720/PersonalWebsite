@@ -1,5 +1,5 @@
 import { Redis } from '@upstash/redis';
-import type { Portfolio, Trade, SignalSnapshot } from '../../components/trading/types';
+import type { Portfolio, Trade, SignalSnapshot, LearningState } from '../../components/trading/types';
 import { DEFAULT_CONFIG } from '../../components/trading/types';
 
 // Initialize Redis client (uses UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN env vars)
@@ -15,6 +15,7 @@ const KEYS = {
   LAST_RUN: 'tradingbot:lastRun',
   HISTORY: 'tradingbot:history',
   SPY_BENCHMARK: 'tradingbot:spyBenchmark',
+  LEARNING_STATE: 'tradingbot:learningState',
 };
 
 export interface PortfolioSnapshot {
@@ -154,5 +155,14 @@ export async function getSPYBenchmark(): Promise<BenchmarkPoint[]> {
   } catch (error) {
     console.error('Error getting SPY benchmark:', error);
     return [];
+  }
+}
+
+export async function getLearningState(): Promise<LearningState | null> {
+  try {
+    return await redis.get<LearningState>(KEYS.LEARNING_STATE);
+  } catch (error) {
+    console.error('Error getting learning state:', error);
+    return null;
   }
 }
