@@ -363,7 +363,7 @@ export default function TradingBot() {
         display: 'inline-flex',
         alignItems: 'center',
         gap: '0.5rem',
-        color: 'rgba(255, 255, 255, 0.6)',
+        color: 'rgba(220, 215, 186, 0.6)',
         textDecoration: 'none',
         fontSize: '0.875rem',
         marginBottom: '1rem',
@@ -385,7 +385,7 @@ export default function TradingBot() {
               <span className="status-dot running" />
               <span className="status-text">Bot Running</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.25rem 0.75rem', background: 'rgba(255,255,255,0.05)', borderRadius: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.25rem 0.75rem', background: 'rgba(220,215,186,0.05)', borderRadius: '4px' }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: marketStatus.color }} />
               <span style={{ fontSize: '0.75rem', color: marketStatus.color }}>{marketStatus.label}</span>
             </div>
@@ -506,21 +506,21 @@ export default function TradingBot() {
                     <h2>Strategy Performance</h2>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1 }}>
                       {strategyPerformance.map(strategy => (
-                        <div key={strategy.name} style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
+                        <div key={strategy.name} style={{ padding: '0.75rem', background: 'rgba(220,215,186,0.02)', borderRadius: '8px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                             <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#fff' }}>{strategy.name}</span>
                             <span style={{ fontSize: '0.875rem', fontWeight: 700, color: strategy.winRate >= 50 ? '#22c55e' : '#ef4444' }}>
                               {strategy.winRate.toFixed(0)}%
                             </span>
                           </div>
-                          <div style={{ height: 4, background: 'rgba(255,255,255,0.1)', borderRadius: 2, overflow: 'hidden' }}>
+                          <div style={{ height: 4, background: 'rgba(220,215,186,0.1)', borderRadius: 2, overflow: 'hidden' }}>
                             <div style={{ height: '100%', width: `${strategy.winRate}%`, background: strategy.winRate >= 50 ? '#22c55e' : '#ef4444', borderRadius: 2 }} />
                           </div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.25rem' }}>
-                            <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)' }}>
+                            <span style={{ fontSize: '0.7rem', color: 'rgba(220,215,186,0.5)' }}>
                               {strategy.wins}W / {strategy.losses}L
                             </span>
-                            <span style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)' }}>
+                            <span style={{ fontSize: '0.7rem', color: 'rgba(220,215,186,0.4)' }}>
                               {strategy.total} trades
                             </span>
                           </div>
@@ -590,8 +590,8 @@ export default function TradingBot() {
                       {(sectorsExpanded ? sectorAllocation : sectorAllocation.slice(0, 6)).map(sector => (
                         <div key={sector.sector} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
                           <div style={{ width: 12, height: 12, borderRadius: 2, background: sector.color, marginRight: '0.5rem' }} />
-                          <span style={{ flex: 1, fontSize: '0.8rem', color: 'rgba(255,255,255,0.8)' }}>{sector.sector}</span>
-                          <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.6)' }}>
+                          <span style={{ flex: 1, fontSize: '0.8rem', color: 'rgba(220,215,186,0.8)' }}>{sector.sector}</span>
+                          <span style={{ fontSize: '0.8rem', color: 'rgba(220,215,186,0.6)' }}>
                             {((sector.value / totalHoldingsValue) * 100).toFixed(1)}%
                           </span>
                         </div>
@@ -599,7 +599,7 @@ export default function TradingBot() {
                       {sectorAllocation.length > 6 && (
                         <div
                           onClick={() => setSectorsExpanded(!sectorsExpanded)}
-                          style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', marginTop: '0.5rem', cursor: 'pointer' }}
+                          style={{ fontSize: '0.75rem', color: 'rgba(220,215,186,0.4)', marginTop: '0.5rem', cursor: 'pointer' }}
                         >
                           {sectorsExpanded ? 'Show less' : `+${sectorAllocation.length - 6} more sectors`}
                         </div>
@@ -633,7 +633,7 @@ export default function TradingBot() {
                         </div>
                       ))}
                       {getTopBuyCandidates(5).length === 0 && (
-                        <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.875rem' }}>No buy signals</div>
+                        <div style={{ color: 'rgba(220, 215, 186, 0.5)', fontSize: '0.875rem' }}>No buy signals</div>
                       )}
                     </div>
                     <div>
@@ -649,7 +649,7 @@ export default function TradingBot() {
                         </div>
                       ))}
                       {getTopSellCandidates(5).length === 0 && (
-                        <div style={{ color: 'rgba(255, 255, 255, 0.5)', fontSize: '0.875rem' }}>No sell signals</div>
+                        <div style={{ color: 'rgba(220, 215, 186, 0.5)', fontSize: '0.875rem' }}>No sell signals</div>
                       )}
                     </div>
                   </div>
@@ -663,17 +663,17 @@ export default function TradingBot() {
                 ) : (
                   <div>
                     {data.trades.slice(0, 3).map(trade => (
-                      <div key={trade.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem', background: 'rgba(255, 255, 255, 0.02)', borderRadius: '8px', marginBottom: '0.5rem' }}>
+                      <div key={trade.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem', background: 'rgba(220, 215, 186, 0.02)', borderRadius: '8px', marginBottom: '0.5rem' }}>
                         <div>
                           <span style={{ color: trade.action === 'BUY' ? '#22c55e' : '#ef4444', fontWeight: 600 }}>{trade.action}</span>{' '}
                           <span style={{ color: '#fff' }}>{trade.symbol}</span>
                         </div>
-                        <div style={{ color: 'rgba(255, 255, 255, 0.6)' }}>{trade.shares} @ ${trade.price.toFixed(2)}</div>
+                        <div style={{ color: 'rgba(220, 215, 186, 0.6)' }}>{trade.shares} @ ${trade.price.toFixed(2)}</div>
                       </div>
                     ))}
                     {data.trades.length > 3 && (
                       <button
-                        style={{ width: '100%', padding: '0.5rem', background: 'transparent', border: '1px dashed rgba(255, 255, 255, 0.2)', borderRadius: '8px', color: 'rgba(255, 255, 255, 0.5)', cursor: 'pointer' }}
+                        style={{ width: '100%', padding: '0.5rem', background: 'transparent', border: '1px dashed rgba(220, 215, 186, 0.2)', borderRadius: '8px', color: 'rgba(220, 215, 186, 0.5)', cursor: 'pointer' }}
                         onClick={() => setActiveTab('log')}
                       >
                         View all {data.trades.length} trades

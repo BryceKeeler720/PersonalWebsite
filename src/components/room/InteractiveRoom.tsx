@@ -35,6 +35,12 @@ const InteractiveRoom: React.FC = () => {
       subtitle: 'Where I self host and work on networking',
       items: [
         {
+          title: 'Live Dashboard',
+          description: 'Real-time monitoring of containers, services, resource utilization, and network topology',
+          tags: ['React', 'Upstash', 'Redis'],
+          link: '/HomeLab',
+        },
+        {
           title: 'Proxmox',
           description: 'Running 15 containers - couple postgres instances, some FastAPI apps, media server. NAS for Storage',
           tags: ['Proxmox', 'Docker', 'LXC', 'Networks'],
@@ -43,12 +49,6 @@ const InteractiveRoom: React.FC = () => {
           title: 'Networking',
           description: 'Pi-hole blocks ads, Tailscale so I can access my server remotely, Jellyfin for music/movies/etc',
           tags: ['Pi-hole', 'Tailscale', 'Jellyfin'],
-        },
-        {
-          title: 'Live Dashboard',
-          description: 'Real-time monitoring of containers, services, resource utilization, and network topology',
-          tags: ['React', 'Upstash', 'Redis'],
-          link: '/HomeLab',
         }
       ]
     },
