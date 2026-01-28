@@ -209,10 +209,10 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
       </div>
 
       {/* Heatmap */}
-      <div style={{ position: 'relative', overflowX: 'auto', overflowY: 'visible' }}>
+      <div style={{ position: 'relative' }}>
         <svg
-          width={svgWidth}
-          height={svgHeight}
+          viewBox={`0 0 ${svgWidth} ${svgHeight}`}
+          width="100%"
           style={{ display: 'block' }}
           role="img"
           aria-label={`Journal contribution heatmap for ${selectedYear}`}
@@ -281,8 +281,8 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
           <div
             style={{
               position: 'absolute',
-              left: Math.max(80, Math.min(hoveredDay.x, svgWidth - 80)),
-              top: hoveredDay.y < 50 ? hoveredDay.y + (CELL_SIZE + CELL_GAP) + 20 : hoveredDay.y - 40,
+              left: `${(Math.max(80, Math.min(hoveredDay.x, svgWidth - 80)) / svgWidth) * 100}%`,
+              top: `${((hoveredDay.y < 50 ? hoveredDay.y + (CELL_SIZE + CELL_GAP) + 20 : hoveredDay.y - 40) / svgHeight) * 100}%`,
               transform: 'translateX(-50%)',
               background: 'rgba(20, 20, 20, 0.95)',
               border: '1px solid rgba(255,255,255,0.15)',
