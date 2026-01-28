@@ -6,27 +6,25 @@ interface JournalKnowledgeMapProps {
 }
 
 const TAG_COLORS = [
-  '#22c55e', // green
-  '#3b82f6', // blue
-  '#f59e0b', // amber
-  '#a855f7', // purple
-  '#ef4444', // red
-  '#06b6d4', // cyan
-  '#f97316', // orange
-  '#ec4899', // pink
-  '#14b8a6', // teal
-  '#8b5cf6', // violet
-  '#64748b', // slate
-  '#fbbf24', // yellow
+  '#22c55e', '#3b82f6', '#f59e0b', '#a855f7', '#ef4444',
+  '#06b6d4', '#f97316', '#ec4899', '#14b8a6', '#8b5cf6',
+  '#64748b', '#fbbf24',
 ];
 
-function hashTag(tag: string): number {
-  let hash = 0;
-  for (let i = 0; i < tag.length; i++) {
-    hash = ((hash << 5) - hash) + tag.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
+interface Node {
+  entry: JournalEntryData;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  radius: number;
+  color: string;
+}
+
+interface Edge {
+  source: number;
+  target: number;
+  sharedTags: string[];
 }
 
 function seededRandom(seed: number): number {
@@ -34,19 +32,108 @@ function seededRandom(seed: number): number {
   return x - Math.floor(x);
 }
 
+function sharedTagCount(a: JournalEntryData, b: JournalEntryData): string[] {
+  return a.tags.filter(t => b.tags.includes(t));
+}
+
+function runForceSimulation(nodes: Node[], edges: Edge[], width: number, height: number): void {
+  const cx = width / 2;
+  const cy = height / 2;
+  const iterations = 300;
+
+  for (let iter = 0; iter < iterations; iter++) {
+    const alpha = 1 - iter / iterations;
+    const strength = alpha * 0.3;
+
+    // Repulsion between all nodes
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        let dx = nodes[j].x - nodes[i].x;
+        let dy = nodes[j].y - nodes[i].y;
+        let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        const minDist = (nodes[i].radius + nodes[j].radius) * 3;
+        const repulse = (minDist * minDist) / (dist * dist) * strength * 2;
+        const fx = (dx / dist) * repulse;
+        const fy = (dy / dist) * repulse;
+        nodes[i].vx -= fx;
+        nodes[i].vy -= fy;
+        nodes[j].vx += fx;
+        nodes[j].vy += fy;
+      }
+    }
+
+    // Attraction along edges (shared tags)
+    for (const edge of edges) {
+      const a = nodes[edge.source];
+      const b = nodes[edge.target];
+      let dx = b.x - a.x;
+      let dy = b.y - a.y;
+      let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      const attract = (dist - 60) * strength * 0.05 * edge.sharedTags.length;
+      const fx = (dx / dist) * attract;
+      const fy = (dy / dist) * attract;
+      a.vx += fx;
+      a.vy += fy;
+      b.vx -= fx;
+      b.vy -= fy;
+    }
+
+    // Center gravity
+    for (const node of nodes) {
+      node.vx += (cx - node.x) * strength * 0.01;
+      node.vy += (cy - node.y) * strength * 0.01;
+    }
+
+    // Apply velocities with damping
+    for (const node of nodes) {
+      node.vx *= 0.6;
+      node.vy *= 0.6;
+      node.x += node.vx;
+      node.y += node.vy;
+      // Keep within bounds with padding
+      node.x = Math.max(40, Math.min(width - 40, node.x));
+      node.y = Math.max(40, Math.min(height - 40, node.y));
+    }
+  }
+}
+
 export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [search, setSearch] = useState('');
-  const [clustered, setClustered] = useState(false);
-  const [hovered, setHovered] = useState<{ entry: JournalEntryData; x: number; y: number } | null>(null);
-  const [dimensions, setDimensions] = useState({ width: 700, height: 360 });
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [dimensions, setDimensions] = useState({ width: 700, height: 420 });
+  const [transform, setTransform] = useState({ x: 0, y: 0, k: 1 });
+  const dragRef = useRef<{ startX: number; startY: number; startTx: number; startTy: number } | null>(null);
+  const transformRef = useRef(transform);
+  transformRef.current = transform;
+
+  // Attach wheel listener with { passive: false } so preventDefault works
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+      const scaleFactor = e.deltaY < 0 ? 1.1 : 0.9;
+      setTransform(t => {
+        const newK = Math.max(0.3, Math.min(5, t.k * scaleFactor));
+        const ratio = newK / t.k;
+        return { k: newK, x: mouseX - (mouseX - t.x) * ratio, y: mouseY - (mouseY - t.y) * ratio };
+      });
+    };
+    canvas.addEventListener('wheel', onWheel, { passive: false });
+    return () => canvas.removeEventListener('wheel', onWheel);
+  }, []);
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const obs = new ResizeObserver((entries) => {
-      const { width } = entries[0].contentRect;
-      setDimensions({ width: Math.max(width, 300), height: 360 });
+    const obs = new ResizeObserver((es) => {
+      const { width } = es[0].contentRect;
+      setDimensions({ width: Math.max(width, 300), height: 420 });
     });
     obs.observe(el);
     return () => obs.disconnect();
@@ -55,94 +142,270 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
   const tagColorMap = useMemo(() => {
     const allTags = [...new Set(entries.flatMap(e => e.tags))];
     const map = new Map<string, string>();
-    allTags.forEach((tag, i) => {
-      map.set(tag, TAG_COLORS[i % TAG_COLORS.length]);
-    });
+    allTags.forEach((tag, i) => map.set(tag, TAG_COLORS[i % TAG_COLORS.length]));
     return map;
   }, [entries]);
 
-  const tagList = useMemo(() => [...tagColorMap.entries()], [tagColorMap]);
+  const { nodes, edges } = useMemo(() => {
+    if (entries.length === 0) return { nodes: [] as Node[], edges: [] as Edge[] };
 
-  const points = useMemo(() => {
-    if (entries.length === 0) return [];
-
-    const padding = { left: 16, right: 16, top: 24, bottom: 24 };
-    const w = dimensions.width - padding.left - padding.right;
-    const h = dimensions.height - padding.top - padding.bottom;
-
-    const dates = entries.map(e => new Date(e.publishDate).getTime());
-    const minDate = Math.min(...dates);
-    const maxDate = Math.max(...dates);
-    const dateRange = maxDate - minDate || 1;
-
+    const w = dimensions.width;
+    const h = dimensions.height;
     const maxWords = Math.max(...entries.map(e => e.wordCount), 1);
 
-    // Assign Y positions based on tag clusters
+    // Group entries by primary tag for initial positioning
     const allTags = [...new Set(entries.flatMap(e => e.tags))];
-    const tagYPositions = new Map<string, number>();
+    const tagAngles = new Map<string, number>();
     allTags.forEach((tag, i) => {
-      tagYPositions.set(tag, (i + 0.5) / Math.max(allTags.length, 1));
+      tagAngles.set(tag, (i / allTags.length) * Math.PI * 2);
     });
 
-    return entries.map((entry, idx) => {
-      const t = (new Date(entry.publishDate).getTime() - minDate) / dateRange;
+    // Initialize nodes in tag-based clusters
+    const spreadRadius = Math.min(w, h) * 0.3;
+    const nodeList: Node[] = entries.map((entry, idx) => {
       const primaryTag = entry.tags[0] || 'untagged';
-      const tagY = tagYPositions.get(primaryTag) ?? 0.5;
-
-      let yPos: number;
-      if (clustered) {
-        // Tight clustering by tag with small jitter
-        const jitter = (seededRandom(idx * 17 + 3) - 0.5) * 0.06;
-        yPos = tagY + jitter;
-      } else {
-        // Spread out with tag influence + more jitter
-        const jitter = (seededRandom(idx * 31 + 7) - 0.5) * 0.4;
-        yPos = tagY * 0.6 + 0.2 + jitter;
-      }
-
-      yPos = Math.max(0.05, Math.min(0.95, yPos));
-
-      const radius = 4 + (entry.wordCount / maxWords) * 8;
-      const color = tagColorMap.get(primaryTag) || '#64748b';
+      const angle = tagAngles.get(primaryTag) ?? 0;
+      const jitterX = (seededRandom(idx * 13 + 5) - 0.5) * 80;
+      const jitterY = (seededRandom(idx * 29 + 11) - 0.5) * 80;
+      const radius = Math.max(3, Math.min(7, Math.log(entry.wordCount + 1) * 1.2));
 
       return {
         entry,
-        x: padding.left + t * w,
-        y: padding.top + yPos * h,
+        x: w / 2 + Math.cos(angle) * spreadRadius + jitterX,
+        y: h / 2 + Math.sin(angle) * spreadRadius + jitterY,
+        vx: 0,
+        vy: 0,
         radius,
-        color,
+        color: tagColorMap.get(primaryTag) || '#64748b',
       };
     });
-  }, [entries, dimensions, clustered, tagColorMap]);
 
-  const filteredPoints = useMemo(() => {
-    if (!search.trim()) return points;
-    const q = search.toLowerCase();
-    return points.map(p => ({
-      ...p,
-      dimmed: !p.entry.title.toLowerCase().includes(q) &&
-              !p.entry.tags.some(t => t.toLowerCase().includes(q)),
-    }));
-  }, [points, search]);
+    // Build edges from shared tags
+    const edgeList: Edge[] = [];
+    for (let i = 0; i < entries.length; i++) {
+      for (let j = i + 1; j < entries.length; j++) {
+        const shared = sharedTagCount(entries[i], entries[j]);
+        if (shared.length > 0) {
+          edgeList.push({ source: i, target: j, sharedTags: shared });
+        }
+      }
+    }
 
-  const handleDotHover = useCallback((point: typeof points[0], e: React.MouseEvent) => {
-    const rect = containerRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    setHovered({
-      entry: point.entry,
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+    // Run force simulation
+    runForceSimulation(nodeList, edgeList, w, h);
+
+    return { nodes: nodeList, edges: edgeList };
+  }, [entries, dimensions, tagColorMap]);
+
+  // Compute tag cluster labels
+  const clusterLabels = useMemo(() => {
+    if (nodes.length === 0) return [];
+    const tagPositions = new Map<string, { sumX: number; sumY: number; count: number; color: string }>();
+
+    nodes.forEach(node => {
+      const primaryTag = node.entry.tags[0];
+      if (!primaryTag) return;
+      const existing = tagPositions.get(primaryTag) || { sumX: 0, sumY: 0, count: 0, color: tagColorMap.get(primaryTag) || '#64748b' };
+      existing.sumX += node.x;
+      existing.sumY += node.y;
+      existing.count++;
+      tagPositions.set(primaryTag, existing);
     });
-  }, []);
+
+    return [...tagPositions.entries()].map(([tag, pos]) => ({
+      tag,
+      x: pos.sumX / pos.count,
+      y: pos.sumY / pos.count - 16,
+      color: pos.color,
+    }));
+  }, [nodes, tagColorMap]);
+
+  // Search filtering
+  const searchQuery = search.toLowerCase().trim();
+  const matchingIndices = useMemo(() => {
+    if (!searchQuery) return null;
+    const set = new Set<number>();
+    nodes.forEach((n, i) => {
+      if (n.entry.title.toLowerCase().includes(searchQuery) ||
+          n.entry.tags.some(t => t.toLowerCase().includes(searchQuery))) {
+        set.add(i);
+      }
+    });
+    return set;
+  }, [nodes, searchQuery]);
+
+  // Screen-space coords
+  const toScreen = useCallback((x: number, y: number) => ({
+    x: x * transform.k + transform.x,
+    y: y * transform.k + transform.y,
+  }), [transform]);
+
+  const fromScreen = useCallback((sx: number, sy: number) => ({
+    x: (sx - transform.x) / transform.k,
+    y: (sy - transform.y) / transform.k,
+  }), [transform]);
+
+  // Canvas rendering
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = dimensions.width * dpr;
+    canvas.height = dimensions.height * dpr;
+    ctx.scale(dpr, dpr);
+
+    // Clear
+    ctx.clearRect(0, 0, dimensions.width, dimensions.height);
+    ctx.fillStyle = 'rgba(255,255,255,0.015)';
+    ctx.fillRect(0, 0, dimensions.width, dimensions.height);
+
+    ctx.save();
+    ctx.translate(transform.x, transform.y);
+    ctx.scale(transform.k, transform.k);
+
+    // Draw edges
+    for (const edge of edges) {
+      const a = nodes[edge.source];
+      const b = nodes[edge.target];
+      const isHoverEdge = hoveredIdx !== null && (edge.source === hoveredIdx || edge.target === hoveredIdx);
+      const isSearchDimmed = matchingIndices !== null && (!matchingIndices.has(edge.source) || !matchingIndices.has(edge.target));
+
+      if (isSearchDimmed && !isHoverEdge) {
+        ctx.globalAlpha = 0.02;
+      } else if (isHoverEdge) {
+        ctx.globalAlpha = 0.3 + edge.sharedTags.length * 0.15;
+      } else {
+        ctx.globalAlpha = 0.06 + edge.sharedTags.length * 0.03;
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.strokeStyle = isHoverEdge ? '#fff' : 'rgba(255,255,255,0.5)';
+      ctx.lineWidth = isHoverEdge ? 1.5 / transform.k : 0.5 / transform.k;
+      ctx.stroke();
+    }
+
+    ctx.globalAlpha = 1;
+
+    // Draw cluster labels
+    for (const label of clusterLabels) {
+      const isSearchMatch = !searchQuery || nodes.some((n, i) => n.entry.tags[0] === label.tag && matchingIndices?.has(i));
+      ctx.globalAlpha = isSearchMatch ? 0.35 : 0.08;
+      ctx.fillStyle = label.color;
+      ctx.font = `500 ${11 / transform.k}px "JetBrains Mono", monospace`;
+      ctx.textAlign = 'center';
+      ctx.fillText(label.tag, label.x, label.y);
+    }
+
+    ctx.globalAlpha = 1;
+
+    // Draw nodes
+    nodes.forEach((node, i) => {
+      const isHovered = hoveredIdx === i;
+      const isSearchMatch = matchingIndices === null || matchingIndices.has(i);
+      const isConnectedToHover = hoveredIdx !== null && edges.some(
+        e => (e.source === hoveredIdx && e.target === i) || (e.target === hoveredIdx && e.source === i)
+      );
+
+      let opacity = 0.7;
+      if (matchingIndices !== null && !isSearchMatch) opacity = 0.08;
+      if (isHovered) opacity = 1;
+      if (isConnectedToHover && !isHovered) opacity = 0.9;
+
+      ctx.globalAlpha = opacity;
+      ctx.beginPath();
+      ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+      ctx.fillStyle = node.color;
+      ctx.fill();
+
+      if (isHovered) {
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5 / transform.k;
+        ctx.stroke();
+      }
+    });
+
+    ctx.globalAlpha = 1;
+
+    // Draw hovered node title
+    if (hoveredIdx !== null) {
+      const node = nodes[hoveredIdx];
+      ctx.fillStyle = '#fff';
+      ctx.font = `600 ${12 / transform.k}px "JetBrains Mono", monospace`;
+      ctx.textAlign = 'center';
+      ctx.globalAlpha = 0.9;
+      ctx.fillText(node.entry.title, node.x, node.y - node.radius - 8 / transform.k);
+
+      ctx.font = `400 ${9 / transform.k}px "JetBrains Mono", monospace`;
+      ctx.globalAlpha = 0.5;
+      const date = new Date(node.entry.publishDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      ctx.fillText(`${date} · ${node.entry.wordCount} words`, node.x, node.y - node.radius - 22 / transform.k);
+    }
+
+    ctx.restore();
+  }, [nodes, edges, clusterLabels, dimensions, transform, hoveredIdx, matchingIndices, searchQuery]);
+
+  // Hit detection
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (dragRef.current) {
+      const dx = e.clientX - dragRef.current.startX;
+      const dy = e.clientY - dragRef.current.startY;
+      setTransform(t => ({ ...t, x: dragRef.current!.startTx + dx, y: dragRef.current!.startTy + dy }));
+      return;
+    }
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const screenX = e.clientX - rect.left;
+    const screenY = e.clientY - rect.top;
+    const { x, y } = fromScreen(screenX, screenY);
+
+    let closestIdx: number | null = null;
+    let minDist = 12 / transform.k;
+
+    nodes.forEach((node, i) => {
+      const dx = node.x - x;
+      const dy = node.y - y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < minDist) {
+        minDist = dist;
+        closestIdx = i;
+      }
+    });
+
+    setHoveredIdx(closestIdx);
+    canvas.style.cursor = closestIdx !== null ? 'pointer' : 'grab';
+  }, [nodes, fromScreen, transform.k]);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (hoveredIdx !== null) return;
+    dragRef.current = { startX: e.clientX, startY: e.clientY, startTx: transform.x, startTy: transform.y };
+    const canvas = canvasRef.current;
+    if (canvas) canvas.style.cursor = 'grabbing';
+  }, [hoveredIdx, transform.x, transform.y]);
+
+  const handleMouseUp = useCallback(() => {
+    dragRef.current = null;
+    const canvas = canvasRef.current;
+    if (canvas) canvas.style.cursor = hoveredIdx !== null ? 'pointer' : 'grab';
+  }, [hoveredIdx]);
+
+  const handleClick = useCallback(() => {
+    if (hoveredIdx !== null) {
+      window.location.href = `/journal/${nodes[hoveredIdx].entry.slug}`;
+    }
+  }, [hoveredIdx, nodes]);
+
+  const tagList = useMemo(() => [...tagColorMap.entries()], [tagColorMap]);
 
   if (entries.length === 0) {
     return (
-      <div style={{
-        padding: '3rem',
-        textAlign: 'center',
-        color: 'rgba(255,255,255,0.4)',
-        fontSize: '0.875rem',
-      }}>
+      <div style={{ padding: '3rem', textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: '0.875rem' }}>
         No entries to map yet.
       </div>
     );
@@ -155,7 +418,7 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
         display: 'flex',
         alignItems: 'center',
         gap: '0.75rem',
-        marginBottom: '1rem',
+        marginBottom: '0.75rem',
         flexWrap: 'wrap',
       }}>
         <input
@@ -180,108 +443,41 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
           onFocus={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.25)'}
           onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
         />
-        <button
-          onClick={() => setClustered(c => !c)}
-          style={{
-            background: clustered ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.05)',
-            border: `1px solid ${clustered ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.1)'}`,
-            borderRadius: '6px',
-            padding: '0.4rem 0.75rem',
-            color: clustered ? 'rgba(34,197,94,0.9)' : 'rgba(255,255,255,0.5)',
-            fontSize: '0.8125rem',
-            fontFamily: 'inherit',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          Cluster
-        </button>
       </div>
 
-      {/* Scatter plot */}
+      {/* Canvas */}
       <div style={{ position: 'relative' }}>
-        <svg
+        <canvas
+          ref={canvasRef}
           width={dimensions.width}
           height={dimensions.height}
           style={{
             display: 'block',
-            background: 'rgba(255,255,255,0.02)',
+            width: dimensions.width,
+            height: dimensions.height,
             borderRadius: '8px',
             border: '1px solid rgba(255,255,255,0.06)',
+            cursor: 'grab',
           }}
-          role="img"
-          aria-label="Knowledge map of journal entries"
-        >
-          {filteredPoints.map((point, i) => {
-            const dimmed = 'dimmed' in point && point.dimmed;
-            return (
-              <circle
-                key={i}
-                cx={point.x}
-                cy={point.y}
-                r={point.radius}
-                fill={point.color}
-                opacity={dimmed ? 0.1 : 0.7}
-                style={{
-                  cursor: 'pointer',
-                  transition: 'opacity 0.2s ease, cx 0.4s ease, cy 0.4s ease',
-                }}
-                onMouseEnter={(e) => handleDotHover(point, e)}
-                onMouseLeave={() => setHovered(null)}
-                onClick={() => { window.location.href = `/journal/${point.entry.slug}`; }}
-              />
-            );
-          })}
-        </svg>
+          onMouseMove={handleMouseMove}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={() => { setHoveredIdx(null); dragRef.current = null; }}
+          onClick={handleClick}
+        />
 
-        {/* Tooltip */}
-        {hovered && (
-          <div
-            style={{
-              position: 'absolute',
-              left: Math.min(hovered.x, dimensions.width - 200),
-              top: hovered.y - 60,
-              background: 'rgba(20, 20, 20, 0.95)',
-              border: '1px solid rgba(255,255,255,0.15)',
-              borderRadius: '6px',
-              padding: '0.5rem 0.75rem',
-              fontSize: '0.75rem',
-              color: '#fff',
-              whiteSpace: 'nowrap',
-              pointerEvents: 'none',
-              zIndex: 10,
-              backdropFilter: 'blur(8px)',
-              maxWidth: '260px',
-            }}
-          >
-            <div style={{ fontWeight: 600, marginBottom: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {hovered.entry.title}
-            </div>
-            <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.6875rem' }}>
-              {new Date(hovered.entry.publishDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-              {' · '}
-              {hovered.entry.wordCount} words
-            </div>
-            {hovered.entry.tags.length > 0 && (
-              <div style={{ display: 'flex', gap: '0.25rem', marginTop: '0.25rem', flexWrap: 'wrap' }}>
-                {hovered.entry.tags.map((tag, i) => (
-                  <span
-                    key={i}
-                    style={{
-                      fontSize: '0.625rem',
-                      padding: '0.1rem 0.4rem',
-                      background: 'rgba(255,255,255,0.08)',
-                      borderRadius: '3px',
-                      color: tagColorMap.get(tag) || 'rgba(255,255,255,0.5)',
-                    }}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+        {/* Help text */}
+        <div style={{
+          position: 'absolute',
+          bottom: 8,
+          left: 12,
+          fontSize: '0.625rem',
+          color: 'rgba(255,255,255,0.2)',
+          pointerEvents: 'none',
+          fontFamily: 'inherit',
+        }}>
+          scroll to zoom · drag to pan · click to read
+        </div>
       </div>
 
       {/* Tag Legend */}
@@ -294,23 +490,8 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
           fontSize: '0.6875rem',
         }}>
           {tagList.map(([tag, color]) => (
-            <span
-              key={tag}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.3rem',
-                color: 'rgba(255,255,255,0.45)',
-              }}
-            >
-              <span style={{
-                width: 8,
-                height: 8,
-                borderRadius: '50%',
-                background: color,
-                opacity: 0.7,
-                display: 'inline-block',
-              }} />
+            <span key={tag} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'rgba(255,255,255,0.45)' }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: color, opacity: 0.7, display: 'inline-block' }} />
               {tag}
             </span>
           ))}
