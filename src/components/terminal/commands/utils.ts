@@ -21,7 +21,7 @@ export const helpCommand: Command = {
       ['', ''],
       ['themes', 'List or switch terminal themes'],
       ['whoami', 'Display current user'],
-      ['fastfetch', 'System info card'],
+      ['fastfetch', 'My main PC specs'],
       ['clear', 'Clear the terminal'],
       ['history', 'Show command history'],
       ['echo', 'Echo text back'],
@@ -141,8 +141,8 @@ export const whoamiCommand: Command = {
 
 export const fastfetchCommand: Command = {
   name: 'fastfetch',
-  description: 'System info card',
-  handler: (): TerminalLine[] => {
+  description: 'My main PC specs',
+  handler: (_args, ctx): TerminalLine[] => {
     const red = '#C34043';
     const green = '#76946A';
     const yellow = '#C0A36E';
@@ -150,21 +150,20 @@ export const fastfetchCommand: Command = {
     const magenta = '#957FB8';
     const cyan = '#6A9589';
     const white = '#DCD7BA';
-    const muted = '#727169';
     const border = '#727169';
 
     const lines: TerminalLine[] = [
       { id: id(), type: 'output', content: '' },
     ];
 
-    // ASCII art logo
+    // ASCII art: cat + Bryce name
     const art = [
-      ' ____                        ',
-      '| __ ) _ __ _   _  ___ ___  ',
-      '|  _ \\| \'__| | | |/ __/ _ \\ ',
-      '| |_) | |  | |_| | (_|  __/ ',
-      '|____/|_|   \\__, |\\___\\___| ',
-      '            |___/            ',
+      '  /\\_/\\      ____                        ',
+      ' / o o \\    | __ ) _ __ _   _  ___ ___  ',
+      '(   "   )   |  _ \\| \'__| | | |/ __/ _ \\ ',
+      ' \\  ~  /    | |_) | |  | |_| | (_|  __/ ',
+      ' /|   |\\    |____/|_|   \\__, |\\___\\___| ',
+      '(_|   |_)               |___/            ',
     ];
 
     for (const line of art) {
@@ -174,16 +173,17 @@ export const fastfetchCommand: Command = {
     lines.push({ id: id(), type: 'output', content: '' });
 
     // System info box
-    lines.push({ id: id(), type: 'output', content: '  \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510', color: border });
+    const topBorder = '  \u250C' + '\u2500'.repeat(48) + '\u2510';
+    const bottomBorder = '  \u2514' + '\u2500'.repeat(48) + '\u2518';
+
+    lines.push({ id: id(), type: 'output', content: topBorder, color: border });
     lines.push({ id: id(), type: 'output', content: '    Chassis   : Desktop (MSI)', color: red });
     lines.push({ id: id(), type: 'output', content: '    OS        : Arch Linux x86_64', color: red });
     lines.push({ id: id(), type: 'output', content: '    Kernel    : 6.18.5-zen1-1-zen', color: yellow });
     lines.push({ id: id(), type: 'output', content: '    Packages  : 1315 (pacman), 34 (flatpak)', color: yellow });
-    lines.push({ id: id(), type: 'output', content: '    Display   : 1920x1080 @ 120Hz', color: green });
-    lines.push({ id: id(), type: 'output', content: '    Display   : 1920x1080 @ 144Hz', color: green });
     lines.push({ id: id(), type: 'output', content: '    Terminal  : kitty 0.45.0', color: cyan });
     lines.push({ id: id(), type: 'output', content: '    WM        : Hyprland', color: cyan });
-    lines.push({ id: id(), type: 'output', content: '  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518', color: border });
+    lines.push({ id: id(), type: 'output', content: bottomBorder, color: border });
 
     lines.push({ id: id(), type: 'output', content: '' });
 
@@ -191,20 +191,31 @@ export const fastfetchCommand: Command = {
     lines.push({ id: id(), type: 'output', content: '    bryce @ arch', color: white });
 
     // Hardware info box
-    lines.push({ id: id(), type: 'output', content: '  \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510', color: border });
+    lines.push({ id: id(), type: 'output', content: topBorder, color: border });
     lines.push({ id: id(), type: 'output', content: '    CPU       : AMD Ryzen 5 5600G @ 4.46 GHz', color: blue });
     lines.push({ id: id(), type: 'output', content: '    GPU       : AMD Radeon Vega Series', color: blue });
     lines.push({ id: id(), type: 'output', content: '    GPU       : Intel Arc B580', color: magenta });
     lines.push({ id: id(), type: 'output', content: '    Driver    : amdgpu', color: magenta });
     lines.push({ id: id(), type: 'output', content: '    Driver    : xe', color: cyan });
-    lines.push({ id: id(), type: 'output', content: '    Memory    : 8.37 GiB / 27.29 GiB', color: cyan });
-    lines.push({ id: id(), type: 'output', content: '    OS Age    : 74 days', color: green });
-    lines.push({ id: id(), type: 'output', content: '    Uptime    : 7 hours, 31 mins', color: green });
-    lines.push({ id: id(), type: 'output', content: '  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518', color: border });
+    lines.push({ id: id(), type: 'output', content: '    Memory    : 27.29 GiB', color: green });
+    lines.push({ id: id(), type: 'output', content: bottomBorder, color: border });
 
-    // Color palette circles
+    // Theme color palette dots
+    const theme = ctx.theme;
     lines.push({ id: id(), type: 'output', content: '' });
-    lines.push({ id: id(), type: 'output', content: `    ${'\u25CF'} ${'\u25CF'} ${'\u25CF'} ${'\u25CF'} ${'\u25CF'} ${'\u25CF'} ${'\u25CF'} ${'\u25CF'}`, color: muted });
+    lines.push({
+      id: id(),
+      type: 'output',
+      content: '',
+      segments: [
+        { text: '    ', color: 'transparent' },
+        { text: '\u25CF ', color: theme.error },
+        { text: '\u25CF ', color: theme.prompt },
+        { text: '\u25CF ', color: theme.accent },
+        { text: '\u25CF ', color: theme.foreground },
+        { text: '\u25CF', color: theme.muted },
+      ],
+    });
 
     lines.push({ id: id(), type: 'output', content: '' });
     lines.push({ id: id(), type: 'output', content: '  Type "help" to see available commands.' });

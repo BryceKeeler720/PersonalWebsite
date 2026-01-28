@@ -1,8 +1,14 @@
+export interface TerminalLineSegment {
+  text: string;
+  color: string;
+}
+
 export interface TerminalLine {
   id: string;
   type: 'input' | 'output' | 'error' | 'system' | 'ascii';
   content: string;
   color?: string;
+  segments?: TerminalLineSegment[];
 }
 
 export interface CommandContext {

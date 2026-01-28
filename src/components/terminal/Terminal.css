@@ -87,16 +87,31 @@
   flex-shrink: 0;
 }
 
-.terminal-input {
+.terminal-input-wrapper {
   flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
+  display: grid;
+  min-width: 0;
+}
+
+.terminal-input-wrapper > * {
+  grid-area: 1 / 1;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.875rem;
   line-height: 1.6;
   padding: 0;
   margin: 0;
+}
+
+.terminal-ghost-text {
+  pointer-events: none;
+  white-space: pre;
+  overflow: hidden;
+}
+
+.terminal-input {
+  background: transparent;
+  border: none;
+  outline: none;
 }
 
 @media (max-width: 768px) {
@@ -117,7 +132,7 @@
     padding: 0.5rem 0.75rem;
   }
 
-  .terminal-input {
+  .terminal-input-wrapper > * {
     font-size: 0.8125rem;
   }
 }
@@ -131,7 +146,7 @@
     font-size: 0.5rem;
   }
 
-  .terminal-input {
+  .terminal-input-wrapper > * {
     font-size: 0.75rem;
   }
 }

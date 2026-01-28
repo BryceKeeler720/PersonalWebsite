@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import type { TerminalLine, Theme, CommandContext } from './types';
 import { commandRegistry, commandNames } from './commands';
 import { defaultTheme } from './data/themes';
@@ -107,6 +107,13 @@ const Terminal: React.FC = () => {
     setLines(prev => [...prev, inputLine, ...result]);
   }, [commandHistory, currentDir, theme]);
 
+  const ghostSuffix = useMemo(() => {
+    const current = inputValue.trim().toLowerCase();
+    if (!current) return '';
+    const match = commandNames.find(name => name.startsWith(current));
+    return match ? match.slice(current.length) : '';
+  }, [inputValue]);
+
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.ctrlKey && e.key === 'l') {
       e.preventDefault();
@@ -135,6 +142,13 @@ const Terminal: React.FC = () => {
           setInputValue(commandHistory[newIndex]);
         }
       }
+    } else if (e.key === 'ArrowRight') {
+      if (ghostSuffix && e.currentTarget.selectionStart === inputValue.length) {
+        e.preventDefault();
+        const current = inputValue.trim().toLowerCase();
+        const match = commandNames.find(name => name.startsWith(current));
+        if (match) setInputValue(match);
+      }
     } else if (e.key === 'Tab') {
       e.preventDefault();
       const current = inputValue.trim().toLowerCase();
@@ -150,7 +164,7 @@ const Terminal: React.FC = () => {
         }
       }
     }
-  }, [commandHistory, historyIndex, inputValue]);
+  }, [commandHistory, historyIndex, inputValue, ghostSuffix]);
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
@@ -198,7 +212,11 @@ const Terminal: React.FC = () => {
                     : line.color || theme.foreground,
             }}
           >
-            {line.type === 'ascii' ? (
+            {line.segments ? (
+              <span>{line.segments.map((seg, i) => (
+                <span key={i} style={{ color: seg.color }}>{seg.text}</span>
+              ))}</span>
+            ) : line.type === 'ascii' ? (
               <pre className="ascii-line">{line.content}</pre>
             ) : (
               <span>{line.content}</span>
@@ -215,19 +233,27 @@ const Terminal: React.FC = () => {
             <span style={{ color: theme.accent }}>{promptDir}</span>
             <span style={{ color: theme.foreground }}>$ </span>
           </span>
-          <input
-            ref={inputRef}
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="terminal-input"
-            style={{ color: theme.foreground, caretColor: theme.accent }}
-            autoFocus
-            autoComplete="off"
-            spellCheck={false}
-            aria-label="Terminal input"
-          />
+          <div className="terminal-input-wrapper">
+            {ghostSuffix && (
+              <span className="terminal-ghost-text" aria-hidden="true">
+                <span style={{ visibility: 'hidden' }}>{inputValue}</span>
+                <span style={{ color: theme.muted, opacity: 0.5 }}>{ghostSuffix}</span>
+              </span>
+            )}
+            <input
+              ref={inputRef}
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="terminal-input"
+              style={{ color: theme.foreground, caretColor: theme.accent }}
+              autoFocus
+              autoComplete="off"
+              spellCheck={false}
+              aria-label="Terminal input"
+            />
+          </div>
         </form>
       </div>
     </div>
