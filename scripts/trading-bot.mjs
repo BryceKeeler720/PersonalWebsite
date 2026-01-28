@@ -1775,6 +1775,16 @@ async function main() {
       }
     }
 
+    // If partial sell would leave a dust position, sell everything instead
+    if (sellPercent > 0 && sellPercent < 1.0) {
+      const remainingShares = holding.shares * (1 - sellPercent);
+      const remainingValue = remainingShares * price;
+      if (remainingValue < DEFAULT_CONFIG.minTradeValue) {
+        sellPercent = 1.0;
+        sellReason += ' (full exit: remainder below minimum)';
+      }
+    }
+
     if (sellPercent > 0) {
       const sharesToSell = Math.round(holding.shares * sellPercent * 10000) / 10000 || holding.shares;
       const total = sharesToSell * price;
@@ -1866,9 +1876,46 @@ async function main() {
   }
 
   // ═══════════════════════════════════════════════════════════
+  // Dust Cleanup — sell positions that drifted below minimum value
+  // ═══════════════════════════════════════════════════════════
+  const dustHoldings = portfolio.holdings.filter(h => {
+    const p = priceCache[h.symbol] || h.currentPrice;
+    return p && h.shares * p < DEFAULT_CONFIG.minTradeValue;
+  });
+  for (const holding of dustHoldings) {
+    const dustPrice = priceCache[holding.symbol] || holding.currentPrice;
+    if (!dustPrice) continue;
+    const total = holding.shares * dustPrice;
+    const txCost = total * DEFAULT_CONFIG.transactionCostBps / 10000;
+    const dustSignal = allSignals[holding.symbol];
+    const trade = {
+      id: crypto.randomUUID(),
+      timestamp: new Date().toISOString(),
+      symbol: holding.symbol,
+      action: 'SELL',
+      shares: holding.shares,
+      price: dustPrice,
+      total,
+      reason: `Dust cleanup: position value $${total.toFixed(2)} below $${DEFAULT_CONFIG.minTradeValue} minimum`,
+      signals: dustSignal || { symbol: holding.symbol, timestamp: new Date().toISOString(), momentum: {}, meanReversion: {}, sentiment: {}, technical: {}, combined: 0, recommendation: 'HOLD' },
+      entrySignals: holding.entrySignals || null,
+      gainLoss: (dustPrice - holding.avgCost) * holding.shares,
+      gainLossPercent: holding.gainLossPercent,
+    };
+    portfolio.cash += total - txCost;
+    portfolio.holdings = portfolio.holdings.filter(h => h.symbol !== holding.symbol);
+    await addTrade(trade);
+    await updateLearningFromTrade(trade, learningState);
+    await submitAlpacaOrder(trade.symbol, trade.shares, 'sell');
+    console.log(`DUST CLEANUP ${trade.shares} ${trade.symbol} @ $${dustPrice} ($${total.toFixed(2)})`);
+  }
+
+  // ═══════════════════════════════════════════════════════════
   // Buy Logic — ATR position sizing, capped new positions
   // ═══════════════════════════════════════════════════════════
-  const openSlots = DEFAULT_CONFIG.maxPositions - portfolio.holdings.length;
+  // Soft position limit: target maxPositions but allow ~20% buffer for strong signals
+  const hardMax = Math.ceil(DEFAULT_CONFIG.maxPositions * 1.2);
+  const openSlots = Math.max(0, hardMax - portfolio.holdings.length);
   const buyCandidates = Object.values(allSignals)
     .filter(s => s.combined > effectiveBuyThreshold && !portfolio.holdings.some(h => h.symbol === s.symbol) && !isOnCooldown(s.symbol))
     .sort((a, b) => b.combined - a.combined)
