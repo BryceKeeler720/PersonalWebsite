@@ -21,7 +21,7 @@ import { calculateATR } from '../../../lib/trading/indicators';
 import { calculateMomentumSignal } from '../../../lib/trading/strategies/momentum';
 import { calculateMeanReversionSignal } from '../../../lib/trading/strategies/meanReversion';
 import { calculateTechnicalSignal } from '../../../lib/trading/strategies/technical';
-import { calculateSentimentSignal, generateMockNews } from '../../../lib/trading/strategies/sentiment';
+import { calculateVWAPReversionSignal } from '../../../lib/trading/strategies/vwapReversion';
 import { combineSignals, calculatePositionSize } from '../../../lib/trading/signalCombiner';
 import { DEFAULT_CONFIG } from '../../../components/trading/types';
 import type { Trade, SignalSnapshot, OHLCV, Holding } from '../../../components/trading/types';
@@ -213,14 +213,13 @@ async function analyzeStock(symbol: string): Promise<SignalSnapshot | null> {
   const momentum = calculateMomentumSignal(historicalData);
   const meanReversion = calculateMeanReversionSignal(historicalData);
   const technical = calculateTechnicalSignal(historicalData);
-  const mockNews = generateMockNews(symbol);
-  const sentiment = calculateSentimentSignal(mockNews);
+  const vwapReversion = calculateVWAPReversionSignal(historicalData);
 
   return combineSignals(
     symbol,
     momentum,
     meanReversion,
-    sentiment,
+    vwapReversion,
     technical,
     DEFAULT_CONFIG.strategyWeights
   );
@@ -389,7 +388,7 @@ export const GET: APIRoute = async ({ request }) => {
           timestamp: new Date().toISOString(),
           momentum: { name: 'momentum', score: 0, confidence: 0, reason: 'N/A' },
           meanReversion: { name: 'meanReversion', score: 0, confidence: 0, reason: 'N/A' },
-          sentiment: { name: 'sentiment', score: 0, confidence: 0, reason: 'N/A' },
+          vwapReversion: { name: 'VWAP Reversion', score: 0, confidence: 0, reason: 'N/A' },
           technical: { name: 'technical', score: 0, confidence: 0, reason: 'N/A' },
           combined: 0,
           recommendation: 'HOLD',

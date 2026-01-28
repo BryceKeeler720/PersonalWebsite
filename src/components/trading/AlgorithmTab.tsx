@@ -671,7 +671,7 @@ export default function AlgorithmTab({ learningState }: { learningState: Learnin
             { label: 'Schedule', value: DEFAULT_CONFIG.scheduleInterval },
             { label: 'Momentum Weight', value: `${(DEFAULT_CONFIG.strategyWeights.momentum * 100).toFixed(0)}%` },
             { label: 'Mean Reversion Weight', value: `${(DEFAULT_CONFIG.strategyWeights.meanReversion * 100).toFixed(0)}%` },
-            { label: 'Sentiment Weight', value: `${(DEFAULT_CONFIG.strategyWeights.sentiment * 100).toFixed(0)}%` },
+            { label: 'VWAP Reversion Weight', value: `${(DEFAULT_CONFIG.strategyWeights.vwapReversion * 100).toFixed(0)}%` },
             { label: 'Technical Weight', value: `${(DEFAULT_CONFIG.strategyWeights.technical * 100).toFixed(0)}%` },
           ].map(item => (
             <div key={item.label} style={{ padding: '0.75rem', background: 'rgba(220,215,186,0.02)', borderRadius: '8px' }}>

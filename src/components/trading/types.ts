@@ -84,7 +84,7 @@ export interface SignalSnapshot {
   timestamp: string;
   momentum: StrategySignal;
   meanReversion: StrategySignal;
-  sentiment: StrategySignal;
+  vwapReversion: StrategySignal;
   technical: StrategySignal;
   combined: number; // Weighted final score
   recommendation: 'STRONG_BUY' | 'BUY' | 'HOLD' | 'SELL' | 'STRONG_SELL';
@@ -106,7 +106,7 @@ export interface TradingConfig {
 export interface StrategyWeights {
   momentum: number;
   meanReversion: number;
-  sentiment: number;
+  vwapReversion: number;
   technical: number;
 }
 
@@ -171,7 +171,7 @@ export const DEFAULT_CONFIG: TradingConfig = {
   strategyWeights: {
     momentum: 0.35, // Trend Momentum (Group A)
     meanReversion: 0.25, // BB+RSI Reversion (Group B)
-    sentiment: 0.10, // VWAP Reversion (Group B)
+    vwapReversion: 0.10, // VWAP Reversion (Group B)
     technical: 0.30, // MACD Trend (Group A)
   },
   scheduleInterval: 'intraday',

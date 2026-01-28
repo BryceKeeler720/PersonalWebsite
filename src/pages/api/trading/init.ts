@@ -17,7 +17,7 @@ import {
 import { calculateMomentumSignal } from '../../../lib/trading/strategies/momentum';
 import { calculateMeanReversionSignal } from '../../../lib/trading/strategies/meanReversion';
 import { calculateTechnicalSignal } from '../../../lib/trading/strategies/technical';
-import { calculateSentimentSignal, generateMockNews } from '../../../lib/trading/strategies/sentiment';
+import { calculateVWAPReversionSignal } from '../../../lib/trading/strategies/vwapReversion';
 import { combineSignals } from '../../../lib/trading/signalCombiner';
 import { DEFAULT_CONFIG } from '../../../components/trading/types';
 import type { Trade, SignalSnapshot, OHLCV, Holding } from '../../../components/trading/types';
@@ -131,14 +131,13 @@ async function analyzeStock(symbol: string): Promise<SignalSnapshot | null> {
   const momentum = calculateMomentumSignal(historicalData);
   const meanReversion = calculateMeanReversionSignal(historicalData);
   const technical = calculateTechnicalSignal(historicalData);
-  const mockNews = generateMockNews(symbol);
-  const sentiment = calculateSentimentSignal(mockNews);
+  const vwapReversion = calculateVWAPReversionSignal(historicalData);
 
   return combineSignals(
     symbol,
     momentum,
     meanReversion,
-    sentiment,
+    vwapReversion,
     technical,
     DEFAULT_CONFIG.strategyWeights
   );

@@ -3,12 +3,12 @@ import type { SignalSnapshot, StrategySignal, StrategyWeights } from '../../comp
 /**
  * Default strategy weights
  * Momentum and Technical get higher weights as they're more reliable
- * Sentiment gets lower weight due to simplified implementation
+ * VWAP Reversion gets lower weight as a secondary mean-reversion signal
  */
 export const DEFAULT_WEIGHTS: StrategyWeights = {
   momentum: 0.3,
   meanReversion: 0.25,
-  sentiment: 0.15,
+  vwapReversion: 0.15,
   technical: 0.3,
 };
 
@@ -25,16 +25,16 @@ export function combineSignals(
   symbol: string,
   momentum: StrategySignal,
   meanReversion: StrategySignal,
-  sentiment: StrategySignal,
+  vwapReversion: StrategySignal,
   technical: StrategySignal,
   weights: StrategyWeights = DEFAULT_WEIGHTS
 ): SignalSnapshot {
   // Normalize weights to sum to 1
-  const totalWeight = weights.momentum + weights.meanReversion + weights.sentiment + weights.technical;
+  const totalWeight = weights.momentum + weights.meanReversion + weights.vwapReversion + weights.technical;
   const normalizedWeights = {
     momentum: weights.momentum / totalWeight,
     meanReversion: weights.meanReversion / totalWeight,
-    sentiment: weights.sentiment / totalWeight,
+    vwapReversion: weights.vwapReversion / totalWeight,
     technical: weights.technical / totalWeight,
   };
 
@@ -42,14 +42,14 @@ export function combineSignals(
   const weightedScore =
     momentum.score * momentum.confidence * normalizedWeights.momentum +
     meanReversion.score * meanReversion.confidence * normalizedWeights.meanReversion +
-    sentiment.score * sentiment.confidence * normalizedWeights.sentiment +
+    vwapReversion.score * vwapReversion.confidence * normalizedWeights.vwapReversion +
     technical.score * technical.confidence * normalizedWeights.technical;
 
   // Total confidence for normalization
   const totalConfidence =
     momentum.confidence * normalizedWeights.momentum +
     meanReversion.confidence * normalizedWeights.meanReversion +
-    sentiment.confidence * normalizedWeights.sentiment +
+    vwapReversion.confidence * normalizedWeights.vwapReversion +
     technical.confidence * normalizedWeights.technical;
 
   // Normalize by confidence to get final score
@@ -63,7 +63,7 @@ export function combineSignals(
     timestamp: new Date().toISOString(),
     momentum,
     meanReversion,
-    sentiment,
+    vwapReversion,
     technical,
     combined,
     recommendation,

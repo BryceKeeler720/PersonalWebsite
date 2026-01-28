@@ -406,7 +406,7 @@ export default function StrategySignals({
             <SignalGauge signal={currentSignal.momentum} />
             <SignalGauge signal={currentSignal.meanReversion} />
             <SignalGauge signal={currentSignal.technical} />
-            <SignalGauge signal={currentSignal.sentiment} />
+            <SignalGauge signal={currentSignal.vwapReversion} />
           </div>
 
           {/* Combined Signal */}

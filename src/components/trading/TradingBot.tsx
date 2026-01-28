@@ -267,7 +267,7 @@ export default function TradingBot() {
     const strategies = {
       momentum: { wins: 0, losses: 0, total: 0 },
       meanReversion: { wins: 0, losses: 0, total: 0 },
-      sentiment: { wins: 0, losses: 0, total: 0 },
+      vwapReversion: { wins: 0, losses: 0, total: 0 },
       technical: { wins: 0, losses: 0, total: 0 },
     };
 
@@ -277,7 +277,7 @@ export default function TradingBot() {
       const isWin = trade.gainLossPercent !== undefined
         ? trade.gainLossPercent >= 0
         : trade.reason.toLowerCase().includes('profit');
-      const { momentum, meanReversion, sentiment, technical } = trade.signals;
+      const { momentum, meanReversion, vwapReversion, technical } = trade.signals;
 
       if (momentum && momentum.score > 0.1) {
         strategies.momentum.total++;
@@ -287,9 +287,9 @@ export default function TradingBot() {
         strategies.meanReversion.total++;
         if (isWin) strategies.meanReversion.wins++; else strategies.meanReversion.losses++;
       }
-      if (sentiment && sentiment.score > 0.1) {
-        strategies.sentiment.total++;
-        if (isWin) strategies.sentiment.wins++; else strategies.sentiment.losses++;
+      if (vwapReversion && vwapReversion.score > 0.1) {
+        strategies.vwapReversion.total++;
+        if (isWin) strategies.vwapReversion.wins++; else strategies.vwapReversion.losses++;
       }
       if (technical && technical.score > 0.1) {
         strategies.technical.total++;
