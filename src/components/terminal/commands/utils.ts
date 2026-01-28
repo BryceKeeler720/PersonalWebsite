@@ -1,6 +1,5 @@
 import type { Command, TerminalLine } from '../types';
 import { asciiArt, welcomeMessage } from '../data/ascii';
-import { personalInfo } from '../data/personalInfo';
 
 let counter = 0;
 const id = () => `util-${counter++}`;
@@ -144,7 +143,6 @@ export const fastfetchCommand: Command = {
   name: 'fastfetch',
   description: 'System info card',
   handler: (): TerminalLine[] => {
-    // Kanagawa ANSI colors matching kitty theme
     const red = '#C34043';
     const green = '#76946A';
     const yellow = '#C0A36E';
@@ -176,29 +174,33 @@ export const fastfetchCommand: Command = {
     lines.push({ id: id(), type: 'output', content: '' });
 
     // System info box
-    lines.push({ id: id(), type: 'output', content: '  \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510', color: border });
-    lines.push({ id: id(), type: 'output', content: '    OS        : Arch Linux', color: red });
-    lines.push({ id: id(), type: 'output', content: '    Kernel    : 6.18.5-zen1-1-zen', color: red });
-    lines.push({ id: id(), type: 'output', content: '    Terminal  : kitty', color: yellow });
-    lines.push({ id: id(), type: 'output', content: '    WM        : Hyprland', color: yellow });
-    lines.push({ id: id(), type: 'output', content: '    Shell     : zsh', color: green });
-    lines.push({ id: id(), type: 'output', content: '    Editor    : Neovim', color: green });
-    lines.push({ id: id(), type: 'output', content: '  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518', color: border });
+    lines.push({ id: id(), type: 'output', content: '  \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510', color: border });
+    lines.push({ id: id(), type: 'output', content: '    Chassis   : Desktop (MSI)', color: red });
+    lines.push({ id: id(), type: 'output', content: '    OS        : Arch Linux x86_64', color: red });
+    lines.push({ id: id(), type: 'output', content: '    Kernel    : 6.18.5-zen1-1-zen', color: yellow });
+    lines.push({ id: id(), type: 'output', content: '    Packages  : 1315 (pacman), 34 (flatpak)', color: yellow });
+    lines.push({ id: id(), type: 'output', content: '    Display   : 1920x1080 @ 120Hz', color: green });
+    lines.push({ id: id(), type: 'output', content: '    Display   : 1920x1080 @ 144Hz', color: green });
+    lines.push({ id: id(), type: 'output', content: '    Terminal  : kitty 0.45.0', color: cyan });
+    lines.push({ id: id(), type: 'output', content: '    WM        : Hyprland', color: cyan });
+    lines.push({ id: id(), type: 'output', content: '  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518', color: border });
 
     lines.push({ id: id(), type: 'output', content: '' });
 
     // Title line
-    lines.push({ id: id(), type: 'output', content: `    ${personalInfo.name}`, color: white });
+    lines.push({ id: id(), type: 'output', content: '    bryce @ arch', color: white });
 
-    // Portfolio info box
-    lines.push({ id: id(), type: 'output', content: '  \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510', color: border });
-    lines.push({ id: id(), type: 'output', content: '    Role      : Analyst @ Huron Consulting', color: blue });
-    lines.push({ id: id(), type: 'output', content: '    School    : UT Dallas \'24 - B.S. CIS', color: blue });
-    lines.push({ id: id(), type: 'output', content: '    Studying  : MIT MicroMasters (Stats & DS)', color: magenta });
-    lines.push({ id: id(), type: 'output', content: '    Stack     : TypeScript, Python, React', color: magenta });
-    lines.push({ id: id(), type: 'output', content: `    Projects  : ${personalInfo.projects.length} active`, color: cyan });
-    lines.push({ id: id(), type: 'output', content: '    Site      : brycekeeler.com', color: cyan });
-    lines.push({ id: id(), type: 'output', content: '  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518', color: border });
+    // Hardware info box
+    lines.push({ id: id(), type: 'output', content: '  \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510', color: border });
+    lines.push({ id: id(), type: 'output', content: '    CPU       : AMD Ryzen 5 5600G @ 4.46 GHz', color: blue });
+    lines.push({ id: id(), type: 'output', content: '    GPU       : AMD Radeon Vega Series', color: blue });
+    lines.push({ id: id(), type: 'output', content: '    GPU       : Intel Arc B580', color: magenta });
+    lines.push({ id: id(), type: 'output', content: '    Driver    : amdgpu', color: magenta });
+    lines.push({ id: id(), type: 'output', content: '    Driver    : xe', color: cyan });
+    lines.push({ id: id(), type: 'output', content: '    Memory    : 8.37 GiB / 27.29 GiB', color: cyan });
+    lines.push({ id: id(), type: 'output', content: '    OS Age    : 74 days', color: green });
+    lines.push({ id: id(), type: 'output', content: '    Uptime    : 7 hours, 31 mins', color: green });
+    lines.push({ id: id(), type: 'output', content: '  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518', color: border });
 
     // Color palette circles
     lines.push({ id: id(), type: 'output', content: '' });
@@ -217,7 +219,7 @@ export const exitCommand: Command = {
   description: 'Go back to the main site',
   handler: (): TerminalLine[] => {
     if (typeof window !== 'undefined') {
-      window.location.href = '/';
+      window.location.href = '/traditional';
     }
     return [
       { id: id(), type: 'output', content: '  Redirecting to home...' },

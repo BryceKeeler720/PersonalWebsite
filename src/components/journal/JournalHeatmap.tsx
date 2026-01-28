@@ -281,8 +281,8 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
           <div
             style={{
               position: 'absolute',
-              left: hoveredDay.x,
-              top: hoveredDay.y - 40,
+              left: Math.max(80, Math.min(hoveredDay.x, svgWidth - 80)),
+              top: hoveredDay.y < 50 ? hoveredDay.y + (CELL_SIZE + CELL_GAP) + 20 : hoveredDay.y - 40,
               transform: 'translateX(-50%)',
               background: 'rgba(20, 20, 20, 0.95)',
               border: '1px solid rgba(255,255,255,0.15)',

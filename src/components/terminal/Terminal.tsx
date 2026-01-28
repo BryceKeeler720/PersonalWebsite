@@ -174,7 +174,7 @@ const Terminal: React.FC = () => {
       onClick={handleContainerClick}
     >
       <div className="terminal-header" style={{ borderBottomColor: theme.muted }}>
-        <a href="/" className="terminal-back-link" style={{ color: theme.muted }}>
+        <a href="/traditional" className="terminal-back-link" style={{ color: theme.muted }}>
           &larr; Home
         </a>
         <span className="terminal-title" style={{ color: theme.muted }}>
