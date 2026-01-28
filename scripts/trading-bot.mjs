@@ -45,6 +45,9 @@ const REGIME_WEIGHTS = {
 const TRADE_COOLDOWN_MS = 4 * 60 * 60 * 1000;
 const tradeCooldowns = new Map(); // symbol → last trade timestamp
 
+// Fractionable asset cache: populated from Alpaca assets API
+const fractionableAssets = new Set();
+
 // Alpaca API Configuration
 const ALPACA_API_KEY = process.env.ALPACA_API_KEY;
 const ALPACA_SECRET_KEY = process.env.ALPACA_SECRET_KEY;
@@ -1587,6 +1590,16 @@ async function fetchNasdaqSymbols() {
     const assets = await response.json();
     console.log(`Alpaca assets API returned ${assets.length} total US equity assets`);
 
+    // Cache fractionability for buy-time checks
+    let fractionableCount = 0;
+    for (const a of assets) {
+      if (a.fractionable) {
+        fractionableAssets.add(a.symbol);
+        fractionableCount++;
+      }
+    }
+    console.log(`Fractionable assets: ${fractionableCount}/${assets.length}`);
+
     // Log unique exchange values for debugging
     const exchanges = {};
     for (const a of assets) {
@@ -1786,7 +1799,11 @@ async function main() {
     }
 
     if (sellPercent > 0) {
-      const sharesToSell = Math.round(holding.shares * sellPercent * 10000) / 10000 || holding.shares;
+      // When selling 100%, use exact share count to avoid floating point residuals
+      const sharesToSell = sellPercent >= 1.0
+        ? holding.shares
+        : (Math.round(holding.shares * sellPercent * 10000) / 10000 || holding.shares);
+      const isFullExit = sellPercent >= 1.0 || sharesToSell >= holding.shares - 0.00001;
       const total = sharesToSell * price;
       // Deduct transaction cost
       const txCost = total * DEFAULT_CONFIG.transactionCostBps / 10000;
@@ -1808,7 +1825,7 @@ async function main() {
 
       portfolio.cash += total - txCost;
 
-      if (sharesToSell >= holding.shares) {
+      if (isFullExit) {
         portfolio.holdings = portfolio.holdings.filter(h => h.symbol !== holding.symbol);
       } else {
         holding.shares -= sharesToSell;
@@ -1949,20 +1966,42 @@ async function main() {
         // Fallback: proportional allocation capped at maxPositionSize
         shares = (portfolio.totalValue * DEFAULT_CONFIG.maxPositionSize) / buyPrice;
       }
-      shares = Math.round(shares * 10000) / 10000;
+
+      // Round based on fractionability
+      const isFractionable = fractionableAssets.has(signal.symbol) || isCryptoSymbol(signal.symbol);
+      if (isFractionable) {
+        shares = Math.round(shares * 10000) / 10000;
+      } else {
+        shares = Math.floor(shares); // Whole shares only
+      }
+
       const total = shares * buyPrice;
 
       // Ensure we don't exceed available cash
       if (total > cashAvailable) {
-        shares = Math.round((cashAvailable / buyPrice) * 10000) / 10000;
+        if (isFractionable) {
+          shares = Math.round((cashAvailable / buyPrice) * 10000) / 10000;
+        } else {
+          shares = Math.floor(cashAvailable / buyPrice);
+        }
       }
-      if (shares < 0.0001) continue;
+      if (shares < (isFractionable ? 0.0001 : 1)) continue;
 
       const finalTotal = shares * buyPrice;
       if (finalTotal < DEFAULT_CONFIG.minTradeValue) continue;
 
       // Deduct transaction cost
       const txCost = finalTotal * DEFAULT_CONFIG.transactionCostBps / 10000;
+
+      // Submit to Alpaca first — only update internal state if accepted
+      const skipAlpaca = isForexOrFutures(signal.symbol);
+      if (!skipAlpaca) {
+        const orderResult = await submitAlpacaOrder(signal.symbol, shares, 'buy');
+        if (!orderResult) {
+          console.log(`Skipping ${signal.symbol}: Alpaca order rejected`);
+          continue;
+        }
+      }
 
       const trade = {
         id: crypto.randomUUID(),
@@ -1996,7 +2035,6 @@ async function main() {
 
       await addTrade(trade);
       setCooldown(signal.symbol);
-      await submitAlpacaOrder(signal.symbol, shares, 'buy');
       console.log(`BUY ${shares} ${signal.symbol} @ $${buyPrice} ($${finalTotal.toFixed(2)}) [ATR: ${atr ? atr.toFixed(3) : 'N/A'}]`);
     }
   }
