@@ -26,6 +26,12 @@ export default function PortfolioDashboard({ portfolio, initialCapital, onStockS
     return `${sign}${value.toFixed(2)}%`;
   };
 
+  const formatShares = (shares: number) => {
+    const rounded = Math.round(shares * 10000) / 10000;
+    if (rounded >= 1) return rounded.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    return rounded.toLocaleString('en-US', { maximumFractionDigits: 4 });
+  };
+
   return (
     <div className="trading-card">
       <h2>Portfolio</h2>
@@ -76,7 +82,7 @@ export default function PortfolioDashboard({ portfolio, initialCapital, onStockS
               <div>
                 <div className="holding-symbol">{holding.symbol}</div>
                 <div className="holding-shares">
-                  {holding.shares} shares @ {formatCurrency(holding.avgCost)}
+                  {formatShares(holding.shares)} shares @ {formatCurrency(holding.avgCost)}
                 </div>
               </div>
               <div className="holding-value">

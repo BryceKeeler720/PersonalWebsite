@@ -14,6 +14,12 @@ export default function TradeLog({ trades }: TradeLogProps) {
     }).format(value);
   };
 
+  const formatShares = (shares: number) => {
+    const rounded = Math.round(shares * 10000) / 10000;
+    if (rounded >= 1) return rounded.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    return rounded.toLocaleString('en-US', { maximumFractionDigits: 4 });
+  };
+
   const formatDate = (timestamp: string) => {
     const date = new Date(timestamp);
     return date.toLocaleDateString('en-US', {
@@ -53,7 +59,7 @@ export default function TradeLog({ trades }: TradeLogProps) {
             </div>
             <div className="trade-details">
               <span>
-                {trade.shares} shares @ {formatCurrency(trade.price)}
+                {formatShares(trade.shares)} shares @ {formatCurrency(trade.price)}
               </span>
               <span style={{ fontWeight: 600 }}>{formatCurrency(trade.total)}</span>
             </div>

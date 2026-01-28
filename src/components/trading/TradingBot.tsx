@@ -78,6 +78,12 @@ const getMarketStatus = () => {
   return { status: 'closed', label: 'Market Closed', color: '#64748b' };
 };
 
+const formatShares = (shares: number) => {
+  const rounded = Math.round(shares * 10000) / 10000;
+  if (rounded >= 1) return rounded.toLocaleString('en-US', { maximumFractionDigits: 2 });
+  return rounded.toLocaleString('en-US', { maximumFractionDigits: 4 });
+};
+
 export default function TradingBot() {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [selectedStock, setSelectedStock] = useState<string | null>(null);
@@ -670,7 +676,7 @@ export default function TradingBot() {
                           <span style={{ color: trade.action === 'BUY' ? '#22c55e' : '#ef4444', fontWeight: 600 }}>{trade.action}</span>{' '}
                           <span style={{ color: '#fff' }}>{trade.symbol}</span>
                         </div>
-                        <div style={{ color: 'rgba(220, 215, 186, 0.6)' }}>{trade.shares} @ ${trade.price.toFixed(2)}</div>
+                        <div style={{ color: 'rgba(220, 215, 186, 0.6)' }}>{formatShares(trade.shares)} @ ${trade.price.toFixed(2)}</div>
                       </div>
                     ))}
                     {data.trades.length > 3 && (
