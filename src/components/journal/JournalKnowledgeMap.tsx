@@ -405,7 +405,7 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
 
   if (entries.length === 0) {
     return (
-      <div style={{ padding: '3rem', textAlign: 'center', color: 'rgba(255,255,255,0.4)', fontSize: '0.875rem' }}>
+      <div style={{ padding: '3rem', textAlign: 'center', color: 'rgba(220,215,186,0.4)', fontSize: '0.875rem' }}>
         No entries to map yet.
       </div>
     );
@@ -427,11 +427,11 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.1)',
+            background: 'rgba(220,215,186,0.05)',
+            border: '1px solid rgba(220,215,186,0.1)',
             borderRadius: '6px',
             padding: '0.4rem 0.75rem',
-            color: '#fff',
+            color: '#DCD7BA',
             fontSize: '0.8125rem',
             fontFamily: 'inherit',
             outline: 'none',
@@ -440,8 +440,8 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
             maxWidth: '240px',
             transition: 'border-color 0.2s ease',
           }}
-          onFocus={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.25)'}
-          onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+          onFocus={(e) => e.target.style.borderColor = 'rgba(220,215,186,0.25)'}
+          onBlur={(e) => e.target.style.borderColor = 'rgba(220,215,186,0.1)'}
         />
       </div>
 
@@ -456,7 +456,7 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
             width: dimensions.width,
             height: dimensions.height,
             borderRadius: '8px',
-            border: '1px solid rgba(255,255,255,0.06)',
+            border: '1px solid rgba(220,215,186,0.06)',
             cursor: 'grab',
           }}
           onMouseMove={handleMouseMove}
@@ -472,7 +472,7 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
           bottom: 8,
           left: 12,
           fontSize: '0.625rem',
-          color: 'rgba(255,255,255,0.2)',
+          color: 'rgba(220,215,186,0.2)',
           pointerEvents: 'none',
           fontFamily: 'inherit',
         }}>
@@ -490,7 +490,7 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
           fontSize: '0.6875rem',
         }}>
           {tagList.map(([tag, color]) => (
-            <span key={tag} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'rgba(255,255,255,0.45)' }}>
+            <span key={tag} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'rgba(220,215,186,0.45)' }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: color, opacity: 0.7, display: 'inline-block' }} />
               {tag}
             </span>

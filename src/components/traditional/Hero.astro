@@ -36,8 +36,8 @@ const { name, tagline } = Astro.props;
     padding: 2rem;
     position: relative;
     background:
-      radial-gradient(ellipse 150% 150% at 50% 30%, rgba(40, 40, 40, 0.5) 0%, transparent 60%),
-      #000000;
+      radial-gradient(ellipse 150% 150% at 50% 30%, rgba(42, 42, 55, 0.5) 0%, transparent 60%),
+      var(--kana-bg);
   }
 
   .hero-content {
@@ -49,7 +49,7 @@ const { name, tagline } = Astro.props;
     font-size: clamp(2.5rem, 8vw, 5rem);
     font-weight: 800;
     margin-bottom: 1.5rem;
-    color: #ffffff;
+    color: var(--kana-fg);
     letter-spacing: -0.02em;
   }
 
@@ -82,25 +82,25 @@ const { name, tagline } = Astro.props;
   }
 
   .btn-primary {
-    background: #ffffff;
-    color: #000000;
+    background: var(--kana-fg);
+    color: var(--kana-bg);
   }
 
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 30px rgba(220, 215, 186, 0.2);
   }
 
   .btn-secondary {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #ffffff;
+    background: rgba(220, 215, 186, 0.05);
+    border: 1px solid rgba(220, 215, 186, 0.2);
+    color: var(--kana-fg);
     backdrop-filter: blur(10px);
   }
 
   .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(220, 215, 186, 0.1);
+    border-color: rgba(220, 215, 186, 0.4);
     transform: translateY(-2px);
   }
 
@@ -114,8 +114,8 @@ const { name, tagline } = Astro.props;
   .scroll-arrow {
     width: 24px;
     height: 24px;
-    border-left: 1px solid rgba(255, 255, 255, 0.5);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    border-left: 1px solid rgba(220, 215, 186, 0.5);
+    border-bottom: 1px solid rgba(220, 215, 186, 0.5);
     transform: rotate(-45deg);
     animation: scroll-bounce 2s ease-in-out infinite;
   }

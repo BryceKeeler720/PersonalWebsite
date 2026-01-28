@@ -57,7 +57,7 @@ export default function ContainerGrid({ containers }: ContainerGridProps) {
                 background: sortBy === key ? 'rgba(220,215,186,0.12)' : 'rgba(220,215,186,0.05)',
                 border: `1px solid ${sortBy === key ? 'rgba(220,215,186,0.25)' : 'rgba(220,215,186,0.1)'}`,
                 borderRadius: 6,
-                color: sortBy === key ? '#fff' : 'rgba(220,215,186,0.5)',
+                color: sortBy === key ? 'var(--kana-fg)' : 'rgba(220,215,186,0.5)',
                 fontSize: '0.7rem',
                 cursor: 'pointer',
                 fontFamily: 'inherit',
