@@ -6,6 +6,8 @@ import {
   saveSignals,
   setLastRun,
   addPortfolioSnapshot,
+  getCooldowns,
+  setCooldown,
 } from '../../../lib/trading/serverStorage';
 import {
   CRYPTO_SYMBOLS,
@@ -13,7 +15,9 @@ import {
   FUTURES_SYMBOLS,
   SP500_SYMBOLS,
   NASDAQ_ADDITIONAL,
+  getAssetType,
 } from '../../../lib/trading/assets';
+import { calculateATR } from '../../../lib/trading/indicators';
 import { calculateMomentumSignal } from '../../../lib/trading/strategies/momentum';
 import { calculateMeanReversionSignal } from '../../../lib/trading/strategies/meanReversion';
 import { calculateTechnicalSignal } from '../../../lib/trading/strategies/technical';
@@ -29,11 +33,18 @@ const CRON_SECRET = process.env.CRON_SECRET;
 const BATCH_SIZE = 15; // Number of stocks to analyze in parallel
 const BATCH_DELAY_MS = 500; // Delay between batches to avoid rate limiting
 
+// Trading filters configuration
+const MIN_STOCK_PRICE = 5.0; // Filter out penny stocks (only applies to stocks, not crypto/forex)
+const ATR_MULTIPLIER = 2.5; // Trailing stop = highWaterMark - (ATR × 2.5)
+const COOLDOWN_HOURS = 24; // Wait 24h before re-entering a sold symbol
+const MIN_SIGNAL_CONFIDENCE = 0.3; // Minimum confidence required per signal
+
 interface QuoteData {
   price: number;
   isExtendedHours: boolean;
   dividendYield?: number;
   annualDividend?: number;
+  shortName?: string;
 }
 
 async function fetchYahooQuote(symbol: string): Promise<QuoteData | null> {
@@ -85,6 +96,7 @@ async function fetchYahooQuote(symbol: string): Promise<QuoteData | null> {
       isExtendedHours,
       dividendYield: meta.dividendYield || undefined,
       annualDividend: meta.trailingAnnualDividendRate || undefined,
+      shortName: meta.shortName || meta.longName || undefined,
     };
   } catch (error) {
     console.error(`Error fetching quote for ${symbol}:`, error);
@@ -129,6 +141,67 @@ async function fetchYahooHistorical(symbol: string): Promise<OHLCV[] | null> {
     console.error(`Error fetching historical for ${symbol}:`, error);
     return null;
   }
+}
+
+// Fetch weekly historical data for multi-timeframe confirmation
+async function fetchYahooHistoricalWeekly(symbol: string): Promise<OHLCV[] | null> {
+  try {
+    const response = await fetch(
+      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1y&interval=1wk`,
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible)',
+        },
+      }
+    );
+    const data = await response.json();
+    const result = data?.chart?.result?.[0];
+
+    if (!result || !result.timestamp || !result.indicators?.quote?.[0]) {
+      return null;
+    }
+
+    const { timestamp, indicators } = result;
+    const quote = indicators.quote[0];
+
+    return timestamp
+      .map((ts: number, i: number) => ({
+        date: new Date(ts * 1000).toISOString().split('T')[0],
+        open: quote.open[i],
+        high: quote.high[i],
+        low: quote.low[i],
+        close: quote.close[i],
+        volume: quote.volume[i],
+      }))
+      .filter(
+        (d: OHLCV) =>
+          d.open !== null && d.high !== null && d.low !== null && d.close !== null
+      );
+  } catch (error) {
+    console.error(`Error fetching weekly historical for ${symbol}:`, error);
+    return null;
+  }
+}
+
+// Check if weekly trend is not bearish (returns true if OK to buy)
+async function checkWeeklyTrendNotBearish(symbol: string): Promise<boolean> {
+  const weeklyData = await fetchYahooHistoricalWeekly(symbol);
+  if (!weeklyData || weeklyData.length < 10) {
+    // If no weekly data, allow the trade (don't block on missing data)
+    return true;
+  }
+
+  // Simple weekly trend check using momentum signal
+  const weeklyMomentum = calculateMomentumSignal(weeklyData);
+
+  // Allow trade if weekly momentum is not strongly bearish (score >= -0.2)
+  const isNotBearish = weeklyMomentum.score >= -0.2;
+
+  if (!isNotBearish) {
+    console.log(`Weekly trend check failed for ${symbol}: momentum score ${weeklyMomentum.score.toFixed(2)}`);
+  }
+
+  return isNotBearish;
 }
 
 async function analyzeStock(symbol: string): Promise<SignalSnapshot | null> {
@@ -243,7 +316,7 @@ export const GET: APIRoute = async ({ request }) => {
       }
     }
 
-    // Check for sell signals on holdings (signal-based + profit-taking + stop-loss)
+    // Check for sell signals on holdings (signal-based + profit-taking + ATR trailing stop)
     for (const holding of portfolio.holdings) {
       const signal = allSignals[holding.symbol];
       const quote = await fetchYahooQuote(holding.symbol);
@@ -254,6 +327,11 @@ export const GET: APIRoute = async ({ request }) => {
       holding.marketValue = holding.shares * quote.price;
       holding.gainLoss = (quote.price - holding.avgCost) * holding.shares;
       holding.gainLossPercent = ((quote.price - holding.avgCost) / holding.avgCost) * 100;
+
+      // Update high water mark for trailing stop
+      if (!holding.highWaterMark || quote.price > holding.highWaterMark) {
+        holding.highWaterMark = quote.price;
+      }
 
       let sellPercent = 0;
       let sellReason = '';
@@ -268,25 +346,37 @@ export const GET: APIRoute = async ({ request }) => {
         sellPercent = 1.0;
         sellReason = `STRONG_SELL signal: score ${signal.combined.toFixed(2)}`;
       }
-      // Priority 3: Stop loss at -3% - sell all to limit losses
+      // Priority 3: ATR-based trailing stop
+      else if (holding.entryATR && holding.highWaterMark) {
+        const trailingStopPrice = holding.highWaterMark - (holding.entryATR * ATR_MULTIPLIER);
+        if (quote.price < trailingStopPrice) {
+          sellPercent = 1.0;
+          sellReason = `ATR trailing stop (HWM $${holding.highWaterMark.toFixed(2)}, stop $${trailingStopPrice.toFixed(2)})`;
+        }
+      }
+      // Priority 3b: Fallback fixed stop loss at -3% if no ATR data
       else if (holding.gainLossPercent <= -3) {
         sellPercent = 1.0;
-        sellReason = `Stop loss triggered at ${holding.gainLossPercent.toFixed(1)}%`;
+        sellReason = `Stop loss triggered at ${holding.gainLossPercent.toFixed(1)}% (no ATR data)`;
       }
-      // Priority 4: Weak signal below buy threshold - sell all to free capital
-      else if (signal.combined < 0.02) {
-        sellPercent = 1.0;
-        sellReason = `Weak signal (${signal.combined.toFixed(3)}) - rotating to stronger positions`;
-      }
-      // Priority 5: Take profit at +4% - sell half to lock in gains
-      else if (holding.gainLossPercent >= 4) {
-        sellPercent = 0.5;
-        sellReason = `Taking profits at ${holding.gainLossPercent.toFixed(1)}%`;
-      }
-      // Priority 6: Regular sell signal - sell half
-      else if (signal.recommendation === 'SELL') {
-        sellPercent = 0.5;
-        sellReason = `SELL signal: score ${signal.combined.toFixed(2)}`;
+
+      // Only check remaining conditions if not already triggered
+      if (sellPercent === 0) {
+        // Priority 4: Weak signal below buy threshold - sell all to free capital
+        if (signal.combined < 0.02) {
+          sellPercent = 1.0;
+          sellReason = `Weak signal (${signal.combined.toFixed(3)}) - rotating to stronger positions`;
+        }
+        // Priority 5: Take profit at +4% - sell half to lock in gains
+        else if (holding.gainLossPercent >= 4) {
+          sellPercent = 0.5;
+          sellReason = `Taking profits at ${holding.gainLossPercent.toFixed(1)}%`;
+        }
+        // Priority 6: Regular sell signal - sell half
+        else if (signal.recommendation === 'SELL') {
+          sellPercent = 0.5;
+          sellReason = `SELL signal: score ${signal.combined.toFixed(2)}`;
+        }
       }
 
       if (sellPercent > 0) {
@@ -321,8 +411,9 @@ export const GET: APIRoute = async ({ request }) => {
 
         // Update or remove holding
         if (sharesToSell >= holding.shares) {
-          // Sold all shares, remove holding
+          // Sold all shares, remove holding and set cooldown
           portfolio.holdings = portfolio.holdings.filter(h => h.symbol !== holding.symbol);
+          await setCooldown(holding.symbol, new Date().toISOString());
         } else {
           // Partial sell, update holding
           holding.shares -= sharesToSell;
@@ -336,12 +427,29 @@ export const GET: APIRoute = async ({ request }) => {
       }
     }
 
-    // Check for buy signals - consider many candidates for high-frequency trading
-    // Include any stock with positive combined score (not just BUY/STRONG_BUY)
+    // Check for buy signals - require complete signal data and positive score
     const buyCandidates = Object.values(allSignals)
-      .filter(s => s.combined > 0.02) // Very low threshold - any slightly positive signal
+      .filter(s => {
+        // Must have positive combined score above threshold
+        if (s.combined <= 0.02) return false;
+
+        // Require adequate confidence on core signals (momentum, meanReversion, technical)
+        if (s.momentum.confidence < MIN_SIGNAL_CONFIDENCE) return false;
+        if (s.meanReversion.confidence < MIN_SIGNAL_CONFIDENCE) return false;
+        if (s.technical.confidence < MIN_SIGNAL_CONFIDENCE) return false;
+
+        // Skip entries with "Insufficient data" in any core signal
+        const reasons = [s.momentum.reason, s.meanReversion.reason, s.technical.reason];
+        if (reasons.some(r => r.toLowerCase().includes('insufficient'))) return false;
+
+        return true;
+      })
       .sort((a, b) => b.combined - a.combined)
-      .slice(0, 35); // Consider up to 35 candidates per run to deploy cash faster
+      .slice(0, 35); // Consider up to 35 candidates per run
+
+    // Get cooldowns to check before buying
+    const cooldowns = await getCooldowns();
+    const COOLDOWN_MS = COOLDOWN_HOURS * 60 * 60 * 1000;
 
     for (const signal of buyCandidates) {
       // Skip if already holding
@@ -349,9 +457,27 @@ export const GET: APIRoute = async ({ request }) => {
         continue;
       }
 
+      // Check cooldown - skip if recently sold
+      const lastSold = cooldowns[signal.symbol];
+      if (lastSold) {
+        const timeSinceSell = Date.now() - new Date(lastSold).getTime();
+        if (timeSinceSell < COOLDOWN_MS) {
+          const hoursRemaining = ((COOLDOWN_MS - timeSinceSell) / (60 * 60 * 1000)).toFixed(1);
+          console.log(`Skipping ${signal.symbol}: cooldown active (${hoursRemaining}h remaining)`);
+          continue;
+        }
+      }
+
       // Check position limits
       if (portfolio.holdings.length >= DEFAULT_CONFIG.maxPositions) {
         break;
+      }
+
+      // Multi-timeframe confirmation: check weekly trend is not bearish
+      const weeklyOK = await checkWeeklyTrendNotBearish(signal.symbol);
+      if (!weeklyOK) {
+        console.log(`Skipping ${signal.symbol}: weekly trend is bearish`);
+        continue;
       }
 
       // Calculate position size - deploy excess cash more aggressively
@@ -368,10 +494,28 @@ export const GET: APIRoute = async ({ request }) => {
 
       const quote = await fetchYahooQuote(signal.symbol);
       if (quote) {
+        // Skip penny stocks (only for stocks, not crypto/forex/futures)
+        const assetType = getAssetType(signal.symbol);
+        if (assetType === 'stock' && quote.price < MIN_STOCK_PRICE) {
+          console.log(`Skipping ${signal.symbol}: price $${quote.price.toFixed(2)} below minimum $${MIN_STOCK_PRICE}`);
+          continue;
+        }
+
         // Use fractional shares - round to 4 decimal places for precision
         const shares = Math.round((positionSize / quote.price) * 10000) / 10000;
         if (shares >= 0.0001) {
           const total = shares * quote.price;
+
+          // Calculate ATR for trailing stop
+          let entryATR: number | null = null;
+          const historicalData = await fetchYahooHistorical(signal.symbol);
+          if (historicalData && historicalData.length >= 15) {
+            const highs = historicalData.map(d => d.high);
+            const lows = historicalData.map(d => d.low);
+            const closes = historicalData.map(d => d.close);
+            const atrValues = calculateATR(highs, lows, closes, 14);
+            entryATR = atrValues.length > 0 ? atrValues[atrValues.length - 1] : null;
+          }
 
           const trade: Trade = {
             id: crypto.randomUUID(),
@@ -387,6 +531,7 @@ export const GET: APIRoute = async ({ request }) => {
 
           const newHolding: Holding = {
             symbol: signal.symbol,
+            companyName: quote.shortName,
             shares,
             avgCost: quote.price,
             currentPrice: quote.price,
@@ -395,6 +540,10 @@ export const GET: APIRoute = async ({ request }) => {
             gainLossPercent: 0,
             isExtendedHours: quote.isExtendedHours,
             priceUpdatedAt: new Date().toISOString(),
+            highWaterMark: quote.price,
+            entryATR,
+            entryTimestamp: new Date().toISOString(),
+            entrySignals: signal,
           };
 
           portfolio.cash -= total;

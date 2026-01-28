@@ -9,6 +9,7 @@ export interface Portfolio {
 
 export interface Holding {
   symbol: string;
+  companyName?: string;
   shares: number;
   avgCost: number;
   currentPrice: number;

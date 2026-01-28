@@ -197,7 +197,7 @@ export const fastfetchCommand: Command = {
     lines.push({ id: id(), type: 'output', content: '    GPU       : Intel Arc B580', color: magenta });
     lines.push({ id: id(), type: 'output', content: '    Driver    : amdgpu', color: magenta });
     lines.push({ id: id(), type: 'output', content: '    Driver    : xe', color: cyan });
-    lines.push({ id: id(), type: 'output', content: '    Memory    : 27.29 GiB', color: green });
+    lines.push({ id: id(), type: 'output', content: '    Memory    : 32 GiB', color: green });
     lines.push({ id: id(), type: 'output', content: bottomBorder, color: border });
 
     // Theme color palette dots

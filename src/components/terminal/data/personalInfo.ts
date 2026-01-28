@@ -40,14 +40,14 @@ export const personalInfo = {
     languages: ['Python', 'TypeScript', 'JavaScript', 'Java', 'SQL', 'HTML/CSS'],
     frontend: ['React', 'Astro', 'Tailwind CSS', 'WebSockets'],
     backend: ['FastAPI', 'Django', 'Flask', 'Node.js', 'REST APIs'],
-    databases: ['PostgreSQL', 'TimescaleDB', 'SQL Server', 'Supabase'],
+    databases: ['PostgreSQL', 'TimescaleDB', 'SQL Server', 'Supabase', 'Redis'],
     'ai/ml': ['PyTorch', 'YOLOv8', 'OpenCV', 'LSTM', 'Random Forest'],
-    devops: ['Docker', 'Proxmox', 'LXC', 'Linux', 'Git', 'Bash'],
+    devops: ['Docker', 'Proxmox', 'LXC', 'Linux', 'Git', 'Bash', 'Vercel'],
     enterprise: ['Workday Extend', 'Workday Studio', 'ServiceNow', 'Power Automate'],
   },
 
   projects: [
-    { name: 'Algorithmic Trading Bot', desc: 'Self-learning regime-adaptive trading system, scans 6,000+ assets', url: '/TradingBot', tags: ['React', 'TypeScript', 'Alpaca'] },
+    { name: 'Algorithmic Trading Bot', desc: 'Self-learning regime-adaptive trading system, scans 6,000+ assets', url: '/TradingBot', tags: ['React', 'TypeScript', 'Alpaca', 'Redis'] },
     { name: 'NutriOne', desc: 'Nutrition tracking with YOLOv8 food recognition', tags: ['FastAPI', 'PostgreSQL', 'YOLOv8'] },
     { name: 'Plant Monitor', desc: 'IoT + LSTM pipeline with ESP32 sensors', tags: ['ESP32', 'PyTorch', 'TimescaleDB'] },
     { name: 'Workday Time Tracker', desc: 'Enterprise app on Workday Marketplace', tags: ['Workday Extend'] },

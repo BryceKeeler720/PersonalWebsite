@@ -16,6 +16,7 @@ const KEYS = {
   HISTORY: 'tradingbot:history',
   SPY_BENCHMARK: 'tradingbot:spyBenchmark',
   LEARNING_STATE: 'tradingbot:learningState',
+  COOLDOWNS: 'tradingbot:cooldowns',
 };
 
 export interface PortfolioSnapshot {
@@ -164,5 +165,35 @@ export async function getLearningState(): Promise<LearningState | null> {
   } catch (error) {
     console.error('Error getting learning state:', error);
     return null;
+  }
+}
+
+// Cooldown tracking - prevents re-entering recently sold positions
+export async function getCooldowns(): Promise<Record<string, string>> {
+  try {
+    const data = await redis.get<Record<string, string>>(KEYS.COOLDOWNS);
+    return data || {};
+  } catch (error) {
+    console.error('Error getting cooldowns:', error);
+    return {};
+  }
+}
+
+export async function setCooldown(symbol: string, timestamp: string): Promise<void> {
+  try {
+    const cooldowns = await getCooldowns();
+    cooldowns[symbol] = timestamp;
+
+    // Clean up old cooldowns (> 7 days) to prevent unbounded growth
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    for (const [sym, ts] of Object.entries(cooldowns)) {
+      if (new Date(ts).getTime() < cutoff) {
+        delete cooldowns[sym];
+      }
+    }
+
+    await redis.set(KEYS.COOLDOWNS, cooldowns);
+  } catch (error) {
+    console.error('Error setting cooldown:', error);
   }
 }

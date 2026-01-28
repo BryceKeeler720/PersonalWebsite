@@ -2,15 +2,17 @@ import { DEFAULT_CONFIG } from './types';
 import type { LearningState } from './types';
 
 const BOT_CONFIG = {
-  buyThreshold: 0.35,
+  buyThreshold: 0.02,
   riskPerTrade: 0.01,
-  atrStopMultiplier: 2,
+  atrStopMultiplier: 2.5,
   atrProfit1Multiplier: 3,
   atrProfit2Multiplier: 5,
-  maxNewPositionsPerCycle: 3,
+  maxNewPositionsPerCycle: 35,
   minHoldBars: 24,
   transactionCostBps: 5,
-  tradeCooldownHours: 4,
+  tradeCooldownHours: 24,
+  minStockPrice: 5,
+  minSignalConfidence: 0.3,
 };
 
 const card: React.CSSProperties = {
@@ -598,10 +600,59 @@ export default function AlgorithmTab({ learningState }: { learningState: Learnin
         </div>
       </div>
 
-      {/* Section 7: Self-Learning System */}
+      {/* Section 7: Entry Filters */}
+      <div style={card}>
+        <h2 style={cardTitle}>Entry Filters</h2>
+        <p style={subtext}>
+          Before entering any position, the bot applies multiple filters to ensure quality setups
+          and avoid problematic securities:
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+          <div style={{ background: 'rgba(220,215,186,0.02)', borderRadius: '12px', padding: '1rem' }}>
+            <div style={{ fontSize: '0.75rem', color: '#7E9CD8', fontWeight: 600, marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Minimum Price Filter</div>
+            <div style={mono}>
+              <div>if (assetType === 'stock') {'{'}</div>
+              <div>  if (price {'<'} ${BOT_CONFIG.minStockPrice}) skip</div>
+              <div>{'}'}</div>
+              <div style={{ color: 'var(--kana-fg-muted)', marginTop: '0.25rem' }}>{'// '}Avoids penny stock volatility</div>
+            </div>
+          </div>
+
+          <div style={{ background: 'rgba(220,215,186,0.02)', borderRadius: '12px', padding: '1rem' }}>
+            <div style={{ fontSize: '0.75rem', color: '#957FB8', fontWeight: 600, marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Signal Quality Filter</div>
+            <div style={mono}>
+              <div>momentum.conf ≥ {BOT_CONFIG.minSignalConfidence}</div>
+              <div>meanReversion.conf ≥ {BOT_CONFIG.minSignalConfidence}</div>
+              <div>technical.conf ≥ {BOT_CONFIG.minSignalConfidence}</div>
+              <div style={{ color: 'var(--kana-fg-muted)', marginTop: '0.25rem' }}>{'// '}No "Insufficient data" entries</div>
+            </div>
+          </div>
+
+          <div style={{ background: 'rgba(220,215,186,0.02)', borderRadius: '12px', padding: '1rem' }}>
+            <div style={{ fontSize: '0.75rem', color: '#76946A', fontWeight: 600, marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Multi-Timeframe Confirmation</div>
+            <div style={mono}>
+              <div>dailySignal = analyze(daily data)</div>
+              <div>weeklyMomentum = analyze(weekly data)</div>
+              <div style={{ color: 'var(--kana-fg-muted)', marginTop: '0.25rem' }}>{'// '}Require weekly momentum ≥ -0.2</div>
+              <div style={{ color: 'var(--kana-fg-muted)' }}>{'// '}Skip if weekly trend is bearish</div>
+            </div>
+          </div>
+
+          <div style={{ background: 'rgba(220,215,186,0.02)', borderRadius: '12px', padding: '1rem' }}>
+            <div style={{ fontSize: '0.75rem', color: '#C0A36E', fontWeight: 600, marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Cooldown Period</div>
+            <div style={mono}>
+              <div>if (soldWithin{BOT_CONFIG.tradeCooldownHours}h) skip</div>
+              <div style={{ color: 'var(--kana-fg-muted)', marginTop: '0.25rem' }}>{'// '}Prevents same-day round trips</div>
+              <div style={{ color: 'var(--kana-fg-muted)' }}>{'// '}Auto-cleans after 7 days</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Section 8: Self-Learning System */}
       <LearningSection learningState={learningState} />
 
-      {/* Section 8: Current Configuration */}
+      {/* Section 9: Current Configuration */}
       <div style={card}>
         <h2 style={cardTitle}>Current Configuration</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
@@ -612,14 +663,16 @@ export default function AlgorithmTab({ learningState }: { learningState: Learnin
             { label: 'Min Trade Value', value: `$${DEFAULT_CONFIG.minTradeValue}` },
             { label: 'Target Cash Ratio', value: `${(DEFAULT_CONFIG.targetCashRatio * 100).toFixed(0)}%` },
             { label: 'Buy Threshold', value: `> ${BOT_CONFIG.buyThreshold}` },
-            { label: 'Risk Per Trade', value: `${(BOT_CONFIG.riskPerTrade * 100).toFixed(0)}%` },
+            { label: 'Min Stock Price', value: `$${BOT_CONFIG.minStockPrice}` },
+            { label: 'Min Signal Confidence', value: `${BOT_CONFIG.minSignalConfidence}` },
+            { label: 'Cooldown Period', value: `${BOT_CONFIG.tradeCooldownHours}h` },
             { label: 'ATR Stop Multiplier', value: `${BOT_CONFIG.atrStopMultiplier}×` },
+            { label: 'Multi-Timeframe', value: 'Daily + Weekly' },
             { label: 'Schedule', value: DEFAULT_CONFIG.scheduleInterval },
             { label: 'Momentum Weight', value: `${(DEFAULT_CONFIG.strategyWeights.momentum * 100).toFixed(0)}%` },
             { label: 'Mean Reversion Weight', value: `${(DEFAULT_CONFIG.strategyWeights.meanReversion * 100).toFixed(0)}%` },
             { label: 'Sentiment Weight', value: `${(DEFAULT_CONFIG.strategyWeights.sentiment * 100).toFixed(0)}%` },
             { label: 'Technical Weight', value: `${(DEFAULT_CONFIG.strategyWeights.technical * 100).toFixed(0)}%` },
-            { label: 'Transaction Cost', value: `${BOT_CONFIG.transactionCostBps} bps/side` },
           ].map(item => (
             <div key={item.label} style={{ padding: '0.75rem', background: 'rgba(220,215,186,0.02)', borderRadius: '8px' }}>
               <div style={{ fontSize: '0.7rem', color: 'var(--kana-fg-muted)', marginBottom: '0.25rem' }}>{item.label}</div>
