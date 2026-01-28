@@ -1,13 +1,13 @@
 ---
 title: "Building a Regime-Adaptive Algorithmic Trading Bot"
-description: "How I built an ML-powered trading bot that adapts its strategy to market conditions, scans 2000+ assets, and executes automatically through Alpaca."
+description: "How I built a self-learning trading bot that adapts its strategy to market conditions, scans 6,000+ assets, and executes automatically through Alpaca."
 publishDate: 2026-01-27
-tags: ["TypeScript", "Trading", "Machine Learning", "Finance", "React"]
+tags: ["TypeScript", "Trading", "Finance", "React"]
 ---
 
-I've always been interested in quantitative finance but never had the capital or infrastructure to do anything serious with it. Last year I decided to change that. I built a trading bot from scratch that scans over 2000 assets across stocks, crypto, forex, and futures, scores them using five strategy groups, and executes trades automatically through Alpaca. It runs on $10,000 of initial capital.
+I've always been interested in quantitative finance but never had the capital or infrastructure to do anything serious with it. Last year I decided to change that. I built a trading bot from scratch that scans over 6,000 assets across stocks, crypto, forex, and futures, scores them using four strategy functions grouped into two strategy families, and executes trades automatically through Alpaca. It runs on $10,000 of initial capital and learns from its own trades over time.
 
-This post walks through the architecture, the algorithm, and what I learned along the way. The live dashboard is on my [website](/TradingBot) if you want to see it in action.
+This post walks through the architecture, the algorithm, the self-learning system, and what I learned along the way. The live dashboard is on my [website](/TradingBot) if you want to see it in action.
 
 ## The Core Idea
 
@@ -25,7 +25,9 @@ Before any strategy runs, the bot classifies the current market environment usin
 
 This requires at least 60 daily bars to calculate reliably. The regime check runs once per cycle before any signals are generated.
 
-## The Five Strategy Groups
+## The Strategy Groups
+
+The bot runs four strategy functions organized into two families. Each produces a score from -1 to +1 and a confidence from 0 to 1.
 
 ### Group A: Trend-Following
 
@@ -38,6 +40,8 @@ This requires at least 60 daily bars to calculate reliably. The regime check run
 **Bollinger Bands + RSI** fires when price touches the outer bands while RSI confirms oversold/overbought conditions. A bandwidth filter skips signals when volatility is too low (< 1%), which avoids false triggers in dead markets. Fixed confidence: 0.70.
 
 **VWAP Reversion** uses Volume Weighted Average Price with a Z-score to measure how far price has deviated from fair value. The deeper the deviation, the higher the score and confidence. A Z-score below -2 generates a strong buy signal at 0.80 confidence. This is the only strategy with dynamic confidence — it ranges from 0.30 to 0.80 depending on extremity.
+
+There's also a **Volume Breakout** strategy that fires when volume spikes above its 20-period average while price confirms the direction. It acts as a standalone confirmation signal.
 
 ## Signal Combination
 
@@ -85,12 +89,12 @@ The remaining 25% rides with a trailing stop at 2× ATR below the high-water mar
 
 The bot scans across four markets:
 
-- **Equities:** S&P 500 + NASDAQ-100 (~600 stocks)
-- **Crypto:** 30 assets including BTC, ETH, SOL (24/7 trading)
-- **Forex:** 20 major pairs (24/5 trading)
-- **Futures:** 18 contracts (ES, NQ, GC, CL, ZB)
+- **Equities:** S&P 500 + dynamically-discovered NASDAQ stocks (~5,800 symbols)
+- **Crypto:** ~100 assets covering majors, DeFi, L1s, AI tokens, and memes (24/7 trading)
+- **Forex:** ~44 pairs including majors, crosses, and emerging markets (24/5 trading)
+- **Futures:** ~43 contracts spanning indices, energy, metals, agriculture, bonds, and currencies
 
-Each asset has category metadata (Technology, Healthcare, Crypto, etc.) which helps with sector-level analysis. The multi-market coverage means there are always opportunities somewhere, even when US equities are closed.
+Each asset has category metadata (Technology, Healthcare, Crypto, etc.) for sector analysis. The buy logic reserves at least one of its three daily buy slots for non-equity assets to maintain diversification. The multi-market coverage means there are always opportunities somewhere, even when US equities are closed.
 
 ## Technical Indicators
 
@@ -122,13 +126,23 @@ Portfolio history is snapshotted every cycle, giving a minute-level equity curve
 
 The system is built with:
 
-- **Frontend:** React + TypeScript running inside Astro, with an interactive dashboard showing live positions, performance charts, trade logs, and the full algorithm breakdown
-- **Backend:** Astro API routes on Vercel with server-side JSON persistence
-- **Data:** Yahoo Finance API for historical OHLCV data (3 months daily + 1-day intraday)
-- **Execution:** Alpaca API for paper trading and live execution
-- **Storage:** Upstash Redis for persistent state across deployments
+- **Frontend:** React + TypeScript running inside Astro, with an interactive dashboard showing live positions, performance charts, trade logs, learning state, and the full algorithm breakdown
+- **Backend:** Node.js bot running as a systemd service, Astro API routes on Vercel for the dashboard
+- **Data:** Yahoo Finance API for historical OHLCV data (3 months daily + 1-day intraday), Alpaca API for live market data and asset metadata
+- **Execution:** Alpaca API for paper trading with fractionable share support
+- **Storage:** Upstash Redis for persistent state — portfolio, trades, signals, history, and learning state
 
-The batch processing system runs through symbols in groups of 15 with 500ms delays to stay within API rate limits. The entire analysis cycle — scanning 600+ assets, computing indicators, generating signals, and executing trades — completes in under a minute.
+To handle 6,000+ symbols without running out of memory, the bot processes them in batches of 200. Each batch fetches market data, runs analysis, stores the results, and then lets the raw bar data fall out of scope before the next batch. This keeps peak memory under 50MB even with the full universe.
+
+## Self-Learning System
+
+The most interesting part of the bot is that it learns from its own trades. After a warmup period of 50 closed trades, the system starts adapting two things:
+
+**Adaptive regime weights.** When the bot closes a trade, it records which strategy group (trend vs. reversion) was dominant at entry and whether the trade was profitable. Using a rolling window of the last 200 closed trades, it computes per-regime accuracy for each group and adjusts the regime weights using EMA smoothing (alpha = 0.05). Weights are clamped to a minimum of 0.10 so no strategy group is ever fully silenced.
+
+**Parameter self-tuning.** Every 50 closed trades, the system runs a hill-climbing step. It picks a random tunable parameter (RSI thresholds, SMA periods, Bollinger Band width, buy threshold, ATR multipliers), compares the win rate of older trades vs. newer trades, and nudges the parameter one step in the improving direction. All parameters have hard min/max bounds to prevent drift into nonsensical values.
+
+The learning state persists in Redis, so it survives bot restarts. There's a `--reset-learning` flag to wipe it back to defaults if needed. The dashboard shows the current learned weights vs. defaults, tuned parameters, warmup progress, and a log of recent parameter adjustments.
 
 ## What I Learned
 
@@ -138,7 +152,9 @@ The batch processing system runs through symbols in groups of 15 with 500ms dela
 
 **Transaction costs matter more than you think.** At 5 basis points per side, a round-trip costs 10 bps. With 15 active positions turning over regularly, these add up. The minimum hold period and cooldown guards exist specifically to prevent the bot from churning through fees.
 
-**Sentiment analysis is the weakest link.** The current implementation is a basic word-matching approach on news headlines. It works as a slight edge but it's nowhere near what a fine-tuned FinBERT model could do. This is the area with the most room for improvement.
+**Dust positions are real.** Partial profit-taking (selling 25% at 3x ATR, 50% at 5x ATR) sounds clean on paper. In practice, it creates tiny residual positions worth pennies that block slots and inflate cash percentages. The bot now auto-promotes partial sells to full exits when the remainder would fall below the minimum trade value, and runs a dust cleanup sweep every cycle.
+
+**Memory matters at scale.** Processing 6,000+ symbols with intraday and daily bars for each one used to crash the bot from out-of-memory errors. Switching from a monolithic fetch-then-analyze approach to batched processing (200 symbols at a time) dropped peak memory from 600MB+ to under 50MB.
 
 ## Try It
 

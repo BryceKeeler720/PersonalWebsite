@@ -1,5 +1,6 @@
 import React from 'react';
 import type { Portfolio } from './types';
+import { getAssetInfo } from '../../lib/trading/assets';
 
 interface PortfolioDashboardProps {
   portfolio: Portfolio;
@@ -36,7 +37,6 @@ export default function PortfolioDashboard({ portfolio, initialCapital, onStockS
     <div className="trading-card">
       <h2>Portfolio</h2>
 
-      {/* Total Value */}
       <div className="portfolio-value">
         <div className="value">{formatCurrency(portfolio.totalValue)}</div>
         <div className={`change ${totalGainLoss >= 0 ? 'positive' : 'negative'}`}>
@@ -44,7 +44,6 @@ export default function PortfolioDashboard({ portfolio, initialCapital, onStockS
         </div>
       </div>
 
-      {/* Stats */}
       <div className="portfolio-stats">
         <div className="stat-item">
           <div className="label">Cash</div>
@@ -64,7 +63,6 @@ export default function PortfolioDashboard({ portfolio, initialCapital, onStockS
         </div>
       </div>
 
-      {/* Holdings */}
       <h2 style={{ marginTop: '1.5rem', borderBottom: 'none', paddingBottom: 0 }}>Holdings</h2>
       {portfolio.holdings.length === 0 ? (
         <div className="empty-state">
@@ -80,7 +78,12 @@ export default function PortfolioDashboard({ portfolio, initialCapital, onStockS
               style={{ cursor: onStockSelect ? 'pointer' : 'default' }}
             >
               <div>
-                <div className="holding-symbol">{holding.symbol}</div>
+                <div className="holding-symbol">
+                  {holding.symbol}
+                  {getAssetInfo(holding.symbol).name !== holding.symbol && (
+                    <span className="holding-name">{getAssetInfo(holding.symbol).name}</span>
+                  )}
+                </div>
                 <div className="holding-shares">
                   {formatShares(holding.shares)} shares @ {formatCurrency(holding.avgCost)}
                 </div>
@@ -96,7 +99,6 @@ export default function PortfolioDashboard({ portfolio, initialCapital, onStockS
         </div>
       )}
 
-      {/* Last Updated */}
       <div
         style={{
           marginTop: '1rem',

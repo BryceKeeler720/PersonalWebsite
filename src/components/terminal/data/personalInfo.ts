@@ -47,7 +47,7 @@ export const personalInfo = {
   },
 
   projects: [
-    { name: 'Algorithmic Trading Bot', desc: 'ML-powered multi-asset trading system, scans 2000+ assets', url: '/TradingBot', tags: ['React', 'TypeScript', 'ML'] },
+    { name: 'Algorithmic Trading Bot', desc: 'Self-learning regime-adaptive trading system, scans 6,000+ assets', url: '/TradingBot', tags: ['React', 'TypeScript', 'Alpaca'] },
     { name: 'NutriOne', desc: 'Nutrition tracking with YOLOv8 food recognition', tags: ['FastAPI', 'PostgreSQL', 'YOLOv8'] },
     { name: 'Plant Monitor', desc: 'IoT + LSTM pipeline with ESP32 sensors', tags: ['ESP32', 'PyTorch', 'TimescaleDB'] },
     { name: 'Workday Time Tracker', desc: 'Enterprise app on Workday Marketplace', tags: ['Workday Extend'] },

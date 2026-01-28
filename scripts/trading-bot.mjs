@@ -56,27 +56,69 @@ const ALPACA_PAPER_URL = 'https://paper-api.alpaca.markets';
 
 // Asset lists
 const CRYPTO_SYMBOLS = [
+  // Top 30 by market cap
   'BTC-USD', 'ETH-USD', 'BNB-USD', 'XRP-USD', 'SOL-USD', 'ADA-USD', 'DOGE-USD',
   'AVAX-USD', 'DOT-USD', 'MATIC-USD', 'LINK-USD', 'SHIB-USD', 'LTC-USD',
   'ATOM-USD', 'UNI-USD', 'XLM-USD', 'NEAR-USD', 'APT-USD', 'OP-USD', 'ARB-USD',
   'FIL-USD', 'HBAR-USD', 'ICP-USD', 'VET-USD', 'AAVE-USD', 'MKR-USD', 'GRT-USD',
   'INJ-USD', 'RUNE-USD', 'FTM-USD',
+  // DeFi & Layer 2
+  'CRV-USD', 'LDO-USD', 'SNX-USD', 'COMP-USD', 'SUSHI-USD', 'YFI-USD', 'BAL-USD',
+  'UMA-USD', '1INCH-USD', 'DYDX-USD', 'ENS-USD', 'RPL-USD', 'GMX-USD',
+  'JUP-USD', 'PENDLE-USD', 'STRK-USD',
+  // Infrastructure & Interoperability
+  'ALGO-USD', 'EGLD-USD', 'MINA-USD', 'FLOW-USD', 'KAVA-USD', 'ZEC-USD',
+  'EOS-USD', 'XTZ-USD', 'THETA-USD', 'AXS-USD', 'SAND-USD', 'MANA-USD',
+  'ENJ-USD', 'CHZ-USD', 'GALA-USD', 'IMX-USD', 'RNDR-USD', 'FET-USD',
+  // Layer 1 / New Chains
+  'SUI-USD', 'SEI-USD', 'TIA-USD', 'STX-USD', 'KAS-USD', 'TON-USD',
+  'TRX-USD', 'BCH-USD', 'ETC-USD', 'NEO-USD',
+  // AI & Data
+  'TAO-USD', 'OCEAN-USD', 'ONDO-USD', 'AGIX-USD', 'WLD-USD',
+  // Exchange & Utility
+  'CRO-USD', 'OKB-USD',
+  // Privacy & Legacy
+  'XMR-USD', 'DASH-USD', 'ZIL-USD', 'IOTA-USD',
+  // Infrastructure
+  'ANKR-USD', 'STORJ-USD', 'BAT-USD', 'CELO-USD', 'ROSE-USD', 'ONE-USD',
+  // Meme & Trending
+  'PEPE-USD', 'WIF-USD', 'BONK-USD', 'FLOKI-USD',
 ];
 
 // Forex pairs (24/5 Trading - Closed weekends) — Yahoo Finance format: PAIR=X
 const FOREX_SYMBOLS = [
+  // Major pairs
   'EURUSD=X', 'GBPUSD=X', 'USDJPY=X', 'USDCHF=X', 'AUDUSD=X', 'USDCAD=X', 'NZDUSD=X',
+  // Cross pairs
   'EURGBP=X', 'EURJPY=X', 'GBPJPY=X', 'AUDJPY=X', 'CADJPY=X', 'EURAUD=X', 'EURCHF=X',
-  'GBPCHF=X', 'USDMXN=X', 'USDZAR=X', 'USDTRY=X', 'USDINR=X', 'USDCNY=X',
+  'GBPCHF=X', 'NZDJPY=X', 'GBPAUD=X', 'EURCZD=X', 'AUDNZD=X', 'GBPCAD=X', 'AUDCAD=X',
+  'CHFJPY=X', 'EURNZD=X', 'GBPNZD=X',
+  // Emerging market pairs
+  'USDMXN=X', 'USDZAR=X', 'USDTRY=X', 'USDINR=X', 'USDCNY=X',
+  'USDSGD=X', 'USDHKD=X', 'USDNOK=X', 'USDSEK=X', 'USDPLN=X',
+  'USDDKK=X', 'USDHUF=X', 'USDCZK=X', 'USDTHB=X', 'USDIDR=X',
+  'USDTWD=X', 'USDKRW=X', 'USDBRL=X', 'USDCLP=X', 'USDCOP=X',
 ];
 
 // Futures — Yahoo Finance format: SYMBOL=F
 const FUTURES_SYMBOLS = [
-  'ES=F', 'NQ=F', 'YM=F', 'RTY=F',   // Index futures
-  'GC=F', 'SI=F', 'CL=F', 'BZ=F', 'NG=F', 'HG=F', 'PL=F',  // Commodity futures
-  'ZC=F', 'ZW=F', 'ZS=F',             // Agricultural futures
-  'ZB=F', 'ZN=F',                      // Bond futures
-  '6E=F', '6B=F', '6J=F',             // Currency futures
+  // Index futures
+  'ES=F', 'NQ=F', 'YM=F', 'RTY=F', 'VIX=F', 'NIKKEI=F',
+  // Energy
+  'CL=F', 'BZ=F', 'NG=F', 'HO=F', 'RB=F',
+  // Metals
+  'GC=F', 'SI=F', 'HG=F', 'PL=F', 'PA=F',
+  // Agricultural
+  'ZC=F', 'ZW=F', 'ZS=F', 'ZM=F', 'ZL=F',  // Corn, Wheat, Soybeans, Meal, Oil
+  'CT=F', 'KC=F', 'SB=F', 'CC=F', 'OJ=F',   // Cotton, Coffee, Sugar, Cocoa, OJ
+  'LC=F', 'LH=F', 'FC=F',                     // Live Cattle, Lean Hogs, Feeder Cattle
+  'ZO=F', 'ZR=F', 'LBS=F',                    // Oats, Rough Rice, Lumber
+  // Bond futures
+  'ZB=F', 'ZN=F', 'ZF=F', 'ZT=F',
+  // Currency & Crypto futures
+  '6E=F', '6B=F', '6J=F', '6A=F', '6C=F', '6S=F', '6N=F', '6M=F',
+  'DX=F',                                      // U.S. Dollar Index
+  'BTC=F', 'ETH=F',                            // CME Crypto futures
 ];
 
 const SP500_SYMBOLS = [
@@ -1050,6 +1092,152 @@ async function syncAlpacaPositions() {
   }
 }
 
+// Reconcile internal portfolio state with Alpaca's actual positions and cash
+async function reconcileWithAlpaca(portfolio) {
+  console.log('\n--- Alpaca Reconciliation ---');
+  const corrections = [];
+
+  // 1. Fetch Alpaca account for actual cash/equity
+  let alpacaCash = null;
+  let alpacaEquity = null;
+  try {
+    const acctRes = await fetch(`${ALPACA_PAPER_URL}/v2/account`, {
+      headers: {
+        'APCA-API-KEY-ID': ALPACA_API_KEY,
+        'APCA-API-SECRET-KEY': ALPACA_SECRET_KEY,
+      },
+    });
+    if (acctRes.ok) {
+      const acct = await acctRes.json();
+      alpacaCash = parseFloat(acct.cash);
+      alpacaEquity = parseFloat(acct.equity);
+      console.log(`Alpaca account: equity=$${alpacaEquity.toFixed(2)}, cash=$${alpacaCash.toFixed(2)}`);
+    } else {
+      console.log(`Alpaca account fetch failed: ${acctRes.status}`);
+      return portfolio;
+    }
+  } catch (error) {
+    console.log(`Alpaca account fetch error: ${error.message}`);
+    return portfolio;
+  }
+
+  // 2. Fetch Alpaca positions with full details
+  let alpacaPositionMap = new Map(); // symbol → { qty, marketValue, avgCost, currentPrice }
+  try {
+    const posRes = await fetch(`${ALPACA_PAPER_URL}/v2/positions`, {
+      headers: {
+        'APCA-API-KEY-ID': ALPACA_API_KEY,
+        'APCA-API-SECRET-KEY': ALPACA_SECRET_KEY,
+      },
+    });
+    if (posRes.ok) {
+      const positions = await posRes.json();
+      for (const p of positions) {
+        const sym = p.asset_class === 'crypto'
+          ? fromAlpacaCryptoSymbol(p.symbol)
+          : fromAlpacaStockSymbol(p.symbol);
+        alpacaPositionMap.set(sym, {
+          qty: parseFloat(p.qty),
+          marketValue: parseFloat(p.market_value),
+          avgCost: parseFloat(p.avg_entry_price),
+          currentPrice: parseFloat(p.current_price),
+        });
+      }
+      console.log(`Alpaca positions: ${alpacaPositionMap.size} holdings`);
+    } else {
+      console.log(`Alpaca positions fetch failed: ${posRes.status}`);
+      return portfolio;
+    }
+  } catch (error) {
+    console.log(`Alpaca positions fetch error: ${error.message}`);
+    return portfolio;
+  }
+
+  // 3. Remove phantom holdings (in Redis but not on Alpaca)
+  // Note: forex/futures are internal-only, so we keep those
+  const reconciledHoldings = [];
+  for (const holding of portfolio.holdings) {
+    if (isForexOrFutures(holding.symbol)) {
+      reconciledHoldings.push(holding);
+      continue;
+    }
+    const alpacaPos = alpacaPositionMap.get(holding.symbol);
+    if (!alpacaPos) {
+      const phantomValue = holding.marketValue || (holding.shares * (holding.currentPrice || 0));
+      corrections.push(`REMOVED phantom: ${holding.symbol} (${holding.shares} shares, $${phantomValue.toFixed(2)})`);
+      continue; // Drop this phantom holding
+    }
+    // 4. Correct share count if different
+    if (Math.abs(holding.shares - alpacaPos.qty) > 0.0001) {
+      corrections.push(`ADJUSTED ${holding.symbol}: shares ${holding.shares.toFixed(4)} → ${alpacaPos.qty.toFixed(4)}`);
+      holding.shares = alpacaPos.qty;
+    }
+    // Update market value and price from Alpaca
+    holding.currentPrice = alpacaPos.currentPrice;
+    holding.avgCost = alpacaPos.avgCost;
+    holding.marketValue = alpacaPos.marketValue;
+    holding.gainLoss = alpacaPos.marketValue - (alpacaPos.avgCost * alpacaPos.qty);
+    holding.gainLossPercent = alpacaPos.avgCost > 0
+      ? ((alpacaPos.currentPrice - alpacaPos.avgCost) / alpacaPos.avgCost) * 100
+      : 0;
+    reconciledHoldings.push(holding);
+  }
+
+  // 5. Add positions that exist on Alpaca but not in Redis (unlikely but possible)
+  for (const [sym, pos] of alpacaPositionMap) {
+    if (!reconciledHoldings.find(h => h.symbol === sym)) {
+      corrections.push(`ADDED missing: ${sym} (${pos.qty.toFixed(4)} shares, $${pos.marketValue.toFixed(2)})`);
+      reconciledHoldings.push({
+        symbol: sym,
+        shares: pos.qty,
+        avgCost: pos.avgCost,
+        currentPrice: pos.currentPrice,
+        marketValue: pos.marketValue,
+        gainLoss: pos.marketValue - (pos.avgCost * pos.qty),
+        gainLossPercent: pos.avgCost > 0
+          ? ((pos.currentPrice - pos.avgCost) / pos.avgCost) * 100
+          : 0,
+      });
+    }
+  }
+
+  portfolio.holdings = reconciledHoldings;
+
+  // 6. Reconcile cash — use Alpaca's actual cash for non-forex/futures portion
+  // Internal-only holdings (forex/futures) have no Alpaca counterpart,
+  // so we compute: cash = alpacaCash - value_of_internal_only_holdings
+  // Actually simpler: just trust Alpaca's cash since forex/futures aren't real money
+  const oldCash = portfolio.cash;
+  portfolio.cash = alpacaCash;
+  if (Math.abs(oldCash - alpacaCash) > 0.01) {
+    corrections.push(`CASH: $${oldCash.toFixed(2)} → $${alpacaCash.toFixed(2)} (diff: $${(alpacaCash - oldCash).toFixed(2)})`);
+  }
+
+  // 7. Recalculate total value
+  const holdingsValue = portfolio.holdings.reduce((sum, h) => sum + h.marketValue, 0);
+  const oldTotal = portfolio.totalValue;
+  portfolio.totalValue = portfolio.cash + holdingsValue;
+  if (Math.abs(oldTotal - portfolio.totalValue) > 0.01) {
+    corrections.push(`TOTAL: $${oldTotal.toFixed(2)} → $${portfolio.totalValue.toFixed(2)} (diff: $${(portfolio.totalValue - oldTotal).toFixed(2)})`);
+  }
+
+  // 8. Report
+  if (corrections.length === 0) {
+    console.log('No discrepancies found — internal state matches Alpaca.');
+  } else {
+    console.log(`Found ${corrections.length} corrections:`);
+    for (const c of corrections) {
+      console.log(`  • ${c}`);
+    }
+    portfolio.lastUpdated = new Date().toISOString();
+    await savePortfolio(portfolio);
+    console.log('Portfolio reconciled and saved.');
+  }
+
+  console.log('--- End Reconciliation ---\n');
+  return portfolio;
+}
+
 async function submitAlpacaOrder(symbol, qty, side) {
   // Forex/futures not supported by Alpaca — skip paper order (still tracked in Redis)
   if (isForexOrFutures(symbol)) return null;
@@ -1663,7 +1851,7 @@ async function main() {
 
   let assetsToAnalyze = [...CRYPTO_SYMBOLS];
   if (!isWeekend) {
-    assetsToAnalyze.push(...SP500_SYMBOLS, ...ETF_SYMBOLS, ...nasdaqSymbols);
+    assetsToAnalyze.push(...SP500_SYMBOLS, ...nasdaqSymbols);
     assetsToAnalyze.push(...FOREX_SYMBOLS, ...FUTURES_SYMBOLS);
   }
   // Always include current holdings so we can generate signals and make sell decisions
@@ -1933,10 +2121,30 @@ async function main() {
   // Soft position limit: target maxPositions but allow ~20% buffer for strong signals
   const hardMax = Math.ceil(DEFAULT_CONFIG.maxPositions * 1.2);
   const openSlots = Math.max(0, hardMax - portfolio.holdings.length);
-  const buyCandidates = Object.values(allSignals)
+  // Diversified buy selection: reserve 1 slot for non-equity assets (crypto/forex/futures)
+  const maxBuys = Math.min(openSlots, DEFAULT_CONFIG.maxNewPositionsPerCycle);
+  const allCandidates = Object.values(allSignals)
     .filter(s => s.combined > effectiveBuyThreshold && !portfolio.holdings.some(h => h.symbol === s.symbol) && !isOnCooldown(s.symbol))
-    .sort((a, b) => b.combined - a.combined)
-    .slice(0, Math.min(openSlots, DEFAULT_CONFIG.maxNewPositionsPerCycle));
+    .sort((a, b) => b.combined - a.combined);
+
+  const isAltAsset = (sym) => isCryptoSymbol(sym) || isForexOrFutures(sym);
+  const altCandidates = allCandidates.filter(s => isAltAsset(s.symbol));
+  const equityCandidates = allCandidates.filter(s => !isAltAsset(s.symbol));
+
+  // Build diversified list: 1 alt slot + remaining equity slots
+  const buyCandidates = [];
+  if (altCandidates.length > 0 && maxBuys > 0) {
+    buyCandidates.push(altCandidates[0]); // Best alternative asset
+  }
+  for (const c of equityCandidates) {
+    if (buyCandidates.length >= maxBuys) break;
+    buyCandidates.push(c);
+  }
+  // Fill any remaining slots with more alt candidates
+  for (const c of altCandidates.slice(1)) {
+    if (buyCandidates.length >= maxBuys) break;
+    buyCandidates.push(c);
+  }
 
   if (buyCandidates.length > 0) {
     const targetCashBuy = portfolio.totalValue * DEFAULT_CONFIG.targetCashRatio;
@@ -2099,6 +2307,15 @@ async function runService() {
   if (process.argv.includes('--reset-learning')) {
     await redis.set(KEYS.LEARNING_STATE, JSON.parse(JSON.stringify(DEFAULT_LEARNING_STATE)));
     console.log('Learning state reset to defaults. Portfolio unchanged.');
+    process.exit(0);
+  }
+
+  if (process.argv.includes('--reconcile')) {
+    console.log('Running Alpaca reconciliation...');
+    await syncAlpacaPositions();
+    let portfolio = await getPortfolio();
+    portfolio = await reconcileWithAlpaca(portfolio);
+    console.log(`\nReconciled portfolio: $${portfolio.totalValue.toFixed(2)} | Holdings: ${portfolio.holdings.length} | Cash: $${portfolio.cash.toFixed(2)}`);
     process.exit(0);
   }
 

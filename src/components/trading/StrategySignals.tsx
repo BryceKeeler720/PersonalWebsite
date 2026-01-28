@@ -163,7 +163,7 @@ export default function StrategySignals({
     return index;
   }, [signals]);
 
-  // Build categories including dynamic symbols
+  // Build categories, merging dynamically-discovered NASDAQ symbols into the NASDAQ category
   const assetCategories = useMemo(() => {
     const dynamicStocks: string[] = [];
     for (const symbol of signals.keys()) {
@@ -172,11 +172,12 @@ export default function StrategySignals({
       }
     }
 
-    const categories = [...STATIC_CATEGORIES];
-    if (dynamicStocks.length > 0) {
-      categories.push({ label: 'Other Analyzed', symbols: dynamicStocks.sort() });
-    }
-    return categories;
+    if (dynamicStocks.length === 0) return [...STATIC_CATEGORIES];
+
+    return STATIC_CATEGORIES.map(cat => {
+      if (cat.label !== 'NASDAQ') return cat;
+      return { label: 'NASDAQ', symbols: [...cat.symbols, ...dynamicStocks].sort() };
+    });
   }, [signals]);
 
   // Ranked search results (only when searching)

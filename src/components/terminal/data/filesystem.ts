@@ -52,9 +52,9 @@ export const filesystem: FSNode = {
                   content: [
                     'Algorithmic Trading Bot',
                     '----------------------',
-                    'ML-powered multi-asset trading system.',
-                    '5 strategy groups, scans 2000+ assets.',
-                    'Stack: React, TypeScript, ML, Alpaca API',
+                    'Self-learning regime-adaptive trading system.',
+                    'Scans 6,000+ assets across stocks, crypto, forex, futures.',
+                    'Stack: React, TypeScript, Alpaca API, Redis',
                     'Live: /TradingBot',
                   ].join('\n'),
                 },

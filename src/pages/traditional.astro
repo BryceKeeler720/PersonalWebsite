@@ -267,8 +267,8 @@ import SkillBadge from '../components/traditional/SkillBadge.astro';
     <div class="projects-grid">
       <Card
         title="Algorithmic Trading Bot"
-        description="ML-powered multi-asset trading bot combining 5 strategy groups: momentum (SMA crossovers, RSI), mean reversion (Bollinger Bands, Z-score), technical (MACD, volume), sentiment analysis (news + social), and an ML ensemble that weights them all. Scans 2000+ assets across stocks, crypto, forex, and futures — ranks by composite score, sizes positions with Kelly criterion, and executes automatically via Alpaca."
-        tags={["React", "TypeScript", "ML", "Data Science", "Yahoo Finance"]}
+        description="Regime-adaptive trading bot with a self-learning system. Classifies market conditions via ADX and dynamically weights trend-following (SMA crossovers, MACD) against mean-reversion (Bollinger Bands + RSI, VWAP Z-score). Scans 6,000+ assets across stocks, crypto, forex, and futures — sizes positions with ATR-based risk and executes automatically via Alpaca. Learns from its own trades to tune strategy weights and parameters over time."
+        tags={["React", "TypeScript", "Yahoo Finance", "Alpaca", "Redis"]}
         href="/TradingBot"
         delay={0}
       />

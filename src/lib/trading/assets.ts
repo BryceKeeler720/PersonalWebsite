@@ -1,117 +1,79 @@
-// Comprehensive trading assets for 24/7 trading
-// Includes: S&P 500, NASDAQ-100, Crypto (24/7), Forex, and Futures
-
-// ============================================================
-// CRYPTO (24/7 Trading) - Yahoo Finance format: SYMBOL-USD
-// ============================================================
+// Yahoo Finance format: SYMBOL-USD
 export const CRYPTO_SYMBOLS = [
-  // Major cryptocurrencies
-  'BTC-USD', // Bitcoin
-  'ETH-USD', // Ethereum
-  'BNB-USD', // Binance Coin
-  'XRP-USD', // Ripple
-  'SOL-USD', // Solana
-  'ADA-USD', // Cardano
-  'DOGE-USD', // Dogecoin
-  'AVAX-USD', // Avalanche
-  'DOT-USD', // Polkadot
-  'MATIC-USD', // Polygon
-  'LINK-USD', // Chainlink
-  'SHIB-USD', // Shiba Inu
-  'LTC-USD', // Litecoin
-  'ATOM-USD', // Cosmos
-  'UNI-USD', // Uniswap
-  'XLM-USD', // Stellar
-  'NEAR-USD', // NEAR Protocol
-  'APT-USD', // Aptos
-  'OP-USD', // Optimism
-  'ARB-USD', // Arbitrum
-  'FIL-USD', // Filecoin
-  'HBAR-USD', // Hedera
-  'ICP-USD', // Internet Computer
-  'VET-USD', // VeChain
-  'AAVE-USD', // Aave
-  'MKR-USD', // Maker
-  'GRT-USD', // The Graph
-  'INJ-USD', // Injective
-  'RUNE-USD', // THORChain
-  'FTM-USD', // Fantom
+  // majors
+  'BTC-USD', 'ETH-USD', 'BNB-USD', 'XRP-USD', 'SOL-USD', 'ADA-USD', 'DOGE-USD',
+  'AVAX-USD', 'DOT-USD', 'MATIC-USD', 'LINK-USD', 'SHIB-USD', 'LTC-USD',
+  'ATOM-USD', 'UNI-USD', 'XLM-USD', 'NEAR-USD', 'APT-USD', 'OP-USD', 'ARB-USD',
+  'FIL-USD', 'HBAR-USD', 'ICP-USD', 'VET-USD', 'AAVE-USD', 'MKR-USD', 'GRT-USD',
+  'INJ-USD', 'RUNE-USD', 'FTM-USD',
+  // defi & l2
+  'CRV-USD', 'LDO-USD', 'SNX-USD', 'COMP-USD', 'SUSHI-USD', 'YFI-USD', 'BAL-USD',
+  'UMA-USD', '1INCH-USD', 'DYDX-USD', 'ENS-USD', 'RPL-USD', 'GMX-USD',
+  'JUP-USD', 'PENDLE-USD', 'STRK-USD',
+  // infrastructure
+  'ALGO-USD', 'EGLD-USD', 'MINA-USD', 'FLOW-USD', 'KAVA-USD', 'ZEC-USD',
+  'EOS-USD', 'XTZ-USD', 'THETA-USD', 'AXS-USD', 'SAND-USD', 'MANA-USD',
+  'ENJ-USD', 'CHZ-USD', 'GALA-USD', 'IMX-USD', 'RNDR-USD', 'FET-USD',
+  // l1 / new chains
+  'SUI-USD', 'SEI-USD', 'TIA-USD', 'STX-USD', 'KAS-USD', 'TON-USD',
+  'TRX-USD', 'BCH-USD', 'ETC-USD', 'NEO-USD',
+  // ai & data
+  'TAO-USD', 'OCEAN-USD', 'ONDO-USD', 'AGIX-USD', 'WLD-USD',
+  // exchange tokens
+  'CRO-USD', 'OKB-USD',
+  // privacy / legacy
+  'XMR-USD', 'DASH-USD', 'ZIL-USD', 'IOTA-USD',
+  // misc infrastructure
+  'ANKR-USD', 'STORJ-USD', 'BAT-USD', 'CELO-USD', 'ROSE-USD', 'ONE-USD',
+  // meme
+  'PEPE-USD', 'WIF-USD', 'BONK-USD', 'FLOKI-USD',
 ] as const;
 
-// ============================================================
-// FOREX (24/5 Trading - Closed weekends) - Yahoo Finance format: PAIR=X
-// ============================================================
+// Yahoo Finance format: PAIR=X
 export const FOREX_SYMBOLS = [
-  // Major pairs (most liquid)
-  'EURUSD=X', // Euro/USD
-  'GBPUSD=X', // British Pound/USD
-  'USDJPY=X', // USD/Japanese Yen
-  'USDCHF=X', // USD/Swiss Franc
-  'AUDUSD=X', // Australian Dollar/USD
-  'USDCAD=X', // USD/Canadian Dollar
-  'NZDUSD=X', // New Zealand Dollar/USD
-  // Cross pairs
-  'EURGBP=X', // Euro/British Pound
-  'EURJPY=X', // Euro/Japanese Yen
-  'GBPJPY=X', // British Pound/Japanese Yen
-  'AUDJPY=X', // Australian Dollar/Japanese Yen
-  'CADJPY=X', // Canadian Dollar/Japanese Yen
-  'EURAUD=X', // Euro/Australian Dollar
-  'EURCHF=X', // Euro/Swiss Franc
-  'GBPCHF=X', // British Pound/Swiss Franc
-  // Emerging market pairs
-  'USDMXN=X', // USD/Mexican Peso
-  'USDZAR=X', // USD/South African Rand
-  'USDTRY=X', // USD/Turkish Lira
-  'USDINR=X', // USD/Indian Rupee
-  'USDCNY=X', // USD/Chinese Yuan
+  // majors
+  'EURUSD=X', 'GBPUSD=X', 'USDJPY=X', 'USDCHF=X', 'AUDUSD=X', 'USDCAD=X', 'NZDUSD=X',
+  // crosses
+  'EURGBP=X', 'EURJPY=X', 'GBPJPY=X', 'AUDJPY=X', 'CADJPY=X', 'EURAUD=X', 'EURCHF=X',
+  'GBPCHF=X', 'NZDJPY=X', 'GBPAUD=X', 'EURCZD=X', 'AUDNZD=X', 'GBPCAD=X', 'AUDCAD=X',
+  'CHFJPY=X', 'EURNZD=X', 'GBPNZD=X',
+  // emerging markets
+  'USDMXN=X', 'USDZAR=X', 'USDTRY=X', 'USDINR=X', 'USDCNY=X',
+  'USDSGD=X', 'USDHKD=X', 'USDNOK=X', 'USDSEK=X', 'USDPLN=X',
+  'USDDKK=X', 'USDHUF=X', 'USDCZK=X', 'USDTHB=X', 'USDIDR=X',
+  'USDTWD=X', 'USDKRW=X', 'USDBRL=X', 'USDCLP=X', 'USDCOP=X',
 ] as const;
 
-// ============================================================
-// FUTURES - Yahoo Finance format: SYMBOL=F
-// ============================================================
+// Yahoo Finance format: SYMBOL=F
 export const FUTURES_SYMBOLS = [
-  // Index futures
-  'ES=F', // E-mini S&P 500
-  'NQ=F', // E-mini NASDAQ-100
-  'YM=F', // Mini Dow Jones
-  'RTY=F', // E-mini Russell 2000
-  // Commodity futures
-  'GC=F', // Gold
-  'SI=F', // Silver
-  'CL=F', // Crude Oil WTI
-  'BZ=F', // Brent Crude Oil
-  'NG=F', // Natural Gas
-  'HG=F', // Copper
-  'PL=F', // Platinum
-  // Agricultural futures
-  'ZC=F', // Corn
-  'ZW=F', // Wheat
-  'ZS=F', // Soybeans
-  // Bond futures
-  'ZB=F', // 30-Year T-Bond
-  'ZN=F', // 10-Year T-Note
-  // Currency futures
-  '6E=F', // Euro FX
-  '6B=F', // British Pound
-  '6J=F', // Japanese Yen
+  // indices
+  'ES=F', 'NQ=F', 'YM=F', 'RTY=F', 'VIX=F', 'NIKKEI=F',
+  // energy
+  'CL=F', 'BZ=F', 'NG=F', 'HO=F', 'RB=F',
+  // metals
+  'GC=F', 'SI=F', 'HG=F', 'PL=F', 'PA=F',
+  // agriculture
+  'ZC=F', 'ZW=F', 'ZS=F', 'ZM=F', 'ZL=F',
+  'CT=F', 'KC=F', 'SB=F', 'CC=F', 'OJ=F',
+  'LC=F', 'LH=F', 'FC=F', 'ZO=F', 'ZR=F', 'LBS=F',
+  // bonds
+  'ZB=F', 'ZN=F', 'ZF=F', 'ZT=F',
+  // currency & crypto
+  '6E=F', '6B=F', '6J=F', '6A=F', '6C=F', '6S=F', '6N=F', '6M=F',
+  'DX=F', 'BTC=F', 'ETH=F',
 ] as const;
 
-// ============================================================
-// NASDAQ Stocks (Comprehensive list - ~400 stocks)
-// Includes NASDAQ-100, growth stocks, biotech, tech, and more
-// ============================================================
 export const NASDAQ_ADDITIONAL = [
-  // === NASDAQ-100 Core (not in S&P 500) ===
+  // nasdaq-100 (not in s&p 500)
   'MELI', 'TEAM', 'LCID', 'RIVN', 'OKTA', 'ZM', 'DOCU', 'ROKU', 'NET',
   'CRSP', 'ASML', 'MRVL', 'PDD', 'JD', 'BIDU', 'NTES', 'TCOM',
 
-  // === Growth & Momentum Stocks ===
+  // growth & momentum
   'SOFI', 'UPST', 'AFRM', 'PATH', 'SNOW', 'DKNG', 'RBLX', 'U', 'BILL',
   'HUBS', 'TWLO', 'MDB', 'CFLT', 'GTLB', 'S', 'DUOL', 'PINS', 'SNAP',
   'SPOT', 'LYFT', 'GRAB', 'SE', 'SHOP', 'SQ', 'FUBO',
 
-  // === Biotech & Pharma ===
+  // biotech & pharma
   'BNTX', 'NVAX', 'SGEN', 'EXAS', 'ALNY', 'SRPT', 'RARE', 'BMRN',
   'NBIX', 'IONS', 'HALO', 'LEGN', 'PCVX', 'KRYS', 'ARWR', 'BGNE',
   'VXRT', 'INO', 'SAVA', 'MGNX', 'NTLA', 'EDIT', 'BEAM', 'PRTA',
@@ -124,7 +86,7 @@ export const NASDAQ_ADDITIONAL = [
   'GERN', 'HRTX', 'IMGN', 'IOVA', 'IRWD', 'JAZZ', 'KURA', 'MCRB',
   'NKTX', 'OLINK', 'PRAX', 'SAGE', 'TGTX', 'TVTX', 'VCYT', 'XERS',
 
-  // === Tech & AI/ML ===
+  // tech & ai
   'ARM', 'IONQ', 'RGTI', 'AI', 'SOUN', 'BBAI', 'UPWK', 'FVRR', 'WIX',
   'ZI', 'ESTC', 'NEWR', 'ASAN', 'MNDY', 'DOCN', 'FSLY', 'AKAM', 'DBX',
   'BOX', 'SPLK', 'DOMO', 'YEXT', 'ZUO', 'APPN', 'BIGC', 'COUP',
@@ -136,14 +98,14 @@ export const NASDAQ_ADDITIONAL = [
   'LSCC', 'MANH', 'NTNX', 'PCOR', 'PEGA', 'PLAN', 'RELY', 'SEMR',
   'TOST', 'WULF', 'XPRO', 'APGE', 'AVPT', 'CLSK', 'COTY', 'CPRT',
 
-  // === Semiconductors ===
+  // semiconductors
   'WOLF', 'ACLS', 'ALGM', 'AMKR', 'AOSL', 'ASPN', 'ATOM', 'AXTI',
   'CAMT', 'CRUS', 'DIOD', 'FORM', 'INDI', 'IPGP', 'ISSI', 'ITOS',
   'KLIC', 'LEDS', 'LITE', 'MASI', 'MKSI', 'MTSI', 'NOVT', 'NXPI',
   'OLED', 'ONTO', 'PLAB', 'POWI', 'QRVO', 'RMBS', 'SITM', 'SLAB',
   'SMTC', 'SYNA', 'TER', 'UCTT', 'VECO', 'VIAV', 'VSH', 'WRAP',
 
-  // === Consumer & Retail ===
+  // consumer & retail
   'FIVE', 'OLLI', 'RH', 'W', 'CHWY', 'CPNG', 'BABA', 'BGFV', 'BIRD',
   'BOOT', 'BROS', 'CAKE', 'CARS', 'CASA', 'CATO', 'CONN', 'COUR',
   'CURV', 'EAT', 'ELF', 'EVRI', 'FIZZ', 'FOXF', 'FRPT', 'FTDR',
@@ -154,7 +116,7 @@ export const NASDAQ_ADDITIONAL = [
   'STNE', 'SWBI', 'TACO', 'TAST', 'TNET', 'TRIP', 'TXRH', 'VIR',
   'VRNT', 'VSCO', 'WINA', 'WING', 'WOOF', 'WW', 'YELP', 'YETI',
 
-  // === EV & Clean Energy ===
+  // ev & clean energy
   'NIO', 'XPEV', 'LI', 'FSR', 'GOEV', 'WKHS', 'HYLN', 'CHPT', 'BLNK',
   'EVGO', 'QS', 'PLUG', 'FCEL', 'BE', 'SEDG', 'RUN', 'ARRY', 'BLDP',
   'CLNE', 'ENVX', 'EVEX', 'FLNC', 'FREY', 'GEVO', 'HYZN', 'LEV',
@@ -163,7 +125,7 @@ export const NASDAQ_ADDITIONAL = [
   'AMPS', 'ARBE', 'ARVL', 'BEEM', 'CALX', 'DRIV', 'EOSE', 'FFIE',
   'FUV', 'LAZR', 'LCID', 'MULN', 'PLTK', 'PODD', 'PRCH', 'SLDP',
 
-  // === Fintech & Financial ===
+  // fintech & financial
   'MSTR', 'VIRT', 'ALLY', 'AX', 'BFAM', 'BL', 'BSIG', 'CACC',
   'CASH', 'CBSH', 'CFFN', 'COOP', 'CUBI', 'CWCO', 'CZFS', 'DCOM',
   'DFIN', 'DNLI', 'ENVA', 'ESNT', 'EQBK', 'FBIZ', 'FCBP', 'FCNCA',
@@ -176,7 +138,7 @@ export const NASDAQ_ADDITIONAL = [
   'UFPI', 'VBTX', 'VLY', 'VRTS', 'WABC', 'WAFD', 'WAL', 'WBS',
   'WRLD', 'WSBC', 'WTBA', 'WTFC', 'XNCR',
 
-  // === Media & Entertainment ===
+  // media & entertainment
   'PARA', 'BMBL', 'ATVI', 'CARG', 'CHDN', 'CNK', 'CPRI', 'CROX',
   'CWST', 'DXPE', 'EYE', 'FOSL', 'GIII', 'GRPN', 'HAFC', 'HLI',
   'IMAX', 'INSW', 'LAUR', 'LINC', 'LIND', 'LNW', 'LPTH', 'LSXMA',
@@ -184,7 +146,7 @@ export const NASDAQ_ADDITIONAL = [
   'QNST', 'RCII', 'RIOT', 'SIRI', 'SONO', 'SPHR', 'STAA', 'STRA',
   'STRR', 'TARS', 'TME', 'TRMK', 'TUYA', 'WMG', 'WWE', 'XMTR', 'ZUMZ',
 
-  // === Communications & Telecom ===
+  // communications & telecom
   'LUMN', 'FYBR', 'USM', 'SATS', 'GSAT', 'IRDM', 'ASTS', 'BAND',
   'BCOV', 'CALX', 'CASA', 'CCOI', 'CIEN', 'CIIG', 'CLFD', 'CNSL',
   'COMM', 'CRNT', 'CTL', 'DZSI', 'EXTR', 'GILT', 'GOGO', 'HLIT',
@@ -192,7 +154,7 @@ export const NASDAQ_ADDITIONAL = [
   'MTCR', 'NTGR', 'OOMA', 'PDCO', 'RBBN', 'RDWR', 'SIFY', 'SPTN',
   'SWIR', 'TZOO', 'UBNT', 'UI', 'UTI', 'VSAT', 'WSTC', 'ZGID',
 
-  // === Industrial & Transportation ===
+  // industrial & transportation
   'SAIA', 'LSTR', 'WERN', 'KNX', 'SNDR', 'AAWW', 'ABUS', 'ACHC',
   'ACLE', 'ACMR', 'AEIS', 'AGYS', 'AIMC', 'ALEX', 'ALGN', 'ALGT',
   'AMRC', 'AMSC', 'AMWD', 'ANGI', 'ANIP', 'APEI', 'APOG', 'ARCB',
@@ -278,7 +240,7 @@ export const NASDAQ_ADDITIONAL = [
   'YRCW', 'YSG', 'YY', 'ZBRA', 'ZEAL', 'ZEUS', 'ZIMV', 'ZION',
   'ZIXI', 'ZLAB', 'ZNTL', 'ZS', 'ZTO', 'ZUMZ', 'ZVO',
 
-  // === Real Estate & REITs ===
+  // real estate & reits
   'REXR', 'COLD', 'IIPR', 'ADC', 'AHH', 'AIRC', 'ALEX', 'APLE',
   'BDN', 'BNL', 'BRX', 'BXP', 'CIO', 'CLPR', 'CMCT', 'CTRE',
   'CUBE', 'CUZ', 'DEA', 'DEI', 'DGRW', 'DHC', 'DOC', 'EGP',
@@ -293,9 +255,6 @@ export const NASDAQ_ADDITIONAL = [
   'VRE', 'VSTA', 'WPC', 'WRI', 'WTRE', 'XHR',
 ] as const;
 
-// ============================================================
-// S&P 500 SYMBOLS (Full list)
-// ============================================================
 export const SP500_SYMBOLS = [
   // Mega Cap Tech
   'NVDA', 'AAPL', 'MSFT', 'AMZN', 'GOOGL', 'GOOG', 'META', 'AVGO', 'TSLA',
@@ -354,11 +313,6 @@ export const SP500_SYMBOLS = [
   'VFC', 'WYNN', 'XPO', 'ZS',
 ] as const;
 
-// ============================================================
-// COMBINED EXPORTS
-// ============================================================
-
-// All tradeable symbols combined
 export const ALL_SYMBOLS = [
   ...SP500_SYMBOLS,
   ...NASDAQ_ADDITIONAL,
@@ -367,36 +321,17 @@ export const ALL_SYMBOLS = [
   ...FUTURES_SYMBOLS,
 ] as const;
 
-// Asset type for categorization
 export type AssetType = 'stock' | 'crypto' | 'forex' | 'futures';
 
-// Get asset type from symbol
 export function getAssetType(symbol: string): AssetType {
   if (symbol.endsWith('-USD') && CRYPTO_SYMBOLS.includes(symbol as typeof CRYPTO_SYMBOLS[number])) {
     return 'crypto';
   }
-  if (symbol.endsWith('=X')) {
-    return 'forex';
-  }
-  if (symbol.endsWith('=F')) {
-    return 'futures';
-  }
+  if (symbol.endsWith('=X')) return 'forex';
+  if (symbol.endsWith('=F')) return 'futures';
   return 'stock';
 }
 
-// Check if asset trades 24/7
-export function is24_7Asset(symbol: string): boolean {
-  return getAssetType(symbol) === 'crypto';
-}
-
-// Check if asset trades on weekends (only crypto does)
-export function tradesOnWeekend(symbol: string): boolean {
-  return getAssetType(symbol) === 'crypto';
-}
-
-// ============================================================
-// ASSET INFO (Names and categories)
-// ============================================================
 export const ASSET_INFO: Record<string, { name: string; category: string }> = {
   // Crypto
   'BTC-USD': { name: 'Bitcoin', category: 'Crypto' },
@@ -429,6 +364,79 @@ export const ASSET_INFO: Record<string, { name: string; category: string }> = {
   'INJ-USD': { name: 'Injective', category: 'Crypto' },
   'RUNE-USD': { name: 'THORChain', category: 'Crypto' },
   'FTM-USD': { name: 'Fantom', category: 'Crypto' },
+  // DeFi & Layer 2
+  'CRV-USD': { name: 'Curve DAO', category: 'Crypto' },
+  'LDO-USD': { name: 'Lido DAO', category: 'Crypto' },
+  'SNX-USD': { name: 'Synthetix', category: 'Crypto' },
+  'COMP-USD': { name: 'Compound', category: 'Crypto' },
+  'SUSHI-USD': { name: 'SushiSwap', category: 'Crypto' },
+  'YFI-USD': { name: 'Yearn Finance', category: 'Crypto' },
+  'BAL-USD': { name: 'Balancer', category: 'Crypto' },
+  'UMA-USD': { name: 'UMA Protocol', category: 'Crypto' },
+  '1INCH-USD': { name: '1inch Network', category: 'Crypto' },
+  'DYDX-USD': { name: 'dYdX', category: 'Crypto' },
+  'ENS-USD': { name: 'Ethereum Name Service', category: 'Crypto' },
+  'RPL-USD': { name: 'Rocket Pool', category: 'Crypto' },
+  'GMX-USD': { name: 'GMX', category: 'Crypto' },
+  'JUP-USD': { name: 'Jupiter', category: 'Crypto' },
+  'PENDLE-USD': { name: 'Pendle', category: 'Crypto' },
+  'STRK-USD': { name: 'Starknet', category: 'Crypto' },
+  // Infrastructure & Interoperability
+  'ALGO-USD': { name: 'Algorand', category: 'Crypto' },
+  'EGLD-USD': { name: 'MultiversX', category: 'Crypto' },
+  'MINA-USD': { name: 'Mina Protocol', category: 'Crypto' },
+  'FLOW-USD': { name: 'Flow', category: 'Crypto' },
+  'KAVA-USD': { name: 'Kava', category: 'Crypto' },
+  'ZEC-USD': { name: 'Zcash', category: 'Crypto' },
+  'EOS-USD': { name: 'EOS', category: 'Crypto' },
+  'XTZ-USD': { name: 'Tezos', category: 'Crypto' },
+  'THETA-USD': { name: 'Theta Network', category: 'Crypto' },
+  'AXS-USD': { name: 'Axie Infinity', category: 'Crypto' },
+  'SAND-USD': { name: 'The Sandbox', category: 'Crypto' },
+  'MANA-USD': { name: 'Decentraland', category: 'Crypto' },
+  'ENJ-USD': { name: 'Enjin Coin', category: 'Crypto' },
+  'CHZ-USD': { name: 'Chiliz', category: 'Crypto' },
+  'GALA-USD': { name: 'Gala Games', category: 'Crypto' },
+  'IMX-USD': { name: 'Immutable X', category: 'Crypto' },
+  'RNDR-USD': { name: 'Render Token', category: 'Crypto' },
+  'FET-USD': { name: 'Fetch.ai', category: 'Crypto' },
+  // Meme & Trending
+  'PEPE-USD': { name: 'Pepe', category: 'Crypto' },
+  'WIF-USD': { name: 'Dogwifhat', category: 'Crypto' },
+  'BONK-USD': { name: 'Bonk', category: 'Crypto' },
+  'FLOKI-USD': { name: 'Floki Inu', category: 'Crypto' },
+  // Layer 1 / New Chains
+  'SUI-USD': { name: 'Sui', category: 'Crypto' },
+  'SEI-USD': { name: 'Sei', category: 'Crypto' },
+  'TIA-USD': { name: 'Celestia', category: 'Crypto' },
+  'STX-USD': { name: 'Stacks', category: 'Crypto' },
+  'KAS-USD': { name: 'Kaspa', category: 'Crypto' },
+  'TON-USD': { name: 'Toncoin', category: 'Crypto' },
+  'TRX-USD': { name: 'TRON', category: 'Crypto' },
+  'BCH-USD': { name: 'Bitcoin Cash', category: 'Crypto' },
+  'ETC-USD': { name: 'Ethereum Classic', category: 'Crypto' },
+  'NEO-USD': { name: 'Neo', category: 'Crypto' },
+  // AI & Data
+  'TAO-USD': { name: 'Bittensor', category: 'Crypto' },
+  'OCEAN-USD': { name: 'Ocean Protocol', category: 'Crypto' },
+  'ONDO-USD': { name: 'Ondo Finance', category: 'Crypto' },
+  'AGIX-USD': { name: 'SingularityNET', category: 'Crypto' },
+  'WLD-USD': { name: 'Worldcoin', category: 'Crypto' },
+  // Exchange & Utility
+  'CRO-USD': { name: 'Cronos', category: 'Crypto' },
+  'OKB-USD': { name: 'OKB', category: 'Crypto' },
+  // Privacy & Legacy
+  'XMR-USD': { name: 'Monero', category: 'Crypto' },
+  'DASH-USD': { name: 'Dash', category: 'Crypto' },
+  'ZIL-USD': { name: 'Zilliqa', category: 'Crypto' },
+  'IOTA-USD': { name: 'IOTA', category: 'Crypto' },
+  // Infrastructure
+  'ANKR-USD': { name: 'Ankr', category: 'Crypto' },
+  'STORJ-USD': { name: 'Storj', category: 'Crypto' },
+  'BAT-USD': { name: 'Basic Attention Token', category: 'Crypto' },
+  'CELO-USD': { name: 'Celo', category: 'Crypto' },
+  'ROSE-USD': { name: 'Oasis Network', category: 'Crypto' },
+  'ONE-USD': { name: 'Harmony', category: 'Crypto' },
 
   // Forex
   'EURUSD=X': { name: 'EUR/USD', category: 'Forex' },
@@ -451,6 +459,30 @@ export const ASSET_INFO: Record<string, { name: string; category: string }> = {
   'USDTRY=X': { name: 'USD/TRY', category: 'Forex' },
   'USDINR=X': { name: 'USD/INR', category: 'Forex' },
   'USDCNY=X': { name: 'USD/CNY', category: 'Forex' },
+  'NZDJPY=X': { name: 'NZD/JPY', category: 'Forex' },
+  'GBPAUD=X': { name: 'GBP/AUD', category: 'Forex' },
+  'EURCZD=X': { name: 'EUR/CZK', category: 'Forex' },
+  'AUDNZD=X': { name: 'AUD/NZD', category: 'Forex' },
+  'GBPCAD=X': { name: 'GBP/CAD', category: 'Forex' },
+  'AUDCAD=X': { name: 'AUD/CAD', category: 'Forex' },
+  'CHFJPY=X': { name: 'CHF/JPY', category: 'Forex' },
+  'EURNZD=X': { name: 'EUR/NZD', category: 'Forex' },
+  'GBPNZD=X': { name: 'GBP/NZD', category: 'Forex' },
+  'USDSGD=X': { name: 'USD/SGD', category: 'Forex' },
+  'USDHKD=X': { name: 'USD/HKD', category: 'Forex' },
+  'USDNOK=X': { name: 'USD/NOK', category: 'Forex' },
+  'USDSEK=X': { name: 'USD/SEK', category: 'Forex' },
+  'USDPLN=X': { name: 'USD/PLN', category: 'Forex' },
+  'USDDKK=X': { name: 'USD/DKK', category: 'Forex' },
+  'USDHUF=X': { name: 'USD/HUF', category: 'Forex' },
+  'USDCZK=X': { name: 'USD/CZK', category: 'Forex' },
+  'USDTHB=X': { name: 'USD/THB', category: 'Forex' },
+  'USDIDR=X': { name: 'USD/IDR', category: 'Forex' },
+  'USDTWD=X': { name: 'USD/TWD', category: 'Forex' },
+  'USDKRW=X': { name: 'USD/KRW', category: 'Forex' },
+  'USDBRL=X': { name: 'USD/BRL', category: 'Forex' },
+  'USDCLP=X': { name: 'USD/CLP', category: 'Forex' },
+  'USDCOP=X': { name: 'USD/COP', category: 'Forex' },
 
   // Futures
   'ES=F': { name: 'S&P 500 E-mini', category: 'Futures' },
@@ -472,6 +504,34 @@ export const ASSET_INFO: Record<string, { name: string; category: string }> = {
   '6E=F': { name: 'Euro FX', category: 'Futures' },
   '6B=F': { name: 'British Pound', category: 'Futures' },
   '6J=F': { name: 'Japanese Yen', category: 'Futures' },
+  'VIX=F': { name: 'CBOE Volatility Index', category: 'Futures' },
+  'NIKKEI=F': { name: 'Nikkei 225', category: 'Futures' },
+  'HO=F': { name: 'Heating Oil', category: 'Futures' },
+  'RB=F': { name: 'RBOB Gasoline', category: 'Futures' },
+  'PA=F': { name: 'Palladium', category: 'Futures' },
+  'ZM=F': { name: 'Soybean Meal', category: 'Futures' },
+  'ZL=F': { name: 'Soybean Oil', category: 'Futures' },
+  'CT=F': { name: 'Cotton', category: 'Futures' },
+  'KC=F': { name: 'Coffee', category: 'Futures' },
+  'SB=F': { name: 'Sugar', category: 'Futures' },
+  'CC=F': { name: 'Cocoa', category: 'Futures' },
+  'OJ=F': { name: 'Orange Juice', category: 'Futures' },
+  'LC=F': { name: 'Live Cattle', category: 'Futures' },
+  'LH=F': { name: 'Lean Hogs', category: 'Futures' },
+  'FC=F': { name: 'Feeder Cattle', category: 'Futures' },
+  'ZF=F': { name: 'Treasury Note 5Y', category: 'Futures' },
+  'ZT=F': { name: 'Treasury Note 2Y', category: 'Futures' },
+  '6A=F': { name: 'Australian Dollar', category: 'Futures' },
+  '6C=F': { name: 'Canadian Dollar', category: 'Futures' },
+  '6S=F': { name: 'Swiss Franc', category: 'Futures' },
+  '6N=F': { name: 'New Zealand Dollar', category: 'Futures' },
+  '6M=F': { name: 'Mexican Peso', category: 'Futures' },
+  'ZO=F': { name: 'Oats', category: 'Futures' },
+  'ZR=F': { name: 'Rough Rice', category: 'Futures' },
+  'LBS=F': { name: 'Lumber', category: 'Futures' },
+  'DX=F': { name: 'U.S. Dollar Index', category: 'Futures' },
+  'BTC=F': { name: 'CME Bitcoin', category: 'Futures' },
+  'ETH=F': { name: 'CME Ethereum', category: 'Futures' },
 
   // Mega Cap Tech Stocks
   NVDA: { name: 'NVIDIA Corporation', category: 'Technology' },
@@ -849,22 +909,11 @@ export const ASSET_INFO: Record<string, { name: string; category: string }> = {
   KTOS: { name: 'Kratos Defense', category: 'Industrial' },
 };
 
-// Get asset info with fallback
 export function getAssetInfo(symbol: string): { name: string; category: string } {
-  return ASSET_INFO[symbol] || { name: symbol, category: getAssetType(symbol) === 'stock' ? 'Stock' : getAssetType(symbol).charAt(0).toUpperCase() + getAssetType(symbol).slice(1) };
-}
-
-// Get category/sector for a symbol
-export function getAssetCategory(symbol: string): string {
-  return ASSET_INFO[symbol]?.category || 'Unknown';
-}
-
-// For backwards compatibility with existing code
-export const STOCK_INFO = ASSET_INFO;
-export function getStockInfo(symbol: string): { name: string; sector: string } {
-  const info = getAssetInfo(symbol);
-  return { name: info.name, sector: info.category };
-}
-export function getStockSector(symbol: string): string {
-  return getAssetCategory(symbol);
+  return ASSET_INFO[symbol] || {
+    name: symbol,
+    category: getAssetType(symbol) === 'stock'
+      ? 'Stock'
+      : getAssetType(symbol).charAt(0).toUpperCase() + getAssetType(symbol).slice(1),
+  };
 }

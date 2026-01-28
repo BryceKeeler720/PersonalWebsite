@@ -58,8 +58,8 @@ const InteractiveRoom: React.FC = () => {
       items: [
         {
           title: 'Algorithmic Trading Bot',
-          description: 'ML-powered trading bot with 5 strategy groups — momentum, mean reversion, technical, sentiment, and ML ensemble. Scans 2000+ assets, ranks by composite score, and executes via Alpaca.',
-          tags: ['React', 'TypeScript', 'ML', 'Alpaca'],
+          description: 'Self-learning regime-adaptive trading bot scanning 6,000+ assets across stocks, crypto, forex, and futures. Adapts strategy weights to market conditions and executes via Alpaca.',
+          tags: ['React', 'TypeScript', 'Alpaca', 'Redis'],
           link: '/TradingBot',
         },
         {

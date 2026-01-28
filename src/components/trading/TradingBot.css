@@ -280,6 +280,18 @@
 .holding-symbol {
   font-weight: 600;
   color: var(--kana-fg);
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.holding-name {
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: var(--kana-fg-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .holding-shares {

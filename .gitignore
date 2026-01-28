@@ -9,3 +9,4 @@ node_modules/
 .venv/
 .sh
 scripts/
+.github/workflows/output/
