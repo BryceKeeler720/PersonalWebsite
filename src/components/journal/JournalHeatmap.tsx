@@ -1,4 +1,8 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
+
+function formatLocalDate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
 
 export interface JournalEntryData {
   slug: string;
@@ -75,7 +79,7 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
 
     const d = new Date(startDate);
     while (d <= endDate) {
-      const dateStr = d.toISOString().split('T')[0];
+      const dateStr = formatLocalDate(d);
       const dayEntries = dayMap.get(dateStr) || [];
       const wordCount = dayEntries.reduce((sum, e) => sum + e.wordCount, 0);
 
@@ -119,13 +123,16 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
     return positions;
   }, [weeks]);
 
-  const handleMouseEnter = useCallback((day: { date: string; entries: JournalEntryData[] }, weekIdx: number, dayIdx: number) => {
-    if (!day.date) return;
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseEnter = useCallback((e: React.MouseEvent, day: { date: string; entries: JournalEntryData[] }) => {
+    if (!day.date || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
     setHoveredDay({
       date: day.date,
       entries: day.entries,
-      x: weekIdx * (CELL_SIZE + CELL_GAP) + 32,
-      y: dayIdx * (CELL_SIZE + CELL_GAP) + 24,
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
     });
   }, []);
 
@@ -209,7 +216,7 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
       </div>
 
       {/* Heatmap */}
-      <div style={{ position: 'relative' }}>
+      <div ref={containerRef} style={{ position: 'relative' }}>
         <svg
           viewBox={`0 0 ${svgWidth} ${svgHeight}`}
           width="100%"
@@ -251,7 +258,7 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
           {weeks.map((week, weekIdx) =>
             week.map((day, dayIdx) => {
               if (!day.date) return null;
-              const today = new Date().toISOString().split('T')[0];
+              const today = formatLocalDate(new Date());
               const isFuture = day.date > today;
               return (
                 <rect
@@ -263,7 +270,7 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
                   rx={2}
                   fill={isFuture ? 'rgba(255,255,255,0.01)' : getIntensityColor(day.wordCount, maxWords)}
                   style={{ cursor: day.entries.length > 0 ? 'pointer' : 'default', transition: 'fill 0.15s ease' }}
-                  onMouseEnter={() => handleMouseEnter(day, weekIdx, dayIdx)}
+                  onMouseEnter={(e) => handleMouseEnter(e, day)}
                   onMouseLeave={() => setHoveredDay(null)}
                   onClick={() => {
                     if (day.entries.length === 1) {
@@ -281,8 +288,8 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
           <div
             style={{
               position: 'absolute',
-              left: `${(Math.max(80, Math.min(hoveredDay.x, svgWidth - 80)) / svgWidth) * 100}%`,
-              top: `${((hoveredDay.y < 50 ? hoveredDay.y + (CELL_SIZE + CELL_GAP) + 20 : hoveredDay.y - 40) / svgHeight) * 100}%`,
+              left: hoveredDay.x,
+              top: hoveredDay.y - 40,
               transform: 'translateX(-50%)',
               background: 'rgba(20, 20, 20, 0.95)',
               border: '1px solid rgba(255,255,255,0.15)',
