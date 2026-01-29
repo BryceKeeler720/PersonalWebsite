@@ -389,6 +389,7 @@ const KEYS = {
   HISTORY: 'tradingbot:history',
   SPY_BENCHMARK: 'tradingbot:spyBenchmark',
   LEARNING_STATE: 'tradingbot:learningState',
+  METRICS: 'tradingbot:metrics',
 };
 
 // Storage functions
@@ -420,6 +421,10 @@ async function addTrade(trade) {
 
 async function saveSignals(signals) {
   await redis.set(KEYS.SIGNALS, signals);
+}
+
+async function saveMetrics(metrics) {
+  await redis.set(KEYS.METRICS, metrics);
 }
 
 async function setLastRun(timestamp) {
@@ -1011,7 +1016,7 @@ async function fetchAlpacaBars(symbols, timeframe, days, isCrypto = false) {
   return allBars;
 }
 
-async function fetchAndAnalyzeBatch(symbols, allSignals, priceCache, atrCache, learningState = null) {
+async function fetchAndAnalyzeBatch(symbols, allSignals, priceCache, atrCache, learningState = null, allMetrics = null) {
   // Fetch market data for this batch only, analyze, then let raw data be GC'd
   const stockSymbols = symbols.filter(s => !isCryptoSymbol(s) && !isForexOrFutures(s));
   const cryptoSymbols = symbols.filter(s => isCryptoSymbol(s));
@@ -1050,6 +1055,17 @@ async function fetchAndAnalyzeBatch(symbols, allSignals, priceCache, atrCache, l
           combined: 0,
           recommendation: 'HOLD',
           regime: 'UNKNOWN',
+        };
+      }
+      // Collect metric for market visualization
+      if (allMetrics && result.lastPrice) {
+        allMetrics[symbol] = {
+          symbol,
+          price: result.lastPrice,
+          changePercent: result.changePercent || 0,
+          volume: result.volume || 0,
+          atr: result.atr || 0,
+          timestamp: new Date().toISOString(),
         };
       }
     } catch (error) {
@@ -1722,7 +1738,7 @@ function checkProfitTake(holding, currentPrice, entryATR, atrProfit1Mult = DEFAU
 
 function analyzeStock(symbol, intradayBars, dailyBars, learningState = null) {
   // Analyze using pre-fetched Alpaca intraday (5-min) and daily bars
-  if (!intradayBars || intradayBars.length < 12) return { signal: null, lastPrice: null, atr: null };
+  if (!intradayBars || intradayBars.length < 12) return { signal: null, lastPrice: null, atr: null, changePercent: null, volume: null };
 
   const params = (learningState && learningState.warmupComplete) ? learningState.params : {};
   const learnedWeights = (learningState && learningState.warmupComplete) ? learningState.regimeWeights : null;
@@ -1753,7 +1769,19 @@ function analyzeStock(symbol, intradayBars, dailyBars, learningState = null) {
   const atr = computeATR(intradayHighs, intradayLows, intradayCloses, 14) ||
               computeATR(dailyHighs, dailyLows, dailyCloses, 14);
 
-  return { signal, lastPrice, atr };
+  // Compute changePercent from daily bars (day-over-day)
+  let changePercent = 0;
+  if (dailyBars && dailyBars.length >= 2) {
+    const latest = dailyBars[dailyBars.length - 1];
+    const previous = dailyBars[dailyBars.length - 2];
+    if (previous.close > 0) {
+      changePercent = ((latest.close - previous.close) / previous.close) * 100;
+    }
+  }
+
+  const volume = intradayBars[intradayBars.length - 1].volume || 0;
+
+  return { signal, lastPrice, atr, changePercent, volume };
 }
 
 // Dynamic NASDAQ symbol discovery via Alpaca assets API
@@ -1839,6 +1867,7 @@ async function main() {
   await syncAlpacaPositions();
   const allSignals = {};
   const priceCache = {};
+  const allMetrics = {};
 
   // Determine assets to analyze (Alpaca for stocks/crypto, Yahoo for forex/futures)
   const now = new Date();
@@ -1876,7 +1905,7 @@ async function main() {
 
   if (holdingSymbols.length > 0) {
     console.log(`Batch 0: Analyzing ${holdingSymbols.length} current holdings...`);
-    await fetchAndAnalyzeBatch(holdingSymbols, allSignals, priceCache, atrCache, learningState);
+    await fetchAndAnalyzeBatch(holdingSymbols, allSignals, priceCache, atrCache, learningState, allMetrics);
   }
 
   const totalBatches = Math.ceil(nonHoldingSymbols.length / ANALYSIS_BATCH_SIZE);
@@ -1884,10 +1913,11 @@ async function main() {
     const batch = nonHoldingSymbols.slice(i, i + ANALYSIS_BATCH_SIZE);
     const batchNum = Math.floor(i / ANALYSIS_BATCH_SIZE) + 1;
     console.log(`Batch ${batchNum}/${totalBatches}: Analyzing ${batch.length} symbols...`);
-    await fetchAndAnalyzeBatch(batch, allSignals, priceCache, atrCache, learningState);
+    await fetchAndAnalyzeBatch(batch, allSignals, priceCache, atrCache, learningState, allMetrics);
   }
 
   console.log(`Analyzed ${Object.keys(allSignals).length} assets successfully`);
+  console.log(`Collected ${Object.keys(allMetrics).length} asset metrics for visualization`);
 
   // Effective parameters: use learned values after warmup, otherwise defaults
   const effectiveBuyThreshold = learningState.warmupComplete
@@ -2255,6 +2285,7 @@ async function main() {
   // Save everything
   await savePortfolio(portfolio);
   await saveSignals(allSignals);
+  await saveMetrics(allMetrics);
   await setLastRun(new Date().toISOString());
   await addPortfolioSnapshot({ timestamp: new Date().toISOString(), totalValue: portfolio.totalValue });
   await updateSPYBenchmark();
