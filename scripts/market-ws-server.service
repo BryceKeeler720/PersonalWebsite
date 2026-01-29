@@ -1,0 +1,36 @@
+[Unit]
+Description=Market Visualization WebSocket Server
+After=network.target
+
+[Service]
+Type=simple
+User=trading
+WorkingDirectory=/opt/trading-bot
+ExecStart=/usr/bin/node /opt/trading-bot/market-ws-server.mjs
+Restart=always
+RestartSec=10
+
+# Environment variables
+Environment=NODE_ENV=production
+Environment=WS_PORT=8765
+Environment=POLL_INTERVAL_MS=10000
+Environment=API_URL=https://brycekeeler.com/api/trading/market-data
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=market-ws-server
+
+# Resource limits
+MemoryMax=256M
+CPUQuota=25%
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/opt/trading-bot
+
+[Install]
+WantedBy=multi-user.target

@@ -10,4 +10,6 @@ node_modules/
 .sh
 scripts/*
 !scripts/check-ci-status.sh
+!scripts/market-ws-server.mjs
+!scripts/market-ws-server.service
 .github/workflows/output/
