@@ -460,15 +460,15 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       const changePercent = (changeFromStart / initialCapital) * 100;
 
       // Position tooltip to avoid covering the dot
-      // Horizontal: flip to left side if in right half of chart
+      // Left half of chart: tooltip on the right side of the dot
+      // Right half of chart: tooltip on the left side of the dot
+      const tooltipWidth = 160;
       const tooltipX = xPos > width / 2
-        ? xPos + margin.left - 160
-        : xPos + margin.left + 20;
+        ? xPos + margin.left - tooltipWidth - 15
+        : xPos + margin.left + 15;
 
-      // Vertical: position below dot if in top half, above if in bottom half
-      const tooltipY = yPos < height / 2
-        ? yPos + margin.top + 20
-        : yPos + margin.top - 100;
+      // Keep vertical centered on the dot
+      const tooltipY = Math.max(10, Math.min(height - 80, yPos + margin.top - 50));
 
       tooltip
         .style('opacity', 1)
