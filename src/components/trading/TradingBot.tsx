@@ -41,21 +41,21 @@ const INITIAL_PORTFOLIO: Portfolio = {
 };
 
 const SECTOR_COLORS: Record<string, string> = {
-  Technology: '#3b82f6',
-  Healthcare: '#22c55e',
-  Financial: '#f59e0b',
-  'Consumer Cyclical': '#ec4899',
-  'Communication Services': '#8b5cf6',
-  Industrial: '#6366f1',
-  'Consumer Defensive': '#14b8a6',
-  Energy: '#f97316',
-  Utilities: '#06b6d4',
-  'Real Estate': '#84cc16',
-  Materials: '#a855f7',
-  Crypto: '#fbbf24',
-  Forex: '#10b981',
-  Futures: '#ef4444',
-  Stock: '#64748b',
+  Technology: '#7E9CD8',
+  Healthcare: '#98BB6C',
+  Financial: '#C0A36E',
+  'Consumer Cyclical': '#D27E99',
+  'Communication Services': '#957FB8',
+  Industrial: '#7FB4CA',
+  'Consumer Defensive': '#6A9589',
+  Energy: '#FFA066',
+  Utilities: '#7AA89F',
+  'Real Estate': '#76946A',
+  Materials: '#938AA9',
+  Crypto: '#E6C384',
+  Forex: '#DCA561',
+  Futures: '#C34043',
+  Stock: '#727169',
 };
 
 const getMarketStatus = () => {
@@ -72,11 +72,11 @@ const getMarketStatus = () => {
   const marketClose = 16 * 60;
   const afterHoursEnd = 20 * 60;
 
-  if (isWeekend) return { status: 'closed', label: 'Weekend', color: '#64748b' };
-  if (time >= marketOpen && time < marketClose) return { status: 'open', label: 'Market Open', color: '#22c55e' };
-  if (time >= preMarketStart && time < marketOpen) return { status: 'pre', label: 'Pre-Market', color: '#f59e0b' };
-  if (time >= marketClose && time < afterHoursEnd) return { status: 'after', label: 'After Hours', color: '#8b5cf6' };
-  return { status: 'closed', label: 'Market Closed', color: '#64748b' };
+  if (isWeekend) return { status: 'closed', label: 'Weekend', color: '#727169' };
+  if (time >= marketOpen && time < marketClose) return { status: 'open', label: 'Market Open', color: '#76946A' };
+  if (time >= preMarketStart && time < marketOpen) return { status: 'pre', label: 'Pre-Market', color: '#C0A36E' };
+  if (time >= marketClose && time < afterHoursEnd) return { status: 'after', label: 'After Hours', color: '#957FB8' };
+  return { status: 'closed', label: 'Market Closed', color: '#727169' };
 };
 
 const formatShares = (shares: number) => {
@@ -195,7 +195,7 @@ export default function TradingBot() {
       sectors[sector] = (sectors[sector] || 0) + holding.marketValue;
     }
     return Object.entries(sectors)
-      .map(([sector, value]) => ({ sector, value, color: SECTOR_COLORS[sector] || '#64748b' }))
+      .map(([sector, value]) => ({ sector, value, color: SECTOR_COLORS[sector] || '#727169' }))
       .sort((a, b) => b.value - a.value);
   }, [data.portfolio.holdings]);
 
@@ -470,9 +470,9 @@ export default function TradingBot() {
                       <div className="stat-box">
                         <div className="stat-label">Wins / Losses</div>
                         <div className="stat-value">
-                          <span style={{ color: '#22c55e' }}>{tradeStats.wins}</span>
+                          <span style={{ color: '#76946A' }}>{tradeStats.wins}</span>
                           {' / '}
-                          <span style={{ color: '#ef4444' }}>{tradeStats.losses}</span>
+                          <span style={{ color: '#C34043' }}>{tradeStats.losses}</span>
                         </div>
                       </div>
                       <div className="stat-box">
@@ -521,12 +521,12 @@ export default function TradingBot() {
                         <div key={strategy.name} style={{ padding: '0.75rem', background: 'rgba(220,215,186,0.02)', borderRadius: '8px' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                             <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#fff' }}>{strategy.name}</span>
-                            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: strategy.winRate >= 50 ? '#22c55e' : '#ef4444' }}>
+                            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: strategy.winRate >= 50 ? '#76946A' : '#C34043' }}>
                               {strategy.winRate.toFixed(0)}%
                             </span>
                           </div>
                           <div style={{ height: 4, background: 'rgba(220,215,186,0.1)', borderRadius: 2, overflow: 'hidden' }}>
-                            <div style={{ height: '100%', width: `${strategy.winRate}%`, background: strategy.winRate >= 50 ? '#22c55e' : '#ef4444', borderRadius: 2 }} />
+                            <div style={{ height: '100%', width: `${strategy.winRate}%`, background: strategy.winRate >= 50 ? '#76946A' : '#C34043', borderRadius: 2 }} />
                           </div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.25rem' }}>
                             <span style={{ fontSize: '0.7rem', color: 'rgba(220,215,186,0.5)' }}>
@@ -633,15 +633,15 @@ export default function TradingBot() {
                 ) : (
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
-                      <h3 style={{ fontSize: '0.875rem', color: '#22c55e', marginBottom: '0.75rem' }}>Buy Signals</h3>
+                      <h3 style={{ fontSize: '0.875rem', color: '#76946A', marginBottom: '0.75rem' }}>Buy Signals</h3>
                       {getTopBuyCandidates(5).map(signal => (
                         <div
                           key={signal.symbol}
-                          style={{ padding: '0.5rem', background: 'rgba(34, 197, 94, 0.1)', borderRadius: '4px', marginBottom: '0.5rem', cursor: 'pointer' }}
+                          style={{ padding: '0.5rem', background: 'rgba(118, 148, 106, 0.1)', borderRadius: '4px', marginBottom: '0.5rem', cursor: 'pointer' }}
                           onClick={() => { setSelectedStock(signal.symbol); setActiveTab('signals'); }}
                         >
                           <div style={{ fontWeight: 600 }}>{signal.symbol}</div>
-                          <div style={{ fontSize: '0.75rem', color: '#22c55e' }}>Score: +{signal.combined.toFixed(3)}</div>
+                          <div style={{ fontSize: '0.75rem', color: '#76946A' }}>Score: +{signal.combined.toFixed(3)}</div>
                         </div>
                       ))}
                       {getTopBuyCandidates(5).length === 0 && (
@@ -649,15 +649,15 @@ export default function TradingBot() {
                       )}
                     </div>
                     <div>
-                      <h3 style={{ fontSize: '0.875rem', color: '#ef4444', marginBottom: '0.75rem' }}>Sell Signals</h3>
+                      <h3 style={{ fontSize: '0.875rem', color: '#C34043', marginBottom: '0.75rem' }}>Sell Signals</h3>
                       {getTopSellCandidates(5).map(signal => (
                         <div
                           key={signal.symbol}
-                          style={{ padding: '0.5rem', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '4px', marginBottom: '0.5rem', cursor: 'pointer' }}
+                          style={{ padding: '0.5rem', background: 'rgba(195, 64, 67, 0.1)', borderRadius: '4px', marginBottom: '0.5rem', cursor: 'pointer' }}
                           onClick={() => { setSelectedStock(signal.symbol); setActiveTab('signals'); }}
                         >
                           <div style={{ fontWeight: 600 }}>{signal.symbol}</div>
-                          <div style={{ fontSize: '0.75rem', color: '#ef4444' }}>Score: {signal.combined.toFixed(3)}</div>
+                          <div style={{ fontSize: '0.75rem', color: '#C34043' }}>Score: {signal.combined.toFixed(3)}</div>
                         </div>
                       ))}
                       {getTopSellCandidates(5).length === 0 && (
@@ -677,7 +677,7 @@ export default function TradingBot() {
                     {data.trades.slice(0, 3).map(trade => (
                       <div key={trade.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem', background: 'rgba(220, 215, 186, 0.02)', borderRadius: '8px', marginBottom: '0.5rem' }}>
                         <div>
-                          <span style={{ color: trade.action === 'BUY' ? '#22c55e' : '#ef4444', fontWeight: 600 }}>{trade.action}</span>{' '}
+                          <span style={{ color: trade.action === 'BUY' ? '#76946A' : '#C34043', fontWeight: 600 }}>{trade.action}</span>{' '}
                           <span style={{ color: '#fff' }}>{trade.symbol}</span>
                         </div>
                         <div style={{ color: 'rgba(220, 215, 186, 0.6)' }}>{formatShares(trade.shares)} @ ${trade.price.toFixed(2)}</div>
