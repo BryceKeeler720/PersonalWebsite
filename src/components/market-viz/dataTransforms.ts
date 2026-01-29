@@ -1,5 +1,6 @@
 import type { SignalSnapshot, AssetMetric } from '../trading/types';
 import { getClusterPosition, getSubCategory } from '../../lib/trading/sectorMap';
+import { getAssetType } from '../../lib/trading/assets';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -85,9 +86,9 @@ function passesFilters(
 ): boolean {
   // Asset class filter
   if (filters.assetClasses.length > 0) {
-    const sub = getSubCategory(signal.symbol);
+    const assetType = getAssetType(signal.symbol);
     const matchesClass = filters.assetClasses.some(
-      (cls) => cls === sub || cls === 'all',
+      (cls) => cls === assetType || cls === 'all',
     );
     if (!matchesClass) return false;
   }

@@ -38,6 +38,7 @@ export class InstancedCubeField {
 
     this.mesh = new THREE.InstancedMesh(this.geometry, this.material, MAX_INSTANCES);
     this.mesh.count = 0;
+    this.mesh.frustumCulled = false;
 
     // Allow per-frame matrix updates
     this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
