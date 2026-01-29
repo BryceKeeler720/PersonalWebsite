@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import * as d3 from 'd3';
 
 interface PortfolioSnapshot {
@@ -31,6 +31,8 @@ interface DrawdownPeriod {
   maxDrawdown: number;
 }
 
+type TimeRange = '1D' | '1W' | '1M' | 'YTD' | 'All';
+
 export default function D3EquityChart({ history, initialCapital, spyBenchmark = [] }: D3EquityChartProps) {
   const mainChartRef = useRef<HTMLDivElement>(null);
   const returnsChartRef = useRef<HTMLDivElement>(null);
@@ -38,6 +40,10 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
   const [showBenchmark, setShowBenchmark] = useState(true);
   const [dimensions, setDimensions] = useState({ width: 800, height: 300 });
   const [brushSelection, setBrushSelection] = useState<[Date, Date] | null>(null);
+  const [timeRange, setTimeRange] = useState<TimeRange>('All');
+
+  // Store current zoom transform for proper cursor tracking
+  const currentTransformRef = useRef<d3.ZoomTransform>(d3.zoomIdentity);
 
   // Process data: calculate daily returns and drawdowns
   const processedData = useMemo((): ProcessedDataPoint[] => {
@@ -58,7 +64,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
         value,
         dailyReturn,
         drawdown,
-        isDrawdown: drawdown < -1, // Mark significant drawdowns (> 1%)
+        isDrawdown: drawdown < -1,
       };
     });
   }, [history, initialCapital]);
@@ -72,6 +78,37 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
     }));
   }, [spyBenchmark]);
 
+  // Filter by time range
+  const timeFilteredData = useMemo(() => {
+    if (processedData.length === 0) return [];
+    const now = new Date();
+    const cutoffDate = new Date();
+
+    switch (timeRange) {
+      case '1D': cutoffDate.setDate(now.getDate() - 1); break;
+      case '1W': cutoffDate.setDate(now.getDate() - 7); break;
+      case '1M': cutoffDate.setMonth(now.getMonth() - 1); break;
+      case 'YTD': cutoffDate.setMonth(0, 1); cutoffDate.setHours(0, 0, 0, 0); break;
+      case 'All': return processedData;
+    }
+    return processedData.filter(d => d.date >= cutoffDate);
+  }, [processedData, timeRange]);
+
+  const timeFilteredBenchmark = useMemo(() => {
+    if (processedBenchmark.length === 0) return [];
+    const now = new Date();
+    const cutoffDate = new Date();
+
+    switch (timeRange) {
+      case '1D': cutoffDate.setDate(now.getDate() - 1); break;
+      case '1W': cutoffDate.setDate(now.getDate() - 7); break;
+      case '1M': cutoffDate.setMonth(now.getMonth() - 1); break;
+      case 'YTD': cutoffDate.setMonth(0, 1); cutoffDate.setHours(0, 0, 0, 0); break;
+      case 'All': return processedBenchmark;
+    }
+    return processedBenchmark.filter(d => d.date >= cutoffDate);
+  }, [processedBenchmark, timeRange]);
+
   // Calculate drawdown periods for shading
   const drawdownPeriods = useMemo((): DrawdownPeriod[] => {
     const periods: DrawdownPeriod[] = [];
@@ -79,7 +116,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
     let periodStart: Date | null = null;
     let maxDrawdown = 0;
 
-    processedData.forEach((d, i) => {
+    timeFilteredData.forEach((d, i) => {
       if (d.isDrawdown && !inDrawdown) {
         inDrawdown = true;
         periodStart = d.date;
@@ -90,7 +127,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
         if (periodStart) {
           periods.push({
             startDate: periodStart,
-            endDate: processedData[i - 1]?.date || d.date,
+            endDate: timeFilteredData[i - 1]?.date || d.date,
             maxDrawdown,
           });
         }
@@ -100,28 +137,27 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       }
     });
 
-    // Close final period if still in drawdown
-    if (inDrawdown && periodStart && processedData.length > 0) {
+    if (inDrawdown && periodStart && timeFilteredData.length > 0) {
       periods.push({
         startDate: periodStart,
-        endDate: processedData[processedData.length - 1].date,
+        endDate: timeFilteredData[timeFilteredData.length - 1].date,
         maxDrawdown,
       });
     }
 
     return periods;
-  }, [processedData]);
+  }, [timeFilteredData]);
 
   // Filter data based on brush selection
   const filteredData = useMemo(() => {
-    if (!brushSelection) return processedData;
-    return processedData.filter(d => d.date >= brushSelection[0] && d.date <= brushSelection[1]);
-  }, [processedData, brushSelection]);
+    if (!brushSelection) return timeFilteredData;
+    return timeFilteredData.filter(d => d.date >= brushSelection[0] && d.date <= brushSelection[1]);
+  }, [timeFilteredData, brushSelection]);
 
   const filteredBenchmark = useMemo(() => {
-    if (!brushSelection) return processedBenchmark;
-    return processedBenchmark.filter(d => d.date >= brushSelection[0] && d.date <= brushSelection[1]);
-  }, [processedBenchmark, brushSelection]);
+    if (!brushSelection) return timeFilteredBenchmark;
+    return timeFilteredBenchmark.filter(d => d.date >= brushSelection[0] && d.date <= brushSelection[1]);
+  }, [timeFilteredBenchmark, brushSelection]);
 
   const filteredDrawdownPeriods = useMemo(() => {
     if (!brushSelection) return drawdownPeriods;
@@ -133,6 +169,12 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       endDate: p.endDate > brushSelection[1] ? brushSelection[1] : p.endDate,
     }));
   }, [drawdownPeriods, brushSelection]);
+
+  // Reset brush when time range changes
+  useEffect(() => {
+    setBrushSelection(null);
+    currentTransformRef.current = d3.zoomIdentity;
+  }, [timeRange]);
 
   // Handle resize
   useEffect(() => {
@@ -156,7 +198,6 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
     const width = dimensions.width - margin.left - margin.right;
     const height = dimensions.height - margin.top - margin.bottom;
 
-    // Clear previous chart
     d3.select(mainChartRef.current).selectAll('*').remove();
 
     const svg = d3.select(mainChartRef.current)
@@ -166,7 +207,6 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .attr('viewBox', `0 0 ${dimensions.width} ${dimensions.height}`)
       .attr('preserveAspectRatio', 'xMidYMid meet');
 
-    // Create clip path
     svg.append('defs')
       .append('clipPath')
       .attr('id', 'chart-clip')
@@ -177,7 +217,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
     const g = svg.append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // Scales
+    // Base scales
     const xExtent = d3.extent(filteredData, d => d.date) as [Date, Date];
     const xScale = d3.scaleTime()
       .domain(xExtent)
@@ -192,6 +232,9 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
     const yScale = d3.scaleLinear()
       .domain([yExtent[0] - yPadding, yExtent[1] + yPadding])
       .range([height, 0]);
+
+    // Store base scale for zoom calculations
+    const xScaleBase = xScale.copy();
 
     // Drawdown regions
     const drawdownGroup = g.append('g').attr('clip-path', 'url(#chart-clip)');
@@ -259,14 +302,13 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .attr('stop-color', isPositive ? '#76946A' : '#C34043')
       .attr('stop-opacity', 0);
 
-    // Area generator
+    // Generators
     const area = d3.area<ProcessedDataPoint>()
       .x(d => xScale(d.date))
       .y0(height)
       .y1(d => yScale(d.value))
       .curve(d3.curveMonotoneX);
 
-    // Line generator
     const line = d3.line<ProcessedDataPoint>()
       .x(d => xScale(d.date))
       .y(d => yScale(d.value))
@@ -274,7 +316,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
 
     const chartGroup = g.append('g').attr('clip-path', 'url(#chart-clip)');
 
-    // Draw area with animation
+    // Draw area
     const areaPath = chartGroup.append('path')
       .datum(filteredData)
       .attr('class', 'd3-equity-area')
@@ -292,7 +334,6 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .attr('stroke-linecap', 'round')
       .attr('d', line);
 
-    // Animate line drawing
     const totalLength = linePath.node()?.getTotalLength() || 0;
     linePath
       .attr('stroke-dasharray', `${totalLength} ${totalLength}`)
@@ -302,7 +343,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .ease(d3.easeCubicOut)
       .attr('stroke-dashoffset', 0);
 
-    // Draw benchmark line if enabled
+    // Benchmark line
     if (showBenchmark && filteredBenchmark.length > 1) {
       const benchmarkLine = d3.line<{ date: Date; value: number }>()
         .x(d => xScale(d.date))
@@ -319,7 +360,6 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
         .attr('opacity', 0.8)
         .attr('d', benchmarkLine);
 
-      // Animate benchmark line
       const benchmarkLength = benchmarkPath.node()?.getTotalLength() || 0;
       benchmarkPath
         .attr('stroke-dasharray', `${benchmarkLength} ${benchmarkLength}`)
@@ -334,25 +374,18 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
     }
 
     // Axes
-    const xAxis = d3.axisBottom(xScale)
-      .ticks(6)
-      .tickFormat(d => d3.timeFormat('%b %d')(d as Date));
-
-    const yAxis = d3.axisLeft(yScale)
-      .ticks(5)
-      .tickFormat(d => `$${d3.format(',.0f')(d as number)}`);
-
-    g.append('g')
+    const xAxisGroup = g.append('g')
       .attr('class', 'd3-x-axis')
       .attr('transform', `translate(0,${height})`)
-      .call(xAxis)
-      .selectAll('text')
+      .call(d3.axisBottom(xScale).ticks(6).tickFormat(d => d3.timeFormat('%b %d')(d as Date)));
+
+    xAxisGroup.selectAll('text')
       .attr('fill', 'rgba(220, 215, 186, 0.5)')
       .attr('font-size', '10px');
 
     g.append('g')
       .attr('class', 'd3-y-axis')
-      .call(yAxis)
+      .call(d3.axisLeft(yScale).ticks(5).tickFormat(d => `$${d3.format(',.0f')(d as number)}`))
       .selectAll('text')
       .attr('fill', 'rgba(220, 215, 186, 0.5)')
       .attr('font-size', '10px');
@@ -360,7 +393,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
     g.selectAll('.d3-x-axis path, .d3-x-axis line, .d3-y-axis path, .d3-y-axis line')
       .attr('stroke', 'rgba(220, 215, 186, 0.1)');
 
-    // Tooltip
+    // Tooltip elements
     const tooltip = d3.select(mainChartRef.current)
       .append('div')
       .attr('class', 'd3-chart-tooltip')
@@ -380,7 +413,6 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .attr('stroke-width', 2)
       .style('opacity', 0);
 
-    // Bisector for finding nearest data point
     const bisect = d3.bisector<ProcessedDataPoint, Date>(d => d.date).left;
 
     // Overlay for mouse events
@@ -391,53 +423,60 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .attr('fill', 'transparent')
       .style('cursor', 'crosshair');
 
+    // Mouse move handler that uses current transform
+    const handleMouseMove = (event: MouseEvent) => {
+      const [mouseX] = d3.pointer(event);
+
+      // Apply current zoom transform to get the correct scale
+      const currentXScale = currentTransformRef.current.rescaleX(xScaleBase);
+      const x0 = currentXScale.invert(mouseX);
+      const i = bisect(filteredData, x0, 1);
+      const d0 = filteredData[i - 1];
+      const d1 = filteredData[i];
+
+      if (!d0 && !d1) return;
+
+      const d = !d1 ? d0 : !d0 ? d1 :
+        x0.getTime() - d0.date.getTime() > d1.date.getTime() - x0.getTime() ? d1 : d0;
+
+      // Use transformed scale for positioning
+      const xPos = currentXScale(d.date);
+      const yPos = yScale(d.value);
+
+      verticalLine
+        .attr('x1', xPos)
+        .attr('x2', xPos)
+        .attr('y1', 0)
+        .attr('y2', height)
+        .style('opacity', 1);
+
+      hoverCircle
+        .attr('cx', xPos)
+        .attr('cy', yPos)
+        .attr('fill', d.value >= initialCapital ? '#76946A' : '#C34043')
+        .style('opacity', 1);
+
+      const changeFromStart = d.value - initialCapital;
+      const changePercent = (changeFromStart / initialCapital) * 100;
+
+      tooltip
+        .style('opacity', 1)
+        .style('left', `${xPos + margin.left + (xPos > width / 2 ? -150 : 15)}px`)
+        .style('top', `${yPos + margin.top - 20}px`)
+        .html(`
+          <div class="d3-tooltip-value">$${d3.format(',.2f')(d.value)}</div>
+          <div class="d3-tooltip-date">${d3.timeFormat('%b %d, %Y %H:%M')(d.date)}</div>
+          <div class="d3-tooltip-change ${changeFromStart >= 0 ? 'positive' : 'negative'}">
+            ${changeFromStart >= 0 ? '+' : ''}$${d3.format(',.2f')(changeFromStart)} (${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%)
+          </div>
+          <div class="d3-tooltip-daily">Daily: ${d.dailyReturn >= 0 ? '+' : ''}${d.dailyReturn.toFixed(2)}%</div>
+          ${d.drawdown < -1 ? `<div class="d3-tooltip-drawdown">Drawdown: ${d.drawdown.toFixed(2)}%</div>` : ''}
+        `);
+    };
+
     overlay
-      .on('mousemove', function(event) {
-        const [mouseX] = d3.pointer(event);
-        const x0 = xScale.invert(mouseX);
-        const i = bisect(filteredData, x0, 1);
-        const d0 = filteredData[i - 1];
-        const d1 = filteredData[i];
-
-        if (!d0 && !d1) return;
-
-        const d = !d1 ? d0 : !d0 ? d1 :
-          x0.getTime() - d0.date.getTime() > d1.date.getTime() - x0.getTime() ? d1 : d0;
-
-        const xPos = xScale(d.date);
-        const yPos = yScale(d.value);
-
-        verticalLine
-          .attr('x1', xPos)
-          .attr('x2', xPos)
-          .attr('y1', 0)
-          .attr('y2', height)
-          .style('opacity', 1);
-
-        hoverCircle
-          .attr('cx', xPos)
-          .attr('cy', yPos)
-          .attr('fill', d.value >= initialCapital ? '#76946A' : '#C34043')
-          .style('opacity', 1);
-
-        const changeFromStart = d.value - initialCapital;
-        const changePercent = (changeFromStart / initialCapital) * 100;
-
-        tooltip
-          .style('opacity', 1)
-          .style('left', `${xPos + margin.left + (xPos > width / 2 ? -150 : 15)}px`)
-          .style('top', `${yPos + margin.top - 20}px`)
-          .html(`
-            <div class="d3-tooltip-value">$${d3.format(',.2f')(d.value)}</div>
-            <div class="d3-tooltip-date">${d3.timeFormat('%b %d, %Y %H:%M')(d.date)}</div>
-            <div class="d3-tooltip-change ${changeFromStart >= 0 ? 'positive' : 'negative'}">
-              ${changeFromStart >= 0 ? '+' : ''}$${d3.format(',.2f')(changeFromStart)} (${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%)
-            </div>
-            <div class="d3-tooltip-daily">Daily: ${d.dailyReturn >= 0 ? '+' : ''}${d.dailyReturn.toFixed(2)}%</div>
-            ${d.drawdown < -1 ? `<div class="d3-tooltip-drawdown">Drawdown: ${d.drawdown.toFixed(2)}%</div>` : ''}
-          `);
-      })
-      .on('mouseout', function() {
+      .on('mousemove', handleMouseMove as any)
+      .on('mouseout', () => {
         tooltip.style('opacity', 0);
         verticalLine.style('opacity', 0);
         hoverCircle.style('opacity', 0);
@@ -449,11 +488,21 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .translateExtent([[0, 0], [width, height]])
       .extent([[0, 0], [width, height]])
       .on('zoom', (event) => {
-        const newXScale = event.transform.rescaleX(xScale);
+        // Store the current transform
+        currentTransformRef.current = event.transform;
+        const newXScale = event.transform.rescaleX(xScaleBase);
 
-        // Update line
-        linePath.attr('d', line.x(d => newXScale(d.date)));
-        areaPath.attr('d', area.x(d => newXScale(d.date)));
+        // Update line and area with new scale
+        linePath.attr('d', d3.line<ProcessedDataPoint>()
+          .x(d => newXScale(d.date))
+          .y(d => yScale(d.value))
+          .curve(d3.curveMonotoneX)(filteredData));
+
+        areaPath.attr('d', d3.area<ProcessedDataPoint>()
+          .x(d => newXScale(d.date))
+          .y0(height)
+          .y1(d => yScale(d.value))
+          .curve(d3.curveMonotoneX)(filteredData));
 
         // Update benchmark
         if (showBenchmark && filteredBenchmark.length > 1) {
@@ -472,13 +521,18 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
           ));
 
         // Update x-axis
-        g.select('.d3-x-axis')
-          .call(d3.axisBottom(newXScale)
-            .ticks(6)
-            .tickFormat(d => d3.timeFormat('%b %d')(d as Date)) as any);
+        xAxisGroup.call(d3.axisBottom(newXScale).ticks(6).tickFormat(d => d3.timeFormat('%b %d')(d as Date)) as any);
+        xAxisGroup.selectAll('text')
+          .attr('fill', 'rgba(220, 215, 186, 0.5)')
+          .attr('font-size', '10px');
+        xAxisGroup.selectAll('path, line')
+          .attr('stroke', 'rgba(220, 215, 186, 0.1)');
       });
 
     svg.call(zoom);
+
+    // Reset zoom transform ref when data changes
+    currentTransformRef.current = d3.zoomIdentity;
 
   }, [filteredData, filteredBenchmark, filteredDrawdownPeriods, dimensions, showBenchmark, initialCapital]);
 
@@ -502,7 +556,6 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
     const g = svg.append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // Scales
     const xExtent = d3.extent(filteredData, d => d.date) as [Date, Date];
     const xScale = d3.scaleBand<Date>()
       .domain(filteredData.map(d => d.date))
@@ -515,7 +568,6 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .domain([-maxReturn * 1.1, maxReturn * 1.1])
       .range([height, 0]);
 
-    // Zero line
     g.append('line')
       .attr('x1', 0)
       .attr('x2', width)
@@ -524,7 +576,6 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .attr('stroke', 'rgba(220, 215, 186, 0.3)')
       .attr('stroke-width', 1);
 
-    // Bars with animation
     g.selectAll('.return-bar')
       .data(filteredData)
       .enter()
@@ -542,25 +593,19 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .attr('y', d => d.dailyReturn >= 0 ? yScale(d.dailyReturn) : yScale(0))
       .attr('height', d => Math.abs(yScale(d.dailyReturn) - yScale(0)));
 
-    // X-axis
     const xAxisTime = d3.scaleTime()
       .domain(xExtent)
       .range([0, width]);
 
     g.append('g')
       .attr('transform', `translate(0,${height})`)
-      .call(d3.axisBottom(xAxisTime)
-        .ticks(6)
-        .tickFormat(d => d3.timeFormat('%b %d')(d as Date)))
+      .call(d3.axisBottom(xAxisTime).ticks(6).tickFormat(d => d3.timeFormat('%b %d')(d as Date)))
       .selectAll('text')
       .attr('fill', 'rgba(220, 215, 186, 0.5)')
       .attr('font-size', '9px');
 
-    // Y-axis
     g.append('g')
-      .call(d3.axisLeft(yScale)
-        .ticks(3)
-        .tickFormat(d => `${d}%`))
+      .call(d3.axisLeft(yScale).ticks(3).tickFormat(d => `${d}%`))
       .selectAll('text')
       .attr('fill', 'rgba(220, 215, 186, 0.5)')
       .attr('font-size', '9px');
@@ -571,7 +616,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
 
   // Brush for date range selection
   useEffect(() => {
-    if (!brushRef.current || processedData.length < 2) return;
+    if (!brushRef.current || timeFilteredData.length < 2) return;
 
     const margin = { top: 5, right: 60, bottom: 20, left: 60 };
     const width = dimensions.width - margin.left - margin.right;
@@ -589,29 +634,26 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
     const g = svg.append('g')
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // Scales for context chart
     const xScale = d3.scaleTime()
-      .domain(d3.extent(processedData, d => d.date) as [Date, Date])
+      .domain(d3.extent(timeFilteredData, d => d.date) as [Date, Date])
       .range([0, width]);
 
     const yScale = d3.scaleLinear()
-      .domain(d3.extent(processedData, d => d.value) as [number, number])
+      .domain(d3.extent(timeFilteredData, d => d.value) as [number, number])
       .range([height, 0]);
 
-    // Mini line
     const line = d3.line<ProcessedDataPoint>()
       .x(d => xScale(d.date))
       .y(d => yScale(d.value))
       .curve(d3.curveMonotoneX);
 
     g.append('path')
-      .datum(processedData)
+      .datum(timeFilteredData)
       .attr('fill', 'none')
       .attr('stroke', 'rgba(220, 215, 186, 0.4)')
       .attr('stroke-width', 1)
       .attr('d', line);
 
-    // Brush
     const brush = d3.brushX<unknown>()
       .extent([[0, 0], [width, height]])
       .on('brush end', (event) => {
@@ -627,7 +669,6 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .attr('class', 'd3-brush')
       .call(brush);
 
-    // Style brush
     brushGroup.selectAll('.selection')
       .attr('fill', 'rgba(126, 156, 216, 0.3)')
       .attr('stroke', 'rgba(126, 156, 216, 0.6)');
@@ -635,26 +676,22 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
     brushGroup.selectAll('.handle')
       .attr('fill', 'rgba(220, 215, 186, 0.8)');
 
-    // X-axis
     g.append('g')
       .attr('transform', `translate(0,${height})`)
-      .call(d3.axisBottom(xScale)
-        .ticks(4)
-        .tickFormat(d => d3.timeFormat('%b')(d as Date)))
+      .call(d3.axisBottom(xScale).ticks(4).tickFormat(d => d3.timeFormat('%b')(d as Date)))
       .selectAll('text')
       .attr('fill', 'rgba(220, 215, 186, 0.4)')
       .attr('font-size', '8px');
 
     g.selectAll('path, line').attr('stroke', 'rgba(220, 215, 186, 0.1)');
 
-  }, [processedData, dimensions]);
+  }, [timeFilteredData, dimensions]);
 
   // Calculate stats
   const stats = useMemo(() => {
     if (filteredData.length === 0) return null;
 
     const currentValue = filteredData[filteredData.length - 1]?.value || initialCapital;
-    const startValue = filteredData[0]?.value || initialCapital;
     const change = currentValue - initialCapital;
     const changePercent = (change / initialCapital) * 100;
 
@@ -686,6 +723,8 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       </div>
     );
   }
+
+  const timeRanges: TimeRange[] = ['1D', '1W', '1M', 'YTD', 'All'];
 
   return (
     <div className="d3-equity-chart">
@@ -720,6 +759,19 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
             {showBenchmark ? 'Hide' : 'Show'} S&P 500
           </button>
         </div>
+      </div>
+
+      {/* Time range tabs */}
+      <div className="chart-time-range">
+        {timeRanges.map((range) => (
+          <button
+            key={range}
+            className={`time-range-btn ${timeRange === range ? 'active' : ''}`}
+            onClick={() => setTimeRange(range)}
+          >
+            {range}
+          </button>
+        ))}
       </div>
 
       {/* Main equity chart */}
