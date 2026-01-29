@@ -10,6 +10,14 @@ import {
   getAssetType,
 } from '../../lib/trading/assets';
 
+// Default signals for when data is missing
+const DEFAULT_SIGNALS: Record<string, StrategySignal> = {
+  momentum: { name: 'Trend Momentum', score: 0, confidence: 0, reason: 'No data available' },
+  meanReversion: { name: 'BB+RSI Reversion', score: 0, confidence: 0, reason: 'No data available' },
+  technical: { name: 'MACD Trend', score: 0, confidence: 0, reason: 'No data available' },
+  vwapReversion: { name: 'VWAP Reversion', score: 0, confidence: 0, reason: 'No data available' },
+};
+
 // Pre-computed search entry for fast lookups
 interface SearchEntry {
   symbol: string;
@@ -62,10 +70,7 @@ interface StrategySignalsProps {
   isAnalyzing: boolean;
 }
 
-function SignalGauge({ signal }: { signal: StrategySignal | undefined }) {
-  if (!signal) {
-    return null;
-  }
+function SignalGauge({ signal }: { signal: StrategySignal }) {
   const isPositive = signal.score >= 0;
   const width = Math.abs(signal.score) * 50; // Max 50% width (half the bar)
 
@@ -406,10 +411,10 @@ export default function StrategySignals({
 
           {/* Strategy Signals */}
           <div className="signals-grid">
-            <SignalGauge signal={currentSignal.momentum} />
-            <SignalGauge signal={currentSignal.meanReversion} />
-            <SignalGauge signal={currentSignal.technical} />
-            <SignalGauge signal={currentSignal.vwapReversion} />
+            <SignalGauge signal={currentSignal.momentum ?? DEFAULT_SIGNALS.momentum} />
+            <SignalGauge signal={currentSignal.meanReversion ?? DEFAULT_SIGNALS.meanReversion} />
+            <SignalGauge signal={currentSignal.technical ?? DEFAULT_SIGNALS.technical} />
+            <SignalGauge signal={currentSignal.vwapReversion ?? DEFAULT_SIGNALS.vwapReversion} />
           </div>
 
           {/* Combined Signal */}
