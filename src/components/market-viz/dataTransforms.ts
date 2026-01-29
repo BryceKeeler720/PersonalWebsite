@@ -24,12 +24,12 @@ export interface FilterState {
 }
 
 // ---------------------------------------------------------------------------
-// Color constants (Kanagawa theme)
+// Color constants (high-contrast heatmap)
 // ---------------------------------------------------------------------------
 
-const KANA_RED = { r: 0.765, g: 0.251, b: 0.263 }; // #C34043
-const KANA_YELLOW = { r: 0.753, g: 0.639, b: 0.431 }; // #C0A36E
-const KANA_GREEN = { r: 0.463, g: 0.580, b: 0.416 }; // #76946A
+const KANA_RED = { r: 0.85, g: 0.15, b: 0.15 }; // #D92626 — strong red
+const KANA_YELLOW = { r: 0.25, g: 0.25, b: 0.28 }; // #404047 — neutral dark
+const KANA_GREEN = { r: 0.10, g: 0.72, b: 0.35 }; // #1AB859 — strong green
 
 // ---------------------------------------------------------------------------
 // Helpers

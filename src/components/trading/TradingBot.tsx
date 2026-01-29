@@ -4,6 +4,7 @@ import TradeLog from './TradeLog';
 import StrategySignals from './StrategySignals';
 import D3EquityChart from './D3EquityChart';
 import AlgorithmTab from './AlgorithmTab';
+import MarketVisualization from '../market-viz/MarketVisualization';
 import type { Portfolio, Trade, SignalSnapshot, LearningState } from './types';
 import { DEFAULT_CONFIG } from './types';
 import { getAssetInfo } from '../../lib/trading/assets';
@@ -19,7 +20,7 @@ interface BenchmarkPoint {
   value: number;
 }
 
-type TabType = 'overview' | 'signals' | 'log' | 'algorithm';
+type TabType = 'overview' | 'signals' | 'log' | 'algorithm' | 'marketmap';
 
 interface TradingData {
   portfolio: Portfolio;
@@ -439,6 +440,9 @@ export default function TradingBot() {
             <button className={activeTab === 'algorithm' ? 'active' : ''} onClick={() => setActiveTab('algorithm')}>
               Algorithm
             </button>
+            <button className={activeTab === 'marketmap' ? 'active' : ''} onClick={() => setActiveTab('marketmap')}>
+              Market Map
+            </button>
           </nav>
 
           {activeTab === 'overview' && (
@@ -700,6 +704,8 @@ export default function TradingBot() {
           {activeTab === 'log' && <TradeLog trades={data.trades} />}
 
           {activeTab === 'algorithm' && <AlgorithmTab learningState={data.learningState} />}
+
+          {activeTab === 'marketmap' && <MarketVisualization />}
         </div>
       </div>
     </div>
