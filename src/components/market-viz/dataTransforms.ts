@@ -28,7 +28,7 @@ export interface FilterState {
 // ---------------------------------------------------------------------------
 
 const KANA_RED = { r: 0.85, g: 0.15, b: 0.15 }; // #D92626 — strong red
-const KANA_YELLOW = { r: 0.25, g: 0.25, b: 0.28 }; // #404047 — neutral dark
+const KANA_YELLOW = { r: 0.45, g: 0.45, b: 0.50 }; // #737380 — visible neutral gray
 const KANA_GREEN = { r: 0.10, g: 0.72, b: 0.35 }; // #1AB859 — strong green
 
 // ---------------------------------------------------------------------------

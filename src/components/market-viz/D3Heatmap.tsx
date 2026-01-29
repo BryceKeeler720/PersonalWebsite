@@ -27,17 +27,17 @@ function signalToColor(combined: number): string {
   const t = (Math.max(-1, Math.min(1, combined)) + 1) / 2;
   let r: number, g: number, b: number;
   if (t < 0.5) {
-    // Red (#D92626) -> neutral dark (#404047)
+    // Red (#D92626) -> neutral gray (#737380)
     const s = t * 2;
-    r = 0.85 + (0.25 - 0.85) * s;
-    g = 0.15 + (0.25 - 0.15) * s;
-    b = 0.15 + (0.28 - 0.15) * s;
+    r = 0.85 + (0.45 - 0.85) * s;
+    g = 0.15 + (0.45 - 0.15) * s;
+    b = 0.15 + (0.50 - 0.15) * s;
   } else {
-    // Neutral dark (#404047) -> green (#1AB859)
+    // Neutral gray (#737380) -> green (#1AB859)
     const s = (t - 0.5) * 2;
-    r = 0.25 + (0.10 - 0.25) * s;
-    g = 0.25 + (0.72 - 0.25) * s;
-    b = 0.28 + (0.35 - 0.28) * s;
+    r = 0.45 + (0.10 - 0.45) * s;
+    g = 0.45 + (0.72 - 0.45) * s;
+    b = 0.50 + (0.35 - 0.50) * s;
   }
   return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
 }

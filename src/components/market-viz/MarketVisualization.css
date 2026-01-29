@@ -527,7 +527,7 @@
   flex: 1;
   height: 8px;
   border-radius: 4px;
-  background: linear-gradient(to right, #D92626, #404047, #1AB859);
+  background: linear-gradient(to right, #D92626, #737380, #1AB859);
 }
 
 .legend-gradient-labels {
