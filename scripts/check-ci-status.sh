@@ -20,20 +20,24 @@ SHA="$VERCEL_GIT_COMMIT_SHA"
 
 echo "Checking CI status for commit $SHA..."
 
-# Get the combined status from GitHub
-STATUS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-  "https://api.github.com/repos/$REPO/commits/$SHA/status" | \
-  grep -o '"state": "[^"]*"' | head -1 | cut -d'"' -f4)
+# GitHub Actions uses Check Runs, not Commit Statuses
+RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+  -H "Accept: application/vnd.github+json" \
+  "https://api.github.com/repos/$REPO/commits/$SHA/check-runs")
 
-echo "CI status: $STATUS"
+TOTAL=$(echo "$RESPONSE" | grep -o '"total_count": [0-9]*' | head -1 | grep -o '[0-9]*')
+COMPLETED=$(echo "$RESPONSE" | grep -o '"status": "completed"' | wc -l)
+SUCCESSES=$(echo "$RESPONSE" | grep -o '"conclusion": "success"' | wc -l)
 
-if [ "$STATUS" = "success" ]; then
-  echo "CI passed - proceeding with build"
+echo "Check runs: $TOTAL total, $COMPLETED completed, $SUCCESSES successful"
+
+if [ "$TOTAL" -gt 0 ] && [ "$TOTAL" -eq "$SUCCESSES" ]; then
+  echo "All checks passed - proceeding with build"
   exit 1
-elif [ "$STATUS" = "pending" ]; then
-  echo "CI still running - skipping build (will redeploy after CI passes)"
+elif [ "$COMPLETED" -lt "$TOTAL" ] 2>/dev/null; then
+  echo "Checks still running - skipping build (will redeploy after CI passes)"
   exit 0
 else
-  echo "CI failed or unknown status - skipping build"
+  echo "Checks failed or not found - skipping build"
   exit 0
 fi
