@@ -161,6 +161,17 @@ export interface LearningState {
   paramHistory: ParamChange[];
 }
 
+// Market visualization metric (computed during cron analysis)
+export interface AssetMetric {
+  symbol: string;
+  price: number;
+  changePercent: number;
+  volume: number;
+  atr: number;
+  marketCap?: number;
+  timestamp: string;
+}
+
 // Default configuration - regime-adaptive strategy
 export const DEFAULT_CONFIG: TradingConfig = {
   initialCapital: 10000,

@@ -1,5 +1,5 @@
 import { Redis } from '@upstash/redis';
-import type { Portfolio, Trade, SignalSnapshot, LearningState } from '../../components/trading/types';
+import type { Portfolio, Trade, SignalSnapshot, LearningState, AssetMetric } from '../../components/trading/types';
 import { DEFAULT_CONFIG } from '../../components/trading/types';
 
 // Initialize Redis client (uses UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN env vars)
@@ -17,6 +17,7 @@ const KEYS = {
   SPY_BENCHMARK: 'tradingbot:spyBenchmark',
   LEARNING_STATE: 'tradingbot:learningState',
   COOLDOWNS: 'tradingbot:cooldowns',
+  METRICS: 'tradingbot:metrics',
 };
 
 export interface PortfolioSnapshot {
@@ -165,6 +166,25 @@ export async function getLearningState(): Promise<LearningState | null> {
   } catch (error) {
     console.error('Error getting learning state:', error);
     return null;
+  }
+}
+
+// Asset metrics for market visualization
+export async function getMetrics(): Promise<Record<string, AssetMetric>> {
+  try {
+    const data = await redis.get<Record<string, AssetMetric>>(KEYS.METRICS);
+    return data || {};
+  } catch (error) {
+    console.error('Error getting metrics:', error);
+    return {};
+  }
+}
+
+export async function saveMetrics(metrics: Record<string, AssetMetric>): Promise<void> {
+  try {
+    await redis.set(KEYS.METRICS, metrics);
+  } catch (error) {
+    console.error('Error saving metrics:', error);
   }
 }
 

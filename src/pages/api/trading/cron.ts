@@ -4,6 +4,7 @@ import {
   savePortfolio,
   addTrade,
   saveSignals,
+  saveMetrics,
   setLastRun,
   addPortfolioSnapshot,
   getCooldowns,
@@ -24,7 +25,7 @@ import { calculateTechnicalSignal } from '../../../lib/trading/strategies/techni
 import { calculateVWAPReversionSignal } from '../../../lib/trading/strategies/vwapReversion';
 import { combineSignals, calculatePositionSize } from '../../../lib/trading/signalCombiner';
 import { DEFAULT_CONFIG } from '../../../components/trading/types';
-import type { Trade, SignalSnapshot, OHLCV, Holding } from '../../../components/trading/types';
+import type { Trade, SignalSnapshot, AssetMetric, OHLCV, Holding } from '../../../components/trading/types';
 
 // Verify cron secret to prevent unauthorized access
 const CRON_SECRET = process.env.CRON_SECRET;
@@ -204,7 +205,12 @@ async function checkWeeklyTrendNotBearish(symbol: string): Promise<boolean> {
   return isNotBearish;
 }
 
-async function analyzeStock(symbol: string): Promise<SignalSnapshot | null> {
+interface AnalysisResult {
+  signal: SignalSnapshot;
+  metric: AssetMetric;
+}
+
+async function analyzeStock(symbol: string): Promise<AnalysisResult | null> {
   const historicalData = await fetchYahooHistorical(symbol);
   if (!historicalData || historicalData.length < 50) {
     return null;
@@ -215,7 +221,7 @@ async function analyzeStock(symbol: string): Promise<SignalSnapshot | null> {
   const technical = calculateTechnicalSignal(historicalData);
   const vwapReversion = calculateVWAPReversionSignal(historicalData);
 
-  return combineSignals(
+  const signal = combineSignals(
     symbol,
     momentum,
     meanReversion,
@@ -223,6 +229,30 @@ async function analyzeStock(symbol: string): Promise<SignalSnapshot | null> {
     technical,
     DEFAULT_CONFIG.strategyWeights
   );
+
+  // Compute metric for market visualization
+  const latest = historicalData[historicalData.length - 1];
+  const previous = historicalData[historicalData.length - 2];
+  const changePercent = previous.close > 0
+    ? ((latest.close - previous.close) / previous.close) * 100
+    : 0;
+
+  const highs = historicalData.map(d => d.high);
+  const lows = historicalData.map(d => d.low);
+  const closes = historicalData.map(d => d.close);
+  const atrValues = calculateATR(highs, lows, closes, 14);
+  const atr = atrValues.length > 0 ? atrValues[atrValues.length - 1] : 0;
+
+  const metric: AssetMetric = {
+    symbol,
+    price: latest.close,
+    changePercent,
+    volume: latest.volume || 0,
+    atr,
+    timestamp: new Date().toISOString(),
+  };
+
+  return { signal, metric };
 }
 
 export const GET: APIRoute = async ({ request }) => {
@@ -241,6 +271,7 @@ export const GET: APIRoute = async ({ request }) => {
     // Get current portfolio
     let portfolio = await getPortfolio();
     const allSignals: Record<string, SignalSnapshot> = {};
+    const allMetrics: Record<string, AssetMetric> = {};
 
     // Determine which assets to analyze based on current time
     const now = new Date();
@@ -288,7 +319,8 @@ export const GET: APIRoute = async ({ request }) => {
       // Collect results
       for (const { symbol, signal } of batchResults) {
         if (signal) {
-          allSignals[symbol] = signal;
+          allSignals[symbol] = signal.signal;
+          allMetrics[symbol] = signal.metric;
         }
       }
 
@@ -561,6 +593,7 @@ export const GET: APIRoute = async ({ request }) => {
     // Save everything
     await savePortfolio(portfolio);
     await saveSignals(allSignals);
+    await saveMetrics(allMetrics);
     await setLastRun(new Date().toISOString());
 
     // Save portfolio snapshot for history chart

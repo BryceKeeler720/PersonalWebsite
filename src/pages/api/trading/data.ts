@@ -7,11 +7,12 @@ import {
   getPortfolioHistory,
   getSPYBenchmark,
   getLearningState,
+  getMetrics,
 } from '../../../lib/trading/serverStorage';
 
 export const GET: APIRoute = async () => {
   try {
-    const [portfolio, trades, signals, lastRun, history, spyBenchmark, learningState] = await Promise.all([
+    const [portfolio, trades, signals, lastRun, history, spyBenchmark, learningState, metrics] = await Promise.all([
       getPortfolio(),
       getTrades(),
       getSignals(),
@@ -19,6 +20,7 @@ export const GET: APIRoute = async () => {
       getPortfolioHistory(),
       getSPYBenchmark(),
       getLearningState(),
+      getMetrics(),
     ]);
 
     // Append a live snapshot so the chart updates every poll (every ~60s)
@@ -45,6 +47,7 @@ export const GET: APIRoute = async () => {
         history: liveHistory,
         spyBenchmark,
         learningState,
+        metrics,
         timestamp: now.toISOString(),
       }),
       {
