@@ -69,6 +69,14 @@ export default function MarketVisualization() {
     });
     sceneRef.current = scene;
 
+    // Push any already-loaded data into the new scene immediately
+    if (data) {
+      const signalsArray = Object.values(data.signals);
+      const metricsMap = new Map(Object.entries(data.metrics));
+      scene.updateData(signalsArray, metricsMap, filters);
+      scene.applyPreset(activePreset);
+    }
+
     return () => {
       scene.dispose();
       sceneRef.current = null;
