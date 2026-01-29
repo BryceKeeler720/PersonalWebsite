@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import PortfolioDashboard from './PortfolioDashboard';
 import TradeLog from './TradeLog';
 import StrategySignals from './StrategySignals';
-import PerformanceChart from './PerformanceChart';
+import D3EquityChart from './D3EquityChart';
 import AlgorithmTab from './AlgorithmTab';
 import type { Portfolio, Trade, SignalSnapshot, LearningState } from './types';
 import { DEFAULT_CONFIG } from './types';
@@ -445,7 +445,7 @@ export default function TradingBot() {
             <div className="overview-grid" style={{ display: 'grid', gap: '1.5rem' }}>
               <div className="trading-card">
                 <h2>Portfolio Performance vs S&P 500</h2>
-                <PerformanceChart
+                <D3EquityChart
                   history={combinedHistory}
                   initialCapital={chartInitialCapital}
                   spyBenchmark={combinedBenchmark}
