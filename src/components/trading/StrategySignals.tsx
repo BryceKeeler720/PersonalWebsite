@@ -62,7 +62,10 @@ interface StrategySignalsProps {
   isAnalyzing: boolean;
 }
 
-function SignalGauge({ signal }: { signal: StrategySignal }) {
+function SignalGauge({ signal }: { signal: StrategySignal | undefined }) {
+  if (!signal) {
+    return null;
+  }
   const isPositive = signal.score >= 0;
   const width = Math.abs(signal.score) * 50; // Max 50% width (half the bar)
 
