@@ -459,10 +459,21 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       const changeFromStart = d.value - initialCapital;
       const changePercent = (changeFromStart / initialCapital) * 100;
 
+      // Position tooltip to avoid covering the dot
+      // Horizontal: flip to left side if in right half of chart
+      const tooltipX = xPos > width / 2
+        ? xPos + margin.left - 160
+        : xPos + margin.left + 20;
+
+      // Vertical: position below dot if in top half, above if in bottom half
+      const tooltipY = yPos < height / 2
+        ? yPos + margin.top + 20
+        : yPos + margin.top - 100;
+
       tooltip
         .style('opacity', 1)
-        .style('left', `${xPos + margin.left + (xPos > width / 2 ? -150 : 15)}px`)
-        .style('top', `${yPos + margin.top - 20}px`)
+        .style('left', `${tooltipX}px`)
+        .style('top', `${tooltipY}px`)
         .html(`
           <div class="d3-tooltip-value">$${d3.format(',.2f')(d.value)}</div>
           <div class="d3-tooltip-date">${d3.timeFormat('%b %d, %Y %H:%M')(d.date)}</div>
