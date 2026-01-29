@@ -1,0 +1,166 @@
+name: Weekend Backtest
+
+on:
+  schedule:
+    # Run every Sunday at 8:00 AM UTC (3:00 AM EST)
+    - cron: '0 8 * * 0'
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Number of backtest days'
+        required: false
+        default: '30'
+      optimize:
+        description: 'Run weight optimization'
+        required: false
+        default: 'true'
+
+env:
+  DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run backtest
+        id: backtest
+        run: |
+          # Run backtest with walk-forward optimization
+          DAYS=${{ github.event.inputs.days || '30' }}
+          OPTIMIZE=${{ github.event.inputs.optimize || 'true' }}
+
+          echo "Running backtest for $DAYS days with optimization=$OPTIMIZE"
+
+          # Capture output and results
+          OUTPUT=$(node scripts/backtest.mjs --days=$DAYS --train-days=60 --optimize=$OPTIMIZE 2>&1) || true
+          echo "$OUTPUT"
+
+          # Extract key metrics from output
+          TOTAL_RETURN=$(echo "$OUTPUT" | grep "Total Return:" | head -1 | awk '{print $3}')
+          SPY_RETURN=$(echo "$OUTPUT" | grep "S&P 500 Return:" | head -1 | awk '{print $4}')
+          ALPHA=$(echo "$OUTPUT" | grep "Alpha:" | head -1 | awk '{print $2}')
+          SHARPE=$(echo "$OUTPUT" | grep "Sharpe Ratio:" | head -1 | awk '{print $3}')
+          MAX_DD=$(echo "$OUTPUT" | grep "Max Drawdown:" | head -1 | awk '{print $3}')
+          WIN_RATE=$(echo "$OUTPUT" | grep "Win Rate:" | head -1 | awk '{print $3}')
+          TOTAL_TRADES=$(echo "$OUTPUT" | grep "Total Trades:" | head -1 | awk '{print $3}')
+
+          # Set outputs for Discord notification
+          echo "total_return=$TOTAL_RETURN" >> $GITHUB_OUTPUT
+          echo "spy_return=$SPY_RETURN" >> $GITHUB_OUTPUT
+          echo "alpha=$ALPHA" >> $GITHUB_OUTPUT
+          echo "sharpe=$SHARPE" >> $GITHUB_OUTPUT
+          echo "max_dd=$MAX_DD" >> $GITHUB_OUTPUT
+          echo "win_rate=$WIN_RATE" >> $GITHUB_OUTPUT
+          echo "total_trades=$TOTAL_TRADES" >> $GITHUB_OUTPUT
+          echo "days=$DAYS" >> $GITHUB_OUTPUT
+
+      - name: Upload backtest results
+        uses: actions/upload-artifact@v4
+        with:
+          name: backtest-results-${{ github.run_number }}
+          path: public/backtest-results.json
+          retention-days: 30
+
+      - name: Send Discord notification
+        if: env.DISCORD_WEBHOOK_URL != ''
+        run: |
+          # Determine emoji based on performance
+          RETURN="${{ steps.backtest.outputs.total_return }}"
+          ALPHA="${{ steps.backtest.outputs.alpha }}"
+
+          # Default to neutral if parsing fails
+          RETURN_NUM=$(echo "$RETURN" | tr -d '%+' || echo "0")
+          ALPHA_NUM=$(echo "$ALPHA" | tr -d '%+' || echo "0")
+
+          if (( $(echo "$RETURN_NUM > 5" | bc -l 2>/dev/null || echo 0) )); then
+            EMOJI="🚀"
+            COLOR=3066993
+          elif (( $(echo "$RETURN_NUM > 0" | bc -l 2>/dev/null || echo 0) )); then
+            EMOJI="📈"
+            COLOR=3447003
+          elif (( $(echo "$RETURN_NUM > -5" | bc -l 2>/dev/null || echo 0) )); then
+            EMOJI="📊"
+            COLOR=15105570
+          else
+            EMOJI="📉"
+            COLOR=15158332
+          fi
+
+          # Send Discord webhook
+          curl -H "Content-Type: application/json" \
+            -d "{
+              \"embeds\": [{
+                \"title\": \"$EMOJI Weekend Backtest Results\",
+                \"description\": \"Automated backtest completed for the past ${{ steps.backtest.outputs.days }} trading days.\",
+                \"color\": $COLOR,
+                \"fields\": [
+                  {
+                    \"name\": \"📊 Portfolio Return\",
+                    \"value\": \"\`${{ steps.backtest.outputs.total_return }}\`\",
+                    \"inline\": true
+                  },
+                  {
+                    \"name\": \"📈 S&P 500 Return\",
+                    \"value\": \"\`${{ steps.backtest.outputs.spy_return }}\`\",
+                    \"inline\": true
+                  },
+                  {
+                    \"name\": \"⚡ Alpha\",
+                    \"value\": \"\`${{ steps.backtest.outputs.alpha }}\`\",
+                    \"inline\": true
+                  },
+                  {
+                    \"name\": \"📐 Sharpe Ratio\",
+                    \"value\": \"\`${{ steps.backtest.outputs.sharpe }}\`\",
+                    \"inline\": true
+                  },
+                  {
+                    \"name\": \"📉 Max Drawdown\",
+                    \"value\": \"\`${{ steps.backtest.outputs.max_dd }}\`\",
+                    \"inline\": true
+                  },
+                  {
+                    \"name\": \"🎯 Win Rate\",
+                    \"value\": \"\`${{ steps.backtest.outputs.win_rate }}\`\",
+                    \"inline\": true
+                  },
+                  {
+                    \"name\": \"🔄 Total Trades\",
+                    \"value\": \"\`${{ steps.backtest.outputs.total_trades }}\`\",
+                    \"inline\": true
+                  }
+                ],
+                \"footer\": {
+                  \"text\": \"Run #${{ github.run_number }} • Walk-Forward Optimization\"
+                },
+                \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+              }]
+            }" \
+            $DISCORD_WEBHOOK_URL
+
+      - name: Summary
+        run: |
+          echo "## 📊 Backtest Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Portfolio Return | ${{ steps.backtest.outputs.total_return }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| S&P 500 Return | ${{ steps.backtest.outputs.spy_return }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Alpha | ${{ steps.backtest.outputs.alpha }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Sharpe Ratio | ${{ steps.backtest.outputs.sharpe }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Max Drawdown | ${{ steps.backtest.outputs.max_dd }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Win Rate | ${{ steps.backtest.outputs.win_rate }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Total Trades | ${{ steps.backtest.outputs.total_trades }} |" >> $GITHUB_STEP_SUMMARY
