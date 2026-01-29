@@ -8,5 +8,6 @@ node_modules/
 .vscode/
 .venv/
 .sh
-scripts/
+scripts/*
+!scripts/check-ci-status.sh
 .github/workflows/output/
