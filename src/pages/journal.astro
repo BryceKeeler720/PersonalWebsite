@@ -340,9 +340,13 @@ const entryData = entries.map((entry: JournalEntry) => ({
   const toggle = document.getElementById('knowledge-map-toggle');
   const panel = document.getElementById('knowledge-map-panel');
 
+  let toggling = false;
   toggle?.addEventListener('click', () => {
+    if (toggling) return;
+    toggling = true;
     const expanded = toggle.getAttribute('aria-expanded') === 'true';
     toggle.setAttribute('aria-expanded', String(!expanded));
     if (panel) panel.hidden = expanded;
+    setTimeout(() => { toggling = false; }, 300);
   });
 </script>

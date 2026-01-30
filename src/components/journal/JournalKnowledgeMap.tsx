@@ -133,7 +133,9 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
     if (!el) return;
     const obs = new ResizeObserver((es) => {
       const { width } = es[0].contentRect;
-      setDimensions({ width: Math.max(width, 300), height: 420 });
+      if (width > 0) {
+        setDimensions({ width, height: 420 });
+      }
     });
     obs.observe(el);
     return () => obs.disconnect();
@@ -384,10 +386,11 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
 
   const handleMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     if (hoveredIdx !== null) return;
-    dragRef.current = { startX: e.clientX, startY: e.clientY, startTx: transform.x, startTy: transform.y };
+    const t = transformRef.current;
+    dragRef.current = { startX: e.clientX, startY: e.clientY, startTx: t.x, startTy: t.y };
     const canvas = canvasRef.current;
     if (canvas) canvas.style.cursor = 'grabbing';
-  }, [hoveredIdx, transform.x, transform.y]);
+  }, [hoveredIdx]);
 
   const handleMouseUp = useCallback(() => {
     dragRef.current = null;
