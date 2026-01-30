@@ -88,6 +88,8 @@ const entryData = entries.map((entry: JournalEntry) => ({
         )}
       </div>
     </section>
+
+    <p class="journal-stats">{daysSinceLaunch} days · {totalWords.toLocaleString()} words</p>
   </main>
 
   <footer class="journal-footer">
@@ -100,7 +102,6 @@ const entryData = entries.map((entry: JournalEntry) => ({
         <span>·</span>
         <a href="/traditional">Portfolio</a>
       </div>
-      <p class="footer-stats">{daysSinceLaunch} days · {totalWords.toLocaleString()} words</p>
     </div>
   </footer>
 </BaseLayout>
@@ -304,10 +305,11 @@ const entryData = entries.map((entry: JournalEntry) => ({
     color: rgba(220, 215, 186, 0.2);
   }
 
-  .footer-stats {
+  .journal-stats {
     font-size: 0.75rem;
     color: rgba(220, 215, 186, 0.3);
-    margin-top: 0.5rem;
+    text-align: center;
+    margin-top: 1rem;
   }
 
   @media (max-width: 768px) {
