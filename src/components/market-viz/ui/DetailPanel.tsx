@@ -35,21 +35,21 @@ export default function DetailPanel({ symbol, signal, metric, onClose }: DetailP
 
   return (
     <div className="detail-panel market-panel">
-      <div className="detail-header">
+      <div className="detail-panel-header">
         <div>
-          <h2 className="detail-symbol">{symbol}</h2>
-          <span className="detail-name">{name}</span>
+          <h2 className="detail-panel-symbol">{symbol}</h2>
+          <span className="detail-panel-name">{name}</span>
         </div>
-        <button className="detail-close" onClick={onClose}>
+        <button className="detail-panel-close" onClick={onClose}>
           &times;
         </button>
       </div>
 
       {metric && (
         <div className="detail-price-section">
-          <span className="detail-price">{formatPrice(metric.price)}</span>
+          <span className="detail-panel-price">{formatPrice(metric.price)}</span>
           <span
-            className="detail-change"
+            className="detail-panel-change"
             style={{ color: metric.changePercent >= 0 ? '#22c55e' : '#ef4444' }}
           >
             {metric.changePercent >= 0 ? '+' : ''}
@@ -58,22 +58,22 @@ export default function DetailPanel({ symbol, signal, metric, onClose }: DetailP
         </div>
       )}
 
-      <hr className="detail-divider" />
+      <hr className="detail-panel-divider" />
 
       {metric && (
-        <div className="detail-section">
+        <div className="detail-panel-section">
           <h3>Market Data</h3>
           <div className="detail-rows">
-            <div className="detail-row">
+            <div className="detail-panel-row">
               <span>Volume</span>
               <span>{formatVolume(metric.volume)}</span>
             </div>
-            <div className="detail-row">
+            <div className="detail-panel-row">
               <span>ATR</span>
               <span>{metric.atr.toFixed(2)}</span>
             </div>
             {signal?.regime && (
-              <div className="detail-row">
+              <div className="detail-panel-row">
                 <span>Regime</span>
                 <span>{signal.regime.replace(/_/g, ' ')}</span>
               </div>
@@ -82,10 +82,10 @@ export default function DetailPanel({ symbol, signal, metric, onClose }: DetailP
         </div>
       )}
 
-      <hr className="detail-divider" />
+      <hr className="detail-panel-divider" />
 
       {signal && (
-        <div className="detail-section">
+        <div className="detail-panel-section">
           <h3>Signals</h3>
           <div className="signal-gauges">
             {SIGNAL_KEYS.map((key) => {
@@ -98,15 +98,15 @@ export default function DetailPanel({ symbol, signal, metric, onClose }: DetailP
 
               return (
                 <div key={key} className="signal-gauge">
-                  <div className="gauge-header">
-                    <span className="gauge-name">{SIGNAL_LABELS[key]}</span>
-                    <span className="gauge-score">{s.score.toFixed(2)}</span>
-                    <span className="gauge-confidence">({(s.confidence * 100).toFixed(0)}%)</span>
+                  <div className="signal-gauge-header">
+                    <span className="signal-gauge-name">{SIGNAL_LABELS[key]}</span>
+                    <span className="signal-gauge-score">{s.score.toFixed(2)}</span>
+                    <span className="signal-gauge-score">({(s.confidence * 100).toFixed(0)}%)</span>
                   </div>
-                  <div className="gauge-bar">
-                    <div className="gauge-center" style={{ left: '50%' }} />
+                  <div className="signal-gauge-bar">
+                    <div className="signal-gauge-center" style={{ left: '50%' }} />
                     <div
-                      className="gauge-fill"
+                      className="signal-gauge-fill"
                       style={{
                         left: `${fillStart}%`,
                         width: `${fillWidth}%`,
@@ -120,7 +120,7 @@ export default function DetailPanel({ symbol, signal, metric, onClose }: DetailP
           </div>
 
           <div className="detail-combined">
-            <div className="detail-row">
+            <div className="detail-panel-row">
               <span>Combined Score</span>
               <span>{signal.combined.toFixed(2)}</span>
             </div>
