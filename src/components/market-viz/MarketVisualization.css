@@ -687,6 +687,16 @@
   pointer-events: none;
 }
 
+.heatmap-sector-label {
+  font-family: 'JetBrains Mono', monospace;
+  fill: var(--kana-fg-muted);
+  font-size: 9px;
+  font-weight: 500;
+  text-anchor: start;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
 /* Three.js CSS2D labels */
 .market-viz-label {
   font-family: 'JetBrains Mono', monospace;

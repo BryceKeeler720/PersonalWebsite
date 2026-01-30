@@ -151,6 +151,39 @@ export default function D3Heatmap({
       .attr('y', d => d.y0 + 12)
       .text(d => d.data.name);
 
+    // Draw sector labels (second-level groups)
+    const sectorNodes: RectNode[] = [];
+    for (const group of (root.children || []) as RectNode[]) {
+      if (group.children) {
+        sectorNodes.push(...(group.children as RectNode[]));
+      }
+    }
+
+    const sectorGroups = svg.selectAll<SVGGElement, RectNode>('g.sector')
+      .data(sectorNodes)
+      .enter()
+      .append('g')
+      .attr('class', 'sector');
+
+    sectorGroups.append('rect')
+      .attr('x', d => d.x0)
+      .attr('y', d => d.y0)
+      .attr('width', d => d.x1 - d.x0)
+      .attr('height', d => d.y1 - d.y0)
+      .attr('fill', 'none')
+      .attr('stroke', 'rgba(220, 215, 186, 0.06)')
+      .attr('stroke-width', 0.5);
+
+    sectorGroups.each(function(d) {
+      const w = d.x1 - d.x0;
+      if (w < 40) return;
+      d3.select(this).append('text')
+        .attr('class', 'heatmap-sector-label')
+        .attr('x', d.x0 + 4)
+        .attr('y', d.y0 + 12)
+        .text(d.data.name);
+    });
+
     // Draw leaf cells
     const leaves = root.leaves() as RectNode[];
     const cells = svg.selectAll<SVGGElement, RectNode>('g.cell')
