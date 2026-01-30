@@ -185,7 +185,8 @@ async function poll() {
     pollErrors = 0;
   } catch (err) {
     pollErrors++;
-    console.error(`[market-ws] Poll error (${pollErrors}):`, err.message);
+    const cause = err.cause ? ` (${err.cause.code || err.cause.message || err.cause})` : '';
+    console.error(`[market-ws] Poll error (${pollErrors}): ${err.message}${cause}`);
 
     // If many consecutive errors, notify clients
     if (pollErrors === 5) {
