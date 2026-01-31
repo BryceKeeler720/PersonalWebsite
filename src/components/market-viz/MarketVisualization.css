@@ -416,24 +416,53 @@
   color: var(--kana-fg);
 }
 
+/* Detail panel rows & containers */
+.detail-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-combined {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.detail-recommendation {
+  margin-top: 8px;
+}
+
 /* Signal gauge */
+.signal-gauges {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .signal-gauge {
   margin-bottom: 8px;
 }
 
 .signal-gauge-header {
   display: flex;
-  justify-content: space-between;
+  gap: 8px;
   font-size: 11px;
   margin-bottom: 4px;
 }
 
 .signal-gauge-name {
   color: var(--kana-fg-dim);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .signal-gauge-score {
   font-weight: 600;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .signal-gauge-bar {
@@ -472,27 +501,27 @@
   letter-spacing: 0.5px;
 }
 
-.recommendation-badge.STRONG_BUY {
+.recommendation-badge.strong-buy {
   background: rgba(118, 148, 106, 0.25);
   color: var(--kana-bright-green);
 }
 
-.recommendation-badge.BUY {
+.recommendation-badge.buy {
   background: rgba(118, 148, 106, 0.15);
   color: var(--kana-green);
 }
 
-.recommendation-badge.HOLD {
+.recommendation-badge.hold {
   background: rgba(192, 163, 110, 0.15);
   color: var(--kana-yellow);
 }
 
-.recommendation-badge.SELL {
+.recommendation-badge.sell {
   background: rgba(195, 64, 67, 0.15);
   color: var(--kana-orange);
 }
 
-.recommendation-badge.STRONG_SELL {
+.recommendation-badge.strong-sell {
   background: rgba(195, 64, 67, 0.25);
   color: var(--kana-red);
 }

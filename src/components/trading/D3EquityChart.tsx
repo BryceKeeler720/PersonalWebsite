@@ -44,8 +44,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
 
   // Store current zoom transform for proper cursor tracking
   const currentTransformRef = useRef<d3.ZoomTransform>(d3.zoomIdentity);
-  const brushGroupRef = useRef<d3.Selection<SVGGElement, unknown, null, undefined> | null>(null);
-  const brushBehaviorRef = useRef<d3.BrushBehavior<unknown> | null>(null);
+  const clearBrushRef = useRef<(() => void) | null>(null);
 
   // Process data: calculate daily returns and drawdowns
   const processedData = useMemo((): ProcessedDataPoint[] => {
@@ -690,8 +689,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .attr('class', 'd3-brush')
       .call(brush);
 
-    brushBehaviorRef.current = brush;
-    brushGroupRef.current = brushGroup;
+    clearBrushRef.current = () => brush.move(brushGroup, null);
 
     brushGroup.selectAll('.selection')
       .attr('fill', 'rgba(126, 156, 216, 0.3)')
@@ -713,8 +711,8 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
 
   // Clear brush visual when selection is reset
   useEffect(() => {
-    if (!brushSelection && brushGroupRef.current && brushBehaviorRef.current) {
-      brushBehaviorRef.current.move(brushGroupRef.current, null);
+    if (!brushSelection) {
+      clearBrushRef.current?.();
     }
   }, [brushSelection]);
 
@@ -819,7 +817,10 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
         <div className="d3-brush-title">
           Date Range
           {brushSelection && (
-            <button className="d3-reset-brush" onClick={() => setBrushSelection(null)}>
+            <button className="d3-reset-brush" onClick={() => {
+              clearBrushRef.current?.();
+              setBrushSelection(null);
+            }}>
               Reset
             </button>
           )}
