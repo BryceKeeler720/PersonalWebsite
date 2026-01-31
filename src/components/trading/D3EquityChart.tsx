@@ -44,6 +44,8 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
 
   // Store current zoom transform for proper cursor tracking
   const currentTransformRef = useRef<d3.ZoomTransform>(d3.zoomIdentity);
+  const brushGroupRef = useRef<d3.Selection<SVGGElement, unknown, null, undefined> | null>(null);
+  const brushBehaviorRef = useRef<d3.BrushBehavior<unknown> | null>(null);
 
   // Process data: calculate daily returns and drawdowns
   const processedData = useMemo((): ProcessedDataPoint[] => {
@@ -341,7 +343,10 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .transition()
       .duration(1500)
       .ease(d3.easeCubicOut)
-      .attr('stroke-dashoffset', 0);
+      .attr('stroke-dashoffset', 0)
+      .on('end', function() {
+        d3.select(this).attr('stroke-dasharray', null);
+      });
 
     // Benchmark line
     if (showBenchmark && filteredBenchmark.length > 1) {
@@ -495,7 +500,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       });
 
     // Zoom behavior
-    const zoom = d3.zoom<SVGSVGElement, unknown>()
+    const zoom = d3.zoom<SVGRectElement, unknown>()
       .scaleExtent([1, 10])
       .translateExtent([[0, 0], [width, height]])
       .extent([[0, 0], [width, height]])
@@ -505,10 +510,14 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
         const newXScale = event.transform.rescaleX(xScaleBase);
 
         // Update line and area with new scale
-        linePath.attr('d', d3.line<ProcessedDataPoint>()
-          .x(d => newXScale(d.date))
-          .y(d => yScale(d.value))
-          .curve(d3.curveMonotoneX)(filteredData));
+        linePath
+          .interrupt()
+          .attr('stroke-dasharray', null)
+          .attr('stroke-dashoffset', null)
+          .attr('d', d3.line<ProcessedDataPoint>()
+            .x(d => newXScale(d.date))
+            .y(d => yScale(d.value))
+            .curve(d3.curveMonotoneX)(filteredData));
 
         areaPath.attr('d', d3.area<ProcessedDataPoint>()
           .x(d => newXScale(d.date))
@@ -541,7 +550,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
           .attr('stroke', 'rgba(220, 215, 186, 0.1)');
       });
 
-    svg.call(zoom);
+    overlay.call(zoom);
 
     // Reset zoom transform ref when data changes
     currentTransformRef.current = d3.zoomIdentity;
@@ -681,6 +690,9 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .attr('class', 'd3-brush')
       .call(brush);
 
+    brushBehaviorRef.current = brush;
+    brushGroupRef.current = brushGroup;
+
     brushGroup.selectAll('.selection')
       .attr('fill', 'rgba(126, 156, 216, 0.3)')
       .attr('stroke', 'rgba(126, 156, 216, 0.6)');
@@ -698,6 +710,13 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
     g.selectAll('path, line').attr('stroke', 'rgba(220, 215, 186, 0.1)');
 
   }, [timeFilteredData, dimensions]);
+
+  // Clear brush visual when selection is reset
+  useEffect(() => {
+    if (!brushSelection && brushGroupRef.current && brushBehaviorRef.current) {
+      brushBehaviorRef.current.move(brushGroupRef.current, null);
+    }
+  }, [brushSelection]);
 
   // Calculate stats
   const stats = useMemo(() => {
