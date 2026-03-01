@@ -2327,8 +2327,10 @@ async function runService() {
     await redis.set(KEYS.HISTORY, []);
     await redis.set(KEYS.SPY_BENCHMARK, []);
     await redis.set(KEYS.LEARNING_STATE, JSON.parse(JSON.stringify(DEFAULT_LEARNING_STATE)));
+    await redis.set(KEYS.METRICS, {});
+    await redis.set(KEYS.LAST_RUN, null);
     console.log(`Portfolio reset to $${resetValue}`);
-    console.log('Cleared: history, trades, signals, S&P 500 benchmark, learning state.');
+    console.log('Cleared: ALL data (history, trades, signals, S&P benchmark, learning state, metrics, last run).');
     process.exit(0);
   }
 
