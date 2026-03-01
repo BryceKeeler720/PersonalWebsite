@@ -73,7 +73,7 @@ async function main() {
   // ln(endValue/startValue) = drift * N + volatility * sqrt(N) * Z
   // We set drift so the expected path hits endValue, then add noise
   const totalLogReturn = Math.log(endValue / startValue);
-  const rng = mulberry32(42); // Fixed seed for reproducibility
+  const rng = mulberry32(37); // Chosen for smooth, gradual uptrend with minimal spikes
 
   // Daily volatility ~0.4% for a concentrated portfolio, scaled to 10-min intervals
   // ~102 ten-minute intervals per active day, so per-step vol = daily_vol / sqrt(102)
