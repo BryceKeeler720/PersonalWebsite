@@ -17,6 +17,7 @@ scripts/*
 !scripts/backtest.mjs
 !scripts/backtest-intraday.mjs
 !scripts/seed-history.mjs
+!scripts/fix-spike.mjs
 !scripts/blackjack/
 scripts/blackjack/.venv/
 scripts/blackjack/calibration_data.json
