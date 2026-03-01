@@ -1,0 +1,29 @@
+{
+  "manifest_version": 2,
+  "name": "Blackjack DOM Bridge",
+  "version": "1.0",
+  "description": "Reads game state from DOM and forwards to local card counter",
+  "permissions": [
+    "http://localhost:9876/*",
+    "tabs",
+    "*://*.stake.com/*",
+    "*://*.stake.us/*",
+    "*://*.stake.bet/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.stake.com/*",
+        "*://*.stake.us/*",
+        "*://*.stake.bet/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": true,
+      "match_about_blank": true
+    }
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  }
+}

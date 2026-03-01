@@ -12,4 +12,7 @@ scripts/*
 !scripts/check-ci-status.sh
 !scripts/market-ws-server.mjs
 !scripts/market-ws-server.service
+!scripts/blackjack/
+scripts/blackjack/.venv/
+scripts/blackjack/calibration_data.json
 .github/workflows/output/
