@@ -1136,8 +1136,12 @@ async function runBacktest() {
       losses: losingTrades.length,
     },
   };
-  writeFileSync(outputPath, JSON.stringify(output, null, 2));
-  console.log(`\nResults written to: ${outputPath}`);
+  try {
+    writeFileSync(outputPath, JSON.stringify(output, null, 2));
+    console.log(`\nResults written to: ${outputPath}`);
+  } catch (e) {
+    console.log(`\nSkipped writing ${outputPath}: ${e.message}`);
+  }
 
   // Optionally write to Redis for the live equity chart
   if (TO_REDIS) {
