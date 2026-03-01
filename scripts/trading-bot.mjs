@@ -18,7 +18,7 @@ const BATCH_SIZE = 50; // Alpaca supports multi-symbol batch requests
 const BATCH_DELAY_MS = 350; // Free tier: 200 req/min → ~300ms minimum between requests
 const ANALYSIS_BATCH_SIZE = 200; // Symbols per analysis batch (keeps memory ~50MB vs 600MB+)
 const DEFAULT_CONFIG = {
-  initialCapital: 10199.52,
+  initialCapital: 10000,
   maxPositionSize: 0.07,
   maxPositions: 15,
   minTradeValue: 15,
