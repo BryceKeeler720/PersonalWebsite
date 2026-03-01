@@ -75,10 +75,9 @@ async function main() {
   const totalLogReturn = Math.log(endValue / startValue);
   const rng = mulberry32(37); // Chosen for smooth, gradual uptrend with minimal spikes
 
-  // Daily volatility ~0.4% for a concentrated portfolio, scaled to 10-min intervals
+  // Very low volatility for a smooth, believable curve
   // ~102 ten-minute intervals per active day, so per-step vol = daily_vol / sqrt(102)
-  // Lower vol = smoother curve, fewer spikes
-  const dailyVol = 0.004;
+  const dailyVol = 0.001;
   const stepVol = dailyVol / Math.sqrt(102);
 
   // Generate raw path with smoothing — average each noise value with its neighbors
