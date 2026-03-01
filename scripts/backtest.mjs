@@ -68,7 +68,7 @@ function loadAllSymbols() {
   ];
   let content;
   for (const p of candidates) {
-    try { content = readFileSync(p, 'utf-8'); break; } catch {}
+    try { content = readFileSync(p, 'utf-8'); break; } catch { /* ignore */ }
   }
   if (!content) throw new Error(`assets.ts not found. Tried: ${candidates.join(', ')}`);
 
