@@ -2306,13 +2306,18 @@ function setupShutdownHandlers() {
 
 // Service loop
 async function runService() {
-  // Handle --reset flag: reset portfolio to initialCapital and clear all history
+  // Handle --reset flag: reset portfolio and clear all history
+  // Usage: --reset          (resets to initialCapital)
+  //        --reset 12400    (resets to custom amount)
   if (process.argv.includes('--reset')) {
+    const resetIdx = process.argv.indexOf('--reset');
+    const customAmount = parseFloat(process.argv[resetIdx + 1]);
+    const resetValue = (!isNaN(customAmount) && customAmount > 0) ? customAmount : DEFAULT_CONFIG.initialCapital;
     console.log('Resetting portfolio...');
     const freshPortfolio = {
-      cash: DEFAULT_CONFIG.initialCapital,
+      cash: resetValue,
       holdings: [],
-      totalValue: DEFAULT_CONFIG.initialCapital,
+      totalValue: resetValue,
       lastUpdated: new Date().toISOString(),
       initialCapital: DEFAULT_CONFIG.initialCapital,
     };
@@ -2322,7 +2327,7 @@ async function runService() {
     await redis.set(KEYS.HISTORY, []);
     await redis.set(KEYS.SPY_BENCHMARK, []);
     await redis.set(KEYS.LEARNING_STATE, JSON.parse(JSON.stringify(DEFAULT_LEARNING_STATE)));
-    console.log(`Portfolio reset to $${DEFAULT_CONFIG.initialCapital}`);
+    console.log(`Portfolio reset to $${resetValue}`);
     console.log('Cleared: history, trades, signals, S&P 500 benchmark, learning state.');
     process.exit(0);
   }
