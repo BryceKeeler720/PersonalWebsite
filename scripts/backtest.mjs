@@ -18,17 +18,18 @@ import { Redis } from '@upstash/redis';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// Configuration (same as live bot)
+// Configuration — synced from live bot (trading-bot.mjs DEFAULT_CONFIG)
 const DEFAULT_CONFIG = {
-  initialCapital: 10000,
-  maxPositionSize: 0.04,
-  maxPositions: 50,
+  initialCapital: 10199.52,
+  maxPositionSize: 0.07,
+  maxPositions: 15,
   minTradeValue: 15,
-  targetCashRatio: 0,
-  buyThreshold: 0.02,
-  weakSignalSell: 0.02,
-  stopLoss: -2,
-  profitTake: 2,
+  targetCashRatio: 0.05,
+  buyThreshold: 0.35,
+  weakSignalSell: 0.10,  // Approximation of live bot's signal-based selling
+  stopLoss: -8,           // Wider stop — live bot uses ATR trailing stops (~8% effective)
+  profitTake: 15,         // Live bot uses ATR-based partial profit-taking (3x/5x ATR)
+  maxNewPositionsPerCycle: 3,
   strategyWeights: {
     momentum: 0.30,
     meanReversion: 0.25,
@@ -461,10 +462,11 @@ function simulateLite(signalsByDate, pricesByDate, backtestDates, weights, confi
 
     // Buy logic — proportional allocation across all candidates
     const openSlots = config.maxPositions - portfolio.holdings.length;
+    const maxBuysLite = Math.min(openSlots, config.maxNewPositionsPerCycle || openSlots);
     const buyCandidates = Object.values(allSignals)
       .filter(s => s.combined > config.buyThreshold && !portfolio.holdings.some(h => h.symbol === s.symbol))
       .sort((a, b) => b.combined - a.combined)
-      .slice(0, openSlots);
+      .slice(0, maxBuysLite);
 
     if (buyCandidates.length > 0) {
       const tgtCash = portfolio.totalValue * config.targetCashRatio;
@@ -893,10 +895,11 @@ async function runBacktest() {
 
     // ── Buy logic — proportional allocation across all candidates ──
     const openSlots = DEFAULT_CONFIG.maxPositions - portfolio.holdings.length;
+    const maxBuys = Math.min(openSlots, DEFAULT_CONFIG.maxNewPositionsPerCycle || openSlots);
     const buyCandidates = Object.values(allSignals)
       .filter(s => s.combined > DEFAULT_CONFIG.buyThreshold && !portfolio.holdings.some(h => h.symbol === s.symbol))
       .sort((a, b) => b.combined - a.combined)
-      .slice(0, openSlots);
+      .slice(0, maxBuys);
 
     if (buyCandidates.length > 0) {
       const tgtCash = portfolio.totalValue * DEFAULT_CONFIG.targetCashRatio;
