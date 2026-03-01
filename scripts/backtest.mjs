@@ -60,8 +60,16 @@ const TOP_N_SMOOTH = 10; // Average top N weight configs to reduce overfitting
 // ────────────────────────────────────────────
 
 function loadAllSymbols() {
-  const assetsPath = join(__dirname, '..', 'src', 'lib', 'trading', 'assets.ts');
-  const content = readFileSync(assetsPath, 'utf-8');
+  // Try repo layout first, then fall back to assets.ts alongside this script (for /opt/trading-bot deploys)
+  const candidates = [
+    join(__dirname, '..', 'src', 'lib', 'trading', 'assets.ts'),
+    join(__dirname, 'assets.ts'),
+  ];
+  let content;
+  for (const p of candidates) {
+    try { content = readFileSync(p, 'utf-8'); break; } catch {}
+  }
+  if (!content) throw new Error(`assets.ts not found. Tried: ${candidates.join(', ')}`);
 
   const symbols = new Set();
 
