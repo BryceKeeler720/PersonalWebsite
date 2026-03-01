@@ -1188,50 +1188,55 @@ async function runBacktest() {
     }
   }
 
-  // Update initial capital and weights across codebase
+  // Update initial capital and weights across codebase (skip when writing to Redis on server)
+  if (TO_REDIS) {
+    console.log('\nSkipping file updates (--to-redis mode).');
+  }
   const roundedFinal = Math.round(finalValue * 100) / 100;
-  console.log(`\nUpdating initialCapital to $${roundedFinal} and weights across codebase...`);
+  if (!TO_REDIS) console.log(`\nUpdating initialCapital to $${roundedFinal} and weights across codebase...`);
 
   const botPath = join(__dirname, 'trading-bot.mjs');
   const typesPath = join(__dirname, '..', 'src', 'components', 'trading', 'types.ts');
 
-  for (const filePath of [botPath, typesPath]) {
-    try {
-      let content = readFileSync(filePath, 'utf-8');
+  if (!TO_REDIS) {
+    for (const filePath of [botPath, typesPath]) {
+      try {
+        let content = readFileSync(filePath, 'utf-8');
 
-      // Update initialCapital
-      const updatedCapital = content.replace(
-        /initialCapital:\s*[\d.]+/,
-        `initialCapital: ${roundedFinal}`
-      );
+        // Update initialCapital
+        const updatedCapital = content.replace(
+          /initialCapital:\s*[\d.]+/,
+          `initialCapital: ${roundedFinal}`
+        );
 
-      // Update strategy weights
-      let updatedWeights = updatedCapital;
-      if (OPTIMIZE) {
-        updatedWeights = updatedWeights.replace(
-          /momentum:\s*[\d.]+/,
-          `momentum: ${activeWeights.momentum.toFixed(2)}`
-        );
-        updatedWeights = updatedWeights.replace(
-          /meanReversion:\s*[\d.]+/,
-          `meanReversion: ${activeWeights.meanReversion.toFixed(2)}`
-        );
-        updatedWeights = updatedWeights.replace(
-          /sentiment:\s*[\d.]+/,
-          `sentiment: ${activeWeights.sentiment.toFixed(2)}`
-        );
-        updatedWeights = updatedWeights.replace(
-          /technical:\s*[\d.]+/,
-          `technical: ${activeWeights.technical.toFixed(2)}`
-        );
+        // Update strategy weights
+        let updatedWeights = updatedCapital;
+        if (OPTIMIZE) {
+          updatedWeights = updatedWeights.replace(
+            /momentum:\s*[\d.]+/,
+            `momentum: ${activeWeights.momentum.toFixed(2)}`
+          );
+          updatedWeights = updatedWeights.replace(
+            /meanReversion:\s*[\d.]+/,
+            `meanReversion: ${activeWeights.meanReversion.toFixed(2)}`
+          );
+          updatedWeights = updatedWeights.replace(
+            /sentiment:\s*[\d.]+/,
+            `sentiment: ${activeWeights.sentiment.toFixed(2)}`
+          );
+          updatedWeights = updatedWeights.replace(
+            /technical:\s*[\d.]+/,
+            `technical: ${activeWeights.technical.toFixed(2)}`
+          );
+        }
+
+        if (updatedWeights !== content) {
+          writeFileSync(filePath, updatedWeights);
+          console.log(`  Updated: ${filePath}`);
+        }
+      } catch (e) {
+        console.error(`  Failed to update ${filePath}: ${e.message}`);
       }
-
-      if (updatedWeights !== content) {
-        writeFileSync(filePath, updatedWeights);
-        console.log(`  Updated: ${filePath}`);
-      }
-    } catch (e) {
-      console.error(`  Failed to update ${filePath}: ${e.message}`);
     }
   }
 
