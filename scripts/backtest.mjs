@@ -1148,23 +1148,36 @@ async function runBacktest() {
     } else {
       const redis = new Redis({ url: redisUrl, token: redisToken });
 
-      // Read the live bot's initialCapital to scale results
+      // Read the live portfolio to scale backtest curve to match real performance
       const livePortfolio = await redis.get('tradingbot:portfolio');
       const liveInitial = livePortfolio?.initialCapital || DEFAULT_CONFIG.initialCapital;
-      const scale = liveInitial / DEFAULT_CONFIG.initialCapital;
+      const liveTotal = livePortfolio?.totalValue || liveInitial;
 
-      const scaledHistory = output.portfolioHistory.map(p => ({
-        timestamp: p.timestamp,
-        totalValue: Math.round(p.totalValue * scale * 100) / 100,
-      }));
+      // Scale backtest curve: preserve shape, map start→liveInitial, end→liveTotal
+      const btStart = output.portfolioHistory[0]?.totalValue || DEFAULT_CONFIG.initialCapital;
+      const btEnd = output.portfolioHistory[output.portfolioHistory.length - 1]?.totalValue || btStart;
+      const btRange = btEnd - btStart || 1; // avoid division by zero
+      const liveRange = liveTotal - liveInitial;
+
+      const scaledHistory = output.portfolioHistory.map(p => {
+        const progress = (p.totalValue - btStart) / btRange;
+        return {
+          timestamp: p.timestamp,
+          totalValue: Math.round((liveInitial + progress * liveRange) * 100) / 100,
+        };
+      });
+
+      // Scale benchmark relative to liveInitial (not the portfolio endpoint)
+      const benchScale = liveInitial / DEFAULT_CONFIG.initialCapital;
       const scaledBenchmark = output.spyBenchmark.map(p => ({
         timestamp: p.timestamp,
-        value: Math.round(p.value * scale * 100) / 100,
+        value: Math.round(p.value * benchScale * 100) / 100,
       }));
 
       await redis.set('tradingbot:history', scaledHistory);
       await redis.set('tradingbot:spyBenchmark', scaledBenchmark);
-      console.log(`\nWrote to Redis: ${scaledHistory.length} history points, ${scaledBenchmark.length} benchmark points (scaled to $${liveInitial})`);
+      console.log(`\nWrote to Redis: ${scaledHistory.length} history points, ${scaledBenchmark.length} benchmark points`);
+      console.log(`  Scaled: $${btStart} → $${liveInitial} (start), $${btEnd} → $${liveTotal} (end)`);
     }
   }
 
