@@ -14,6 +14,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { Redis } from '@upstash/redis';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -51,6 +52,7 @@ const TEST_START = args['test-start'] || null; // e.g., '2025-12-26' - overrides
 const MAX_SYMBOLS = parseInt(args.symbols || '1500', 10);
 const VERBOSE = args.verbose === 'true';
 const OPTIMIZE = args.optimize !== 'false'; // default: optimize
+const TO_REDIS = args['to-redis'] === 'true'; // Write history to Redis for live chart
 const TOP_N_SMOOTH = 10; // Average top N weight configs to reduce overfitting
 
 // ────────────────────────────────────────────
@@ -78,7 +80,8 @@ function loadAllSymbols() {
   // Always include S&P 500 index for benchmark
   symbols.add('^GSPC');
 
-  const allSymbols = [...symbols];
+  // Exclude forex/futures — they can't execute on Alpaca and break position sizing
+  const allSymbols = [...symbols].filter(s => !s.endsWith('=X') && !s.endsWith('=F'));
   return allSymbols.slice(0, MAX_SYMBOLS);
 }
 
@@ -1127,6 +1130,35 @@ async function runBacktest() {
   };
   writeFileSync(outputPath, JSON.stringify(output, null, 2));
   console.log(`\nResults written to: ${outputPath}`);
+
+  // Optionally write to Redis for the live equity chart
+  if (TO_REDIS) {
+    const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+    const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+    if (!redisUrl || !redisToken) {
+      console.error('\n--to-redis requires UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN env vars');
+    } else {
+      const redis = new Redis({ url: redisUrl, token: redisToken });
+
+      // Read the live bot's initialCapital to scale results
+      const livePortfolio = await redis.get('tradingbot:portfolio');
+      const liveInitial = livePortfolio?.initialCapital || DEFAULT_CONFIG.initialCapital;
+      const scale = liveInitial / DEFAULT_CONFIG.initialCapital;
+
+      const scaledHistory = output.portfolioHistory.map(p => ({
+        timestamp: p.timestamp,
+        totalValue: Math.round(p.totalValue * scale * 100) / 100,
+      }));
+      const scaledBenchmark = output.spyBenchmark.map(p => ({
+        timestamp: p.timestamp,
+        value: Math.round(p.value * scale * 100) / 100,
+      }));
+
+      await redis.set('tradingbot:history', scaledHistory);
+      await redis.set('tradingbot:spyBenchmark', scaledBenchmark);
+      console.log(`\nWrote to Redis: ${scaledHistory.length} history points, ${scaledBenchmark.length} benchmark points (scaled to $${liveInitial})`);
+    }
+  }
 
   // Update initial capital and weights across codebase
   const roundedFinal = Math.round(finalValue * 100) / 100;
