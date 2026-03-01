@@ -1170,12 +1170,13 @@ async function reconcileWithAlpaca(portfolio) {
   }
 
   // 3. Remove phantom holdings (in Redis but not on Alpaca)
-  // Note: forex/futures are internal-only, so we keep those
+  // Forex/futures are dropped — they can't execute on Alpaca and inflate portfolio value
   const reconciledHoldings = [];
   for (const holding of portfolio.holdings) {
     if (isForexOrFutures(holding.symbol)) {
-      reconciledHoldings.push(holding);
-      continue;
+      const phantomValue = holding.marketValue || (holding.shares * (holding.currentPrice || 0));
+      corrections.push(`REMOVED forex/futures: ${holding.symbol} (${holding.shares} shares, $${phantomValue.toFixed(2)})`);
+      continue; // Drop forex/futures holdings
     }
     const alpacaPos = alpacaPositionMap.get(holding.symbol);
     if (!alpacaPos) {
@@ -2155,23 +2156,24 @@ async function main() {
   const maxBuys = Math.min(openSlots, DEFAULT_CONFIG.maxNewPositionsPerCycle);
   const allCandidates = Object.values(allSignals)
     .filter(s => s.combined > effectiveBuyThreshold && !portfolio.holdings.some(h => h.symbol === s.symbol) && !isOnCooldown(s.symbol))
+    .filter(s => !isForexOrFutures(s.symbol)) // Forex/futures can't execute on Alpaca — exclude from trading
     .sort((a, b) => b.combined - a.combined);
 
-  const isAltAsset = (sym) => isCryptoSymbol(sym) || isForexOrFutures(sym);
-  const altCandidates = allCandidates.filter(s => isAltAsset(s.symbol));
-  const equityCandidates = allCandidates.filter(s => !isAltAsset(s.symbol));
+  const isCrypto = (sym) => isCryptoSymbol(sym);
+  const cryptoCandidates = allCandidates.filter(s => isCrypto(s.symbol));
+  const equityCandidates = allCandidates.filter(s => !isCrypto(s.symbol));
 
-  // Build diversified list: 1 alt slot + remaining equity slots
+  // Build diversified list: 1 crypto slot + remaining equity slots
   const buyCandidates = [];
-  if (altCandidates.length > 0 && maxBuys > 0) {
-    buyCandidates.push(altCandidates[0]); // Best alternative asset
+  if (cryptoCandidates.length > 0 && maxBuys > 0) {
+    buyCandidates.push(cryptoCandidates[0]); // Best crypto asset
   }
   for (const c of equityCandidates) {
     if (buyCandidates.length >= maxBuys) break;
     buyCandidates.push(c);
   }
-  // Fill any remaining slots with more alt candidates
-  for (const c of altCandidates.slice(1)) {
+  // Fill any remaining slots with more crypto candidates
+  for (const c of cryptoCandidates.slice(1)) {
     if (buyCandidates.length >= maxBuys) break;
     buyCandidates.push(c);
   }
@@ -2338,6 +2340,31 @@ async function runService() {
   if (process.argv.includes('--reset-learning')) {
     await redis.set(KEYS.LEARNING_STATE, JSON.parse(JSON.stringify(DEFAULT_LEARNING_STATE)));
     console.log('Learning state reset to defaults. Portfolio unchanged.');
+    process.exit(0);
+  }
+
+  if (process.argv.includes('--cleanup')) {
+    console.log('Cleaning up portfolio: removing forex/futures holdings and reconciling with Alpaca...');
+    await syncAlpacaPositions();
+    let portfolio = await getPortfolio();
+    const before = { total: portfolio.totalValue, holdings: portfolio.holdings.length, cash: portfolio.cash };
+    const removed = portfolio.holdings.filter(h => isForexOrFutures(h.symbol));
+    if (removed.length > 0) {
+      console.log(`\nRemoving ${removed.length} forex/futures holdings:`);
+      for (const h of removed) {
+        console.log(`  ${h.symbol}: ${h.shares} shares, marketValue $${(h.marketValue || 0).toFixed(2)}`);
+      }
+    }
+    portfolio = await reconcileWithAlpaca(portfolio);
+    // Also trim history to remove inflated snapshots
+    const history = await getPortfolioHistory();
+    const cleanHistory = history.filter(s => s.totalValue < before.total * 0.5 || s.totalValue <= portfolio.totalValue * 2);
+    if (cleanHistory.length < history.length) {
+      console.log(`\nTrimmed ${history.length - cleanHistory.length} inflated history snapshots`);
+      await redis.set(KEYS.HISTORY, cleanHistory);
+    }
+    console.log(`\nBefore: $${before.total.toFixed(2)} | ${before.holdings} holdings | Cash: $${before.cash.toFixed(2)}`);
+    console.log(`After:  $${portfolio.totalValue.toFixed(2)} | ${portfolio.holdings.length} holdings | Cash: $${portfolio.cash.toFixed(2)}`);
     process.exit(0);
   }
 
