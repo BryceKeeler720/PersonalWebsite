@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import * as d3 from 'd3';
 import type { SignalSnapshot, AssetMetric } from '../trading/types';
-import { ASSET_INFO, getAssetType } from '../../lib/trading/assets';
+import { getAssetType } from '../../lib/trading/assets';
 import { getSubCategory } from '../../lib/trading/sectorMap';
 import type { FilterState } from './dataTransforms';
 

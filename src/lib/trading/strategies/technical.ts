@@ -1,4 +1,4 @@
-import { calculateMACD, calculateRSI, calculateSMA } from '../indicators';
+import { calculateMACD, calculateRSI } from '../indicators';
 import type { StrategySignal, OHLCV } from '../../../components/trading/types';
 
 /**

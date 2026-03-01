@@ -153,8 +153,6 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
 
     const w = dimensions.width;
     const h = dimensions.height;
-    const maxWords = Math.max(...entries.map(e => e.wordCount), 1);
-
     // Group entries by primary tag for initial positioning
     const allTags = [...new Set(entries.flatMap(e => e.tags))];
     const tagAngles = new Map<string, number>();
@@ -235,12 +233,6 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
     });
     return set;
   }, [nodes, searchQuery]);
-
-  // Screen-space coords
-  const toScreen = useCallback((x: number, y: number) => ({
-    x: x * transform.k + transform.x,
-    y: y * transform.k + transform.y,
-  }), [transform]);
 
   const fromScreen = useCallback((sx: number, sy: number) => ({
     x: (sx - transform.x) / transform.k,

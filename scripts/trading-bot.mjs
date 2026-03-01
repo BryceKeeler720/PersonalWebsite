@@ -1320,16 +1320,6 @@ function computeSMA(prices, period) {
   return slice.reduce((a, b) => a + b, 0) / period;
 }
 
-function computeEMA(prices, period) {
-  if (prices.length < period) return null;
-  const k = 2 / (period + 1);
-  let ema = prices.slice(0, period).reduce((a, b) => a + b, 0) / period;
-  for (let i = period; i < prices.length; i++) {
-    ema = prices[i] * k + ema * (1 - k);
-  }
-  return ema;
-}
-
 function computeRSI(prices, period = 14) {
   if (prices.length < period + 1) return 50;
   const changes = [];

@@ -23,7 +23,6 @@ interface MarketData {
 type ViewMode = '2d' | '3d';
 type WSStatus = 'connecting' | 'connected' | 'disconnected';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const WS_URL: string = (import.meta as any).env?.PUBLIC_WS_URL || '';
 const API_URL = '/api/trading/market-data';
 const POLL_INTERVAL = 30_000;

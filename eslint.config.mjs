@@ -40,6 +40,6 @@ export default [
     },
   },
   {
-    ignores: ['dist/**', 'node_modules/**', '.astro/**', '*.d.ts'],
+    ignores: ['dist/**', 'node_modules/**', '.astro/**', '*.d.ts', 'scripts/blackjack/extension/**'],
   },
 ];

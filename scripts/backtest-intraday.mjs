@@ -314,11 +314,9 @@ async function fetchAlpacaBars(symbols, timeframe, days, isCrypto = false) {
 
         const data = await response.json();
         const bars = data.bars || {};
-        let pageBars = 0;
         for (const [sym, barList] of Object.entries(bars)) {
           if (!symbolBars[sym]) symbolBars[sym] = [];
           symbolBars[sym].push(...barList);
-          pageBars += barList.length;
         }
         pageToken = data.next_page_token || null;
         pageCount++;
