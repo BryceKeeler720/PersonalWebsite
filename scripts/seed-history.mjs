@@ -75,18 +75,27 @@ async function main() {
   const totalLogReturn = Math.log(endValue / startValue);
   const rng = mulberry32(42); // Fixed seed for reproducibility
 
-  // Daily volatility ~0.8% for a diversified portfolio, scaled to 10-min intervals
+  // Daily volatility ~0.4% for a concentrated portfolio, scaled to 10-min intervals
   // ~102 ten-minute intervals per active day, so per-step vol = daily_vol / sqrt(102)
-  const dailyVol = 0.008;
+  // Lower vol = smoother curve, fewer spikes
+  const dailyVol = 0.004;
   const stepVol = dailyVol / Math.sqrt(102);
 
-  // Generate raw path
+  // Generate raw path with smoothing — average each noise value with its neighbors
+  // to prevent sudden spikes
+  const rawNoise = [];
+  for (let i = 0; i < N; i++) {
+    rawNoise.push(normalRandom(rng) * stepVol);
+  }
+  // Exponential moving average smoothing (alpha = 0.05 → heavy smoothing)
+  const alpha = 0.05;
   const logReturns = [];
+  let ema = rawNoise[0];
   let sumNoise = 0;
   for (let i = 0; i < N; i++) {
-    const noise = normalRandom(rng) * stepVol;
-    logReturns.push(noise);
-    sumNoise += noise;
+    ema = alpha * rawNoise[i] + (1 - alpha) * ema;
+    logReturns.push(ema);
+    sumNoise += ema;
   }
 
   // Adjust drift so path ends exactly at endValue
@@ -107,33 +116,29 @@ async function main() {
     });
   }
 
-  // Generate S&P 500 benchmark (real SPY return was ~-0.87% over this period)
-  const spyStart = startValue;
-  const spyReturn = -0.0087; // -0.87%
-  const spyEnd = spyStart * (1 + spyReturn);
-  const spyTotalLog = Math.log(spyEnd / spyStart);
-  const spyRng = mulberry32(123);
-  const spyDailyVol = 0.01; // SPY is slightly more volatile
-  const spyStepVol = spyDailyVol / Math.sqrt(102);
+  // Fetch real S&P 500 data from Yahoo Finance
+  console.log('Fetching S&P 500 benchmark data from Yahoo Finance...');
+  const spyPeriod1 = Math.floor(startDate.getTime() / 1000);
+  const spyPeriod2 = Math.floor(endDate.getTime() / 1000);
+  const spyRes = await fetch(
+    `https://query1.finance.yahoo.com/v8/finance/chart/%5EGSPC?period1=${spyPeriod1}&period2=${spyPeriod2}&interval=1d`,
+    { headers: { 'User-Agent': 'Mozilla/5.0 (compatible)' } }
+  );
+  const spyJson = await spyRes.json();
+  const spyResult = spyJson?.chart?.result?.[0];
+  const spyTimestamps = spyResult?.timestamp || [];
+  const spyCloses = spyResult?.indicators?.quote?.[0]?.close || [];
 
-  let spySumNoise = 0;
-  const spyLogReturns = [];
-  for (let i = 0; i < N; i++) {
-    const noise = normalRandom(spyRng) * spyStepVol;
-    spyLogReturns.push(noise);
-    spySumNoise += noise;
-  }
-  const spyDrift = (spyTotalLog - spySumNoise) / N;
-
+  const firstSpyClose = spyCloses.find(c => c != null);
   const spyBenchmark = [];
-  let spyValue = spyStart;
-  for (let i = 0; i < N; i++) {
-    spyValue = spyValue * Math.exp(spyDrift + spyLogReturns[i]);
+  for (let i = 0; i < spyTimestamps.length; i++) {
+    if (spyCloses[i] == null) continue;
     spyBenchmark.push({
-      timestamp: new Date(timestamps[i]).toISOString(),
-      value: Math.round(spyValue * 100) / 100,
+      timestamp: new Date(spyTimestamps[i] * 1000).toISOString(),
+      value: Math.round((spyCloses[i] / firstSpyClose) * startValue * 100) / 100,
     });
   }
+  console.log(`  Got ${spyBenchmark.length} S&P 500 data points`);
 
   // Cap at 1000 entries (matching live bot limit) — take evenly spaced samples
   const maxEntries = 1000;
