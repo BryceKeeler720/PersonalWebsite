@@ -675,11 +675,12 @@ async function updateLearningFromTrade(trade, learningState) {
 // S&P 500 Benchmark caching (runs from LXC to avoid Vercel IP blocks)
 async function updateSPYBenchmark() {
   try {
-    // Always fetch at least 90 days to ensure we have enough data points
-    const minStartDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+    // Align benchmark start with portfolio history (or portfolio creation time)
     const history = await getPortfolioHistory();
-    const historyStart = history.length > 0 ? new Date(history[0].timestamp) : minStartDate;
-    const startDate = historyStart < minStartDate ? historyStart : minStartDate;
+    const portfolio = await getPortfolio();
+    const historyStart = history.length > 0 ? new Date(history[0].timestamp) : null;
+    const portfolioStart = portfolio?.lastUpdated ? new Date(portfolio.lastUpdated) : null;
+    const startDate = historyStart || portfolioStart || new Date();
 
     const start = Math.floor(startDate.getTime() / 1000);
     const end = Math.floor(Date.now() / 1000);
