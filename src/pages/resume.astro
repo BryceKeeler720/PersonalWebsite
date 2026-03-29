@@ -148,6 +148,23 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <div class="resume-item">
           <div class="item-header">
             <div>
+              <h3><a href="https://2signal.dev" target="_blank" rel="noopener noreferrer">2Signal</a></h3>
+              <p class="company">AI Agent Testing & Reliability Platform</p>
+            </div>
+          </div>
+          <ul>
+            <li>Built a full-stack observability and evaluation platform for AI agents — "Datadog for AI agents" — as a solo developer, with a Turborepo monorepo (8 packages), dual API surface (tRPC + REST), and async event pipeline (SDK → S3 → BullMQ → PostgreSQL)</li>
+            <li>Designed a pluggable evaluation engine with 25 evaluators: 15 deterministic (regex, JSON schema, cosine similarity, Levenshtein, toxicity) and 8 LLM-based (hallucination detection, bias detection, PII detection, prompt injection detection) plus webhook-based external evaluators</li>
+            <li>Implemented statistical analysis systems including evaluation drift detection (Shewhart control charts, CUSUM, Welch's t-test), deployment regression detection, and A/B testing infrastructure for prompt templates with automatic significance testing</li>
+            <li>Developed 5 language SDKs (Python, TypeScript, Go, Java, Ruby) with auto-tracing wrappers for 10+ LLM providers, decorator-based instrumentation, and language-idiomatic context propagation</li>
+            <li>Built 20+ page dashboard with trace explorer, span tree visualization, interactive LLM playground with SSE streaming, human review system, custom dashboards with public share links, and D3-based drift detection charts</li>
+            <li>Implemented Supabase Auth with SSO/SAML, granular RBAC (4 roles, ~40 permissions), immutable audit logging (~55 action types), AES-256-GCM encryption, and Stripe subscription billing with 5 plan tiers</li>
+          </ul>
+        </div>
+
+        <div class="resume-item">
+          <div class="item-header">
+            <div>
               <h3>NutriOne</h3>
               <p class="company">Full-Stack Nutrition Tracking Application</p>
             </div>
@@ -195,7 +212,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <div class="skills-grid">
           <div class="skill-group">
             <h4>Languages</h4>
-            <p>Python, JavaScript, TypeScript, Java, SQL, CSS, HTML</p>
+            <p>Python, JavaScript, TypeScript, Go, Java, Ruby, SQL, CSS, HTML</p>
           </div>
           <div class="skill-group">
             <h4>AI/ML</h4>
@@ -203,15 +220,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           </div>
           <div class="skill-group">
             <h4>Backend</h4>
-            <p>FastAPI, Django, Flask, Node.js, PostgreSQL, SQL Server</p>
+            <p>FastAPI, Django, Flask, Node.js, tRPC, Prisma, BullMQ, PostgreSQL, Redis, SQL Server</p>
           </div>
           <div class="skill-group">
             <h4>Frontend</h4>
-            <p>React, TypeScript, Astro, Tailwind CSS</p>
+            <p>React, Next.js, Astro, Tailwind CSS, shadcn/ui, Recharts, D3</p>
           </div>
           <div class="skill-group">
             <h4>DevOps & Tools</h4>
-            <p>Docker, Git, Proxmox, LXC, Linux (Arch, Ubuntu), Bash</p>
+            <p>Docker, Git, GitHub Actions, AWS S3, Proxmox, LXC, Linux (Arch, Ubuntu), Bash</p>
           </div>
           <div class="skill-group">
             <h4>Platforms</h4>

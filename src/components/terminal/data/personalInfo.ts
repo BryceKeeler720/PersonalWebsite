@@ -37,16 +37,17 @@ export const personalInfo = {
   ],
 
   skills: {
-    languages: ['Python', 'TypeScript', 'JavaScript', 'Java', 'SQL', 'HTML/CSS'],
-    frontend: ['React', 'Astro', 'Tailwind CSS', 'WebSockets'],
-    backend: ['FastAPI', 'Django', 'Flask', 'Node.js', 'REST APIs'],
+    languages: ['Python', 'TypeScript', 'JavaScript', 'Go', 'Java', 'Ruby', 'SQL', 'HTML/CSS'],
+    frontend: ['React', 'Next.js', 'Astro', 'Tailwind CSS', 'shadcn/ui', 'Recharts', 'D3', 'WebSockets'],
+    backend: ['FastAPI', 'Django', 'Flask', 'Node.js', 'tRPC', 'Prisma', 'BullMQ', 'REST APIs'],
     databases: ['PostgreSQL', 'TimescaleDB', 'SQL Server', 'Supabase', 'Redis'],
     'ai/ml': ['PyTorch', 'YOLOv8', 'OpenCV', 'LSTM', 'Random Forest'],
-    devops: ['Docker', 'Proxmox', 'LXC', 'Linux', 'Git', 'Bash', 'Vercel'],
+    devops: ['Docker', 'GitHub Actions', 'AWS S3', 'Proxmox', 'LXC', 'Linux', 'Git', 'Bash', 'Vercel'],
     enterprise: ['Workday Extend', 'Workday Studio', 'ServiceNow', 'Power Automate'],
   },
 
   projects: [
+    { name: '2Signal', desc: 'AI agent testing & reliability platform — observability, evaluation engine, 5 language SDKs', url: 'https://2signal.dev', tags: ['TypeScript', 'Python', 'Go', 'Next.js', 'PostgreSQL', 'Redis', 'Docker'] },
     { name: 'Algorithmic Trading Bot', desc: 'Self-learning regime-adaptive trading system, scans 6,000+ assets', url: '/TradingBot', tags: ['React', 'TypeScript', 'Alpaca', 'Redis'] },
     { name: 'NutriOne', desc: 'Nutrition tracking with YOLOv8 food recognition', tags: ['FastAPI', 'PostgreSQL', 'YOLOv8'] },
     { name: 'Plant Monitor', desc: 'IoT + LSTM pipeline with ESP32 sensors', tags: ['ESP32', 'PyTorch', 'TimescaleDB'] },
