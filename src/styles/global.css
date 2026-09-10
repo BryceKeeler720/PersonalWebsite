@@ -188,6 +188,28 @@ html[data-theme="light"] #cathedral pre {
   color: var(--bone, var(--kana-fg));
 }
 
+/* ── Command palette hint (top right, keycap chip) ── */
+#cmdk-hint {
+  position: fixed;
+  top: 16px;
+  right: 58px;
+  z-index: 100;
+  background: transparent;
+  border: 1px solid var(--faint, #3a3a3a);
+  color: var(--dim, #6e6e6e);
+  font-family: inherit;
+  font-size: 0.75rem;
+  letter-spacing: 0.1ch;
+  line-height: 1;
+  padding: 0.35rem 0.8ch;
+  cursor: pointer;
+}
+#cmdk-hint:hover {
+  background: var(--bone, #f2f2f2);
+  color: var(--void, #000);
+  border-color: var(--bone, #f2f2f2);
+}
+
 /* ── Command palette (cmd+k / :) ──────────────────── */
 #cmdk {
   position: fixed;

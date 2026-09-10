@@ -55,6 +55,7 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
   </head>
   <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
+    <button id="cmdk-hint" aria-label="Open command palette">⌘K</button>
     <button id="theme-toggle" aria-label="Toggle light/dark mode">☾</button>
     <div id="cmdk" hidden>
       <div class="cmdk-box">
@@ -85,6 +86,8 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
         const wrap = document.getElementById('cmdk');
         const input = document.getElementById('cmdk-input');
         const list = document.getElementById('cmdk-list');
+        const hint = document.getElementById('cmdk-hint');
+        if (hint && !/Mac|iPhone|iPad/.test(navigator.platform)) hint.textContent = 'ctrl K';
         let matches = routes, sel = 0;
 
         function fuzzy(q, name) {
@@ -147,6 +150,7 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
         });
         input.addEventListener('input', filter);
         wrap.addEventListener('mousedown', (e) => { if (e.target === wrap) close(); });
+        hint?.addEventListener('click', () => { wrap.hidden ? open() : close(); });
       })();
     </script>
     <script is:inline>
