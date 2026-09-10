@@ -21,7 +21,6 @@ import {
   exitCommand,
 } from './utils';
 import { lsCommand, cdCommand, catCommand, pwdCommand } from './filesystem';
-import { donutCommand } from './donut';
 
 export const commandRegistry: Record<string, Command> = {
   help: helpCommand,
@@ -37,7 +36,6 @@ export const commandRegistry: Record<string, Command> = {
   themes: themesCommand,
   whoami: whoamiCommand,
   fastfetch: fastfetchCommand,
-  donut: donutCommand,
   clear: clearCommand,
   history: historyCommand,
   echo: echoCommand,
