@@ -21,13 +21,16 @@ const CELL_GAP = 2;
 const DAY_LABELS = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
 const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+// Grayscale intensity ramp built from theme vars so both themes work.
+const INTENSITY_RAMP = ['var(--ghost)', 'var(--faint)', 'var(--dim)', 'var(--ink)', 'var(--bone)'];
+
 function getIntensityColor(wordCount: number, maxWords: number): string {
-  if (wordCount === 0) return 'rgba(220, 215, 186, 0.03)';
+  if (wordCount === 0) return INTENSITY_RAMP[0];
   const ratio = Math.min(wordCount / Math.max(maxWords, 1), 1);
-  if (ratio < 0.25) return 'rgba(118, 148, 106, 0.25)';
-  if (ratio < 0.5) return 'rgba(118, 148, 106, 0.45)';
-  if (ratio < 0.75) return 'rgba(118, 148, 106, 0.65)';
-  return 'rgba(118, 148, 106, 0.9)';
+  if (ratio < 0.25) return INTENSITY_RAMP[1];
+  if (ratio < 0.5) return INTENSITY_RAMP[2];
+  if (ratio < 0.75) return INTENSITY_RAMP[3];
+  return INTENSITY_RAMP[4];
 }
 
 function getYearRange(entries: JournalEntryData[]): { min: number; max: number } {
@@ -141,6 +144,21 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
 
   return (
     <div style={{ width: '100%' }}>
+      <style>{`
+        .jh-nav {
+          background: transparent;
+          border: 1px solid var(--faint);
+          border-radius: 0;
+          color: var(--ink);
+          font-family: inherit;
+          font-size: 0.875rem;
+          padding: 0.15rem 0.6rem;
+          cursor: pointer;
+          transition: background 0.15s ease, color 0.15s ease;
+        }
+        .jh-nav:hover:not(:disabled) { background: var(--bone); color: var(--void); }
+        .jh-nav:disabled { color: var(--ghost); border-color: var(--ghost); cursor: default; }
+      `}</style>
       {/* Stats Row */}
       <div style={{
         display: 'flex',
@@ -152,14 +170,14 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
       }}>
         <div style={{ display: 'flex', gap: '2rem' }}>
           <div>
-            <span style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--kana-fg)' }}>{yearEntries.length}</span>
-            <span style={{ fontSize: '0.8125rem', color: 'rgba(220,215,186,0.5)', marginLeft: '0.5rem' }}>
+            <span style={{ fontSize: '1.75rem', fontWeight: 400, color: 'var(--bone)' }}>{yearEntries.length}</span>
+            <span style={{ fontSize: '0.8125rem', color: 'var(--dim)', marginLeft: '0.5rem' }}>
               {yearEntries.length === 1 ? 'entry' : 'entries'}
             </span>
           </div>
           <div>
-            <span style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--kana-fg)' }}>{totalWords.toLocaleString()}</span>
-            <span style={{ fontSize: '0.8125rem', color: 'rgba(220,215,186,0.5)', marginLeft: '0.5rem' }}>words</span>
+            <span style={{ fontSize: '1.75rem', fontWeight: 400, color: 'var(--bone)' }}>{totalWords.toLocaleString()}</span>
+            <span style={{ fontSize: '0.8125rem', color: 'var(--dim)', marginLeft: '0.5rem' }}>words</span>
           </div>
         </div>
 
@@ -170,44 +188,27 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
           gap: '1rem',
         }}>
           <button
+            className="jh-nav"
             onClick={() => setSelectedYear(y => Math.max(y - 1, yearRange.min))}
             disabled={selectedYear <= yearRange.min}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: selectedYear <= yearRange.min ? 'rgba(220,215,186,0.15)' : 'rgba(220,215,186,0.5)',
-              cursor: selectedYear <= yearRange.min ? 'default' : 'pointer',
-              fontSize: '1rem',
-              padding: '0.25rem 0.5rem',
-              transition: 'color 0.2s ease',
-              fontFamily: 'inherit',
-            }}
             aria-label="Previous year"
           >
             ←
           </button>
           <span style={{
             fontSize: '1rem',
-            fontWeight: 600,
-            color: 'var(--kana-fg)',
+            fontWeight: 400,
+            color: 'var(--bone)',
+            letterSpacing: '0.3ch',
             minWidth: '4ch',
             textAlign: 'center',
           }}>
             {selectedYear}
           </span>
           <button
+            className="jh-nav"
             onClick={() => setSelectedYear(y => Math.min(y + 1, yearRange.max))}
             disabled={selectedYear >= yearRange.max}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: selectedYear >= yearRange.max ? 'rgba(220,215,186,0.15)' : 'rgba(220,215,186,0.5)',
-              cursor: selectedYear >= yearRange.max ? 'default' : 'pointer',
-              fontSize: '1rem',
-              padding: '0.25rem 0.5rem',
-              transition: 'color 0.2s ease',
-              fontFamily: 'inherit',
-            }}
             aria-label="Next year"
           >
             →
@@ -230,7 +231,7 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
               key={i}
               x={mp.x * (CELL_SIZE + CELL_GAP) + 32}
               y={10}
-              fill="rgba(220,215,186,0.4)"
+              fill="var(--dim)"
               fontSize="10"
               fontFamily="inherit"
             >
@@ -245,7 +246,7 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
                 key={i}
                 x={0}
                 y={i * (CELL_SIZE + CELL_GAP) + 24 + CELL_SIZE - 2}
-                fill="rgba(220,215,186,0.3)"
+                fill="var(--dim)"
                 fontSize="9"
                 fontFamily="inherit"
               >
@@ -267,8 +268,8 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
                   y={dayIdx * (CELL_SIZE + CELL_GAP) + 16}
                   width={CELL_SIZE}
                   height={CELL_SIZE}
-                  rx={2}
-                  fill={isFuture ? 'rgba(220,215,186,0.01)' : getIntensityColor(day.wordCount, maxWords)}
+                  rx={0}
+                  fill={isFuture ? 'transparent' : getIntensityColor(day.wordCount, maxWords)}
                   style={{ cursor: day.entries.length > 0 ? 'pointer' : 'default', transition: 'fill 0.15s ease' }}
                   onMouseEnter={(e) => handleMouseEnter(e, day)}
                   onMouseLeave={() => setHoveredDay(null)}
@@ -291,29 +292,28 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
               left: hoveredDay.x,
               top: hoveredDay.y - 40,
               transform: 'translateX(-50%)',
-              background: 'rgba(31, 31, 40, 0.95)',
-              border: '1px solid rgba(220,215,186,0.15)',
-              borderRadius: '6px',
+              background: 'var(--kana-bg)',
+              border: '1px solid var(--faint)',
+              borderRadius: 0,
               padding: '0.5rem 0.75rem',
               fontSize: '0.75rem',
-              color: 'var(--kana-fg)',
+              color: 'var(--ink)',
               whiteSpace: 'nowrap',
               pointerEvents: 'none',
               zIndex: 10,
-              backdropFilter: 'blur(8px)',
             }}
           >
-            <div style={{ color: 'rgba(220,215,186,0.6)', marginBottom: hoveredDay.entries.length > 0 ? '0.25rem' : 0 }}>
+            <div style={{ color: 'var(--dim)', marginBottom: hoveredDay.entries.length > 0 ? '0.25rem' : 0 }}>
               {new Date(hoveredDay.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
             </div>
             {hoveredDay.entries.length > 0 ? (
               hoveredDay.entries.map((e, i) => (
-                <div key={i} style={{ color: 'rgba(118, 148, 106, 0.9)' }}>
+                <div key={i} style={{ color: 'var(--bone)' }}>
                   {e.title} · {e.wordCount} words
                 </div>
               ))
             ) : (
-              <div style={{ color: 'rgba(220,215,186,0.3)' }}>No entries</div>
+              <div style={{ color: 'var(--dim)' }}>No entries</div>
             )}
           </div>
         )}
@@ -327,21 +327,17 @@ export default function JournalHeatmap({ entries }: JournalHeatmapProps) {
         gap: '0.375rem',
         marginTop: '0.75rem',
         fontSize: '0.6875rem',
-        color: 'rgba(220,215,186,0.35)',
+        color: 'var(--dim)',
       }}>
         <span>Less</span>
-        {[0, 0.25, 0.5, 0.75, 1].map((level, i) => (
+        {INTENSITY_RAMP.map((bg, i) => (
           <div
             key={i}
             style={{
               width: 10,
               height: 10,
-              borderRadius: 2,
-              background: level === 0 ? 'rgba(220,215,186,0.03)' :
-                level < 0.3 ? 'rgba(118,148,106,0.25)' :
-                level < 0.55 ? 'rgba(118,148,106,0.45)' :
-                level < 0.8 ? 'rgba(118,148,106,0.65)' :
-                'rgba(118,148,106,0.9)',
+              borderRadius: 0,
+              background: bg,
             }}
           />
         ))}

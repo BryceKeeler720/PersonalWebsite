@@ -1,6 +1,5 @@
 ---
 import '../styles/global.css';
-import Analytics from '@vercel/analytics/astro';
 
 interface Props {
   title: string;
@@ -9,7 +8,6 @@ interface Props {
 }
 
 const { title, description = "Bryce Keeler — machine learning engineer. Trading systems, ML infrastructure, self-hosted hardware.", image = "/og-image.png" } = Astro.props;
-const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 const siteUrl = "https://brycekeeler.com";
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
 ---
@@ -23,9 +21,14 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
         let t = 'dark';
         try { t = localStorage.getItem('theme') || 'dark'; } catch (e) { /* ignore */ }
         document.documentElement.dataset.theme = t;
+        window.syncThemeColor = function () {
+          const m = document.querySelector('meta[name="theme-color"]');
+          if (m) m.setAttribute('content', document.documentElement.dataset.theme === 'light' ? '#f2f0ea' : '#000000');
+        };
       })();
     </script>
     <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#000000" />
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
@@ -49,18 +52,6 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
     <!-- RSS Feed -->
     <link rel="alternate" type="application/rss+xml" title="Bryce Keeler - Blog" href="/rss.xml" />
 
-    <!-- Google Analytics -->
-    {gaId && gaId !== 'G-XXXXXXXXXX' && (
-      <>
-        <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
-        <script is:inline define:vars={{ gaId }}>
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', gaId);
-        </script>
-      </>
-    )}
   </head>
   <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -164,18 +155,35 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
         const btn = document.getElementById('theme-toggle');
         const icon = () => { btn.textContent = document.documentElement.dataset.theme === 'light' ? '☾' : '☀'; };
         icon();
-        btn.addEventListener('click', () => {
-          const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+        window.syncThemeColor();
+        function applyTheme(next) {
           document.documentElement.dataset.theme = next;
           try { localStorage.setItem('theme', next); } catch (e) { /* ignore */ }
           icon();
+          window.syncThemeColor();
+        }
+        btn.addEventListener('click', () => {
+          const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+          const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (!document.startViewTransition || reduced) { applyTheme(next); return; }
+          // circular wipe flowing out from the toggle
+          const r = btn.getBoundingClientRect();
+          const x = r.left + r.width / 2;
+          const y = r.top + r.height / 2;
+          const maxR = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+          const vt = document.startViewTransition(() => applyTheme(next));
+          vt.ready.then(() => {
+            document.documentElement.animate(
+              { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${maxR}px at ${x}px ${y}px)`] },
+              { duration: 420, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', pseudoElement: '::view-transition-new(root)' }
+            );
+          }).catch(() => {});
         });
       })();
     </script>
     <main id="main-content">
       <slot />
     </main>
-    <Analytics />
   </body>
 </html>
 

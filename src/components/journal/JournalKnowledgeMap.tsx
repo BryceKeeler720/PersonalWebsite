@@ -5,11 +5,9 @@ interface JournalKnowledgeMapProps {
   entries: JournalEntryData[];
 }
 
-const TAG_COLORS = [
-  '#76946A', '#7E9CD8', '#C0A36E', '#957FB8', '#C34043',
-  '#6A9589', '#FFA066', '#D27E99', '#7FB4CA', '#938AA9',
-  '#727169', '#DCA561',
-];
+// Grayscale shades (CSS custom property names) cycled per tag.
+// Resolved at draw time via getComputedStyle so both themes work.
+const TAG_COLORS = ['--bone', '--ink', '--kana-fg-dim', '--dim'];
 
 interface Node {
   entry: JournalEntryData;
@@ -108,6 +106,14 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
   const transformRef = useRef(transform);
   transformRef.current = transform;
 
+  // Canvas colors are resolved from CSS vars at draw time; redraw on theme switch.
+  const [themeTick, setThemeTick] = useState(0);
+  useEffect(() => {
+    const obs = new MutationObserver(() => setThemeTick(t => t + 1));
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    return () => obs.disconnect();
+  }, []);
+
   // Attach wheel listener with { passive: false } so preventDefault works
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -176,7 +182,7 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
         vx: 0,
         vy: 0,
         radius,
-        color: tagColorMap.get(primaryTag) || '#64748b',
+        color: tagColorMap.get(primaryTag) || '--dim',
       };
     });
 
@@ -205,7 +211,7 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
     nodes.forEach(node => {
       const primaryTag = node.entry.tags[0];
       if (!primaryTag) return;
-      const existing = tagPositions.get(primaryTag) || { sumX: 0, sumY: 0, count: 0, color: tagColorMap.get(primaryTag) || '#64748b' };
+      const existing = tagPositions.get(primaryTag) || { sumX: 0, sumY: 0, count: 0, color: tagColorMap.get(primaryTag) || '--dim' };
       existing.sumX += node.x;
       existing.sumY += node.y;
       existing.count++;
@@ -251,10 +257,12 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
     canvas.height = dimensions.height * dpr;
     ctx.scale(dpr, dpr);
 
-    // Clear
+    // Resolve theme vars for canvas drawing (canvas can't use var() directly)
+    const themeStyles = getComputedStyle(document.documentElement);
+    const shade = (name: string) => themeStyles.getPropertyValue(name).trim() || '#888888';
+
+    // Clear — page background (var(--void)) shows through the transparent canvas
     ctx.clearRect(0, 0, dimensions.width, dimensions.height);
-    ctx.fillStyle = 'rgba(220,215,186,0.015)';
-    ctx.fillRect(0, 0, dimensions.width, dimensions.height);
 
     ctx.save();
     ctx.translate(transform.x, transform.y);
@@ -278,7 +286,7 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
       ctx.beginPath();
       ctx.moveTo(a.x, a.y);
       ctx.lineTo(b.x, b.y);
-      ctx.strokeStyle = isHoverEdge ? '#DCD7BA' : 'rgba(220,215,186,0.5)';
+      ctx.strokeStyle = isHoverEdge ? shade('--bone') : shade('--dim');
       ctx.lineWidth = isHoverEdge ? 1.5 / transform.k : 0.5 / transform.k;
       ctx.stroke();
     }
@@ -288,8 +296,8 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
     // Draw cluster labels
     for (const label of clusterLabels) {
       const isSearchMatch = !searchQuery || nodes.some((n, i) => n.entry.tags[0] === label.tag && matchingIndices?.has(i));
-      ctx.globalAlpha = isSearchMatch ? 0.35 : 0.08;
-      ctx.fillStyle = label.color;
+      ctx.globalAlpha = isSearchMatch ? 0.55 : 0.12;
+      ctx.fillStyle = shade('--kana-fg-dim');
       ctx.font = `500 ${11 / transform.k}px "JetBrains Mono", monospace`;
       ctx.textAlign = 'center';
       ctx.fillText(label.tag, label.x, label.y);
@@ -313,11 +321,11 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
       ctx.globalAlpha = opacity;
       ctx.beginPath();
       ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
-      ctx.fillStyle = node.color;
+      ctx.fillStyle = shade(node.color);
       ctx.fill();
 
       if (isHovered) {
-        ctx.strokeStyle = '#DCD7BA';
+        ctx.strokeStyle = shade('--bone');
         ctx.lineWidth = 1.5 / transform.k;
         ctx.stroke();
       }
@@ -328,20 +336,21 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
     // Draw hovered node title
     if (hoveredIdx !== null) {
       const node = nodes[hoveredIdx];
-      ctx.fillStyle = '#DCD7BA';
-      ctx.font = `600 ${12 / transform.k}px "JetBrains Mono", monospace`;
+      ctx.fillStyle = shade('--bone');
+      ctx.font = `400 ${12 / transform.k}px "JetBrains Mono", monospace`;
       ctx.textAlign = 'center';
-      ctx.globalAlpha = 0.9;
+      ctx.globalAlpha = 1;
       ctx.fillText(node.entry.title, node.x, node.y - node.radius - 8 / transform.k);
 
+      ctx.fillStyle = shade('--kana-fg-dim');
       ctx.font = `400 ${9 / transform.k}px "JetBrains Mono", monospace`;
-      ctx.globalAlpha = 0.5;
+      ctx.globalAlpha = 1;
       const date = new Date(node.entry.publishDate + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
       ctx.fillText(`${date} · ${node.entry.wordCount} words`, node.x, node.y - node.radius - 22 / transform.k);
     }
 
     ctx.restore();
-  }, [nodes, edges, clusterLabels, dimensions, transform, hoveredIdx, matchingIndices, searchQuery]);
+  }, [nodes, edges, clusterLabels, dimensions, transform, hoveredIdx, matchingIndices, searchQuery, themeTick]);
 
   // Hit detection
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -400,7 +409,7 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
 
   if (entries.length === 0) {
     return (
-      <div style={{ padding: '3rem', textAlign: 'center', color: 'rgba(220,215,186,0.4)', fontSize: '0.875rem' }}>
+      <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--dim)', fontSize: '0.875rem' }}>
         No entries to map yet.
       </div>
     );
@@ -422,11 +431,11 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{
-            background: 'rgba(220,215,186,0.05)',
-            border: '1px solid rgba(220,215,186,0.1)',
-            borderRadius: '6px',
+            background: 'transparent',
+            border: '1px solid var(--faint)',
+            borderRadius: 0,
             padding: '0.4rem 0.75rem',
-            color: '#DCD7BA',
+            color: 'var(--ink)',
             fontSize: '0.8125rem',
             fontFamily: 'inherit',
             outline: 'none',
@@ -435,8 +444,8 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
             maxWidth: '240px',
             transition: 'border-color 0.2s ease',
           }}
-          onFocus={(e) => e.target.style.borderColor = 'rgba(220,215,186,0.25)'}
-          onBlur={(e) => e.target.style.borderColor = 'rgba(220,215,186,0.1)'}
+          onFocus={(e) => e.target.style.borderColor = 'var(--bone)'}
+          onBlur={(e) => e.target.style.borderColor = 'var(--faint)'}
         />
       </div>
 
@@ -450,8 +459,8 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
             display: 'block',
             width: dimensions.width,
             height: dimensions.height,
-            borderRadius: '8px',
-            border: '1px solid rgba(220,215,186,0.06)',
+            borderRadius: 0,
+            border: '1px solid var(--faint)',
             cursor: 'grab',
           }}
           onMouseMove={handleMouseMove}
@@ -467,7 +476,7 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
           bottom: 8,
           left: 12,
           fontSize: '0.625rem',
-          color: 'rgba(220,215,186,0.2)',
+          color: 'var(--dim)',
           pointerEvents: 'none',
           fontFamily: 'inherit',
         }}>
@@ -485,8 +494,8 @@ export default function JournalKnowledgeMap({ entries }: JournalKnowledgeMapProp
           fontSize: '0.6875rem',
         }}>
           {tagList.map(([tag, color]) => (
-            <span key={tag} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'rgba(220,215,186,0.45)' }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: color, opacity: 0.7, display: 'inline-block' }} />
+            <span key={tag} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--dim)' }}>
+              <span style={{ width: 8, height: 8, borderRadius: 0, background: `var(${color})`, display: 'inline-block' }} />
               {tag}
             </span>
           ))}

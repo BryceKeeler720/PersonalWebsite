@@ -1,13 +1,10 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import DocLayout from '../layouts/DocLayout.astro';
 ---
 
-<BaseLayout title="Resume | Bryce Keeler" description="Bryce Keeler — machine learning engineer. Resume.">
-  <div class="page">
-    <nav class="crumbs"><a href="/">← home</a> · <a href="/Bryce_Keeler_Resume.pdf">download pdf</a></nav>
-
-    <header class="masthead">
-      <h1>BRYCE KEELER</h1>
+<DocLayout title="Resume | Bryce Keeler" description="Bryce Keeler — machine learning engineer. Resume.">
+  <header>
+      <h1>Bryce Keeler</h1>
       <div class="sub">machine learning engineer</div>
       <p class="contact-line">
         <a href="mailto:Bryce@BryceKeeler.com">Bryce@BryceKeeler.com</a> ·
@@ -100,86 +97,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </ul>
     </section>
 
-    <footer>© 2026</footer>
-  </div>
-</BaseLayout>
+    <p class="meta"><a href="/Bryce_Keeler_Resume.pdf" target="_blank" rel="noopener">→ download pdf</a></p>
+</DocLayout>
 
 <style>
-  :global(body) { padding-inline: 16px; }
-  a { color: var(--ink); }
-  a:hover { background: var(--bone); color: var(--void); text-decoration: none; }
-
-  .page {
-    max-width: 92ch;
-    margin: 0 auto;
-    padding-block: 2.5rem 4rem;
-  }
-  .crumbs { color: var(--dim); font-size: 0.85rem; margin-bottom: 2rem; }
-  .crumbs a { color: var(--dim); text-decoration: none; }
-  .crumbs a:hover { background: var(--bone); color: var(--void); }
-
-  .masthead h1 {
-    margin: 0;
-    font-size: 1.8rem;
-    font-weight: normal;
-    color: var(--bone);
-    letter-spacing: 0.5ch;
-  }
-  .masthead .sub {
-    color: var(--dim);
-    letter-spacing: 0.25ch;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    margin-top: 0.3rem;
-  }
   .contact-line { color: var(--dim); font-size: 0.85rem; margin-top: 0.6rem; }
-
-  section { margin-top: 2.8rem; }
-  h2 {
-    font-size: 1rem;
-    font-weight: normal;
-    color: var(--bone);
-    letter-spacing: 0.4ch;
-    text-transform: uppercase;
-    margin: 0 0 0.8rem;
-  }
-  h2::before { content: "// "; color: var(--dim); }
-  p { margin: 0.3rem 0 0; font-size: 0.9rem; color: var(--kana-fg-dim); }
-
-  .entries { list-style: none; margin: 0; padding: 0; }
-  .entries > li {
-    padding: 0.6rem 0;
-    border-bottom: 1px dashed var(--ghost);
-  }
-  .head { color: var(--ink); }
-  .k {
-    color: var(--bone);
-    font-weight: bold;
-    letter-spacing: 0.1ch;
-  }
-  .k::after { content: " — "; color: var(--faint); font-weight: normal; }
+  .contact-line a { color: var(--dim); }
   .when { color: var(--dim); float: right; font-size: 0.85rem; }
-
-  .bullets {
-    list-style: none;
-    margin: 0.4rem 0 0;
-    padding: 0;
-    font-size: 0.88rem;
-    color: var(--kana-fg-dim);
-  }
-  .bullets li { padding: 0.15rem 0 0.15rem 2ch; position: relative; }
-  .bullets li::before { content: "·"; position: absolute; left: 0.5ch; color: var(--faint); }
-
-  .skills { list-style: none; margin: 0; padding: 0; font-size: 0.88rem; }
+  .skills { list-style: none; margin: 0; padding: 0; font-size: 0.88rem; color: var(--kana-fg-dim); }
   .skills li { padding: 0.25rem 0; }
-
-  footer {
-    margin-top: 4rem;
-    color: var(--dim);
-    font-size: 0.8rem;
-    letter-spacing: 0.2ch;
-  }
-
+  .skills .k { color: var(--bone); font-weight: bold; letter-spacing: 0.1ch; }
+  .skills .k::after { content: " — "; color: var(--faint); font-weight: normal; }
+  .meta { color: var(--dim); font-size: 0.85rem; margin-top: 2.5rem; }
   @media (max-width: 700px) {
     .when { float: none; display: block; }
   }

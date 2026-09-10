@@ -1,23 +1,23 @@
 import type { Theme } from '../types';
 
 export const themes: Record<string, Theme> = {
-  kanagawa: {
-    name: 'kanagawa',
-    background: '#1F1F28',
-    foreground: '#DCD7BA',
-    prompt: '#76946A',
-    accent: '#7E9CD8',
-    error: '#C34043',
-    muted: '#727169',
-  },
-  dark: {
-    name: 'dark',
+  gothic: {
+    name: 'gothic',
     background: '#000000',
-    foreground: '#ffffff',
-    prompt: '#22c55e',
-    accent: '#22c55e',
-    error: '#ef4444',
-    muted: 'rgba(255, 255, 255, 0.5)',
+    foreground: '#d4d4d4',
+    prompt: '#f2f2f2',
+    accent: '#f2f2f2',
+    error: '#C34043',
+    muted: '#6e6e6e',
+  },
+  paper: {
+    name: 'paper',
+    background: '#f2f0ea',
+    foreground: '#22211d',
+    prompt: '#141310',
+    accent: '#141310',
+    error: '#9c2f33',
+    muted: '#77756c',
   },
   matrix: {
     name: 'matrix',
@@ -28,15 +28,6 @@ export const themes: Record<string, Theme> = {
     error: '#ff0000',
     muted: 'rgba(0, 255, 65, 0.5)',
   },
-  ocean: {
-    name: 'ocean',
-    background: '#0b1929',
-    foreground: '#c0d6e8',
-    prompt: '#5ccfe6',
-    accent: '#5ccfe6',
-    error: '#f07178',
-    muted: 'rgba(192, 214, 232, 0.5)',
-  },
   retro: {
     name: 'retro',
     background: '#1a1200',
@@ -46,15 +37,6 @@ export const themes: Record<string, Theme> = {
     error: '#ff6b35',
     muted: 'rgba(255, 176, 0, 0.5)',
   },
-  light: {
-    name: 'light',
-    background: '#fafafa',
-    foreground: '#1a1a1a',
-    prompt: '#16a34a',
-    accent: '#16a34a',
-    error: '#dc2626',
-    muted: 'rgba(0, 0, 0, 0.5)',
-  },
 };
 
-export const defaultTheme = themes.kanagawa;
+export const defaultTheme = themes.gothic;
