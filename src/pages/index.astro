@@ -16,13 +16,62 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
 
   <aside id="index">
     <div class="label">INDEX</div>
-    <ul>
-      <li><span class="tree">├─</span> <a href="#about" data-sec="about">home</a></li>
-      <li><span class="tree">├─</span> <a href="#projects" data-sec="projects">projects</a></li>
-      <li><span class="tree">├─</span> <a href="#writing" data-sec="writing">writing</a></li>
-      <li><span class="tree">├─</span> <a href="#resume" data-sec="resume">resume</a></li>
-      <li><span class="tree">└─</span> <a href="#contact" data-sec="contact">contact</a></li>
-    </ul>
+    <div class="json">
+      <div class="brace">&#123;</div>
+      <div class="node scalar">
+        <a class="key" href="#about" data-sec="about">"home"</a><span class="p">: "/",</span>
+      </div>
+      <div class="node obj" data-node="projects">
+        <div class="row">
+          <a class="key" href="#projects" data-sec="projects">"projects"</a><span class="p">: </span><button class="tog" aria-expanded="false">[ &hellip; ]</button><span class="p bkt" hidden>[</span><span class="p comma">,</span>
+        </div>
+        <ul class="children" hidden>
+          <li><a href="https://2signal.dev">"2signal"</a><span class="p">,</span></li>
+          <li><a href="/TradingBot">"trading-bot"</a><span class="p">,</span></li>
+          <li><a href="/HomeLab">"homelab"</a><span class="p">,</span></li>
+          <li><a href="/terminal">"terminal"</a><span class="p">,</span></li>
+          <li><span class="leaf">"nutrione"</span><span class="p">,</span></li>
+          <li><span class="leaf">"plant-monitor"</span><span class="p">,</span></li>
+          <li><span class="leaf">"llm-reports"</span><span class="p">,</span></li>
+          <li><span class="leaf">"scheduling-app"</span><span class="p">,</span></li>
+          <li><span class="leaf">"time-tracker"</span></li>
+        </ul>
+        <div class="p close" hidden>],</div>
+      </div>
+      <div class="node obj" data-node="writing">
+        <div class="row">
+          <a class="key" href="#writing" data-sec="writing">"writing"</a><span class="p">: </span><button class="tog" aria-expanded="false">[ &hellip; ]</button><span class="p bkt" hidden>[</span><span class="p comma">,</span>
+        </div>
+        <ul class="children" hidden>
+          <li><a href="/blog">"blog"</a><span class="p">,</span></li>
+          <li><a href="/journal">"journal"</a></li>
+        </ul>
+        <div class="p close" hidden>],</div>
+      </div>
+      <div class="node obj" data-node="resume">
+        <div class="row">
+          <a class="key" href="#resume" data-sec="resume">"resume"</a><span class="p">: </span><button class="tog" aria-expanded="false">[ &hellip; ]</button><span class="p bkt" hidden>[</span><span class="p comma">,</span>
+        </div>
+        <ul class="children" hidden>
+          <li><a href="/Bryce_Keeler_Resume.pdf">"pdf"</a><span class="p">,</span></li>
+          <li><a href="/resume">"html"</a></li>
+        </ul>
+        <div class="p close" hidden>],</div>
+      </div>
+      <div class="node obj" data-node="contact">
+        <div class="row">
+          <a class="key" href="#contact" data-sec="contact">"contact"</a><span class="p">: </span><button class="tog" aria-expanded="false">[ &hellip; ]</button><span class="p bkt" hidden>[</span>
+        </div>
+        <ul class="children" hidden>
+          <li><a href="mailto:Bryce@BryceKeeler.com">"email"</a><span class="p">,</span></li>
+          <li><a href="https://github.com/BryceKeeler720">"github"</a><span class="p">,</span></li>
+          <li><a href="https://www.linkedin.com/in/bryce-keeler720/">"linkedin"</a><span class="p">,</span></li>
+          <li><a href="/rss.xml">"rss"</a></li>
+        </ul>
+        <div class="p close" hidden>]</div>
+      </div>
+      <div class="brace">&#125;</div>
+    </div>
     <div class="foot">© 2026<br />NO TRACKING</div>
   </aside>
 
@@ -129,28 +178,44 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
     position: fixed;
     top: 0;
     left: 0;
-    width: calc(20ch + 32px);
+    width: calc(24ch + 32px);
     height: 100vh;
     padding: 2.5rem 16px;
     z-index: 2;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    overflow-y: auto;
   }
   #index .label {
     color: var(--dim);
     letter-spacing: 0.3ch;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.6rem;
   }
-  #index ul { list-style: none; margin: 0; padding: 0; }
-  #index li { white-space: pre; }
-  #index .tree { color: var(--faint); }
+  #index .json { line-height: 1.55; }
+  #index .brace, #index .p { color: var(--faint); }
+  #index .node { padding-left: 1.5ch; }
+  #index .row { white-space: nowrap; }
   #index a {
     color: var(--dim);
     text-decoration: none;
-    padding: 0.05rem 0.4ch;
   }
   #index a:hover { background: var(--bone); color: var(--void); }
-  #index a.active { color: var(--bone); }
-  #index a.active::before { content: "▸ "; }
+  #index a.key.active { color: var(--bone); font-weight: bold; }
+  #index .tog {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: var(--faint);
+    cursor: pointer;
+  }
+  #index .tog:hover { color: var(--bone); }
+  #index .children {
+    list-style: none;
+    margin: 0;
+    padding-left: 2ch;
+  }
+  #index .children .leaf { color: var(--faint); }
+  #index .close { padding-left: 0; }
   #index .foot {
     position: absolute;
     bottom: 2rem;
@@ -164,7 +229,7 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
   .page {
     position: relative;
     z-index: 1;
-    margin-left: calc(20ch + 48px);
+    margin-left: calc(24ch + 48px);
     max-width: 100ch;
     padding-block: 3rem 30vh;
   }
@@ -185,7 +250,7 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
     margin-top: 0.3rem;
   }
 
-  section { scroll-margin-top: 6rem; margin-top: 5.5rem; }
+  section { scroll-margin-top: 6rem; margin-top: 5.5rem; min-height: 38vh; }
   h2 {
     font-size: 1rem;
     font-weight: normal;
@@ -225,12 +290,15 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
       width: auto;
       height: auto;
       padding: 1.5rem 0 0;
+      overflow: visible;
     }
     #index .foot { display: none; }
-    #index ul { display: flex; flex-wrap: wrap; gap: 0.2rem 1.2rem; }
-    #index .tree { display: none; }
+    #index .json { display: flex; flex-wrap: wrap; gap: 0.2rem 1.4ch; }
+    #index .node { padding-left: 0; }
+    #index .brace, #index .p, #index .tog, #index .children, #index .close { display: none; }
     .page { margin-left: 0; }
     #cathedral pre { opacity: 0.55; }
+    section { min-height: 0; }
   }
 </style>
 
@@ -361,8 +429,32 @@ window.addEventListener('resize', () => {
   const secs = Array.from(document.querySelectorAll('section[id]'));
   if (!secs.length) return;
 
+  const nodes = {};
+  document.querySelectorAll('#index .node.obj').forEach((n) => { nodes[n.dataset.node] = n; });
+
+  function setExpanded(node, open) {
+    const tog = node.querySelector('.tog');
+    const bkt = node.querySelector('.bkt');
+    const comma = node.querySelector('.comma');
+    const children = node.querySelector('.children');
+    const close = node.querySelector('.close');
+    tog.hidden = open;
+    if (comma) comma.hidden = open;
+    bkt.hidden = !open;
+    children.hidden = !open;
+    close.hidden = !open;
+    tog.setAttribute('aria-expanded', String(open));
+  }
+
+  Object.values(nodes).forEach((n) => {
+    n.querySelector('.tog').addEventListener('click', () => setExpanded(n, true));
+    n.querySelector('.close').addEventListener('click', () => setExpanded(n, false));
+  });
+
   function setActive(id) {
     Object.values(links).forEach((a) => a.classList.toggle('active', a.dataset.sec === id));
+    // the active section's node unfolds; the rest fold shut
+    Object.entries(nodes).forEach(([sec, n]) => setExpanded(n, sec === id));
   }
 
   function spy() {
