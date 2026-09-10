@@ -231,7 +231,7 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
     z-index: 1;
     margin-left: calc(24ch + 48px);
     max-width: 100ch;
-    padding-block: 3rem 30vh;
+    padding-block: 3rem 15vh;
   }
 
   .masthead { margin-bottom: 3rem; }
@@ -250,7 +250,7 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
     margin-top: 0.3rem;
   }
 
-  section { scroll-margin-top: 6rem; margin-top: 5.5rem; min-height: 38vh; }
+  section { scroll-margin-top: 6rem; margin-top: 4rem; }
   h2 {
     font-size: 1rem;
     font-weight: normal;
@@ -298,7 +298,6 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
     #index .brace, #index .p, #index .tog, #index .children, #index .close { display: none; }
     .page { margin-left: 0; }
     #cathedral pre { opacity: 0.55; }
-    section { min-height: 0; }
   }
 </style>
 
@@ -459,18 +458,19 @@ window.addEventListener('resize', () => {
 
   function spy() {
     const doc = document.documentElement;
-    // pinned to the bottom -> last section wins
-    if (window.innerHeight + window.scrollY >= doc.scrollHeight - 2) {
-      setActive(secs[secs.length - 1].id);
-      return;
-    }
-    // otherwise: last section whose top has crossed the reading line
+    const maxScroll = Math.max(1, doc.scrollHeight - window.innerHeight);
     const ref = window.innerHeight * 0.35;
-    let current = secs[0];
-    for (const sec of secs) {
-      if (sec.getBoundingClientRect().top <= ref) current = sec;
-    }
-    setActive(current.id);
+    const n = secs.length;
+    // each section activates when its top crosses the reading line, but
+    // never later than its even share of the reachable scroll range —
+    // so short pages still hand every section a scroll band
+    let current = secs[0].id;
+    secs.forEach((sec, i) => {
+      const natural = sec.getBoundingClientRect().top + window.scrollY - ref;
+      const cap = (maxScroll * i) / Math.max(1, n - 1);
+      if (window.scrollY >= Math.min(natural, cap) - 1) current = sec.id;
+    });
+    setActive(current);
   }
 
   let ticking = false;
