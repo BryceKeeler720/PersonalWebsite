@@ -230,7 +230,7 @@ export const exitCommand: Command = {
   description: 'Go back to the main site',
   handler: (): TerminalLine[] => {
     if (typeof window !== 'undefined') {
-      window.location.href = '/traditional';
+      window.location.href = '/';
     }
     return [
       { id: id(), type: 'output', content: '  Redirecting to home...' },

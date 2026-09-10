@@ -40,8 +40,7 @@ export const filesystem: FSNode = {
               content: [
                 'View full resume at: /resume',
                 '',
-                'Download SWE resume: /Bryce_Keeler_Resume_2026_SWE.pdf',
-                'Download DS resume:  /Bryce_Keeler_Resume_2026_DS.pdf',
+                'Download resume: /Bryce_Keeler_Resume.pdf',
               ].join('\n'),
             },
             projects: {

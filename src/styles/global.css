@@ -1,27 +1,37 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&display=swap');
 
 :root {
-  /* Kanagawa Core Palette */
-  --kana-bg: #1F1F28;
-  --kana-bg-dark: #16161D;
-  --kana-bg-dim: #1A1A22;
-  --kana-bg-light: #2A2A37;
-  --kana-bg-lighter: #363646;
-  --kana-fg: #DCD7BA;
-  --kana-fg-dim: #C8C093;
-  --kana-fg-muted: #727169;
+  /* Monochrome gothic palette (legacy --kana-* names kept
+     so component styles keep resolving) */
+  --kana-bg: #000000;
+  --kana-bg-dark: #000000;
+  --kana-bg-dim: #0a0a0a;
+  --kana-bg-light: #161616;
+  --kana-bg-lighter: #222222;
+  --kana-fg: #d4d4d4;
+  --kana-fg-dim: #a8a8a8;
+  --kana-fg-muted: #6e6e6e;
 
-  /* Kanagawa Accent Colors */
-  --kana-blue: #7E9CD8;
+  /* Accents collapsed to grayscale; green/red kept muted for
+     positive/negative data semantics */
+  --kana-blue: #f2f2f2;
   --kana-green: #76946A;
   --kana-red: #C34043;
-  --kana-yellow: #C0A36E;
-  --kana-magenta: #957FB8;
-  --kana-cyan: #6A9589;
-  --kana-orange: #FFA066;
-  --kana-pink: #D27E99;
-  --kana-light-blue: #7FB4CA;
-  --kana-bright-green: #98BB6C;
+  --kana-yellow: #bcbcbc;
+  --kana-magenta: #9a9a9a;
+  --kana-cyan: #8a8a8a;
+  --kana-orange: #c6c6c6;
+  --kana-pink: #9a9a9a;
+  --kana-light-blue: #cccccc;
+  --kana-bright-green: #8faf7e;
+
+  /* Gothic tokens */
+  --ink: #d4d4d4;
+  --dim: #6e6e6e;
+  --faint: #3a3a3a;
+  --ghost: #2a2a2a;
+  --bone: #f2f2f2;
+  --void: #000000;
 
   /* Semantic Aliases */
   --primary-color: var(--kana-fg);
@@ -31,15 +41,15 @@
   --text-primary: var(--kana-fg);
   --text-secondary: var(--kana-fg-dim);
 
-  /* Surface Tokens (glassmorphism) */
-  --surface-glass: rgba(220, 215, 186, 0.03);
-  --surface-glass-hover: rgba(220, 215, 186, 0.05);
-  --surface-elevated: rgba(220, 215, 186, 0.06);
+  /* Surface Tokens */
+  --surface-glass: rgba(255, 255, 255, 0.03);
+  --surface-glass-hover: rgba(255, 255, 255, 0.05);
+  --surface-elevated: rgba(255, 255, 255, 0.06);
 
   /* Border Tokens */
-  --border-subtle: rgba(220, 215, 186, 0.08);
-  --border-default: rgba(220, 215, 186, 0.12);
-  --border-hover: rgba(220, 215, 186, 0.20);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.12);
+  --border-hover: rgba(255, 255, 255, 0.20);
 
   /* Status Colors */
   --color-positive: var(--kana-green);
@@ -48,8 +58,8 @@
   --color-info: var(--kana-blue);
 
   /* Scrollbar */
-  --scrollbar-thumb: rgba(220, 215, 186, 0.15);
-  --scrollbar-thumb-hover: rgba(220, 215, 186, 0.25);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.15);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.25);
 }
 
 * {
@@ -105,4 +115,64 @@ body {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+/* ── Light mode (inverted monochrome) ─────────────── */
+html[data-theme="light"] {
+  --kana-bg: #f4f4f2;
+  --kana-bg-dark: #ffffff;
+  --kana-bg-dim: #ececea;
+  --kana-bg-light: #e2e2e0;
+  --kana-bg-lighter: #d6d6d4;
+  --kana-fg: #1a1a1a;
+  --kana-fg-dim: #3a3a3a;
+  --kana-fg-muted: #757575;
+
+  --kana-blue: #111111;
+  --kana-green: #4e7040;
+  --kana-red: #a83236;
+  --kana-yellow: #555555;
+  --kana-magenta: #666666;
+  --kana-cyan: #666666;
+  --kana-orange: #444444;
+  --kana-pink: #666666;
+  --kana-light-blue: #333333;
+  --kana-bright-green: #557a48;
+
+  --ink: #1a1a1a;
+  --dim: #6e6e6e;
+  --faint: #c2c2c2;
+  --ghost: #d4d4d4;
+  --bone: #111111;
+  --void: #f4f4f2;
+
+  --surface-glass: rgba(0, 0, 0, 0.03);
+  --surface-glass-hover: rgba(0, 0, 0, 0.05);
+  --surface-elevated: rgba(0, 0, 0, 0.06);
+  --border-subtle: rgba(0, 0, 0, 0.10);
+  --border-default: rgba(0, 0, 0, 0.15);
+  --border-hover: rgba(0, 0, 0, 0.25);
+  --scrollbar-thumb: rgba(0, 0, 0, 0.2);
+  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.35);
+}
+
+/* ── Theme toggle button ──────────────────────────── */
+#theme-toggle {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  z-index: 100;
+  background: transparent;
+  border: 1px solid var(--faint, var(--border-default));
+  color: var(--dim, var(--kana-fg-muted));
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+}
+#theme-toggle:hover {
+  background: var(--bone, var(--kana-fg));
+  color: var(--void, var(--kana-bg));
+  border-color: var(--bone, var(--kana-fg));
 }

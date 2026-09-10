@@ -1,9 +1,9 @@
 export const personalInfo = {
   name: 'Bryce Keeler',
-  tagline: 'consultant \u00b7 developer',
-  title: 'Software Engineer & Data Scientist',
+  tagline: 'machine learning \u00b7 systems',
+  title: 'Machine Learning Engineer',
   company: 'Huron Consulting Group',
-  role: 'Analyst - Digital Consulting',
+  role: 'Machine Learning Engineer',
   email: 'Bryce@BryceKeeler.com',
   github: 'github.com/BryceKeeler720',
   githubUrl: 'https://github.com/BryceKeeler720',
@@ -30,7 +30,7 @@ export const personalInfo = {
   ],
 
   experience: [
-    { role: 'Analyst', company: 'Huron Consulting Group', period: 'Jan 2025 - Present', desc: 'Workday Extend apps, Studio integrations, orchestrations' },
+    { role: 'Machine Learning Engineer', company: 'Huron Consulting Group', period: 'Jan 2025 - Present', desc: 'ML models for ad yield + predictive maintenance, GenAI reporting systems' },
     { role: 'Intern', company: 'Huron Consulting Group', period: 'Summer 2024', desc: 'Student scheduling app, university integrations' },
     { role: 'Intern', company: 'PwC', period: 'Summer 2023', desc: 'Tableau/PowerBI dashboards, ETL pipelines' },
     { role: 'Intern', company: 'EY', period: 'Summer 2022', desc: 'Nonprofit consulting, data visualization' },

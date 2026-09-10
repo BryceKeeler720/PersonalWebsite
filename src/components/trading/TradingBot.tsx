@@ -368,7 +368,7 @@ export default function TradingBot() {
 
   return (
     <div className="trading-bot">
-      <a href="/traditional" className="back-link" style={{
+      <a href="/" className="back-link" style={{
         display: 'inline-flex',
         alignItems: 'center',
         gap: '0.5rem',

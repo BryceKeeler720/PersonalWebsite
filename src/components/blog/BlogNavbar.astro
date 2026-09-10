@@ -20,12 +20,12 @@ const isActive = (href: string) => {
     </button>
 
     <div class="navbar-links" role="list">
-      <a href="/traditional#about" class="nav-link">About</a>
-      <a href="/traditional#experience" class="nav-link">Work</a>
-      <a href="/traditional#education" class="nav-link">Education</a>
-      <a href="/traditional#projects" class="nav-link">Projects</a>
-      <a href="/traditional#homelab" class="nav-link">Home Lab</a>
-      <a href="/traditional#contact" class="nav-link">Contact</a>
+      <a href="/#about" class="nav-link">Home</a>
+      <a href="/#projects" class="nav-link">Projects</a>
+      <a href="/resume" class="nav-link">Resume</a>
+      
+      <a href="/HomeLab" class="nav-link">Home Lab</a>
+      <a href="/#contact" class="nav-link">Contact</a>
       <a href="/blog" class={`nav-link ${isActive('/blog') ? 'nav-link-active' : ''}`}>Blog</a>
       <a href="/journal" class={`nav-link ${isActive('/journal') ? 'nav-link-active' : ''}`}>Journal</a>
       <a href="/terminal" class="nav-link">Terminal</a>
@@ -42,12 +42,12 @@ const isActive = (href: string) => {
 <div class="mobile-backdrop"></div>
 
 <div class="mobile-menu">
-  <a href="/traditional#about" class="mobile-nav-link">About</a>
-  <a href="/traditional#experience" class="mobile-nav-link">Work</a>
-  <a href="/traditional#education" class="mobile-nav-link">Education</a>
-  <a href="/traditional#projects" class="mobile-nav-link">Projects</a>
-  <a href="/traditional#homelab" class="mobile-nav-link">Home Lab</a>
-  <a href="/traditional#contact" class="mobile-nav-link">Contact</a>
+  <a href="/#about" class="mobile-nav-link">Home</a>
+  <a href="/#projects" class="mobile-nav-link">Projects</a>
+  <a href="/resume" class="mobile-nav-link">Resume</a>
+  
+  <a href="/HomeLab" class="mobile-nav-link">Home Lab</a>
+  <a href="/#contact" class="mobile-nav-link">Contact</a>
   <a href="/blog" class={`mobile-nav-link ${isActive('/blog') ? 'mobile-nav-link-active' : ''}`}>Blog</a>
   <a href="/journal" class={`mobile-nav-link ${isActive('/journal') ? 'mobile-nav-link-active' : ''}`}>Journal</a>
   <a href="/terminal" class="mobile-nav-link">Terminal</a>

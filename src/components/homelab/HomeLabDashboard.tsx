@@ -176,7 +176,7 @@ export default function HomeLabDashboard() {
 
   return (
     <div className="homelab-dashboard">
-      <a href="/traditional" className="back-link" style={{
+      <a href="/" className="back-link" style={{
         display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
         color: 'rgba(255,255,255,0.6)', textDecoration: 'none', fontSize: '0.875rem', marginBottom: '1rem', transition: 'color 0.2s ease',
       }}>

@@ -8,17 +8,24 @@ interface Props {
   image?: string;
 }
 
-const { title, description = "Interactive 3D Portfolio", image = "/og-image.png" } = Astro.props;
+const { title, description = "Bryce Keeler — machine learning engineer. Trading systems, ML infrastructure, self-hosted hardware.", image = "/og-image.png" } = Astro.props;
 const gaId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID;
 const siteUrl = "https://brycekeeler.com";
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
 ---
 
 <!doctype html>
-<html lang="en" style="background-color: #1F1F28;">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="color-scheme" content="dark" />
+    <script is:inline>
+      (function () {
+        let t = 'dark';
+        try { t = localStorage.getItem('theme') || 'dark'; } catch (e) { /* ignore */ }
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
+    <meta name="color-scheme" content="dark light" />
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
@@ -57,6 +64,20 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
   </head>
   <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
+    <button id="theme-toggle" aria-label="Toggle light/dark mode">☾</button>
+    <script is:inline>
+      (function () {
+        const btn = document.getElementById('theme-toggle');
+        const icon = () => { btn.textContent = document.documentElement.dataset.theme === 'light' ? '☾' : '☀'; };
+        icon();
+        btn.addEventListener('click', () => {
+          const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+          document.documentElement.dataset.theme = next;
+          try { localStorage.setItem('theme', next); } catch (e) { /* ignore */ }
+          icon();
+        });
+      })();
+    </script>
     <main id="main-content">
       <slot />
     </main>
