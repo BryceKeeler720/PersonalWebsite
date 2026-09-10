@@ -163,16 +163,14 @@ html[data-theme="light"] {
   right: 16px;
   z-index: 100;
   background: transparent;
-  border: 1px solid var(--faint, var(--border-default));
+  border: none;
   color: var(--dim, var(--kana-fg-muted));
   font-family: inherit;
-  font-size: 1rem;
+  font-size: 1.15rem;
   line-height: 1;
-  padding: 0.35rem 0.6rem;
+  padding: 0.3rem;
   cursor: pointer;
 }
 #theme-toggle:hover {
-  background: var(--bone, var(--kana-fg));
-  color: var(--void, var(--kana-bg));
-  border-color: var(--bone, var(--kana-fg));
+  color: var(--bone, var(--kana-fg));
 }
