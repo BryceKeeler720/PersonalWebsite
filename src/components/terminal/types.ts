@@ -5,7 +5,7 @@ export interface TerminalLineSegment {
 
 export interface TerminalLine {
   id: string;
-  type: 'input' | 'output' | 'error' | 'system' | 'ascii';
+  type: 'input' | 'output' | 'error' | 'system' | 'ascii' | 'donut';
   content: string;
   color?: string;
   segments?: TerminalLineSegment[];

@@ -4,6 +4,7 @@ import { commandRegistry, commandNames } from './commands';
 import { defaultTheme } from './data/themes';
 import { HOME_DIR } from './data/filesystem';
 import { fastfetchCommand } from './commands/utils';
+import DonutTorus from './DonutTorus';
 import './Terminal.css';
 
 let lineCounter = 0;
@@ -212,7 +213,9 @@ const Terminal: React.FC = () => {
                     : line.color || theme.foreground,
             }}
           >
-            {line.segments ? (
+            {line.type === 'donut' ? (
+              <DonutTorus color={theme.accent} hudColor={theme.muted} />
+            ) : line.segments ? (
               <span>{line.segments.map((seg, i) => (
                 <span key={i} style={{ color: seg.color }}>{seg.text}</span>
               ))}</span>

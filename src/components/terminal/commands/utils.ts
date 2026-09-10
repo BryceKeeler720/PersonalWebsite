@@ -22,6 +22,7 @@ export const helpCommand: Command = {
       ['themes', 'List or switch terminal themes'],
       ['whoami', 'Display current user'],
       ['fastfetch', 'My main PC specs'],
+      ['donut', 'Spin a 3D ASCII torus'],
       ['clear', 'Clear the terminal'],
       ['history', 'Show command history'],
       ['echo', 'Echo text back'],
@@ -157,14 +158,15 @@ export const fastfetchCommand: Command = {
     ];
 
     // ASCII art: cat + Bryce name
-    const art = [
-      '  /\\_/\\      ____                        ',
-      ' / o o \\    | __ ) _ __ _   _  ___ ___  ',
-      '(   "   )   |  _ \\| \'__| | | |/ __/ _ \\ ',
-      ' \\  ~  /    | |_) | |  | |_| | (_|  __/ ',
-      ' /|   |\\    |____/|_|   \\__, |\\___\\___| ',
-      '(_|   |_)               |___/            ',
+    const cat = [
+      '  /\\_/\\',
+      ' / o o \\',
+      '(   "   )',
+      ' \\  ~  /',
+      ' /|   |\\',
+      '(_|   |_)',
     ];
+    const art = cat.map((line, i) => line.padEnd(12) + asciiArt[i]);
 
     for (const line of art) {
       lines.push({ id: id(), type: 'ascii', content: line });
