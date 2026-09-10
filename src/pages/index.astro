@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Bryce Keeler" description="Machine learning engineer. Trading systems, ML infrastructure, and self-hosted hardware.">
-  <div id="cathedral" aria-hidden="true"><pre></pre></div>
+  <div id="cathedral" aria-hidden="true"><pre class="bg-far"></pre><pre class="bg-main"></pre></div>
 
   <aside id="index">
     <div class="label">INDEX</div>
@@ -155,13 +155,36 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     overflow: hidden;
     pointer-events: none;
     user-select: none;
-    display: flex;
-    align-items: flex-end;
   }
   #cathedral pre {
+    position: absolute;
+    left: 0;
+    bottom: 0;
     font-size: 11px;
     line-height: 1.0;
+  }
+  /* depth by color: the distant layer recedes toward the page
+     ground; the main mass runs brighter at street level and fades
+     as it climbs away */
+  #cathedral .bg-far {
+    color: color-mix(in srgb, var(--ghost) 55%, var(--void));
+  }
+  #cathedral .bg-main {
     color: var(--ghost);
+  }
+  @supports ((-webkit-background-clip: text) or (background-clip: text)) {
+    #cathedral .bg-main {
+      background: linear-gradient(
+        to top,
+        color-mix(in srgb, var(--faint) 55%, var(--dim)) 0%,
+        var(--faint) 40%,
+        var(--ghost) 82%,
+        color-mix(in srgb, var(--ghost) 80%, var(--void)) 100%
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
   }
 
   /* ── Left index ─────────────────────────────────── */
@@ -323,8 +346,9 @@ function bkVnoise(x, y, s) {
    (lit west flanks, shadowed east flanks) across the main mass,
    and a loose buttress rhythm in the walls. */
 function renderCathedral() {
-  const el = document.querySelector('#cathedral pre');
-  if (!el) return;
+  const el = document.querySelector('#cathedral .bg-main');
+  const farEl = document.querySelector('#cathedral .bg-far');
+  if (!el || !farEl) return;
   const seed = 7;
   // measure real cell size so spire positions stay true viewport fractions
   el.textContent = '@@@@@@@@@@';
@@ -355,7 +379,11 @@ function renderCathedral() {
   ];
 
   const grid = [];
-  for (let y = 0; y < rows; y++) grid.push(new Array(cols).fill(' '));
+  const farGrid = [];
+  for (let y = 0; y < rows; y++) {
+    grid.push(new Array(cols).fill(' '));
+    farGrid.push(new Array(cols).fill(' '));
+  }
 
   function buildProfile(st, envLeftAt, baseH) {
     const prof = new Array(cols);
@@ -393,7 +421,7 @@ function renderCathedral() {
       const fine = bkHash(x, y, seed + 11);
       if (fine > 0.62) continue; // heavy dropout reads as haze
       const n = bkVnoise(x * 0.3, y * 0.5, seed + 12);
-      grid[y][x] = y === topY ? '~' : (n > 0.6 ? ';' : n > 0.42 ? ':' : n > 0.25 ? '-' : ',');
+      farGrid[y][x] = y === topY ? '~' : (n > 0.6 ? ';' : n > 0.42 ? ':' : n > 0.25 ? '-' : ',');
     }
   }
 
@@ -415,6 +443,7 @@ function renderCathedral() {
     const topL = Math.floor(rows * (1 - (prof[x - 1] ?? 0)));
     const topR = Math.floor(rows * (1 - (prof[x + 1] ?? 0)));
     for (let y = topY; y < rows; y++) {
+      farGrid[y][x] = ' '; // the main mass occludes the distance, gashes included
       const depth = (y - topY) / Math.max(1, rows - topY);
       const n = bkVnoise(x * 0.4, y * 0.4, seed + 1);
       const g = bkVnoise(x * 0.09, y * 0.8, seed + 2);
@@ -457,6 +486,7 @@ function renderCathedral() {
     if (topY - 1 >= 0) grid[topY - 1][x] = '+';
   }
   el.textContent = grid.map((r) => r.join('')).join('\n');
+  farEl.textContent = farGrid.map((r) => r.join('')).join('\n');
 }
 
 renderCathedral();
