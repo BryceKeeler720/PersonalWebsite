@@ -87,6 +87,13 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
         Machine learning engineer. I build ML systems, trading automation,
         and self-hosted infrastructure.
       </p>
+      <h3>work</h3>
+      <ul class="entries">
+        <li><span class="date">2025 –&nbsp;&nbsp;&nbsp;</span><span class="k">huron consulting group</span>machine learning engineer</li>
+        <li><span class="date">2024&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="k">huron consulting group</span>digital consulting intern</li>
+        <li><span class="date">2023&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="k">pwc</span>start consulting intern</li>
+        <li><span class="date">2022&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="k">ey</span>expedition intern</li>
+      </ul>
     </section>
 
     <section id="projects">
@@ -123,25 +130,33 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
           </li>
         ))}
       </ul>
-      <p class="more"><a href="/blog">→ all posts</a> · <a href="/journal">→ journal</a></p>
+      <ul class="vlinks">
+        <li><a href="/blog">→ all posts</a></li>
+        <li><a href="/journal">→ journal</a></li>
+      </ul>
     </section>
 
     <section id="resume">
       <h2>Resume</h2>
-      <p>
-        <a href="/Bryce_Keeler_Resume.pdf">pdf</a> ·
-        <a href="/resume">html</a>
-      </p>
+      <h3>education</h3>
+      <ul class="entries">
+        <li><span class="date">2026 –&nbsp;&nbsp;&nbsp;</span><span class="k">mitx</span>micromasters, statistics &amp; data science</li>
+        <li><span class="date">2021 – 24</span><span class="k">ut dallas</span>b.s. computer information systems</li>
+      </ul>
+      <ul class="vlinks">
+        <li><a href="/Bryce_Keeler_Resume.pdf">→ pdf</a></li>
+        <li><a href="/resume">→ html version</a></li>
+      </ul>
     </section>
 
     <section id="contact">
       <h2>Contact</h2>
-      <p>
-        <a href="mailto:Bryce@BryceKeeler.com">email</a> ·
-        <a href="https://github.com/BryceKeeler720">github</a> ·
-        <a href="https://www.linkedin.com/in/bryce-keeler720/">linkedin</a> ·
-        <a href="/rss.xml">rss</a>
-      </p>
+      <ul class="vlinks">
+        <li><a href="mailto:Bryce@BryceKeeler.com">→ email</a></li>
+        <li><a href="https://github.com/BryceKeeler720">→ github</a></li>
+        <li><a href="https://www.linkedin.com/in/bryce-keeler720/">→ linkedin</a></li>
+        <li><a href="/rss.xml">→ rss</a></li>
+      </ul>
     </section>
 
     <footer>© 2026</footer>
@@ -260,8 +275,17 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
     margin: 0 0 0.8rem;
   }
   h2::before { content: "// "; color: var(--dim); }
+  h3 {
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: var(--dim);
+    letter-spacing: 0.3ch;
+    text-transform: uppercase;
+    margin: 1.6rem 0 0.5rem;
+  }
+  .vlinks { list-style: none; margin: 1rem 0 0; padding: 0; }
+  .vlinks li { padding: 0.2rem 0; }
   p { max-width: 78ch; margin: 0 0 0.8rem; }
-  .more { color: var(--dim); font-size: 0.85rem; margin-top: 0.8rem; }
 
   .entries { list-style: none; margin: 0; padding: 0; max-width: 88ch; }
   .entries li {
