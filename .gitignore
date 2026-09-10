@@ -24,3 +24,6 @@ scripts/blackjack/calibration_data.json
 .github/workflows/output/
 __pycache__/
 *.pyc
+
+# personal career notes — never publish
+career-research.md
