@@ -257,9 +257,13 @@ function renderCathedral() {
   const el = document.querySelector('#cathedral pre');
   if (!el) return;
   const seed = 7;
-  const charH = 11, charW = 11 * 0.6;
+  // measure real cell size so spire positions stay true viewport fractions
+  el.textContent = '@@@@@@@@@@';
+  const probe = el.getBoundingClientRect();
+  const charW = probe.width / 10 || 6.6;
+  const charH = probe.height || 11;
   const rows = Math.floor(window.innerHeight / charH);
-  const cols = Math.min(260, Math.floor(window.innerWidth / charW));
+  const cols = Math.min(700, Math.ceil(window.innerWidth / charW));
 
   // [center fx, half-width fx, height] — main spire at 0.75
   const steeples = [
