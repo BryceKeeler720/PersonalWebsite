@@ -79,6 +79,11 @@ body {
   overflow-x: hidden;
 }
 
+::selection {
+  background: var(--bone, var(--kana-fg));
+  color: var(--void, var(--kana-bg));
+}
+
 .loading-spinner {
   border: 3px solid var(--border-default);
   border-top-color: var(--primary-color);
@@ -119,41 +124,49 @@ body {
 
 /* ── Light mode (inverted monochrome) ─────────────── */
 html[data-theme="light"] {
-  --kana-bg: #f4f4f2;
-  --kana-bg-dark: #ffffff;
-  --kana-bg-dim: #ececea;
-  --kana-bg-light: #e2e2e0;
-  --kana-bg-lighter: #d6d6d4;
-  --kana-fg: #1a1a1a;
-  --kana-fg-dim: #3a3a3a;
-  --kana-fg-muted: #757575;
+  /* warm paper, near-black ink — etching on parchment,
+     not a mechanical inversion */
+  --kana-bg: #f2f0ea;
+  --kana-bg-dark: #f7f5f0;
+  --kana-bg-dim: #ebe9e2;
+  --kana-bg-light: #e2dfd6;
+  --kana-bg-lighter: #d7d4c9;
+  --kana-fg: #22211d;
+  --kana-fg-dim: #45443e;
+  --kana-fg-muted: #77756c;
 
-  --kana-blue: #111111;
-  --kana-green: #4e7040;
-  --kana-red: #a83236;
-  --kana-yellow: #555555;
-  --kana-magenta: #666666;
-  --kana-cyan: #666666;
-  --kana-orange: #444444;
-  --kana-pink: #666666;
-  --kana-light-blue: #333333;
-  --kana-bright-green: #557a48;
+  --kana-blue: #141310;
+  --kana-green: #4a6b3d;
+  --kana-red: #9c2f33;
+  --kana-yellow: #56544c;
+  --kana-magenta: #67655c;
+  --kana-cyan: #67655c;
+  --kana-orange: #45443e;
+  --kana-pink: #67655c;
+  --kana-light-blue: #34332e;
+  --kana-bright-green: #517245;
 
-  --ink: #1a1a1a;
-  --dim: #6e6e6e;
-  --faint: #c2c2c2;
-  --ghost: #d4d4d4;
-  --bone: #111111;
-  --void: #f4f4f2;
+  --ink: #22211d;
+  --dim: #6d6b62;
+  --faint: #c5c2b6;
+  --ghost: #b4b1a4;
+  --bone: #141310;
+  --void: #f2f0ea;
 
-  --surface-glass: rgba(0, 0, 0, 0.03);
-  --surface-glass-hover: rgba(0, 0, 0, 0.05);
-  --surface-elevated: rgba(0, 0, 0, 0.06);
-  --border-subtle: rgba(0, 0, 0, 0.10);
-  --border-default: rgba(0, 0, 0, 0.15);
-  --border-hover: rgba(0, 0, 0, 0.25);
-  --scrollbar-thumb: rgba(0, 0, 0, 0.2);
-  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.35);
+  --surface-glass: rgba(20, 19, 16, 0.03);
+  --surface-glass-hover: rgba(20, 19, 16, 0.05);
+  --surface-elevated: rgba(20, 19, 16, 0.06);
+  --border-subtle: rgba(20, 19, 16, 0.12);
+  --border-default: rgba(20, 19, 16, 0.18);
+  --border-hover: rgba(20, 19, 16, 0.30);
+  --scrollbar-thumb: rgba(20, 19, 16, 0.22);
+  --scrollbar-thumb-hover: rgba(20, 19, 16, 0.38);
+}
+
+/* light mode: cathedral reads as pencil sketch, slightly
+   subdued so overlaid text keeps clear contrast */
+html[data-theme="light"] #cathedral pre {
+  opacity: 0.75;
 }
 
 /* ── Theme toggle button ──────────────────────────── */
