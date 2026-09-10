@@ -397,11 +397,11 @@ export default function StrategySignals({
       ) : (
         <>
           {/* Asset Info */}
-          <div style={{ marginBottom: '1rem', color: 'var(--kana-fg-dim)' }}>
+          <div style={{ marginBottom: '1rem', color: 'var(--dim)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
               <div style={{ fontSize: '0.875rem' }}>{assetInfo.name}</div>
               {currentSignal.price != null && (
-                <div style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--kana-fg)' }}>
+                <div style={{ fontSize: '1rem', fontWeight: 'bold', color: 'var(--bone)' }}>
                   ${currentSignal.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </div>
               )}
@@ -425,10 +425,10 @@ export default function StrategySignals({
               style={{
                 color:
                   currentSignal.combined > 0.1
-                    ? '#76946A'
+                    ? 'var(--color-positive)'
                     : currentSignal.combined < -0.1
-                      ? '#C34043'
-                      : 'var(--kana-fg-dim)',
+                      ? 'var(--color-negative)'
+                      : 'var(--dim)',
               }}
             >
               {currentSignal.combined >= 0 ? '+' : ''}
@@ -444,7 +444,7 @@ export default function StrategySignals({
             style={{
               marginTop: '1rem',
               fontSize: '0.75rem',
-              color: 'var(--kana-fg-muted)',
+              color: 'var(--dim)',
               textAlign: 'center',
             }}
           >

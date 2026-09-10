@@ -237,10 +237,10 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
       <div className="chart-header">
         <div className="chart-title">
           <span style={{ marginRight: '1rem' }}>Fund Performance</span>
-          <span style={{ fontSize: '0.75rem', color: 'var(--kana-fg-muted)' }}>
-            <span style={{ color: isPositive ? '#76946A' : '#C34043' }}>● Portfolio</span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--dim)' }}>
+            <span style={{ color: isPositive ? 'var(--color-positive)' : 'var(--color-negative)' }}>● Portfolio</span>
             {hasBenchmark && (
-              <span style={{ marginLeft: '0.75rem', color: '#C0A36E' }}>● S&P 500</span>
+              <span style={{ marginLeft: '0.75rem', color: 'var(--dim)' }}>● S&P 500</span>
             )}
           </span>
         </div>
@@ -250,7 +250,7 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
             {isPositive ? '+' : ''}{changePercent.toFixed(2)}%
           </span>
           {hasBenchmark && (
-            <span style={{ fontSize: '0.75rem', color: '#C0A36E', marginLeft: '0.5rem' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--dim)', marginLeft: '0.5rem' }}>
               (S&P 500: {spyChangePercent >= 0 ? '+' : ''}{spyChangePercent.toFixed(2)}%)
             </span>
           )}
@@ -265,43 +265,36 @@ export default function PerformanceChart({ history, initialCapital, spyBenchmark
       </div>
       <div className="chart-container" ref={chartRef} onMouseMove={handleMouseMove} onMouseLeave={() => setHoveredIndex(null)}>
         <svg viewBox={`0 0 ${width} ${height}`}>
-          <defs>
-            <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={isPositive ? '#76946A' : '#C34043'} stopOpacity="0.3" />
-              <stop offset="100%" stopColor={isPositive ? '#76946A' : '#C34043'} stopOpacity="0" />
-            </linearGradient>
-          </defs>
-
           {yLabels.map((label, i) => (
             <g key={i}>
               <line x1={padding.left} y1={label.y} x2={padding.left + chartWidth} y2={label.y}
-                stroke={label.value === initialCapital ? 'rgba(220, 215, 186, 0.3)' : 'rgba(220, 215, 186, 0.08)'}
+                style={{ stroke: label.value === initialCapital ? 'var(--faint)' : 'var(--ghost)' }}
                 strokeWidth="1" strokeDasharray={label.value === initialCapital ? '4 4' : undefined} />
-              <text x={padding.left - 8} y={label.y} fill="rgba(220, 215, 186, 0.5)" fontSize="9" textAnchor="end" dominantBaseline="middle">
+              <text x={padding.left - 8} y={label.y} style={{ fill: 'var(--dim)' }} fontSize="9" textAnchor="end" dominantBaseline="middle">
                 {formatCurrency(label.value)}
               </text>
             </g>
           ))}
 
           {xLabels.map((label, i) => (
-            <text key={i} x={label.x} y={height - 6} fill="rgba(220, 215, 186, 0.5)" fontSize="9" textAnchor="middle">
+            <text key={i} x={label.x} y={height - 6} style={{ fill: 'var(--dim)' }} fontSize="9" textAnchor="middle">
               {formatTime(label.timestamp)}
             </text>
           ))}
 
-          {areaD && <path d={areaD} fill="url(#chartGradient)" style={{ transition: 'd 0.5s ease-in-out' }} />}
+          {areaD && <path d={areaD} style={{ fill: isPositive ? 'var(--color-positive)' : 'var(--color-negative)', fillOpacity: 0.08, transition: 'd 0.5s ease-in-out' }} />}
 
           {benchmarkPathD && (
-            <path d={benchmarkPathD} fill="none" stroke="#C0A36E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" style={{ transition: 'd 0.5s ease-in-out' }} />
+            <path d={benchmarkPathD} fill="none" strokeWidth="2" strokeDasharray="5 3" strokeLinecap="round" strokeLinejoin="round" opacity="0.8" style={{ stroke: 'var(--dim)', transition: 'd 0.5s ease-in-out' }} />
           )}
 
-          {pathD && <path d={pathD} fill="none" stroke={isPositive ? '#76946A' : '#C34043'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: 'd 0.5s ease-in-out' }} />}
+          {pathD && <path d={pathD} fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ stroke: isPositive ? 'var(--color-positive)' : 'var(--color-negative)', transition: 'd 0.5s ease-in-out' }} />}
 
           {hoveredPoint && (
             <>
-              <line x1={hoveredPoint.x} y1={padding.top} x2={hoveredPoint.x} y2={padding.top + chartHeight} stroke="rgba(220, 215, 186, 0.4)" strokeWidth="1" />
-              <line x1={padding.left} y1={hoveredPoint.y} x2={hoveredPoint.x} y2={hoveredPoint.y} stroke="rgba(220, 215, 186, 0.2)" strokeWidth="1" strokeDasharray="4 4" />
-              <circle cx={hoveredPoint.x} cy={hoveredPoint.y} r="4" fill={hoveredPoint.value >= startValue ? '#76946A' : '#C34043'} stroke="#DCD7BA" strokeWidth="1.5" />
+              <line x1={hoveredPoint.x} y1={padding.top} x2={hoveredPoint.x} y2={padding.top + chartHeight} style={{ stroke: 'var(--dim)' }} strokeWidth="1" />
+              <line x1={padding.left} y1={hoveredPoint.y} x2={hoveredPoint.x} y2={hoveredPoint.y} style={{ stroke: 'var(--faint)' }} strokeWidth="1" strokeDasharray="4 4" />
+              <circle cx={hoveredPoint.x} cy={hoveredPoint.y} r="4" style={{ fill: hoveredPoint.value >= startValue ? 'var(--color-positive)' : 'var(--color-negative)', stroke: 'var(--bone)' }} strokeWidth="1.5" />
             </>
           )}
         </svg>

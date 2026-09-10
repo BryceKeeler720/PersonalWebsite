@@ -50,7 +50,7 @@ export default function DetailPanel({ symbol, signal, metric, onClose }: DetailP
           <span className="detail-panel-price">{formatPrice(metric.price)}</span>
           <span
             className="detail-panel-change"
-            style={{ color: metric.changePercent >= 0 ? '#22c55e' : '#ef4444' }}
+            style={{ color: metric.changePercent >= 0 ? 'var(--color-positive)' : 'var(--color-negative)' }}
           >
             {metric.changePercent >= 0 ? '+' : ''}
             {metric.changePercent.toFixed(2)}%
@@ -92,7 +92,7 @@ export default function DetailPanel({ symbol, signal, metric, onClose }: DetailP
               const s = signal[key];
               const pct = ((s.score + 1) / 2) * 100;
               const isNeg = s.score < 0;
-              const fillColor = isNeg ? '#ef4444' : '#22c55e';
+              const fillColor = isNeg ? 'var(--color-negative)' : 'var(--color-positive)';
               const fillStart = isNeg ? pct : 50;
               const fillWidth = Math.abs(pct - 50);
 

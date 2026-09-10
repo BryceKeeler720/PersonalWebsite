@@ -1,14 +1,16 @@
-/* Home Lab Dashboard - Reuses patterns from TradingBot.css */
+/* Home Lab Dashboard — monochrome gothic terminal (patterns match TradingBot.css) */
 
 .homelab-dashboard {
   min-height: 100vh;
-  background: var(--kana-bg);
+  background: var(--void);
+  color: var(--ink);
   padding: 2rem;
   font-family: 'JetBrains Mono', monospace;
 }
 
 .homelab-dashboard .back-link:hover {
-  color: rgba(220, 215, 186, 0.9) !important;
+  background: var(--bone);
+  color: var(--void) !important;
 }
 
 /* Header */
@@ -18,23 +20,25 @@
   align-items: center;
   padding: 1.5rem 2rem;
   margin-bottom: 2rem;
-  background: rgba(220, 215, 186, 0.03);
-  border: 1px solid rgba(220, 215, 186, 0.1);
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
+  background: var(--void);
+  border: 1px solid var(--faint);
+  border-radius: 0;
 }
 
 .homelab-header-content h1 {
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  font-weight: 700;
-  color: var(--kana-fg);
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.4ch;
+  color: var(--bone);
   margin: 0;
 }
 
 .homelab-header-content p {
-  color: rgba(220, 215, 186, 0.6);
+  color: var(--dim);
   margin: 0.25rem 0 0;
   font-size: 0.875rem;
+  letter-spacing: 0.1ch;
 }
 
 .homelab-status {
@@ -42,8 +46,26 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1.25rem;
-  background: rgba(220, 215, 186, 0.05);
-  border-radius: 8px;
+  border: 1px solid var(--ghost);
+  border-radius: 0;
+}
+
+/* Status dot (also used by header) */
+.homelab-dashboard .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 0;
+  background: var(--faint);
+}
+
+.homelab-dashboard .status-dot.running {
+  background: var(--color-positive);
+  animation: homelab-pulse 2s infinite;
+}
+
+@keyframes homelab-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 /* Grid Layout */
@@ -61,25 +83,31 @@
 
 /* Cards */
 .homelab-card {
-  background: rgba(220, 215, 186, 0.03);
-  border: 1px solid rgba(220, 215, 186, 0.1);
-  border-radius: 16px;
+  background: var(--void);
+  border: 1px solid var(--faint);
+  border-radius: 0;
   padding: 1.5rem;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
+  transition: border-color 0.2s ease;
 }
 
 .homelab-card:hover {
-  border-color: rgba(220, 215, 186, 0.15);
+  border-color: var(--dim);
 }
 
 .homelab-card-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: rgba(220, 215, 186, 0.9);
+  font-size: 0.9rem;
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.35ch;
+  color: var(--bone);
   margin: 0 0 1rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(220, 215, 186, 0.1);
+  border-bottom: 1px dashed var(--ghost);
+}
+
+.homelab-card-title::before {
+  content: "// ";
+  color: var(--dim);
 }
 
 /* Tab Navigation — reuse .tab-nav from TradingBot.css */
@@ -91,26 +119,27 @@
 
 .homelab-main .tab-nav button {
   padding: 0.625rem 1.25rem;
-  background: rgba(220, 215, 186, 0.05);
-  border: 1px solid rgba(220, 215, 186, 0.1);
-  border-radius: 8px;
-  color: rgba(220, 215, 186, 0.6);
-  font-weight: 500;
+  background: transparent;
+  border: 1px solid var(--faint);
+  border-radius: 0;
+  color: var(--dim);
+  font-weight: normal;
   font-size: 0.875rem;
+  letter-spacing: 0.1ch;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease, color 0.15s ease;
   font-family: inherit;
 }
 
 .homelab-main .tab-nav button:hover {
-  background: rgba(220, 215, 186, 0.08);
-  color: rgba(220, 215, 186, 0.8);
+  background: var(--bone);
+  color: var(--void);
 }
 
 .homelab-main .tab-nav button.active {
-  background: rgba(220, 215, 186, 0.1);
-  border-color: rgba(220, 215, 186, 0.25);
-  color: var(--kana-fg);
+  background: var(--bone);
+  border-color: var(--bone);
+  color: var(--void);
 }
 
 /* Error Banner */
@@ -120,10 +149,10 @@
   align-items: center;
   padding: 1rem 1.5rem;
   margin-bottom: 1.5rem;
-  background: rgba(195, 64, 67, 0.1);
-  border: 1px solid rgba(195, 64, 67, 0.3);
-  border-radius: 12px;
-  color: var(--kana-red);
+  background: transparent;
+  border: 1px solid var(--color-negative);
+  border-radius: 0;
+  color: var(--color-negative);
 }
 
 .homelab-error p {
@@ -133,14 +162,20 @@
 
 .homelab-error button {
   padding: 0.5rem 1rem;
-  background: rgba(195, 64, 67, 0.2);
-  border: 1px solid rgba(195, 64, 67, 0.3);
-  border-radius: 6px;
-  color: var(--kana-red);
+  background: transparent;
+  border: 1px solid var(--color-negative);
+  border-radius: 0;
+  color: var(--color-negative);
   font-family: inherit;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: normal;
   cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.homelab-error button:hover {
+  background: var(--color-negative);
+  color: var(--void);
 }
 
 /* Loading */
@@ -150,7 +185,7 @@
   align-items: center;
   justify-content: center;
   min-height: 50vh;
-  color: rgba(220, 215, 186, 0.6);
+  color: var(--dim);
 }
 
 .homelab-loading p {
@@ -161,8 +196,8 @@
 .homelab-spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(220, 215, 186, 0.1);
-  border-top-color: rgba(220, 215, 186, 0.5);
+  border: 3px solid var(--ghost);
+  border-top-color: var(--dim);
   border-radius: 50%;
   animation: homelab-spin 1s linear infinite;
 }
@@ -175,7 +210,7 @@
 .homelab-empty {
   text-align: center;
   padding: 2rem;
-  color: rgba(220, 215, 186, 0.5);
+  color: var(--dim);
 }
 
 .homelab-empty p {
@@ -211,12 +246,12 @@
 
   .homelab-header {
     padding: 1rem;
-    border-radius: 12px;
+    border-radius: 0;
     margin-bottom: 1rem;
   }
 
   .homelab-header-content h1 {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
   }
 
   .homelab-main .tab-nav {
@@ -234,11 +269,11 @@
 
   .homelab-card {
     padding: 1rem;
-    border-radius: 12px;
+    border-radius: 0;
   }
 
   .homelab-card-title {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     margin-bottom: 0.75rem;
     padding-bottom: 0.5rem;
   }

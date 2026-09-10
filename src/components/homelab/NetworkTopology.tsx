@@ -19,10 +19,10 @@ interface VLAN {
 
 // Hardcoded topology — edit when network changes
 const VLANS: VLAN[] = [
-  { name: 'Management', subnet: '10.0.0.0/24', color: '#7E9CD8' },
-  { name: 'Servers', subnet: '10.0.10.0/24', color: '#76946A' },
-  { name: 'IoT', subnet: '10.0.20.0/24', color: '#C0A36E' },
-  { name: 'Personal', subnet: '10.0.30.0/24', color: '#957FB8' },
+  { name: 'Management', subnet: '10.0.0.0/24', color: '#f2f2f2' },
+  { name: 'Servers', subnet: '10.0.10.0/24', color: '#c6c6c6' },
+  { name: 'IoT', subnet: '10.0.20.0/24', color: '#9a9a9a' },
+  { name: 'Personal', subnet: '10.0.30.0/24', color: '#6e6e6e' },
 ];
 
 const NODES: NetworkNode[] = [
@@ -79,7 +79,7 @@ export default function NetworkTopology() {
   return (
     <div className="homelab-card">
       <h2 className="homelab-card-title">Network Topology</h2>
-      <p style={{ fontSize: '0.8rem', color: 'rgba(220,215,186,0.5)', margin: '0 0 1.25rem' }}>
+      <p style={{ fontSize: '0.8rem', color: 'var(--dim)', margin: '0 0 1.25rem' }}>
         VLAN-segmented network with isolated zones for servers, IoT, and personal devices.
       </p>
 
@@ -87,15 +87,15 @@ export default function NetworkTopology() {
         {vlanNodes.map(vlan => (
           <div key={vlan.name} style={{
             padding: '1rem',
-            background: `${vlan.color}08`,
-            border: `1px solid ${vlan.color}25`,
-            borderRadius: 12,
+            background: 'transparent',
+            border: '1px solid var(--ghost)',
+            borderLeft: `2px solid ${vlan.color}`,
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-              <div style={{ width: 3, height: 20, background: vlan.color, borderRadius: 2 }} />
+              <div style={{ width: 3, height: 20, background: vlan.color }} />
               <div>
                 <div style={{ fontSize: '0.8rem', fontWeight: 600, color: vlan.color }}>{vlan.name}</div>
-                <div style={{ fontSize: '0.65rem', color: 'rgba(220,215,186,0.4)', fontFamily: "'JetBrains Mono', monospace" }}>{vlan.subnet}</div>
+                <div style={{ fontSize: '0.65rem', color: 'var(--dim)', fontFamily: "'JetBrains Mono', monospace" }}>{vlan.subnet}</div>
               </div>
             </div>
 
@@ -106,15 +106,14 @@ export default function NetworkTopology() {
                   <div key={node.id} style={{
                     display: 'flex', alignItems: 'center', gap: '0.5rem',
                     padding: '0.5rem 0.75rem',
-                    background: 'rgba(220,215,186,0.04)',
-                    borderRadius: 8,
-                    border: '1px solid rgba(220,215,186,0.08)',
+                    background: 'transparent',
+                    border: '1px solid var(--ghost)',
                   }}>
                     <NodeIcon icon={node.icon} color={vlan.color} />
                     <div>
-                      <div style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--kana-fg)' }}>{node.label}</div>
+                      <div style={{ fontSize: '0.8rem', fontWeight: 500, color: 'var(--bone)' }}>{node.label}</div>
                       {outgoing.length > 0 && (
-                        <div style={{ fontSize: '0.65rem', color: 'rgba(220,215,186,0.35)' }}>
+                        <div style={{ fontSize: '0.65rem', color: 'var(--dim)' }}>
                           → {outgoing.map(l => NODES.find(n => n.id === l.to)?.label).filter(Boolean).join(', ')}
                         </div>
                       )}
@@ -127,16 +126,16 @@ export default function NetworkTopology() {
         ))}
       </div>
 
-      <div style={{ marginTop: '1.25rem', padding: '0.75rem 1rem', background: 'rgba(220,215,186,0.02)', borderRadius: 8 }}>
-        <div style={{ fontSize: '0.7rem', color: 'rgba(220,215,186,0.4)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>Key Connections</div>
+      <div style={{ marginTop: '1.25rem', padding: '0.75rem 1rem', border: '1px solid var(--ghost)' }}>
+        <div style={{ fontSize: '0.7rem', color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: '0.2ch', marginBottom: '0.5rem' }}>Key Connections</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
           {LINKS.filter(l => l.label).map((link, i) => {
             const from = NODES.find(n => n.id === link.from);
             const to = NODES.find(n => n.id === link.to);
             if (!from || !to) return null;
             return (
-              <div key={i} style={{ fontSize: '0.7rem', color: 'rgba(220,215,186,0.6)', padding: '0.25rem 0.5rem', background: 'rgba(220,215,186,0.04)', borderRadius: 4 }}>
-                {from.label} → {to.label} <span style={{ color: 'rgba(220,215,186,0.35)' }}>({link.label})</span>
+              <div key={i} style={{ fontSize: '0.7rem', color: 'var(--ink)', padding: '0.25rem 0.5rem', border: '1px solid var(--ghost)' }}>
+                {from.label} → {to.label} <span style={{ color: 'var(--dim)' }}>({link.label})</span>
               </div>
             );
           })}

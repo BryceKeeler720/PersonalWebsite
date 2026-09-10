@@ -1,14 +1,31 @@
-/* Trading Bot Styles - Following existing glassmorphism patterns */
+/* Trading Bot Styles — monochrome gothic terminal */
 
 .back-link:hover {
-  color: rgba(220, 215, 186, 0.9) !important;
+  background: var(--bone);
+  color: var(--void) !important;
 }
 
 .trading-bot {
   min-height: 100vh;
-  background: var(--kana-bg);
+  background: var(--void);
+  color: var(--ink);
   padding: 2rem;
   font-family: 'JetBrains Mono', monospace;
+}
+
+/* Section headers — uppercase, "// " prefixed
+   (.detail-panel-symbol is the market-map ticker heading, not a section header) */
+.trading-bot h2:not(.detail-panel-symbol) {
+  font-size: 0.9rem;
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.35ch;
+  color: var(--bone);
+}
+
+.trading-bot h2:not(.detail-panel-symbol)::before {
+  content: "// ";
+  color: var(--dim);
 }
 
 /* Header */
@@ -18,23 +35,25 @@
   align-items: center;
   padding: 1.5rem 2rem;
   margin-bottom: 2rem;
-  background: rgba(220, 215, 186, 0.03);
-  border: 1px solid rgba(220, 215, 186, 0.1);
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
+  background: var(--void);
+  border: 1px solid var(--faint);
+  border-radius: 0;
 }
 
 .header-content h1 {
-  font-size: clamp(1.5rem, 4vw, 2rem);
-  font-weight: 700;
-  color: var(--kana-fg);
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.4ch;
+  color: var(--bone);
   margin: 0;
 }
 
 .header-content p {
-  color: rgba(220, 215, 186, 0.6);
+  color: var(--dim);
   margin: 0.25rem 0 0;
   font-size: 0.875rem;
+  letter-spacing: 0.1ch;
 }
 
 /* Bot Status */
@@ -43,64 +62,64 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1.25rem;
-  background: rgba(220, 215, 186, 0.05);
-  border-radius: 8px;
+  border: 1px solid var(--ghost);
+  border-radius: 0;
 }
 
 .status-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: rgba(220, 215, 186, 0.3);
-  transition: all 0.3s ease;
+  width: 8px;
+  height: 8px;
+  border-radius: 0;
+  background: var(--faint);
+  transition: background 0.3s ease;
 }
 
 .status-dot.running {
   background: var(--color-positive);
-  box-shadow: 0 0 8px rgba(118, 148, 106, 0.5);
   animation: pulse 2s infinite;
 }
 
 .status-dot.analyzing {
-  background: var(--color-warning);
-  box-shadow: 0 0 8px rgba(192, 163, 110, 0.5);
+  background: var(--dim);
   animation: pulse 1s infinite;
 }
 
 .status-text {
   font-size: 0.875rem;
-  font-weight: 500;
-  color: rgba(220, 215, 186, 0.8);
+  font-weight: normal;
+  color: var(--ink);
 }
 
 .last-run {
   font-size: 0.75rem;
-  color: rgba(220, 215, 186, 0.4);
+  color: var(--dim);
   padding-left: 0.75rem;
-  border-left: 1px solid rgba(220, 215, 186, 0.1);
+  border-left: 1px solid var(--ghost);
 }
 
 /* Rebalance Button */
 .rebalance-btn {
   padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, rgba(126, 156, 216, 0.8), rgba(149, 127, 184, 0.8));
-  border: none;
-  border-radius: 6px;
-  color: var(--kana-fg);
+  background: transparent;
+  border: 1px solid var(--faint);
+  border-radius: 0;
+  color: var(--ink);
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.15ch;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .rebalance-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(126, 156, 216, 1), rgba(149, 127, 184, 1));
-  transform: translateY(-1px);
+  background: var(--bone);
+  color: var(--void);
 }
 
 .rebalance-btn:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
@@ -110,10 +129,10 @@
 
 .rebalance-result {
   font-size: 0.7rem;
-  color: rgba(220, 215, 186, 0.7);
+  color: var(--dim);
   padding: 0.25rem 0.5rem;
-  background: rgba(118, 148, 106, 0.2);
-  border-radius: 4px;
+  border: 1px solid var(--ghost);
+  border-radius: 0;
 }
 
 /* Main Grid Layout */
@@ -132,27 +151,24 @@
 
 /* Cards */
 .trading-card {
-  background: rgba(220, 215, 186, 0.03);
-  border: 1px solid rgba(220, 215, 186, 0.1);
-  border-radius: 16px;
+  background: var(--void);
+  border: 1px solid var(--faint);
+  border-radius: 0;
   padding: 1.5rem;
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
+  transition: border-color 0.2s ease;
   display: flex;
   flex-direction: column;
 }
 
 .trading-card:hover {
-  border-color: rgba(220, 215, 186, 0.15);
+  border-color: var(--dim);
 }
 
 .trading-card h2 {
-  font-size: 1rem;
-  font-weight: 600;
-  color: rgba(220, 215, 186, 0.9);
+  font-size: 0.9rem;
   margin: 0 0 1rem;
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(220, 215, 186, 0.1);
+  border-bottom: 1px dashed var(--ghost);
 }
 
 /* Tab Navigation */
@@ -164,26 +180,27 @@
 
 .tab-nav button {
   padding: 0.625rem 1.25rem;
-  background: rgba(220, 215, 186, 0.05);
-  border: 1px solid rgba(220, 215, 186, 0.1);
-  border-radius: 8px;
-  color: rgba(220, 215, 186, 0.6);
-  font-weight: 500;
+  background: transparent;
+  border: 1px solid var(--faint);
+  border-radius: 0;
+  color: var(--dim);
+  font-weight: normal;
   font-size: 0.875rem;
+  letter-spacing: 0.1ch;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease, color 0.15s ease;
   font-family: inherit;
 }
 
 .tab-nav button:hover {
-  background: rgba(220, 215, 186, 0.08);
-  color: rgba(220, 215, 186, 0.8);
+  background: var(--bone);
+  color: var(--void);
 }
 
 .tab-nav button.active {
-  background: rgba(220, 215, 186, 0.1);
-  border-color: rgba(220, 215, 186, 0.25);
-  color: var(--kana-fg);
+  background: var(--bone);
+  border-color: var(--bone);
+  color: var(--void);
 }
 
 /* Portfolio Dashboard */
@@ -191,13 +208,13 @@
   text-align: center;
   padding: 1rem 0;
   margin-bottom: 1rem;
-  border-bottom: 1px solid rgba(220, 215, 186, 0.1);
+  border-bottom: 1px dashed var(--ghost);
 }
 
 .portfolio-value .value {
   font-size: 2rem;
-  font-weight: 700;
-  color: var(--kana-fg);
+  font-weight: bold;
+  color: var(--bone);
 }
 
 .portfolio-value .change {
@@ -222,28 +239,30 @@
 
 .stat-item {
   padding: 0.75rem;
-  background: rgba(220, 215, 186, 0.02);
-  border-radius: 8px;
+  border: 1px solid var(--ghost);
+  border-radius: 0;
 }
 
 .stat-item .label {
   font-size: 0.75rem;
-  color: rgba(220, 215, 186, 0.5);
+  color: var(--dim);
   margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1ch;
 }
 
 .stat-item .value {
   font-size: 1rem;
-  font-weight: 600;
-  color: var(--kana-fg);
+  font-weight: bold;
+  color: var(--bone);
 }
 
-/* Holdings Table */
+/* Holdings Table — ledger rows */
 .holdings-list {
   max-height: 300px;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(220, 215, 186, 0.2) transparent;
+  scrollbar-color: var(--faint) transparent;
 }
 
 .holdings-list::-webkit-scrollbar {
@@ -255,40 +274,40 @@
 }
 
 .holdings-list::-webkit-scrollbar-thumb {
-  background: rgba(220, 215, 186, 0.2);
-  border-radius: 3px;
+  background: var(--faint);
+  border-radius: 0;
 }
 
 .holdings-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(220, 215, 186, 0.3);
+  background: var(--dim);
 }
 
 .holding-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem;
-  background: rgba(220, 215, 186, 0.02);
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
+  padding: 0.6rem 0.25rem;
+  background: transparent;
+  border-radius: 0;
+  border-bottom: 1px dashed var(--ghost);
 }
 
 .holding-item:last-child {
-  margin-bottom: 0;
+  border-bottom: none;
 }
 
 .holding-symbol {
-  font-weight: 600;
-  color: var(--kana-fg);
+  font-weight: bold;
+  color: var(--bone);
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
 }
 
 .holding-name {
-  font-weight: 400;
+  font-weight: normal;
   font-size: 0.75rem;
-  color: var(--kana-fg-muted);
+  color: var(--dim);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -296,7 +315,7 @@
 
 .holding-shares {
   font-size: 0.75rem;
-  color: rgba(220, 215, 186, 0.5);
+  color: var(--dim);
 }
 
 .holding-value {
@@ -304,8 +323,8 @@
 }
 
 .holding-price {
-  font-weight: 500;
-  color: var(--kana-fg);
+  font-weight: normal;
+  color: var(--ink);
 }
 
 .holding-pnl {
@@ -320,12 +339,12 @@
   color: var(--color-negative);
 }
 
-/* Trade Log */
+/* Trade Log — ledger rows */
 .trade-log {
   max-height: 500px;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(220, 215, 186, 0.2) transparent;
+  scrollbar-color: var(--faint) transparent;
 }
 
 .trade-log::-webkit-scrollbar {
@@ -337,19 +356,20 @@
 }
 
 .trade-log::-webkit-scrollbar-thumb {
-  background: rgba(220, 215, 186, 0.2);
-  border-radius: 3px;
+  background: var(--faint);
+  border-radius: 0;
 }
 
 .trade-log::-webkit-scrollbar-thumb:hover {
-  background: rgba(220, 215, 186, 0.3);
+  background: var(--dim);
 }
 
 .trade-item {
-  padding: 1rem;
-  background: rgba(220, 215, 186, 0.02);
-  border-radius: 8px;
-  margin-bottom: 0.75rem;
+  padding: 0.85rem 0.25rem;
+  background: transparent;
+  border-radius: 0;
+  border-bottom: 1px dashed var(--ghost);
+  margin-bottom: 0;
 }
 
 .trade-header {
@@ -366,42 +386,44 @@
 }
 
 .trade-action .badge {
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: bold;
+  letter-spacing: 0.1ch;
+  background: transparent;
 }
 
 .trade-action .badge.buy {
-  background: rgba(118, 148, 106, 0.2);
+  border: 1px solid var(--color-positive);
   color: var(--color-positive);
 }
 
 .trade-action .badge.sell {
-  background: rgba(195, 64, 67, 0.2);
+  border: 1px solid var(--color-negative);
   color: var(--color-negative);
 }
 
 .trade-symbol {
-  font-weight: 600;
-  color: var(--kana-fg);
+  font-weight: bold;
+  color: var(--bone);
 }
 
 .trade-time {
   font-size: 0.75rem;
-  color: rgba(220, 215, 186, 0.5);
+  color: var(--dim);
 }
 
 .trade-details {
   display: flex;
   justify-content: space-between;
   font-size: 0.875rem;
-  color: rgba(220, 215, 186, 0.7);
+  color: var(--ink);
 }
 
 .trade-reason {
   font-size: 0.75rem;
-  color: rgba(220, 215, 186, 0.5);
+  color: var(--dim);
   margin-top: 0.5rem;
   font-style: italic;
 }
@@ -415,10 +437,10 @@
 .stock-dropdown-trigger {
   width: 100%;
   padding: 0.75rem;
-  background-color: rgba(220, 215, 186, 0.05);
-  border: 1px solid rgba(220, 215, 186, 0.1);
-  border-radius: 8px;
-  color: var(--kana-fg);
+  background-color: transparent;
+  border: 1px solid var(--faint);
+  border-radius: 0;
+  color: var(--ink);
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.8rem;
   cursor: pointer;
@@ -429,8 +451,9 @@
 }
 
 .stock-dropdown-trigger:hover {
-  background-color: rgba(220, 215, 186, 0.08);
-  border-color: rgba(220, 215, 186, 0.2);
+  background-color: var(--bone);
+  border-color: var(--bone);
+  color: var(--void);
 }
 
 .stock-dropdown-menu {
@@ -439,28 +462,28 @@
   left: 0;
   right: 0;
   margin-top: 4px;
-  background: var(--kana-bg-light);
-  border: 1px solid rgba(220, 215, 186, 0.15);
-  border-radius: 8px;
+  background: var(--void);
+  border: 1px solid var(--faint);
+  border-radius: 0;
   z-index: 1000;
-  box-shadow: 0 8px 24px rgba(22, 22, 29, 0.5);
+  box-shadow: none;
   overflow: hidden;
 }
 
 .stock-dropdown-search {
   width: 100%;
   padding: 0.75rem;
-  background: rgba(220, 215, 186, 0.05);
+  background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(220, 215, 186, 0.1);
-  color: var(--kana-fg);
+  border-bottom: 1px solid var(--faint);
+  color: var(--ink);
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.8rem;
   outline: none;
 }
 
 .stock-dropdown-search::placeholder {
-  color: rgba(220, 215, 186, 0.4);
+  color: var(--dim);
 }
 
 .stock-dropdown-list {
@@ -470,7 +493,7 @@
 
 .stock-dropdown-list {
   scrollbar-width: thin;
-  scrollbar-color: rgba(220, 215, 186, 0.2) transparent;
+  scrollbar-color: var(--faint) transparent;
 }
 
 .stock-dropdown-list::-webkit-scrollbar {
@@ -482,12 +505,12 @@
 }
 
 .stock-dropdown-list::-webkit-scrollbar-thumb {
-  background: rgba(220, 215, 186, 0.2);
-  border-radius: 3px;
+  background: var(--faint);
+  border-radius: 0;
 }
 
 .stock-dropdown-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(220, 215, 186, 0.3);
+  background: var(--dim);
 }
 
 .stock-dropdown-item {
@@ -495,7 +518,8 @@
   padding: 0.6rem 0.75rem;
   background: transparent;
   border: none;
-  color: var(--kana-fg);
+  border-bottom: 1px dashed var(--ghost);
+  color: var(--ink);
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.75rem;
   cursor: pointer;
@@ -506,20 +530,27 @@
 }
 
 .stock-dropdown-item:hover {
-  background: rgba(220, 215, 186, 0.08);
+  background: var(--bone);
+  color: var(--void);
+}
+
+.stock-dropdown-item:hover .stock-name {
+  color: var(--void);
 }
 
 .stock-dropdown-item.selected {
-  background: rgba(118, 148, 106, 0.15);
+  background: transparent;
+  color: var(--bone);
+  font-weight: bold;
 }
 
 .stock-dropdown-item .stock-symbol {
-  font-weight: 600;
+  font-weight: bold;
   min-width: 50px;
 }
 
 .stock-dropdown-item .stock-name {
-  color: rgba(220, 215, 186, 0.6);
+  color: var(--dim);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -528,7 +559,7 @@
 .stock-dropdown-empty {
   padding: 1rem;
   text-align: center;
-  color: rgba(220, 215, 186, 0.4);
+  color: var(--dim);
   font-size: 0.8rem;
 }
 
@@ -537,8 +568,8 @@
   padding: 0.75rem;
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(220, 215, 186, 0.06);
-  color: var(--kana-fg);
+  border-bottom: 1px dashed var(--ghost);
+  color: var(--ink);
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.8rem;
   cursor: pointer;
@@ -546,7 +577,7 @@
   align-items: center;
   gap: 0.5rem;
   text-align: left;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .stock-dropdown-category-btn:last-child {
@@ -554,32 +585,39 @@
 }
 
 .stock-dropdown-category-btn:hover {
-  background: rgba(220, 215, 186, 0.08);
+  background: var(--bone);
+  color: var(--void);
+}
+
+.stock-dropdown-category-btn:hover .category-count {
+  color: var(--void);
+  border-color: var(--void);
 }
 
 .stock-dropdown-category-btn .category-name {
   flex: 1;
-  font-weight: 500;
+  font-weight: normal;
 }
 
 .stock-dropdown-category-btn .category-count {
   font-size: 0.7rem;
-  color: rgba(220, 215, 186, 0.4);
-  background: rgba(220, 215, 186, 0.08);
+  color: var(--dim);
+  background: transparent;
+  border: 1px solid var(--ghost);
   padding: 0.15rem 0.4rem;
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 .stock-dropdown-back {
   width: 100%;
   padding: 0.6rem 0.75rem;
-  background: var(--kana-bg-light);
+  background: var(--void);
   border: none;
-  border-bottom: 1px solid rgba(220, 215, 186, 0.1);
-  color: rgba(220, 215, 186, 0.8);
+  border-bottom: 1px solid var(--faint);
+  color: var(--bone);
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -591,7 +629,8 @@
 }
 
 .stock-dropdown-back:hover {
-  background: var(--kana-bg-lighter);
+  background: var(--bone);
+  color: var(--void);
 }
 
 .signals-grid {
@@ -600,9 +639,10 @@
 }
 
 .signal-item {
-  padding: 1rem;
-  background: rgba(220, 215, 186, 0.02);
-  border-radius: 8px;
+  padding: 1rem 0.25rem;
+  background: transparent;
+  border-radius: 0;
+  border-bottom: 1px dashed var(--ghost);
 }
 
 .signal-header {
@@ -613,12 +653,12 @@
 }
 
 .signal-name {
-  font-weight: 600;
-  color: var(--kana-fg);
+  font-weight: bold;
+  color: var(--bone);
 }
 
 .signal-score {
-  font-weight: 700;
+  font-weight: bold;
   font-size: 1.125rem;
 }
 
@@ -631,13 +671,13 @@
 }
 
 .signal-score.neutral {
-  color: rgba(220, 215, 186, 0.6);
+  color: var(--dim);
 }
 
 .signal-gauge {
   height: 6px;
-  background: rgba(220, 215, 186, 0.1);
-  border-radius: 3px;
+  background: var(--ghost);
+  border-radius: 0;
   overflow: hidden;
   position: relative;
   margin-bottom: 0.5rem;
@@ -649,7 +689,7 @@
   top: 0;
   bottom: 0;
   width: 2px;
-  background: rgba(220, 215, 186, 0.3);
+  background: var(--faint);
 }
 
 .signal-gauge-fill {
@@ -661,77 +701,77 @@
 
 .signal-gauge-fill.positive {
   left: 50%;
-  background: linear-gradient(90deg, rgba(118, 148, 106, 0.5), var(--color-positive));
+  background: var(--color-positive);
 }
 
 .signal-gauge-fill.negative {
   right: 50%;
-  background: linear-gradient(270deg, rgba(195, 64, 67, 0.5), var(--color-negative));
+  background: var(--color-negative);
 }
 
 .signal-reason {
   font-size: 0.75rem;
-  color: rgba(220, 215, 186, 0.5);
+  color: var(--dim);
 }
 
 .signal-confidence {
   font-size: 0.75rem;
-  color: rgba(220, 215, 186, 0.4);
+  color: var(--dim);
   margin-top: 0.25rem;
 }
 
 /* Combined Signal */
 .combined-signal {
   padding: 1.5rem;
-  background: rgba(220, 215, 186, 0.03);
-  border: 1px solid rgba(220, 215, 186, 0.1);
-  border-radius: 12px;
+  background: transparent;
+  border: 1px solid var(--faint);
+  border-radius: 0;
   text-align: center;
   margin-top: 1rem;
 }
 
 .combined-signal .label {
   font-size: 0.75rem;
-  color: rgba(220, 215, 186, 0.5);
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 0.2ch;
   margin-bottom: 0.5rem;
 }
 
 .combined-signal .score {
   font-size: 2.5rem;
-  font-weight: 700;
+  font-weight: bold;
 }
 
 .recommendation-badge {
   display: inline-block;
   padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 0;
+  font-weight: bold;
   font-size: 0.875rem;
+  letter-spacing: 0.1ch;
   margin-top: 0.75rem;
+  background: transparent;
+  border: 1px solid currentcolor;
 }
 
 .recommendation-badge.strong-buy {
-  background: rgba(118, 148, 106, 0.2);
   color: var(--color-positive);
 }
 
 .recommendation-badge.buy {
-  background: rgba(152, 187, 108, 0.2);
-  color: var(--kana-bright-green);
+  color: var(--color-positive);
 }
 
 .recommendation-badge.hold {
-  background: rgba(114, 113, 105, 0.2);
-  color: var(--kana-fg-muted);
+  color: var(--dim);
 }
 
 .recommendation-badge.sell {
-  background: rgba(210, 126, 153, 0.2);
-  color: var(--kana-red);
+  color: var(--color-negative);
 }
 
 .recommendation-badge.strong-sell {
-  background: rgba(195, 64, 67, 0.2);
   color: var(--color-negative);
 }
 
@@ -744,41 +784,44 @@
 
 .control-btn {
   padding: 0.625rem 1.25rem;
-  border-radius: 8px;
-  font-weight: 500;
+  border-radius: 0;
+  font-weight: normal;
   font-size: 0.875rem;
+  letter-spacing: 0.1ch;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease, color 0.15s ease;
   font-family: inherit;
-  border: none;
+  background: transparent;
+  border: 1px solid var(--faint);
 }
 
 .control-btn.primary {
-  background: rgba(118, 148, 106, 0.2);
+  border-color: var(--color-positive);
   color: var(--color-positive);
 }
 
 .control-btn.primary:hover {
-  background: rgba(118, 148, 106, 0.3);
+  background: var(--color-positive);
+  color: var(--void);
 }
 
 .control-btn.danger {
-  background: rgba(195, 64, 67, 0.2);
+  border-color: var(--color-negative);
   color: var(--color-negative);
 }
 
 .control-btn.danger:hover {
-  background: rgba(195, 64, 67, 0.3);
+  background: var(--color-negative);
+  color: var(--void);
 }
 
 .control-btn.secondary {
-  background: rgba(220, 215, 186, 0.05);
-  color: rgba(220, 215, 186, 0.7);
+  color: var(--dim);
 }
 
 .control-btn.secondary:hover {
-  background: rgba(220, 215, 186, 0.1);
-  color: var(--kana-fg);
+  background: var(--bone);
+  color: var(--void);
 }
 
 .control-btn:disabled {
@@ -791,13 +834,13 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.75rem;
-  color: rgba(220, 215, 186, 0.5);
+  color: var(--dim);
 }
 
 .scheduler-status .dot {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
+  border-radius: 0;
 }
 
 .scheduler-status .dot.running {
@@ -806,7 +849,7 @@
 }
 
 .scheduler-status .dot.stopped {
-  background: rgba(220, 215, 186, 0.3);
+  background: var(--faint);
 }
 
 @keyframes pulse {
@@ -825,7 +868,7 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  color: rgba(220, 215, 186, 0.5);
+  color: var(--dim);
 }
 
 .loading-container {
@@ -834,7 +877,7 @@
   align-items: center;
   justify-content: center;
   min-height: 50vh;
-  color: rgba(220, 215, 186, 0.6);
+  color: var(--dim);
 }
 
 .loading-container p {
@@ -845,8 +888,8 @@
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(220, 215, 186, 0.1);
-  border-top-color: rgba(220, 215, 186, 0.5);
+  border: 3px solid var(--ghost);
+  border-top-color: var(--dim);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -858,10 +901,10 @@
   align-items: center;
   padding: 1rem 1.5rem;
   margin-bottom: 1.5rem;
-  background: rgba(195, 64, 67, 0.1);
-  border: 1px solid rgba(195, 64, 67, 0.3);
-  border-radius: 12px;
-  color: var(--kana-red);
+  background: transparent;
+  border: 1px solid var(--color-negative);
+  border-radius: 0;
+  color: var(--color-negative);
 }
 
 .error-banner p {
@@ -871,19 +914,20 @@
 
 .error-banner button {
   padding: 0.5rem 1rem;
-  background: rgba(195, 64, 67, 0.2);
-  border: 1px solid rgba(195, 64, 67, 0.3);
-  border-radius: 6px;
-  color: var(--kana-red);
+  background: transparent;
+  border: 1px solid var(--color-negative);
+  border-radius: 0;
+  color: var(--color-negative);
   font-family: inherit;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: normal;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .error-banner button:hover {
-  background: rgba(195, 64, 67, 0.3);
+  background: var(--color-negative);
+  color: var(--void);
 }
 
 @keyframes spin {
@@ -896,7 +940,7 @@
 .empty-state {
   text-align: center;
   padding: 2rem;
-  color: rgba(220, 215, 186, 0.5);
+  color: var(--dim);
 }
 
 .empty-state p {
@@ -905,8 +949,9 @@
 
 /* Performance Chart */
 .performance-chart {
-  background: rgba(220, 215, 186, 0.02);
-  border-radius: 12px;
+  background: transparent;
+  border: 1px solid var(--ghost);
+  border-radius: 0;
   padding: 1.25rem;
 }
 
@@ -919,7 +964,7 @@
 
 .chart-placeholder {
   text-align: center;
-  color: rgba(220, 215, 186, 0.4);
+  color: var(--dim);
 }
 
 .chart-placeholder svg {
@@ -930,12 +975,12 @@
 .chart-placeholder p {
   margin: 0;
   font-size: 0.875rem;
-  color: rgba(220, 215, 186, 0.5);
+  color: var(--dim);
 }
 
 .chart-placeholder span {
   font-size: 0.75rem;
-  color: rgba(220, 215, 186, 0.3);
+  color: var(--faint);
 }
 
 .chart-header {
@@ -947,13 +992,15 @@
 
 .chart-title {
   font-size: 0.875rem;
-  font-weight: 600;
-  color: rgba(220, 215, 186, 0.9);
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.2ch;
+  color: var(--bone);
 }
 
 .chart-change {
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: bold;
 }
 
 .chart-change.positive {
@@ -972,26 +1019,26 @@
 
 .time-range-btn {
   padding: 0.375rem 0.75rem;
-  background: rgba(220, 215, 186, 0.05);
-  border: 1px solid rgba(220, 215, 186, 0.1);
-  border-radius: 6px;
-  color: rgba(220, 215, 186, 0.6);
+  background: transparent;
+  border: 1px solid var(--faint);
+  border-radius: 0;
+  color: var(--dim);
   font-family: inherit;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: normal;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .time-range-btn:hover {
-  background: rgba(220, 215, 186, 0.08);
-  color: rgba(220, 215, 186, 0.8);
+  background: var(--bone);
+  color: var(--void);
 }
 
 .time-range-btn.active {
-  background: rgba(220, 215, 186, 0.12);
-  border-color: rgba(220, 215, 186, 0.25);
-  color: var(--kana-fg);
+  background: var(--bone);
+  border-color: var(--bone);
+  color: var(--void);
 }
 
 .chart-value-display {
@@ -1002,8 +1049,8 @@
 
 .chart-current-value {
   font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--kana-fg);
+  font-weight: bold;
+  color: var(--bone);
 }
 
 .chart-container {
@@ -1024,39 +1071,38 @@
   justify-content: space-between;
   margin-top: 0.5rem;
   font-size: 0.625rem;
-  color: rgba(220, 215, 186, 0.4);
+  color: var(--dim);
 }
 
 /* Chart Tooltip */
 .chart-tooltip {
   position: absolute;
-  background: rgba(31, 31, 40, 0.95);
-  border: 1px solid rgba(220, 215, 186, 0.2);
-  border-radius: 8px;
+  background: var(--void);
+  border: 1px solid var(--faint);
+  border-radius: 0;
   padding: 0.75rem 1rem;
   pointer-events: none;
   z-index: 100;
   min-width: 120px;
-  box-shadow: 0 4px 12px rgba(22, 22, 29, 0.4);
-  backdrop-filter: blur(8px);
+  box-shadow: none;
 }
 
 .tooltip-value {
   font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--kana-fg);
+  font-weight: bold;
+  color: var(--bone);
   margin-bottom: 0.25rem;
 }
 
 .tooltip-time {
   font-size: 0.75rem;
-  color: rgba(220, 215, 186, 0.5);
+  color: var(--dim);
   margin-bottom: 0.25rem;
 }
 
 .tooltip-change {
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: bold;
 }
 
 .tooltip-change.positive {
@@ -1078,8 +1124,9 @@
 
 .stat-box {
   padding: 0.75rem;
-  background: rgba(220, 215, 186, 0.02);
-  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--ghost);
+  border-radius: 0;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -1088,14 +1135,16 @@
 
 .stat-box .stat-label {
   font-size: 0.7rem;
-  color: rgba(220, 215, 186, 0.5);
+  color: var(--dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1ch;
   margin-bottom: 0.25rem;
 }
 
 .stat-box .stat-value {
   font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--kana-fg);
+  font-weight: bold;
+  color: var(--bone);
 }
 
 .stat-box .stat-value.positive {
@@ -1136,12 +1185,12 @@
 .sector-color {
   width: 10px;
   height: 10px;
-  border-radius: 2px;
+  border-radius: 0;
   flex-shrink: 0;
 }
 
 .sector-name {
-  color: rgba(220, 215, 186, 0.8);
+  color: var(--ink);
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1149,8 +1198,8 @@
 }
 
 .sector-percent {
-  color: rgba(220, 215, 186, 0.5);
-  font-weight: 500;
+  color: var(--dim);
+  font-weight: normal;
 }
 
 /* Responsive */
@@ -1187,12 +1236,12 @@
 
   .trading-header {
     padding: 1rem;
-    border-radius: 12px;
+    border-radius: 0;
     margin-bottom: 1rem;
   }
 
   .header-content h1 {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
   }
 
   .header-content p {
@@ -1214,11 +1263,11 @@
 
   .trading-card {
     padding: 1rem;
-    border-radius: 12px;
+    border-radius: 0;
   }
 
   .trading-card h2 {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     margin-bottom: 0.75rem;
     padding-bottom: 0.5rem;
   }
@@ -1280,7 +1329,7 @@
   }
 
   .holding-item {
-    padding: 0.5rem;
+    padding: 0.5rem 0.25rem;
   }
 
   .trade-log {
@@ -1288,7 +1337,7 @@
   }
 
   .trade-item {
-    padding: 0.75rem;
+    padding: 0.75rem 0.25rem;
   }
 
   .portfolio-value .value {
@@ -1327,7 +1376,7 @@
   }
 
   .signal-item {
-    padding: 0.75rem;
+    padding: 0.75rem 0.25rem;
   }
 
   .combined-signal {
@@ -1341,8 +1390,9 @@
 
 /* D3 Equity Chart Styles */
 .d3-equity-chart {
-  background: rgba(220, 215, 186, 0.02);
-  border-radius: 12px;
+  background: transparent;
+  border: 1px solid var(--ghost);
+  border-radius: 0;
   padding: 1.25rem;
 }
 
@@ -1370,8 +1420,10 @@
 
 .d3-chart-title > span:first-child {
   font-size: 0.875rem;
-  font-weight: 600;
-  color: rgba(220, 215, 186, 0.9);
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.2ch;
+  color: var(--bone);
 }
 
 .d3-chart-legend {
@@ -1381,19 +1433,19 @@
 }
 
 .d3-chart-legend .legend-item {
-  color: var(--kana-fg-muted);
+  color: var(--dim);
 }
 
 .d3-chart-legend .legend-item.positive {
-  color: #76946A;
+  color: var(--color-positive);
 }
 
 .d3-chart-legend .legend-item.negative {
-  color: #C34043;
+  color: var(--color-negative);
 }
 
 .d3-chart-legend .legend-item.benchmark {
-  color: #C0A36E;
+  color: var(--dim);
 }
 
 .d3-chart-controls {
@@ -1411,13 +1463,13 @@
 
 .d3-current-value {
   font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--kana-fg);
+  font-weight: bold;
+  color: var(--bone);
 }
 
 .d3-change {
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: bold;
 }
 
 .d3-change.positive {
@@ -1430,31 +1482,31 @@
 
 .d3-benchmark-change {
   font-size: 0.75rem;
-  color: #C0A36E;
+  color: var(--dim);
 }
 
 .benchmark-toggle {
   padding: 0.375rem 0.75rem;
-  background: rgba(220, 215, 186, 0.05);
-  border: 1px solid rgba(220, 215, 186, 0.1);
-  border-radius: 6px;
-  color: rgba(220, 215, 186, 0.6);
+  background: transparent;
+  border: 1px solid var(--faint);
+  border-radius: 0;
+  color: var(--dim);
   font-family: inherit;
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: normal;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .benchmark-toggle:hover {
-  background: rgba(220, 215, 186, 0.08);
-  color: rgba(220, 215, 186, 0.8);
+  background: var(--bone);
+  color: var(--void);
 }
 
 .benchmark-toggle.active {
-  background: rgba(192, 163, 110, 0.15);
-  border-color: rgba(192, 163, 110, 0.3);
-  color: #C0A36E;
+  background: transparent;
+  border-color: var(--bone);
+  color: var(--bone);
 }
 
 .d3-main-chart {
@@ -1472,35 +1524,34 @@
 /* D3 Tooltip */
 .d3-chart-tooltip {
   position: absolute;
-  background: rgba(31, 31, 40, 0.95);
-  border: 1px solid rgba(220, 215, 186, 0.2);
-  border-radius: 8px;
+  background: var(--void);
+  border: 1px solid var(--faint);
+  border-radius: 0;
   padding: 0.75rem 1rem;
   pointer-events: none;
   z-index: 100;
   min-width: 140px;
-  box-shadow: 0 4px 12px rgba(22, 22, 29, 0.4);
-  backdrop-filter: blur(8px);
+  box-shadow: none;
   font-family: 'JetBrains Mono', monospace;
   transition: opacity 0.15s ease;
 }
 
 .d3-tooltip-value {
   font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--kana-fg);
+  font-weight: bold;
+  color: var(--bone);
   margin-bottom: 0.25rem;
 }
 
 .d3-tooltip-date {
   font-size: 0.75rem;
-  color: rgba(220, 215, 186, 0.5);
+  color: var(--dim);
   margin-bottom: 0.25rem;
 }
 
 .d3-tooltip-change {
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: bold;
 }
 
 .d3-tooltip-change.positive {
@@ -1513,13 +1564,13 @@
 
 .d3-tooltip-daily {
   font-size: 0.75rem;
-  color: rgba(220, 215, 186, 0.6);
+  color: var(--ink);
   margin-top: 0.25rem;
 }
 
 .d3-tooltip-drawdown {
   font-size: 0.75rem;
-  color: #C34043;
+  color: var(--color-negative);
   margin-top: 0.25rem;
 }
 
@@ -1527,13 +1578,15 @@
 .d3-returns-section {
   margin-top: 1.5rem;
   padding-top: 1rem;
-  border-top: 1px solid rgba(220, 215, 186, 0.08);
+  border-top: 1px dashed var(--ghost);
 }
 
 .d3-returns-title {
   font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(220, 215, 186, 0.7);
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.2ch;
+  color: var(--dim);
   margin-bottom: 0.5rem;
 }
 
@@ -1551,7 +1604,7 @@
 .d3-brush-section {
   margin-top: 1rem;
   padding-top: 0.75rem;
-  border-top: 1px solid rgba(220, 215, 186, 0.08);
+  border-top: 1px dashed var(--ghost);
 }
 
 .d3-brush-title {
@@ -1559,27 +1612,29 @@
   align-items: center;
   justify-content: space-between;
   font-size: 0.75rem;
-  font-weight: 600;
-  color: rgba(220, 215, 186, 0.7);
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.2ch;
+  color: var(--dim);
   margin-bottom: 0.5rem;
 }
 
 .d3-reset-brush {
   padding: 0.25rem 0.5rem;
-  background: rgba(220, 215, 186, 0.05);
-  border: 1px solid rgba(220, 215, 186, 0.1);
-  border-radius: 4px;
-  color: rgba(220, 215, 186, 0.6);
+  background: transparent;
+  border: 1px solid var(--faint);
+  border-radius: 0;
+  color: var(--dim);
   font-family: inherit;
   font-size: 0.65rem;
-  font-weight: 500;
+  font-weight: normal;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .d3-reset-brush:hover {
-  background: rgba(220, 215, 186, 0.1);
-  color: var(--kana-fg);
+  background: var(--bone);
+  color: var(--void);
 }
 
 .d3-brush-chart {
@@ -1594,12 +1649,13 @@
 
 /* D3 Brush Styling */
 .d3-brush .selection {
-  fill: rgba(126, 156, 216, 0.3);
-  stroke: rgba(126, 156, 216, 0.6);
+  fill: var(--faint);
+  fill-opacity: 0.4;
+  stroke: var(--dim);
 }
 
 .d3-brush .handle {
-  fill: rgba(220, 215, 186, 0.8);
+  fill: var(--bone);
 }
 
 .d3-brush .overlay {

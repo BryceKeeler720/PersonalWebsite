@@ -41,21 +41,21 @@ const INITIAL_PORTFOLIO: Portfolio = {
 };
 
 const SECTOR_COLORS: Record<string, string> = {
-  Technology: '#7E9CD8',
-  Healthcare: '#98BB6C',
-  Financial: '#C0A36E',
-  'Consumer Cyclical': '#D27E99',
-  'Communication Services': '#957FB8',
-  Industrial: '#7FB4CA',
-  'Consumer Defensive': '#6A9589',
-  Energy: '#FFA066',
-  Utilities: '#7AA89F',
-  'Real Estate': '#76946A',
-  Materials: '#938AA9',
-  Crypto: '#E6C384',
-  Forex: '#DCA561',
-  Futures: '#C34043',
-  Stock: '#727169',
+  Technology: '#f2f2f2',
+  Healthcare: '#dcdcdc',
+  Financial: '#c6c6c6',
+  'Consumer Cyclical': '#b0b0b0',
+  'Communication Services': '#9a9a9a',
+  Industrial: '#8a8a8a',
+  'Consumer Defensive': '#7a7a7a',
+  Energy: '#6e6e6e',
+  Utilities: '#626262',
+  'Real Estate': '#565656',
+  Materials: '#4a4a4a',
+  Crypto: '#e8e8e8',
+  Forex: '#a2a2a2',
+  Futures: '#767676',
+  Stock: '#5e5e5e',
 };
 
 const getMarketStatus = () => {
@@ -72,11 +72,11 @@ const getMarketStatus = () => {
   const marketClose = 16 * 60;
   const afterHoursEnd = 20 * 60;
 
-  if (isWeekend) return { status: 'closed', label: 'Weekend', color: '#727169' };
-  if (time >= marketOpen && time < marketClose) return { status: 'open', label: 'Market Open', color: '#76946A' };
-  if (time >= preMarketStart && time < marketOpen) return { status: 'pre', label: 'Pre-Market', color: '#C0A36E' };
-  if (time >= marketClose && time < afterHoursEnd) return { status: 'after', label: 'After Hours', color: '#957FB8' };
-  return { status: 'closed', label: 'Market Closed', color: '#727169' };
+  if (isWeekend) return { status: 'closed', label: 'Weekend', color: 'var(--dim)' };
+  if (time >= marketOpen && time < marketClose) return { status: 'open', label: 'Market Open', color: 'var(--color-positive)' };
+  if (time >= preMarketStart && time < marketOpen) return { status: 'pre', label: 'Pre-Market', color: 'var(--ink)' };
+  if (time >= marketClose && time < afterHoursEnd) return { status: 'after', label: 'After Hours', color: 'var(--ink)' };
+  return { status: 'closed', label: 'Market Closed', color: 'var(--dim)' };
 };
 
 const formatShares = (shares: number) => {
@@ -195,7 +195,7 @@ export default function TradingBot() {
       sectors[sector] = (sectors[sector] || 0) + holding.marketValue;
     }
     return Object.entries(sectors)
-      .map(([sector, value]) => ({ sector, value, color: SECTOR_COLORS[sector] || '#727169' }))
+      .map(([sector, value]) => ({ sector, value, color: SECTOR_COLORS[sector] || '#5e5e5e' }))
       .sort((a, b) => b.value - a.value);
   }, [data.portfolio.holdings]);
 
@@ -372,11 +372,11 @@ export default function TradingBot() {
         display: 'inline-flex',
         alignItems: 'center',
         gap: '0.5rem',
-        color: 'rgba(220, 215, 186, 0.6)',
+        color: 'var(--dim)',
         textDecoration: 'none',
         fontSize: '0.875rem',
         marginBottom: '1rem',
-        transition: 'color 0.2s ease',
+        transition: 'background 0.15s ease, color 0.15s ease',
       }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -394,8 +394,8 @@ export default function TradingBot() {
               <span className="status-dot running" />
               <span className="status-text">Bot Running</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.25rem 0.75rem', background: 'rgba(220,215,186,0.05)', borderRadius: '4px' }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: marketStatus.color }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.25rem 0.75rem', border: '1px solid var(--ghost)' }}>
+              <span style={{ width: 8, height: 8, background: marketStatus.color }} />
               <span style={{ fontSize: '0.75rem', color: marketStatus.color }}>{marketStatus.label}</span>
             </div>
           </div>
@@ -470,9 +470,9 @@ export default function TradingBot() {
                       <div className="stat-box">
                         <div className="stat-label">Wins / Losses</div>
                         <div className="stat-value">
-                          <span style={{ color: '#76946A' }}>{tradeStats.wins}</span>
+                          <span style={{ color: 'var(--color-positive)' }}>{tradeStats.wins}</span>
                           {' / '}
-                          <span style={{ color: '#C34043' }}>{tradeStats.losses}</span>
+                          <span style={{ color: 'var(--color-negative)' }}>{tradeStats.losses}</span>
                         </div>
                       </div>
                       <div className="stat-box">
@@ -518,21 +518,21 @@ export default function TradingBot() {
                     <h2>Strategy Performance</h2>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1 }}>
                       {strategyPerformance.map(strategy => (
-                        <div key={strategy.name} style={{ padding: '0.75rem', background: 'rgba(220,215,186,0.02)', borderRadius: '8px' }}>
+                        <div key={strategy.name} style={{ padding: '0.75rem', border: '1px solid var(--ghost)' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#fff' }}>{strategy.name}</span>
-                            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: strategy.winRate >= 50 ? '#76946A' : '#C34043' }}>
+                            <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--bone)' }}>{strategy.name}</span>
+                            <span style={{ fontSize: '0.875rem', fontWeight: 700, color: strategy.winRate >= 50 ? 'var(--color-positive)' : 'var(--color-negative)' }}>
                               {strategy.winRate.toFixed(0)}%
                             </span>
                           </div>
-                          <div style={{ height: 4, background: 'rgba(220,215,186,0.1)', borderRadius: 2, overflow: 'hidden' }}>
-                            <div style={{ height: '100%', width: `${strategy.winRate}%`, background: strategy.winRate >= 50 ? '#76946A' : '#C34043', borderRadius: 2 }} />
+                          <div style={{ height: 4, background: 'var(--ghost)', overflow: 'hidden' }}>
+                            <div style={{ height: '100%', width: `${strategy.winRate}%`, background: strategy.winRate >= 50 ? 'var(--color-positive)' : 'var(--color-negative)' }} />
                           </div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.25rem' }}>
-                            <span style={{ fontSize: '0.7rem', color: 'rgba(220,215,186,0.5)' }}>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--dim)' }}>
                               {strategy.wins}W / {strategy.losses}L
                             </span>
-                            <span style={{ fontSize: '0.7rem', color: 'rgba(220,215,186,0.4)' }}>
+                            <span style={{ fontSize: '0.7rem', color: 'var(--dim)' }}>
                               {strategy.total} trades
                             </span>
                           </div>
@@ -596,14 +596,14 @@ export default function TradingBot() {
                           return <path key={i} d={path} fill={sector.color} opacity="0.85" />;
                         });
                       })()}
-                      <circle cx="80" cy="80" r="35" fill="#000" />
+                      <circle cx="80" cy="80" r="35" style={{ fill: 'var(--void)' }} />
                     </svg>
                     <div style={{ flex: 1, minWidth: '200px' }}>
                       {(sectorsExpanded ? sectorAllocation : sectorAllocation.slice(0, 6)).map(sector => (
                         <div key={sector.sector} style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
-                          <div style={{ width: 12, height: 12, borderRadius: 2, background: sector.color, marginRight: '0.5rem' }} />
-                          <span style={{ flex: 1, fontSize: '0.8rem', color: 'rgba(220,215,186,0.8)' }}>{sector.sector}</span>
-                          <span style={{ fontSize: '0.8rem', color: 'rgba(220,215,186,0.6)' }}>
+                          <div style={{ width: 12, height: 12, background: sector.color, marginRight: '0.5rem' }} />
+                          <span style={{ flex: 1, fontSize: '0.8rem', color: 'var(--ink)' }}>{sector.sector}</span>
+                          <span style={{ fontSize: '0.8rem', color: 'var(--dim)' }}>
                             {((sector.value / totalHoldingsValue) * 100).toFixed(1)}%
                           </span>
                         </div>
@@ -611,7 +611,7 @@ export default function TradingBot() {
                       {sectorAllocation.length > 6 && (
                         <div
                           onClick={() => setSectorsExpanded(!sectorsExpanded)}
-                          style={{ fontSize: '0.75rem', color: 'rgba(220,215,186,0.4)', marginTop: '0.5rem', cursor: 'pointer' }}
+                          style={{ fontSize: '0.75rem', color: 'var(--dim)', marginTop: '0.5rem', cursor: 'pointer' }}
                         >
                           {sectorsExpanded ? 'Show less' : `+${sectorAllocation.length - 6} more sectors`}
                         </div>
@@ -633,35 +633,35 @@ export default function TradingBot() {
                 ) : (
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
-                      <h3 style={{ fontSize: '0.875rem', color: '#76946A', marginBottom: '0.75rem' }}>Buy Signals</h3>
+                      <h3 style={{ fontSize: '0.875rem', fontWeight: 'normal', textTransform: 'uppercase', letterSpacing: '0.2ch', color: 'var(--color-positive)', marginBottom: '0.75rem' }}>Buy Signals</h3>
                       {getTopBuyCandidates(5).map(signal => (
                         <div
                           key={signal.symbol}
-                          style={{ padding: '0.5rem', background: 'rgba(118, 148, 106, 0.1)', borderRadius: '4px', marginBottom: '0.5rem', cursor: 'pointer' }}
+                          style={{ padding: '0.5rem', border: '1px solid var(--ghost)', borderLeft: '2px solid var(--color-positive)', marginBottom: '0.5rem', cursor: 'pointer' }}
                           onClick={() => { setSelectedStock(signal.symbol); setActiveTab('signals'); }}
                         >
                           <div style={{ fontWeight: 600 }}>{signal.symbol}</div>
-                          <div style={{ fontSize: '0.75rem', color: '#76946A' }}>Score: +{signal.combined.toFixed(3)}</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--color-positive)' }}>Score: +{signal.combined.toFixed(3)}</div>
                         </div>
                       ))}
                       {getTopBuyCandidates(5).length === 0 && (
-                        <div style={{ color: 'rgba(220, 215, 186, 0.5)', fontSize: '0.875rem' }}>No buy signals</div>
+                        <div style={{ color: 'var(--dim)', fontSize: '0.875rem' }}>No buy signals</div>
                       )}
                     </div>
                     <div>
-                      <h3 style={{ fontSize: '0.875rem', color: '#C34043', marginBottom: '0.75rem' }}>Sell Signals</h3>
+                      <h3 style={{ fontSize: '0.875rem', fontWeight: 'normal', textTransform: 'uppercase', letterSpacing: '0.2ch', color: 'var(--color-negative)', marginBottom: '0.75rem' }}>Sell Signals</h3>
                       {getTopSellCandidates(5).map(signal => (
                         <div
                           key={signal.symbol}
-                          style={{ padding: '0.5rem', background: 'rgba(195, 64, 67, 0.1)', borderRadius: '4px', marginBottom: '0.5rem', cursor: 'pointer' }}
+                          style={{ padding: '0.5rem', border: '1px solid var(--ghost)', borderLeft: '2px solid var(--color-negative)', marginBottom: '0.5rem', cursor: 'pointer' }}
                           onClick={() => { setSelectedStock(signal.symbol); setActiveTab('signals'); }}
                         >
                           <div style={{ fontWeight: 600 }}>{signal.symbol}</div>
-                          <div style={{ fontSize: '0.75rem', color: '#C34043' }}>Score: {signal.combined.toFixed(3)}</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--color-negative)' }}>Score: {signal.combined.toFixed(3)}</div>
                         </div>
                       ))}
                       {getTopSellCandidates(5).length === 0 && (
-                        <div style={{ color: 'rgba(220, 215, 186, 0.5)', fontSize: '0.875rem' }}>No sell signals</div>
+                        <div style={{ color: 'var(--dim)', fontSize: '0.875rem' }}>No sell signals</div>
                       )}
                     </div>
                   </div>
@@ -675,17 +675,17 @@ export default function TradingBot() {
                 ) : (
                   <div>
                     {data.trades.slice(0, 3).map(trade => (
-                      <div key={trade.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem', background: 'rgba(220, 215, 186, 0.02)', borderRadius: '8px', marginBottom: '0.5rem' }}>
+                      <div key={trade.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.75rem 0.25rem', borderBottom: '1px dashed var(--ghost)' }}>
                         <div>
-                          <span style={{ color: trade.action === 'BUY' ? '#76946A' : '#C34043', fontWeight: 600 }}>{trade.action}</span>{' '}
-                          <span style={{ color: '#fff' }}>{trade.symbol}</span>
+                          <span style={{ color: trade.action === 'BUY' ? 'var(--color-positive)' : 'var(--color-negative)', fontWeight: 'bold' }}>{trade.action}</span>{' '}
+                          <span style={{ color: 'var(--bone)' }}>{trade.symbol}</span>
                         </div>
-                        <div style={{ color: 'rgba(220, 215, 186, 0.6)' }}>{formatShares(trade.shares)} @ ${trade.price.toFixed(2)}</div>
+                        <div style={{ color: 'var(--dim)' }}>{formatShares(trade.shares)} @ ${trade.price.toFixed(2)}</div>
                       </div>
                     ))}
                     {data.trades.length > 3 && (
                       <button
-                        style={{ width: '100%', padding: '0.5rem', background: 'transparent', border: '1px dashed rgba(220, 215, 186, 0.2)', borderRadius: '8px', color: 'rgba(220, 215, 186, 0.5)', cursor: 'pointer' }}
+                        style={{ width: '100%', marginTop: '0.75rem', padding: '0.5rem', background: 'transparent', border: '1px dashed var(--faint)', color: 'var(--dim)', cursor: 'pointer', fontFamily: 'inherit' }}
                         onClick={() => setActiveTab('log')}
                       >
                         View all {data.trades.length} trades

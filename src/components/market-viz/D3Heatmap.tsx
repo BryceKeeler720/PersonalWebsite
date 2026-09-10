@@ -27,20 +27,27 @@ function signalToColor(combined: number): string {
   const t = (Math.max(-1, Math.min(1, combined)) + 1) / 2;
   let r: number, g: number, b: number;
   if (t < 0.5) {
-    // Red (#D92626) -> neutral gray (#737380)
+    // Muted red (#C34043) -> neutral gray (#4a4a4a)
     const s = t * 2;
-    r = 0.85 + (0.45 - 0.85) * s;
-    g = 0.15 + (0.45 - 0.15) * s;
-    b = 0.15 + (0.50 - 0.15) * s;
+    r = 0.765 + (0.29 - 0.765) * s;
+    g = 0.251 + (0.29 - 0.251) * s;
+    b = 0.263 + (0.29 - 0.263) * s;
   } else {
-    // Neutral gray (#737380) -> green (#1AB859)
+    // Neutral gray (#4a4a4a) -> muted green (#76946A)
     const s = (t - 0.5) * 2;
-    r = 0.45 + (0.10 - 0.45) * s;
-    g = 0.45 + (0.72 - 0.45) * s;
-    b = 0.50 + (0.35 - 0.50) * s;
+    r = 0.29 + (0.463 - 0.29) * s;
+    g = 0.29 + (0.58 - 0.29) * s;
+    b = 0.29 + (0.416 - 0.29) * s;
   }
   return `rgb(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)})`;
 }
+
+// Read a CSS custom property so D3-drawn colors follow the site theme
+const cssVar = (name: string, fallback: string): string => {
+  if (typeof window === 'undefined') return fallback;
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v || fallback;
+};
 
 function formatVolume(v: number): string {
   if (v >= 1e9) return (v / 1e9).toFixed(1) + 'B';
@@ -142,7 +149,7 @@ export default function D3Heatmap({
       .attr('width', d => d.x1 - d.x0)
       .attr('height', d => d.y1 - d.y0)
       .attr('fill', 'none')
-      .attr('stroke', 'rgba(220, 215, 186, 0.08)')
+      .attr('stroke', cssVar('--ghost', '#2a2a2a'))
       .attr('stroke-width', 1);
 
     groups.append('text')
@@ -171,7 +178,7 @@ export default function D3Heatmap({
       .attr('width', d => d.x1 - d.x0)
       .attr('height', d => d.y1 - d.y0)
       .attr('fill', 'none')
-      .attr('stroke', 'rgba(220, 215, 186, 0.06)')
+      .attr('stroke', cssVar('--ghost', '#2a2a2a'))
       .attr('stroke-width', 0.5);
 
     sectorGroups.each(function(d) {
@@ -200,11 +207,11 @@ export default function D3Heatmap({
       .attr('height', d => Math.max(0, d.y1 - d.y0))
       .attr('fill', d => {
         const signal = d.data.signal;
-        return signal ? signalToColor(signal.combined) : '#363646';
+        return signal ? signalToColor(signal.combined) : cssVar('--ghost', '#2a2a2a');
       })
       .attr('stroke-width', d => d.data.symbol === highlightSymbol ? 2 : 1)
-      .attr('stroke', d => d.data.symbol === highlightSymbol ? '#7E9CD8' : '#1F1F28')
-      .attr('rx', 2)
+      .attr('stroke', d => d.data.symbol === highlightSymbol ? cssVar('--bone', '#f2f2f2') : cssVar('--void', '#000000'))
+      .attr('rx', 0)
       .on('mousemove', (event, d) => {
         if (d.data.symbol) {
           onHover(d.data.symbol, event.clientX, event.clientY);
@@ -242,7 +249,7 @@ export default function D3Heatmap({
           .attr('x', (d.x0 + d.x1) / 2)
           .attr('y', (d.y0 + d.y1) / 2 + 10)
           .attr('font-size', '9px')
-          .attr('fill', change >= 0 ? '#76946A' : '#C34043')
+          .attr('fill', change >= 0 ? cssVar('--kana-green', '#76946A') : cssVar('--kana-red', '#C34043'))
           .text((change >= 0 ? '+' : '') + change.toFixed(2) + '%');
       }
 
@@ -253,7 +260,7 @@ export default function D3Heatmap({
           .attr('x', (d.x0 + d.x1) / 2)
           .attr('y', (d.y0 + d.y1) / 2 + 22)
           .attr('font-size', '8px')
-          .attr('fill', 'rgba(220, 215, 186, 0.5)')
+          .attr('fill', cssVar('--dim', '#6e6e6e'))
           .text('Vol ' + formatVolume(d.data.metric.volume));
       }
     });

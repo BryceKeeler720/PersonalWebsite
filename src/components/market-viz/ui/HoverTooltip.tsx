@@ -25,7 +25,7 @@ export default function HoverTooltip({ symbol, signal, metric, x, y }: HoverTool
           </div>
           <div
             className="tooltip-change"
-            style={{ color: metric.changePercent >= 0 ? '#22c55e' : '#ef4444' }}
+            style={{ color: metric.changePercent >= 0 ? 'var(--color-positive)' : 'var(--color-negative)' }}
           >
             {metric.changePercent >= 0 ? '+' : ''}
             {metric.changePercent.toFixed(2)}%

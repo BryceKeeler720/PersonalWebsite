@@ -33,6 +33,13 @@ interface DrawdownPeriod {
 
 type TimeRange = '1D' | '1W' | '1M' | 'YTD' | 'All';
 
+// Read a CSS custom property so D3-drawn colors follow the site theme
+const cssVar = (name: string, fallback: string): string => {
+  if (typeof window === 'undefined') return fallback;
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v || fallback;
+};
+
 export default function D3EquityChart({ history, initialCapital, spyBenchmark = [] }: D3EquityChartProps) {
   const mainChartRef = useRef<HTMLDivElement>(null);
   const returnsChartRef = useRef<HTMLDivElement>(null);
@@ -248,7 +255,8 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
         .attr('y', 0)
         .attr('width', Math.max(0, x2 - x1))
         .attr('height', height)
-        .attr('fill', 'rgba(195, 64, 67, 0.15)')
+        .attr('fill', cssVar('--kana-red', '#C34043'))
+        .attr('fill-opacity', 0.12)
         .attr('opacity', 0)
         .transition()
         .duration(800)
@@ -266,7 +274,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .attr('x2', width)
       .attr('y1', d => yScale(d))
       .attr('y2', d => yScale(d))
-      .attr('stroke', 'rgba(220, 215, 186, 0.08)')
+      .attr('stroke', cssVar('--ghost', '#2a2a2a'))
       .attr('stroke-dasharray', '2,2');
 
     // Initial capital reference line
@@ -277,31 +285,13 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
         .attr('x2', width)
         .attr('y1', yScale(initialCapital))
         .attr('y2', yScale(initialCapital))
-        .attr('stroke', 'rgba(220, 215, 186, 0.3)')
+        .attr('stroke', cssVar('--faint', '#3a3a3a'))
         .attr('stroke-dasharray', '4,4')
         .attr('stroke-width', 1);
     }
 
-    // Area gradient
+    // Flat, low-opacity area fill (sign-semantic color, no gradients)
     const isPositive = filteredData[filteredData.length - 1]?.value >= initialCapital;
-    const gradientId = 'area-gradient';
-    const gradient = svg.select('defs')
-      .append('linearGradient')
-      .attr('id', gradientId)
-      .attr('x1', '0%')
-      .attr('y1', '0%')
-      .attr('x2', '0%')
-      .attr('y2', '100%');
-
-    gradient.append('stop')
-      .attr('offset', '0%')
-      .attr('stop-color', isPositive ? '#76946A' : '#C34043')
-      .attr('stop-opacity', 0.3);
-
-    gradient.append('stop')
-      .attr('offset', '100%')
-      .attr('stop-color', isPositive ? '#76946A' : '#C34043')
-      .attr('stop-opacity', 0);
 
     // Generators
     const area = d3.area<ProcessedDataPoint>()
@@ -321,7 +311,8 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
     const areaPath = chartGroup.append('path')
       .datum(filteredData)
       .attr('class', 'd3-equity-area')
-      .attr('fill', `url(#${gradientId})`)
+      .attr('fill', isPositive ? cssVar('--kana-green', '#76946A') : cssVar('--kana-red', '#C34043'))
+      .attr('fill-opacity', 0.08)
       .attr('d', area);
 
     // Draw portfolio line with animation
@@ -329,7 +320,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .datum(filteredData)
       .attr('class', 'd3-equity-line')
       .attr('fill', 'none')
-      .attr('stroke', isPositive ? '#76946A' : '#C34043')
+      .attr('stroke', isPositive ? cssVar('--kana-green', '#76946A') : cssVar('--kana-red', '#C34043'))
       .attr('stroke-width', 2)
       .attr('stroke-linejoin', 'round')
       .attr('stroke-linecap', 'round')
@@ -358,7 +349,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
         .datum(filteredBenchmark)
         .attr('class', 'd3-benchmark-line')
         .attr('fill', 'none')
-        .attr('stroke', '#C0A36E')
+        .attr('stroke', cssVar('--dim', '#6e6e6e'))
         .attr('stroke-width', 2)
         .attr('stroke-dasharray', '5,3')
         .attr('opacity', 0.8)
@@ -384,18 +375,18 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .call(d3.axisBottom(xScale).ticks(6).tickFormat(d => d3.timeFormat('%b %d')(d as Date)));
 
     xAxisGroup.selectAll('text')
-      .attr('fill', 'rgba(220, 215, 186, 0.5)')
+      .attr('fill', cssVar('--dim', '#6e6e6e'))
       .attr('font-size', '10px');
 
     g.append('g')
       .attr('class', 'd3-y-axis')
       .call(d3.axisLeft(yScale).ticks(5).tickFormat(d => `$${d3.format(',.0f')(d as number)}`))
       .selectAll('text')
-      .attr('fill', 'rgba(220, 215, 186, 0.5)')
+      .attr('fill', cssVar('--dim', '#6e6e6e'))
       .attr('font-size', '10px');
 
     g.selectAll('.d3-x-axis path, .d3-x-axis line, .d3-y-axis path, .d3-y-axis line')
-      .attr('stroke', 'rgba(220, 215, 186, 0.1)');
+      .attr('stroke', cssVar('--ghost', '#2a2a2a'));
 
     // Tooltip elements
     const tooltip = d3.select(mainChartRef.current)
@@ -405,15 +396,15 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
 
     const verticalLine = g.append('line')
       .attr('class', 'd3-vertical-line')
-      .attr('stroke', 'rgba(220, 215, 186, 0.4)')
+      .attr('stroke', cssVar('--dim', '#6e6e6e'))
       .attr('stroke-width', 1)
       .style('opacity', 0);
 
     const hoverCircle = g.append('circle')
       .attr('class', 'd3-hover-circle')
       .attr('r', 5)
-      .attr('fill', isPositive ? '#76946A' : '#C34043')
-      .attr('stroke', '#DCD7BA')
+      .attr('fill', isPositive ? cssVar('--kana-green', '#76946A') : cssVar('--kana-red', '#C34043'))
+      .attr('stroke', cssVar('--bone', '#f2f2f2'))
       .attr('stroke-width', 2)
       .style('opacity', 0);
 
@@ -457,7 +448,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       hoverCircle
         .attr('cx', xPos)
         .attr('cy', yPos)
-        .attr('fill', d.value >= initialCapital ? '#76946A' : '#C34043')
+        .attr('fill', d.value >= initialCapital ? cssVar('--kana-green', '#76946A') : cssVar('--kana-red', '#C34043'))
         .style('opacity', 1);
 
       const changeFromStart = d.value - initialCapital;
@@ -543,10 +534,10 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
         // Update x-axis
         xAxisGroup.call(d3.axisBottom(newXScale).ticks(6).tickFormat(d => d3.timeFormat('%b %d')(d as Date)) as any);
         xAxisGroup.selectAll('text')
-          .attr('fill', 'rgba(220, 215, 186, 0.5)')
+          .attr('fill', cssVar('--dim', '#6e6e6e'))
           .attr('font-size', '10px');
         xAxisGroup.selectAll('path, line')
-          .attr('stroke', 'rgba(220, 215, 186, 0.1)');
+          .attr('stroke', cssVar('--ghost', '#2a2a2a'));
       });
 
     overlay.call(zoom);
@@ -593,7 +584,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .attr('x2', width)
       .attr('y1', yScale(0))
       .attr('y2', yScale(0))
-      .attr('stroke', 'rgba(220, 215, 186, 0.3)')
+      .attr('stroke', cssVar('--faint', '#3a3a3a'))
       .attr('stroke-width', 1);
 
     g.selectAll('.return-bar')
@@ -605,7 +596,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .attr('width', Math.max(1, xScale.bandwidth()))
       .attr('y', yScale(0))
       .attr('height', 0)
-      .attr('fill', d => d.dailyReturn >= 0 ? '#76946A' : '#C34043')
+      .attr('fill', d => d.dailyReturn >= 0 ? cssVar('--kana-green', '#76946A') : cssVar('--kana-red', '#C34043'))
       .attr('opacity', 0.7)
       .transition()
       .duration(800)
@@ -621,16 +612,16 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
       .attr('transform', `translate(0,${height})`)
       .call(d3.axisBottom(xAxisTime).ticks(6).tickFormat(d => d3.timeFormat('%b %d')(d as Date)))
       .selectAll('text')
-      .attr('fill', 'rgba(220, 215, 186, 0.5)')
+      .attr('fill', cssVar('--dim', '#6e6e6e'))
       .attr('font-size', '9px');
 
     g.append('g')
       .call(d3.axisLeft(yScale).ticks(3).tickFormat(d => `${d}%`))
       .selectAll('text')
-      .attr('fill', 'rgba(220, 215, 186, 0.5)')
+      .attr('fill', cssVar('--dim', '#6e6e6e'))
       .attr('font-size', '9px');
 
-    g.selectAll('path, line').attr('stroke', 'rgba(220, 215, 186, 0.1)');
+    g.selectAll('path, line').attr('stroke', cssVar('--ghost', '#2a2a2a'));
 
   }, [filteredData, dimensions]);
 
@@ -670,7 +661,7 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
     g.append('path')
       .datum(timeFilteredData)
       .attr('fill', 'none')
-      .attr('stroke', 'rgba(220, 215, 186, 0.4)')
+      .attr('stroke', cssVar('--dim', '#6e6e6e'))
       .attr('stroke-width', 1)
       .attr('d', line);
 
@@ -692,20 +683,21 @@ export default function D3EquityChart({ history, initialCapital, spyBenchmark = 
     clearBrushRef.current = () => brush.move(brushGroup, null);
 
     brushGroup.selectAll('.selection')
-      .attr('fill', 'rgba(126, 156, 216, 0.3)')
-      .attr('stroke', 'rgba(126, 156, 216, 0.6)');
+      .attr('fill', cssVar('--faint', '#3a3a3a'))
+      .attr('fill-opacity', 0.4)
+      .attr('stroke', cssVar('--dim', '#6e6e6e'));
 
     brushGroup.selectAll('.handle')
-      .attr('fill', 'rgba(220, 215, 186, 0.8)');
+      .attr('fill', cssVar('--bone', '#f2f2f2'));
 
     g.append('g')
       .attr('transform', `translate(0,${height})`)
       .call(d3.axisBottom(xScale).ticks(4).tickFormat(d => d3.timeFormat('%b')(d as Date)))
       .selectAll('text')
-      .attr('fill', 'rgba(220, 215, 186, 0.4)')
+      .attr('fill', cssVar('--dim', '#6e6e6e'))
       .attr('font-size', '8px');
 
-    g.selectAll('path, line').attr('stroke', 'rgba(220, 215, 186, 0.1)');
+    g.selectAll('path, line').attr('stroke', cssVar('--ghost', '#2a2a2a'));
 
   }, [timeFilteredData, dimensions]);
 
