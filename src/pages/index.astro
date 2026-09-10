@@ -1,14 +1,5 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-
-type BlogPost = CollectionEntry<'blog'>;
-
-const posts: BlogPost[] = (await getCollection('blog', ({ data }: BlogPost) => !data.draft))
-  .sort((a: BlogPost, b: BlogPost) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf())
-  .slice(0, 5);
-
-const fmt = (d: Date) => d.toISOString().slice(0, 10);
 ---
 
 <BaseLayout title="Bryce Keeler" description="Machine learning engineer. Trading systems, ML infrastructure, and self-hosted hardware.">
@@ -20,6 +11,16 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
       <div class="brace jline d0">&#123;</div>
       <div class="node scalar jline d1">
         <a class="key" href="#about" data-sec="about">"home"</a><span class="p">: "/",</span>
+      </div>
+      <div class="node obj" data-node="resume">
+        <div class="row jline d1">
+          <a class="key" href="#resume" data-sec="resume">"resume"</a><span class="p">: </span><button class="tog" aria-expanded="false">[ &hellip; ]</button><span class="p bkt" hidden>[</span><span class="p comma">,</span>
+        </div>
+        <ul class="children" hidden>
+          <li class="jline d2"><a href="/resume">"experience"</a><span class="p">,</span></li>
+          <li class="jline d2"><a href="/Bryce_Keeler_Resume.pdf">"pdf"</a></li>
+        </ul>
+        <div class="p close jline d1" hidden>],</div>
       </div>
       <div class="node obj" data-node="projects">
         <div class="row jline d1">
@@ -45,16 +46,6 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
         <ul class="children" hidden>
           <li class="jline d2"><a href="/blog">"blog"</a><span class="p">,</span></li>
           <li class="jline d2"><a href="/journal">"journal"</a></li>
-        </ul>
-        <div class="p close jline d1" hidden>],</div>
-      </div>
-      <div class="node obj" data-node="resume">
-        <div class="row jline d1">
-          <a class="key" href="#resume" data-sec="resume">"resume"</a><span class="p">: </span><button class="tog" aria-expanded="false">[ &hellip; ]</button><span class="p bkt" hidden>[</span><span class="p comma">,</span>
-        </div>
-        <ul class="children" hidden>
-          <li class="jline d2"><a href="/Bryce_Keeler_Resume.pdf">"pdf"</a><span class="p">,</span></li>
-          <li class="jline d2"><a href="/resume">"html"</a></li>
         </ul>
         <div class="p close jline d1" hidden>],</div>
       </div>
@@ -84,15 +75,30 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
     <section id="about">
       <h2>About</h2>
       <p>
-        Machine learning engineer. I build ML systems, trading automation,
-        and self-hosted infrastructure.
+        Machine learning engineer. Things I spend my time on:
       </p>
-      <h3>work</h3>
+      <ul class="entries">
+        <li><span class="k">statistics</span>probability &amp; inference —
+            working through the MITx micromasters.</li>
+        <li><span class="k">self-hosting</span>home labbing on proxmox,
+            15+ containers of my own infrastructure.</li>
+        <li><span class="k">markets</span>building &amp; backtesting
+            automated trading systems.</li>
+        <li><span class="k">hardware</span>ESP32 sensor networks,
+            computer vision rigs.</li>
+      </ul>
+    </section>
+
+    <section id="resume">
+      <h2>Resume</h2>
       <ul class="entries">
         <li><span class="date">2025 –&nbsp;&nbsp;&nbsp;</span><span class="k">huron consulting group</span>machine learning engineer</li>
-        <li><span class="date">2024&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="k">huron consulting group</span>digital consulting intern</li>
-        <li><span class="date">2023&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="k">pwc</span>start consulting intern</li>
-        <li><span class="date">2022&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="k">ey</span>expedition intern</li>
+        <li><span class="date">2026 –&nbsp;&nbsp;&nbsp;</span><span class="k">mitx</span>micromasters, statistics &amp; data science</li>
+        <li><span class="date">2021 – 24</span><span class="k">ut dallas</span>b.s. computer information systems</li>
+      </ul>
+      <ul class="vlinks">
+        <li><a href="/resume">→ full experience</a></li>
+        <li><a href="/Bryce_Keeler_Resume.pdf">→ pdf</a></li>
       </ul>
     </section>
 
@@ -122,30 +128,9 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
 
     <section id="writing">
       <h2>Writing</h2>
-      <ul class="entries">
-        {posts.map((post) => (
-          <li>
-            <span class="date">{fmt(post.data.publishDate)}</span>
-            <a href={`/blog/${post.slug}`}>{post.data.title}</a>
-          </li>
-        ))}
-      </ul>
       <ul class="vlinks">
-        <li><a href="/blog">→ all posts</a></li>
+        <li><a href="/blog">→ blog</a></li>
         <li><a href="/journal">→ journal</a></li>
-      </ul>
-    </section>
-
-    <section id="resume">
-      <h2>Resume</h2>
-      <h3>education</h3>
-      <ul class="entries">
-        <li><span class="date">2026 –&nbsp;&nbsp;&nbsp;</span><span class="k">mitx</span>micromasters, statistics &amp; data science</li>
-        <li><span class="date">2021 – 24</span><span class="k">ut dallas</span>b.s. computer information systems</li>
-      </ul>
-      <ul class="vlinks">
-        <li><a href="/Bryce_Keeler_Resume.pdf">→ pdf</a></li>
-        <li><a href="/resume">→ html version</a></li>
       </ul>
     </section>
 
@@ -282,14 +267,6 @@ const fmt = (d: Date) => d.toISOString().slice(0, 10);
     margin: 0 0 0.8rem;
   }
   h2::before { content: "// "; color: var(--dim); }
-  h3 {
-    font-size: 0.8rem;
-    font-weight: normal;
-    color: var(--dim);
-    letter-spacing: 0.3ch;
-    text-transform: uppercase;
-    margin: 1.6rem 0 0.5rem;
-  }
   .vlinks { list-style: none; margin: 1rem 0 0; padding: 0; }
   .vlinks li { padding: 0.2rem 0; }
   p { max-width: 78ch; margin: 0 0 0.8rem; }
