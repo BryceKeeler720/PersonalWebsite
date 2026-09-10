@@ -22,3 +22,5 @@ scripts/*
 scripts/blackjack/.venv/
 scripts/blackjack/calibration_data.json
 .github/workflows/output/
+__pycache__/
+*.pyc
