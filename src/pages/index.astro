@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title="Bryce Keeler" description="Machine learning engineer. Trading systems, ML infrastructure, and self-hosted hardware.">
-  <div id="cathedral" aria-hidden="true"><pre class="bg-far"></pre><pre class="bg-main"></pre></div>
+  <div id="cathedral" aria-hidden="true"><pre class="bg-far"></pre><pre class="bg-mid"></pre><pre class="bg-main"></pre></div>
 
   <aside id="index">
     <div class="label">INDEX</div>
@@ -163,23 +163,26 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     font-size: 11px;
     line-height: 1.0;
   }
-  /* depth by color: the distant layer recedes toward the page
-     ground; the main mass runs brighter at street level and fades
-     as it climbs away */
+  /* depth by color, three planes: the far layer sinks toward the
+     page ground, the mid layer holds just under ghost, and the
+     main mass runs brightest at street level, fading as it climbs */
   #cathedral .bg-far {
-    color: color-mix(in srgb, var(--ghost) 55%, var(--void));
+    color: color-mix(in srgb, var(--ghost) 85%, var(--void));
+  }
+  #cathedral .bg-mid {
+    color: color-mix(in srgb, var(--faint) 75%, var(--ghost));
   }
   #cathedral .bg-main {
-    color: var(--ghost);
+    color: var(--dim);
   }
   @supports ((-webkit-background-clip: text) or (background-clip: text)) {
     #cathedral .bg-main {
       background: linear-gradient(
         to top,
-        color-mix(in srgb, var(--faint) 55%, var(--dim)) 0%,
-        var(--faint) 40%,
-        var(--ghost) 82%,
-        color-mix(in srgb, var(--ghost) 80%, var(--void)) 100%
+        color-mix(in srgb, var(--ink) 25%, var(--dim)) 0%,
+        var(--dim) 45%,
+        color-mix(in srgb, var(--faint) 55%, var(--dim)) 82%,
+        var(--faint) 100%
       );
       -webkit-background-clip: text;
       background-clip: text;
@@ -319,7 +322,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     #index .node { padding-left: 0; }
     #index .brace, #index .p, #index .tog, #index .children, #index .close, #index :global(.ln) { display: none; }
     .page { margin-left: 0; }
-    #cathedral pre { opacity: 0.55; }
+    #cathedral pre { opacity: 0.7; }
   }
 </style>
 
@@ -347,8 +350,9 @@ function bkVnoise(x, y, s) {
    and a loose buttress rhythm in the walls. */
 function renderCathedral() {
   const el = document.querySelector('#cathedral .bg-main');
+  const midEl = document.querySelector('#cathedral .bg-mid');
   const farEl = document.querySelector('#cathedral .bg-far');
-  if (!el || !farEl) return;
+  if (!el || !midEl || !farEl) return;
   const seed = 7;
   // measure real cell size so spire positions stay true viewport fractions
   el.textContent = '@@@@@@@@@@';
@@ -368,9 +372,22 @@ function renderCathedral() {
     [0.675, 0.034, 0.60],
     [0.810, 0.034, 0.56],
   ];
-  // a second, distant complex filling the gaps between the main spires
+  // a second complex one block back, filling gaps between the main spires
+  const midSteeples = [
+    [0.455, 0.040, 0.55],
+    [0.500, 0.046, 0.72],
+    [0.560, 0.038, 0.60],
+    [0.645, 0.042, 0.78],
+    [0.720, 0.036, 0.85],
+    [0.838, 0.045, 0.80],
+    [0.925, 0.042, 0.74],
+    [0.990, 0.038, 0.60],
+  ];
+  // and a distant third, hazing out on the horizon
   const farSteeples = [
-    [0.575, 0.050, 0.58],
+    [0.415, 0.048, 0.42],
+    [0.480, 0.040, 0.55],
+    [0.575, 0.050, 0.62],
     [0.660, 0.040, 0.50],
     [0.715, 0.046, 0.66],
     [0.788, 0.044, 0.60],
@@ -379,9 +396,11 @@ function renderCathedral() {
   ];
 
   const grid = [];
+  const midGrid = [];
   const farGrid = [];
   for (let y = 0; y < rows; y++) {
     grid.push(new Array(cols).fill(' '));
+    midGrid.push(new Array(cols).fill(' '));
     farGrid.push(new Array(cols).fill(' '));
   }
 
@@ -410,10 +429,11 @@ function renderCathedral() {
   }
 
   const prof = buildProfile(steeples, 0.42, 0.12);
-  const farProf = buildProfile(farSteeples, 0.40, 0.10);
+  const midProf = buildProfile(midSteeples, 0.38, 0.11);
+  const farProf = buildProfile(farSteeples, 0.34, 0.10);
 
   // pass 1 — distant layer: hazy and sparse, no detail; it survives
-  // only where it rises above the main skyline
+  // only where it rises above everything nearer
   for (let x = 0; x < cols; x++) {
     if (farProf[x] < 0.03) continue;
     const topY = Math.floor(rows * (1 - farProf[x]));
@@ -425,7 +445,29 @@ function renderCathedral() {
     }
   }
 
-  // pass 2 — main complex, inked over the distance
+  // pass 2 — middle layer: firmer than the distance, still loose;
+  // it occludes the far layer beneath its own skyline
+  for (let x = 0; x < cols; x++) {
+    if (midProf[x] < 0.03) continue;
+    const topY = Math.floor(rows * (1 - midProf[x]));
+    const topL = Math.floor(rows * (1 - (midProf[x - 1] ?? 0)));
+    const topR = Math.floor(rows * (1 - (midProf[x + 1] ?? 0)));
+    for (let y = topY; y < rows; y++) {
+      farGrid[y][x] = ' ';
+      const fine = bkHash(x, y, seed + 21);
+      if (y < topL && y < topR) { midGrid[y][x] = fine > 0.5 ? '|' : '!'; continue; }
+      if (y < topL) { midGrid[y][x] = '/'; continue; }
+      if (y < topR) { midGrid[y][x] = '\\'; continue; }
+      if (y === topY) { midGrid[y][x] = fine > 0.5 ? '^' : 'n'; continue; }
+      if (fine > 0.86) continue; // lighter dropout than the far haze
+      const n = bkVnoise(x * 0.35, y * 0.45, seed + 22);
+      const depth = (y - topY) / Math.max(1, rows - topY);
+      const v = n * 0.7 + depth * 0.25;
+      midGrid[y][x] = v > 0.78 ? '!' : v > 0.62 ? '=' : v > 0.48 ? ';' : v > 0.36 ? ':' : v > 0.24 ? '-' : ',';
+    }
+  }
+
+  // pass 3 — main complex, inked over both back layers
   for (let x = 0; x < cols; x++) {
     if (prof[x] < 0.03) continue;
     const fx = x / cols;
@@ -443,7 +485,9 @@ function renderCathedral() {
     const topL = Math.floor(rows * (1 - (prof[x - 1] ?? 0)));
     const topR = Math.floor(rows * (1 - (prof[x + 1] ?? 0)));
     for (let y = topY; y < rows; y++) {
-      farGrid[y][x] = ' '; // the main mass occludes the distance, gashes included
+      // the main mass occludes both back layers, gashes included
+      farGrid[y][x] = ' ';
+      midGrid[y][x] = ' ';
       const depth = (y - topY) / Math.max(1, rows - topY);
       const n = bkVnoise(x * 0.4, y * 0.4, seed + 1);
       const g = bkVnoise(x * 0.09, y * 0.8, seed + 2);
@@ -486,6 +530,7 @@ function renderCathedral() {
     if (topY - 1 >= 0) grid[topY - 1][x] = '+';
   }
   el.textContent = grid.map((r) => r.join('')).join('\n');
+  midEl.textContent = midGrid.map((r) => r.join('')).join('\n');
   farEl.textContent = farGrid.map((r) => r.join('')).join('\n');
 }
 
