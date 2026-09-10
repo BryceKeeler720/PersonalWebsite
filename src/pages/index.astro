@@ -78,10 +78,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         Machine learning engineer. Things I enjoy:
       </p>
       <ul class="entries">
-        <li>statistics</li>
-        <li>home-labbing</li>
-        <li>hardware</li>
-        <li>playing cello</li>
+        <li><span class="k solo">statistics</span></li>
+        <li><span class="k solo">home-labbing</span></li>
+        <li><span class="k solo">hardware</span></li>
+        <li><span class="k solo">playing cello</span></li>
       </ul>
     </section>
 
@@ -316,6 +316,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     letter-spacing: 0.1ch;
   }
   .entries .k::after { content: " — "; color: var(--faint); font-weight: normal; }
+  .entries .k.solo::after { content: none; }
   .entries .date { color: var(--dim); white-space: nowrap; margin-right: 1.5ch; }
   .entries .go { white-space: nowrap; }
 
