@@ -1,0 +1,61 @@
+---
+import DocLayout from '../../layouts/DocLayout.astro';
+---
+
+<DocLayout title="NutriOne | Bryce Keeler" description="NutriOne — nutrition tracking with on-device YOLOv8 food recognition. Architecture, design notes, and specs.">
+  <header>
+    <h1>NutriOne</h1>
+    <div class="sub">nutrition tracking · computer vision</div>
+  </header>
+
+  <section>
+    <h2>Overview</h2>
+    <p>
+      Full-stack nutrition tracker where the camera is the input device:
+      point it at a plate, get recognized foods and logged macros. No
+      public deployment — this page is the architecture write-up.
+    </p>
+  </section>
+
+  <section>
+    <h2>Architecture</h2>
+    <pre class="diagram">
+ .––––––––––––.      .–––––––––––––––.      .––––––––––––––.
+ |  react     |      |  fastapi      |      |  postgresql  |
+ |  frontend  | –––→ |  backend      | –––→ |              |
+ |  + camera  |      |  auth · meals |      |  users       |
+ '–––––––––––-'      |  macro calc   |      |  meal logs   |
+       |             '–––––––––––––––'      |  food db     |
+       ↓                                    '––––––––––––––'
+ .––––––––––––.
+ |  yolov8    |   on-device inference —
+ |  (custom)  |   frames never leave the phone
+ '–––––––––––-'
+    </pre>
+  </section>
+
+  <section>
+    <h2>Design notes</h2>
+    <ul class="bullets">
+      <li>The recognition model runs on device, not the server — food photos are
+          personal data, and inference at the edge means the backend only ever
+          sees food labels and portions.</li>
+      <li>Trained a custom YOLOv8 on ~101k food images; ~90% accuracy on common
+          foods. The long tail is handled by falling back to manual search
+          rather than pretending the model knows.</li>
+      <li>Macro calculation lives server-side against a canonical food table so
+          logged history stays consistent when nutrition data gets corrected.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Specs</h2>
+    <ul class="entries">
+      <li><span class="k">model</span>YOLOv8, custom-trained, ~101k food images</li>
+      <li><span class="k">accuracy</span>~90% on common foods, on-device inference</li>
+      <li><span class="k">backend</span>FastAPI — auth, meal logging, macro calculation</li>
+      <li><span class="k">storage</span>PostgreSQL</li>
+      <li><span class="k">frontend</span>React with camera integration</li>
+    </ul>
+  </section>
+</DocLayout>

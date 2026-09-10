@@ -65,6 +65,100 @@ const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
   <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <button id="theme-toggle" aria-label="Toggle light/dark mode">☾</button>
+    <div id="cmdk" hidden>
+      <div class="cmdk-box">
+        <div class="cmdk-prompt"><span>:</span><input id="cmdk-input" type="text" placeholder="go somewhere… (esc to close)" autocomplete="off" spellcheck="false" /></div>
+        <ul id="cmdk-list"></ul>
+      </div>
+    </div>
+    <script is:inline>
+      (function () {
+        const routes = [
+          { name: 'home', to: '/' },
+          { name: 'now', to: '/#now' },
+          { name: 'resume', to: '/resume' },
+          { name: 'resume pdf', to: '/Bryce_Keeler_Resume.pdf', blank: true },
+          { name: '2signal', to: 'https://2signal.dev', blank: true },
+          { name: 'trading bot', to: '/TradingBot' },
+          { name: 'homelab', to: '/HomeLab' },
+          { name: 'terminal', to: '/terminal' },
+          { name: 'nutrione', to: '/projects/nutrione' },
+          { name: 'plant monitor', to: '/projects/plant-monitor' },
+          { name: 'blog', to: '/blog' },
+          { name: 'journal', to: '/journal' },
+          { name: 'email', to: 'mailto:Bryce@BryceKeeler.com' },
+          { name: 'github', to: 'https://github.com/BryceKeeler720', blank: true },
+          { name: 'linkedin', to: 'https://www.linkedin.com/in/bryce-keeler720/', blank: true },
+          { name: 'rss', to: '/rss.xml' },
+          { name: 'toggle theme', act: () => document.getElementById('theme-toggle')?.click() },
+        ];
+        const wrap = document.getElementById('cmdk');
+        const input = document.getElementById('cmdk-input');
+        const list = document.getElementById('cmdk-list');
+        let matches = routes, sel = 0;
+
+        function fuzzy(q, name) {
+          q = q.toLowerCase(); name = name.toLowerCase();
+          let i = 0;
+          for (const ch of name) if (ch === q[i]) i++;
+          return i === q.length;
+        }
+        function render() {
+          list.innerHTML = '';
+          matches.forEach((r, i) => {
+            const li = document.createElement('li');
+            li.textContent = r.name;
+            if (i === sel) li.className = 'sel';
+            li.addEventListener('mouseenter', () => { sel = i; render(); });
+            li.addEventListener('mousedown', (e) => { e.preventDefault(); go(r); });
+            list.appendChild(li);
+          });
+        }
+        function filter() {
+          const q = input.value.trim();
+          matches = q ? routes.filter((r) => fuzzy(q, r.name)) : routes;
+          sel = 0;
+          render();
+        }
+        function open() {
+          wrap.hidden = false;
+          input.value = '';
+          filter();
+          input.focus();
+        }
+        function close() { wrap.hidden = true; input.blur(); }
+        function go(r) {
+          close();
+          if (!r) return;
+          if (r.act) { r.act(); return; }
+          if (r.blank) { window.open(r.to, '_blank', 'noopener'); return; }
+          window.location.href = r.to;
+        }
+
+        document.addEventListener('keydown', (e) => {
+          const t = e.target;
+          const typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
+          if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            wrap.hidden ? open() : close();
+            return;
+          }
+          if (!wrap.hidden && e.key === 'Escape') { close(); return; }
+          if (wrap.hidden && !typing && e.key === ':') { e.preventDefault(); open(); return; }
+        });
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowDown') { e.preventDefault(); sel = Math.min(sel + 1, matches.length - 1); render(); }
+          else if (e.key === 'ArrowUp') { e.preventDefault(); sel = Math.max(sel - 1, 0); render(); }
+          else if (e.key === 'Enter') {
+            const q = input.value.trim().toLowerCase();
+            if (q === 'q' || q === 'q!' || q === 'wq') { close(); return; }
+            go(matches[sel]);
+          }
+        });
+        input.addEventListener('input', filter);
+        wrap.addEventListener('mousedown', (e) => { if (e.target === wrap) close(); });
+      })();
+    </script>
     <script is:inline>
       (function () {
         const btn = document.getElementById('theme-toggle');

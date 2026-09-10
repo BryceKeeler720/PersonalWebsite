@@ -12,6 +12,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <div class="node scalar jline d1">
         <a class="key" href="#about" data-sec="about">"home"</a><span class="p">: "/",</span>
       </div>
+      <div class="node scalar jline d1">
+        <a class="key" href="#now" data-sec="now">"now"</a><span class="p">: "…",</span>
+      </div>
       <div class="node obj" data-node="resume">
         <div class="row jline d1">
           <a class="key" href="#resume" data-sec="resume">"resume"</a><span class="p">: </span><button class="tog" aria-expanded="false">[ &hellip; ]</button><span class="p bkt" hidden>[</span><span class="p comma">,</span>
@@ -31,8 +34,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <li class="jline d2"><a href="/TradingBot">"trading-bot"</a><span class="p">,</span></li>
           <li class="jline d2"><a href="/HomeLab">"homelab"</a><span class="p">,</span></li>
           <li class="jline d2"><a href="/terminal">"terminal"</a><span class="p">,</span></li>
-          <li class="jline d2"><span class="leaf">"nutrione"</span><span class="p">,</span></li>
-          <li class="jline d2"><span class="leaf">"plant-monitor"</span></li>
+          <li class="jline d2"><a href="/projects/nutrione">"nutrione"</a><span class="p">,</span></li>
+          <li class="jline d2"><a href="/projects/plant-monitor">"plant-monitor"</a></li>
         </ul>
         <div class="p close jline d1" hidden>],</div>
       </div>
@@ -86,6 +89,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </ul>
     </section>
 
+    <section id="now">
+      <h2>Now</h2>
+      <ul class="entries">
+        <li><span class="k">studying</span>MITx probability &amp; statistics.</li>
+        <li><span class="k">building</span>2signal — agent evaluation platform.</li>
+        <li><span class="k">running</span>the trading bot, live in the market.</li>
+      </ul>
+    </section>
+
     <section id="resume">
       <h2>Resume</h2>
       <ul class="entries">
@@ -111,9 +123,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <li><span class="k">terminal</span>this site, as a shell.
             <a class="go" href="/terminal">→ open</a></li>
         <li><span class="k">nutrione</span>nutrition tracking with YOLOv8
-            food recognition.</li>
+            food recognition. <a class="go" href="/projects/nutrione">→ architecture</a></li>
         <li><span class="k">plant monitor</span>IoT + LSTM watering
-            predictions on ESP32 sensors.</li>
+            predictions on ESP32 sensors. <a class="go" href="/projects/plant-monitor">→ architecture</a></li>
       </ul>
     </section>
 
@@ -135,7 +147,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </ul>
     </section>
 
-    <footer>© 2026</footer>
+    <footer>
+      <div id="live-line" hidden></div>
+      <div>© 2026</div>
+    </footer>
   </div>
 </BaseLayout>
 
@@ -254,8 +269,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     position: relative;
     z-index: 1;
     margin-left: calc(24ch + 48px);
-    max-width: 100ch;
+    /* keep the column clear of the cathedral (art begins ~45vw):
+       tighter measure + slightly smaller type than the site base */
+    font-size: 14px;
+    max-width: min(80ch, 44vw);
     padding-block: 3rem 15vh;
+  }
+  @media (max-width: 1500px) {
+    .page { max-width: 80ch; }
   }
 
   .masthead { margin-bottom: 3rem; }
@@ -308,6 +329,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     font-size: 0.8rem;
     letter-spacing: 0.2ch;
   }
+  #live-line { margin-bottom: 0.5rem; }
 
   @media (max-width: 980px) {
     #index {
@@ -628,5 +650,38 @@ window.addEventListener('resize', () => {
   });
 
   spy();
+})();
+
+/* ── live status line: bot + homelab ──────────────── */
+(async function () {
+  const el = document.getElementById('live-line');
+  if (!el) return;
+  const bits = [];
+  try {
+    const r = await fetch('/api/trading/data');
+    if (r.ok) {
+      const d = await r.json();
+      const v = d.portfolio && d.portfolio.totalValue;
+      const hist = Array.isArray(d.history) ? d.history : [];
+      const dayStart = new Date(); dayStart.setHours(0, 0, 0, 0);
+      const base = hist.find((h) => new Date(h.timestamp) >= dayStart);
+      if (v && base && base.totalValue) {
+        const pct = ((v - base.totalValue) / base.totalValue) * 100;
+        bits.push('bot: ' + (pct >= 0 ? '+' : '') + pct.toFixed(2) + '% today');
+      }
+    }
+  } catch (e) { /* offline is fine */ }
+  try {
+    const r = await fetch('/api/homelab/data');
+    if (r.ok) {
+      const d = await r.json();
+      const cs = d.latest && d.latest.containers;
+      if (Array.isArray(cs) && cs.length) {
+        const up = cs.filter((c) => c.status === 'running').length;
+        bits.push('homelab: ' + up + '/' + cs.length + ' up');
+      }
+    }
+  } catch (e) { /* offline is fine */ }
+  if (bits.length) { el.textContent = bits.join(' · '); el.hidden = false; }
 })();
 </script>

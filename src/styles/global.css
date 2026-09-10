@@ -187,3 +187,55 @@ html[data-theme="light"] #cathedral pre {
 #theme-toggle:hover {
   color: var(--bone, var(--kana-fg));
 }
+
+/* ── Command palette (cmd+k / :) ──────────────────── */
+#cmdk {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 18vh;
+}
+html[data-theme="light"] #cmdk { background: rgba(60, 58, 50, 0.35); }
+#cmdk[hidden] { display: none; }
+.cmdk-box {
+  width: min(52ch, calc(100vw - 32px));
+  background: var(--kana-bg, #000);
+  border: 1px solid var(--faint, #3a3a3a);
+}
+.cmdk-prompt {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px dashed var(--faint, #3a3a3a);
+  color: var(--dim, #6e6e6e);
+}
+#cmdk-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--kana-fg, #d4d4d4);
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+#cmdk-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.3rem 0;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+#cmdk-list li {
+  padding: 0.25rem 1rem;
+  color: var(--kana-fg-dim, #a8a8a8);
+  cursor: pointer;
+}
+#cmdk-list li.sel {
+  background: var(--bone, #f2f2f2);
+  color: var(--void, #000);
+}

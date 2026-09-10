@@ -1,7 +1,6 @@
 ---
 import { getCollection, type CollectionEntry } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import BlogNavbar from '../components/blog/BlogNavbar.astro';
+import DocLayout from '../layouts/DocLayout.astro';
 import { getWordCount } from '../utils/readingTime';
 import JournalHeatmap from '../components/journal/JournalHeatmap';
 import JournalKnowledgeMap from '../components/journal/JournalKnowledgeMap';
@@ -11,13 +10,6 @@ type JournalEntry = CollectionEntry<'journal'>;
 const entries: JournalEntry[] = (await getCollection('journal', ({ data }: JournalEntry) => !data.draft))
   .sort((a: JournalEntry, b: JournalEntry) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
 
-const blogEntries = await getCollection('blog', ({ data }) => !data.draft);
-
-const totalWords = [...entries, ...blogEntries].reduce((sum, entry) => sum + getWordCount(entry.body), 0);
-const siteStart = new Date('2025-12-31');
-const daysSinceLaunch = Math.floor((Date.now() - siteStart.getTime()) / (1000 * 60 * 60 * 24));
-
-// Serialize entries for React components
 const entryData = entries.map((entry: JournalEntry) => ({
   slug: entry.slug,
   title: entry.data.title,
@@ -25,330 +17,66 @@ const entryData = entries.map((entry: JournalEntry) => ({
   tags: entry.data.tags,
   wordCount: getWordCount(entry.body),
 }));
+
+const fmt = (d: Date) => d.toISOString().slice(0, 10);
 ---
 
-<BaseLayout title="Journal | Bryce Keeler" description="Quick notes, updates, and things I'm working on.">
-  <BlogNavbar />
+<DocLayout title="Journal | Bryce Keeler" description="Quick notes, updates, and things I'm working on.">
+  <header>
+    <h1>Journal</h1>
+    <div class="sub">quick notes &amp; updates</div>
+  </header>
 
-  <main class="journal-page">
-    <header class="journal-header">
-      <h1>Journal</h1>
-      <p class="journal-subtitle">Quick notes and updates</p>
-    </header>
+  <section>
+    <JournalHeatmap entries={entryData} client:load />
+  </section>
 
-    <!-- Heatmap with stats and year navigation -->
-    <section class="journal-section">
-      <JournalHeatmap entries={entryData} client:load />
-    </section>
-
-    <!-- Knowledge Map Toggle -->
-    <section class="journal-section">
-      <button id="knowledge-map-toggle" class="knowledge-map-btn" aria-expanded="false">
-        <span class="btn-icon">◆</span>
-        Knowledge Map
-        <span class="btn-arrow">↓</span>
-      </button>
-      <div id="knowledge-map-panel" class="knowledge-map-panel" hidden>
-        <JournalKnowledgeMap entries={entryData} client:load />
-      </div>
-    </section>
-
-    <!-- Entry List -->
-    <section class="journal-section">
-      <h2 class="section-title">All Entries</h2>
-      <div class="journal-entries">
-        {entries.length === 0 ? (
-          <p class="journal-empty">Nothing here yet.</p>
-        ) : (
-          entries.map((entry: JournalEntry) => {
-            const wordCount = getWordCount(entry.body);
-            const formattedDate = entry.data.publishDate.toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-            });
-
-            return (
-              <a href={`/journal/${entry.slug}`} class="journal-entry">
-                <span class="entry-title">{entry.data.title}</span>
-                <span class="entry-right">
-                  {entry.data.tags.length > 0 && (
-                    <span class="entry-tags">
-                      {entry.data.tags.map((tag: string) => (
-                        <span class="entry-tag">{tag}</span>
-                      ))}
-                    </span>
-                  )}
-                  <span class="entry-words">{wordCount} words</span>
-                  <span class="entry-date">{formattedDate}</span>
-                </span>
-              </a>
-            );
-          })
-        )}
-      </div>
-    </section>
-
-    <p class="journal-stats">{daysSinceLaunch} days · {totalWords.toLocaleString()} words</p>
-  </main>
-
-  <footer class="journal-footer">
-    <div class="footer-content">
-      <p>Bryce Keeler · 2026</p>
-      <div class="footer-links">
-        <a href="/">Home</a>
-        <span>·</span>
-        <a href="/blog">Blog</a>
-        <span>·</span>
-        <a href="/">Home</a>
-      </div>
+  <section>
+    <button id="knowledge-map-toggle" class="map-toggle" aria-expanded="false">→ knowledge map</button>
+    <div id="knowledge-map-panel" hidden>
+      <JournalKnowledgeMap entries={entryData} client:load />
     </div>
-  </footer>
-</BaseLayout>
+  </section>
+
+  <section>
+    <h2>Entries</h2>
+    <ul class="entries">
+      {entries.map((entry) => (
+        <li>
+          <span class="date">{fmt(entry.data.publishDate)}</span>
+          <a href={`/journal/${entry.slug}`}>{entry.data.title}</a>
+        </li>
+      ))}
+    </ul>
+    <p class="meta"><a href="/blog">→ blog</a></p>
+  </section>
+</DocLayout>
 
 <style>
-  .journal-page {
-    min-height: 100vh;
-    padding: 8rem 2rem 4rem;
-    max-width: 720px;
-    margin: 0 auto;
-  }
-
-  .journal-header {
-    margin-bottom: 2.5rem;
-  }
-
-  .journal-header h1 {
-    font-size: clamp(2rem, 5vw, 2.75rem);
-    font-weight: 800;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-  }
-
-  .journal-subtitle {
-    color: var(--text-secondary);
-    font-size: 1rem;
-  }
-
-  .journal-section {
-    margin-bottom: 3rem;
-  }
-
-  .section-title {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-  }
-
-  .knowledge-map-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: rgba(220, 215, 186, 0.04);
-    border: 1px solid rgba(220, 215, 186, 0.1);
-    border-radius: 6px;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-    font-weight: 500;
+  .entries .date { color: var(--dim); white-space: nowrap; margin-right: 1.5ch; }
+  .entries a { color: var(--ink); text-decoration: none; }
+  .entries a:hover { background: var(--bone); color: var(--void); }
+  .map-toggle {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: var(--ink);
     font-family: inherit;
+    font-size: 0.9rem;
     cursor: pointer;
-    transition: all 0.2s ease;
   }
-
-  .knowledge-map-btn:hover {
-    background: rgba(220, 215, 186, 0.07);
-    color: var(--text-primary);
-    border-color: rgba(220, 215, 186, 0.2);
-  }
-
-  .knowledge-map-btn[aria-expanded="true"] {
-    background: rgba(220, 215, 186, 0.06);
-    color: var(--text-primary);
-    border-color: rgba(220, 215, 186, 0.15);
-  }
-
-  .btn-icon {
-    font-size: 0.625rem;
-    opacity: 0.5;
-  }
-
-  .btn-arrow {
-    font-size: 0.75rem;
-    transition: transform 0.2s ease;
-  }
-
-  .knowledge-map-btn[aria-expanded="true"] .btn-arrow {
-    transform: rotate(180deg);
-  }
-
-  .knowledge-map-panel {
-    margin-top: 1rem;
-    overflow: hidden;
-  }
-
-  .journal-entries {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .journal-empty {
-    color: var(--text-secondary);
-    text-align: center;
-    padding: 3rem 0;
-  }
-
-  .journal-entry {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1.5rem;
-    padding: 0.875rem 0;
-    border-bottom: 1px solid rgba(220, 215, 186, 0.06);
-    text-decoration: none;
-    transition: background 0.2s ease;
-  }
-
-  .journal-entry:first-child {
-    border-top: 1px solid rgba(220, 215, 186, 0.06);
-  }
-
-  .journal-entry:hover {
-    background: rgba(220, 215, 186, 0.02);
-  }
-
-  .entry-title {
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .entry-right {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex-shrink: 0;
-  }
-
-  .entry-date {
-    font-size: 0.8125rem;
-    color: var(--text-secondary);
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-  }
-
-  .entry-tags {
-    display: flex;
-    gap: 0.375rem;
-  }
-
-  .entry-tag {
-    font-size: 0.6875rem;
-    padding: 0.125rem 0.5rem;
-    background: rgba(220, 215, 186, 0.05);
-    border: 1px solid rgba(220, 215, 186, 0.1);
-    border-radius: 3px;
-    color: var(--text-secondary);
-  }
-
-  .entry-words {
-    font-size: 0.75rem;
-    color: rgba(220, 215, 186, 0.4);
-    white-space: nowrap;
-  }
-
-  .journal-footer {
-    padding: 3rem 2rem;
-    border-top: 1px solid rgba(220, 215, 186, 0.1);
-    background: rgba(31, 31, 40, 0.5);
-  }
-
-  .footer-content {
-    max-width: 720px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    text-align: center;
-  }
-
-  .footer-content p {
-    color: var(--text-secondary);
-    font-size: 0.9375rem;
-  }
-
-  .footer-links {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .footer-links a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: 0.875rem;
-    transition: color 0.3s ease;
-  }
-
-  .footer-links a:hover {
-    color: var(--primary-color);
-  }
-
-  .footer-links span {
-    color: rgba(220, 215, 186, 0.2);
-  }
-
-  .journal-stats {
-    font-size: 0.75rem;
-    color: rgba(220, 215, 186, 0.3);
-    text-align: center;
-    margin-top: 1rem;
-  }
-
-  @media (max-width: 768px) {
-    .journal-page {
-      padding: 6rem 1.5rem 3rem;
-    }
-
-    .journal-entry {
-      flex-direction: column;
-      gap: 0.5rem;
-      padding: 0.875rem 0;
-    }
-
-    .entry-right {
-      flex-wrap: wrap;
-    }
-
-    .footer-links {
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .footer-links span {
-      display: none;
-    }
-  }
+  .map-toggle:hover { background: var(--bone); color: var(--void); }
+  #knowledge-map-panel { margin-top: 1rem; }
+  .meta a { color: var(--dim); text-decoration: none; }
 </style>
 
-<script>
-  const toggle = document.getElementById('knowledge-map-toggle');
+<script is:inline>
+  const btn = document.getElementById('knowledge-map-toggle');
   const panel = document.getElementById('knowledge-map-panel');
-
-  let toggling = false;
-  toggle?.addEventListener('click', () => {
-    if (toggling) return;
-    toggling = true;
-    const expanded = toggle.getAttribute('aria-expanded') === 'true';
-    toggle.setAttribute('aria-expanded', String(!expanded));
-    if (panel) panel.hidden = expanded;
-    setTimeout(() => { toggling = false; }, 300);
+  btn?.addEventListener('click', () => {
+    const open = panel.hidden;
+    panel.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+    btn.textContent = open ? '↓ knowledge map' : '→ knowledge map';
   });
 </script>
