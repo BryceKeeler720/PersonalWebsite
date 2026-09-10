@@ -301,124 +301,252 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 </style>
 
 <script is:inline>
-/* ── noise kit ─────────────────────────────────────── */
-function bkHash(x, y, s) {
-  let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(s, 2246822519);
-  h = Math.imul(h ^ (h >>> 13), 1274126177);
-  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
-}
-function bkSstep(t) { return t * t * (3 - 2 * t); }
-function bkVnoise(x, y, s) {
-  const xi = Math.floor(x), yi = Math.floor(y);
-  const xf = bkSstep(x - xi), yf = bkSstep(y - yi);
-  const a = bkHash(xi, yi, s), b = bkHash(xi + 1, yi, s);
-  const c = bkHash(xi, yi + 1, s), d = bkHash(xi + 1, yi + 1, s);
-  return a + (b - a) * xf + (c - a) * yf + (a - b - c + d) * xf * yf;
-}
-
-/* ── background cathedral: sketchy inked spires ─────
-   Full-page backdrop; the main spire peaks at ~3/4 of
-   the viewport width. */
-function renderCathedral() {
+/* ── background cathedral, rendered donut.c-style ───
+   A real 3D model this time: a point cloud sampled over boxes,
+   pitched roofs, pyramid + cone spires and a half-cylinder apse,
+   each point carrying its surface normal. Every frame the cloud is
+   yaw-rotated (slow turntable), perspective-projected onto the
+   character grid, z-buffered, and shaded against a fixed light
+   through the classic ".,-~:;=!*#$@" luminance ramp. */
+(function () {
   const el = document.querySelector('#cathedral pre');
   if (!el) return;
-  const seed = 7;
-  // measure real cell size so spire positions stay true viewport fractions
-  el.textContent = '@@@@@@@@@@';
-  const probe = el.getBoundingClientRect();
-  const charW = probe.width / 10 || 6.6;
-  const charH = probe.height || 11;
-  const rows = Math.floor(window.innerHeight / charH);
-  const cols = Math.min(700, Math.ceil(window.innerWidth / charW));
 
-  // [center fx, half-width fx, height] — main spire at 0.75
-  const steeples = [
-    [0.75, 0.072, 1.00],
-    [0.615, 0.055, 0.72],
-    [0.865, 0.052, 0.78],
-    [0.54, 0.042, 0.48],
-    [0.945, 0.040, 0.52],
-    [0.675, 0.034, 0.60],
-    [0.810, 0.034, 0.56],
-  ];
-  const grid = [];
-  for (let y = 0; y < rows; y++) grid.push(new Array(cols).fill(' '));
+  const LUM = '.,-~:;=!*#$@';
+  const STEP = 0.2; // surface sample spacing, model units
 
-  const prof = new Array(cols);
-  for (let x = 0; x < cols; x++) {
-    const fx = x / cols;
-    let h = 0.12;
-    for (const [c, w, ht] of steeples) {
-      const d = Math.abs(fx - c) / w;
-      if (d < 0.45) {
-        const t = 1 - d / 0.45;
-        h = Math.max(h, ht * (0.74 + 0.26 * t * t));
+  /* ── point cloud ── */
+  const px = [], py = [], pz = [], nX = [], nY = [], nZ = [], bst = [];
+  function pt(x, y, z, nx, ny, nz, b) {
+    const l = Math.hypot(nx, ny, nz) || 1;
+    px.push(x); py.push(y); pz.push(z);
+    nX.push(nx / l); nY.push(ny / l); nZ.push(nz / l);
+    bst.push(b || 0);
+  }
+  function quad(o, u, v, n, boost) {
+    const nu = Math.max(1, Math.ceil(Math.hypot(u[0], u[1], u[2]) / STEP));
+    const nv = Math.max(1, Math.ceil(Math.hypot(v[0], v[1], v[2]) / STEP));
+    for (let i = 0; i <= nu; i++) for (let j = 0; j <= nv; j++) {
+      const a = i / nu, c = j / nv;
+      pt(o[0] + u[0] * a + v[0] * c, o[1] + u[1] * a + v[1] * c, o[2] + u[2] * a + v[2] * c,
+        n[0], n[1], n[2], boost ? boost(a, c) : 0);
+    }
+  }
+  // box: cx,cz center, y0 ground; window boosts per face
+  function box(cx, y0, cz, sx, sy, sz, w) {
+    const hx = sx / 2, hz = sz / 2;
+    w = w || {};
+    quad([cx + hx, y0, cz - hz], [0, sy, 0], [0, 0, sz], [1, 0, 0], w.posx);
+    quad([cx - hx, y0, cz - hz], [0, sy, 0], [0, 0, sz], [-1, 0, 0], w.negx);
+    quad([cx - hx, y0, cz + hz], [0, sy, 0], [sx, 0, 0], [0, 0, 1], w.posz);
+    quad([cx - hx, y0, cz - hz], [0, sy, 0], [sx, 0, 0], [0, 0, -1], w.negz);
+    quad([cx - hx, y0 + sy, cz - hz], [sx, 0, 0], [0, 0, sz], [0, 1, 0]);
+  }
+  // triangle fan helper for gables & pyramid faces
+  function tri(base, apexY, half, fixed, axis) {
+    const nA = Math.max(1, Math.ceil((apexY - base[1]) / STEP));
+    for (let i = 0; i <= nA; i++) {
+      const a = i / nA, w = half * (1 - a);
+      const nC = Math.max(1, Math.ceil((2 * w) / STEP));
+      for (let j = 0; j <= nC; j++) {
+        const c = -w + (2 * w) * (j / nC);
+        if (axis === 'x') pt(base[0] + c, base[1] + a * (apexY - base[1]), base[2], fixed[0], fixed[1], fixed[2]);
+        else pt(base[0], base[1] + a * (apexY - base[1]), base[2] + c, fixed[0], fixed[1], fixed[2]);
       }
-      if (d < 0.70) h = Math.max(h, ht * 0.60);
-      if (d < 1.00) h = Math.max(h, ht * 0.44 * (1.15 - d * 0.4));
-    }
-    // confine the complex to the right side; fade base wall at both ends
-    const envL = bkSstep(Math.max(0, Math.min(1, (fx - 0.42) / 0.12)));
-    const envR = bkSstep(Math.max(0, Math.min(1, (1.0 - fx) / 0.045)));
-    h *= envL * (0.3 + 0.7 * envR);
-    h += (bkVnoise(x * 0.35, 0, seed) - 0.5) * 0.04;
-    prof[x] = Math.max(0.0, Math.min(0.995, h));
-  }
-
-  for (let x = 0; x < cols; x++) {
-    if (prof[x] < 0.03) continue;
-    const topY = Math.floor(rows * (1 - prof[x]));
-    const topL = Math.floor(rows * (1 - (prof[x - 1] ?? 0)));
-    const topR = Math.floor(rows * (1 - (prof[x + 1] ?? 0)));
-    for (let y = topY; y < rows; y++) {
-      const depth = (y - topY) / Math.max(1, rows - topY);
-      const n = bkVnoise(x * 0.4, y * 0.4, seed + 1);
-      const g = bkVnoise(x * 0.09, y * 0.8, seed + 2);
-      const fine = bkHash(x, y, seed + 3);
-
-      if (y < topL && y < topR) { grid[y][x] = fine > 0.5 ? '|' : '!'; continue; }
-      if (y < topL) { grid[y][x] = '/'; continue; }
-      if (y < topR) { grid[y][x] = '\\'; continue; }
-      if (y === topY) { grid[y][x] = fine > 0.6 ? '^' : (fine > 0.3 ? 'A' : 'n'); continue; }
-
-      // sketchy dropout — white gashes like unfinished linework
-      const gash = bkVnoise(x * 0.22, y * 0.18, seed + 9);
-      if (gash > 0.72 || fine > 0.955) { grid[y][x] = fine > 0.5 ? ' ' : '.'; continue; }
-
-      // pointed windows: dark masses on loose vertical rhythm
-      const wphase = (x * 5 + (seed * 3 | 0)) % 11;
-      const isWin = wphase <= 1 && depth > 0.18 && n > 0.35;
-
-      let v = n * 0.55 + g * 0.45 + depth * 0.30;
-      if (isWin) v += 0.35;
-      let ch;
-      if (v > 0.92) ch = '@';
-      else if (v > 0.80) ch = fine > 0.5 ? '&' : '%';
-      else if (v > 0.70) ch = '#';
-      else if (v > 0.60) ch = fine > 0.5 ? '(' : '|';
-      else if (v > 0.50) ch = fine > 0.5 ? '/' : '\\';
-      else if (v > 0.42) ch = fine > 0.5 ? '!' : ';';
-      else if (v > 0.34) ch = ':';
-      else ch = fine > 0.5 ? '.' : "'";
-      if ((y + ((x * 0.06) | 0)) % 9 === 0 && depth > 0.12 && depth < 0.9 && fine > 0.35 && v > 0.4) ch = '=';
-      grid[y][x] = ch;
     }
   }
-  for (const [c, , ht] of steeples) {
-    if (ht < 0.6) continue;
-    const x = Math.floor(c * cols);
-    const topY = Math.floor(rows * (1 - prof[x]));
-    if (topY - 1 >= 0) grid[topY - 1][x] = '+';
+  // pitched roof, ridge along z
+  function roofZ(cx, y1, cz, sx, sz, h) {
+    const hx = sx / 2, hz = sz / 2;
+    quad([cx + hx, y1, cz - hz], [-hx, h, 0], [0, 0, sz], [h, hx, 0]);
+    quad([cx - hx, y1, cz - hz], [hx, h, 0], [0, 0, sz], [-h, hx, 0]);
+    tri([cx, y1, cz - hz], y1 + h, hx, [0, 0, -1], 'x');
+    tri([cx, y1, cz + hz], y1 + h, hx, [0, 0, 1], 'x');
   }
-  el.textContent = grid.map((r) => r.join('')).join('\n');
-}
+  // pitched roof, ridge along x
+  function roofX(cx, y1, cz, sx, sz, h) {
+    const hx = sx / 2, hz = sz / 2;
+    quad([cx - hx, y1, cz + hz], [0, h, -hz], [sx, 0, 0], [0, hz, h]);
+    quad([cx - hx, y1, cz - hz], [0, h, hz], [sx, 0, 0], [0, hz, -h]);
+    tri([cx - hx, y1, cz], y1 + h, hz, [-1, 0, 0], 'z');
+    tri([cx + hx, y1, cz], y1 + h, hz, [1, 0, 0], 'z');
+  }
+  // 4-sided pyramid spire
+  function pyramid(cx, y0, cz, half, h) {
+    for (const [dx, dz] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nA = Math.max(1, Math.ceil(Math.hypot(h, half) / STEP));
+      for (let i = 0; i <= nA; i++) {
+        const a = i / nA, w = half * (1 - a);
+        const nC = Math.max(1, Math.ceil((2 * w) / STEP));
+        for (let j = 0; j <= nC; j++) {
+          const c = -w + (2 * w) * (j / nC);
+          pt(cx + dx * w + (dz !== 0 ? c : 0), y0 + a * h, cz + dz * w + (dx !== 0 ? c : 0),
+            dx * h, half, dz * h);
+        }
+      }
+    }
+  }
+  // smooth cone spire
+  function cone(cx, y0, cz, r, h) {
+    const nA = Math.max(2, Math.ceil(Math.hypot(h, r) / STEP));
+    for (let i = 0; i <= nA; i++) {
+      const t = i / nA, rr = r * (1 - t);
+      const nT = Math.max(3, Math.ceil((2 * Math.PI * rr) / STEP));
+      for (let j = 0; j < nT; j++) {
+        const th = (j / nT) * Math.PI * 2;
+        pt(cx + rr * Math.cos(th), y0 + t * h, cz + rr * Math.sin(th),
+          Math.cos(th) * h, r, Math.sin(th) * h);
+      }
+    }
+  }
+  // half-cylinder apse (rounded east end) + conical half-roof
+  function apse(cx, y0, cz, r, h, roofH) {
+    const nYr = Math.ceil(h / STEP), nT = Math.ceil((Math.PI * r) / STEP);
+    for (let i = 0; i <= nYr; i++) for (let j = 0; j <= nT; j++) {
+      const th = (j / nT) * Math.PI;
+      const win = ((j / nT) * 5) % 1;
+      const b = (i / nYr > 0.3 && i / nYr < 0.75 && win > 0.35 && win < 0.65) ? 0.45 : 0;
+      pt(cx + r * Math.cos(th), y0 + (i / nYr) * h, cz + r * Math.sin(th),
+        Math.cos(th), 0, Math.sin(th), b);
+    }
+    const nA = Math.ceil(Math.hypot(roofH, r) / STEP);
+    for (let i = 0; i <= nA; i++) {
+      const t = i / nA, rr = r * (1 - t);
+      const nT2 = Math.max(2, Math.ceil((Math.PI * rr) / STEP));
+      for (let j = 0; j <= nT2; j++) {
+        const th = (j / nT2) * Math.PI;
+        pt(cx + rr * Math.cos(th), y0 + h + t * roofH, cz + rr * Math.sin(th),
+          Math.cos(th) * roofH, r, Math.sin(th) * roofH);
+      }
+    }
+  }
+  // lancet windows along a wall: a = height frac, c = length frac
+  function lancets(nWin, lo, hi) {
+    lo = lo ?? 0.22; hi = hi ?? 0.72;
+    return (a, c) => {
+      if (a < lo || a > hi) return 0;
+      const ph = (c * nWin) % 1;
+      const t = (a - lo) / (hi - lo);
+      const half = t < 0.7 ? 0.16 : 0.16 * (1 - (t - 0.7) / 0.3);
+      return Math.abs(ph - 0.5) < half ? 0.5 : 0;
+    };
+  }
+  // rose window disc on the west front
+  function rose(cy, r) {
+    return (a, c) => {
+      const d = Math.hypot(a - cy, c - 0.5);
+      if (d < r * 0.35) return 0.5;
+      if (d < r) return ((Math.atan2(a - cy, c - 0.5) * 8 / Math.PI) % 2 + 2) % 2 < 1 ? 0.5 : 0.15;
+      return 0;
+    };
+  }
 
-renderCathedral();
-let bkRto;
-window.addEventListener('resize', () => {
-  clearTimeout(bkRto);
-  bkRto = setTimeout(renderCathedral, 150);
-});
+  /* assemble (y up, ground y=0, west front at -z) */
+  box(0, 0, -2, 9, 11, 30, { posx: lancets(9), negx: lancets(9), negz: rose(0.62, 0.30) });
+  roofZ(0, 11, -2, 9, 30, 4.5);
+  box(0, 0, 3, 20, 10, 7, { negz: lancets(3), posz: lancets(3) });
+  roofX(0, 10, 3, 20, 7, 4);
+  for (const tx of [-3.6, 3.6]) {
+    const tw = lancets(1, 0.5, 0.85);
+    box(tx, 0, -17.8, 5.4, 17, 5.4, { negz: tw, posx: tw, negx: tw });
+    pyramid(tx, 17, -17.8, 2.9, 6.5);
+  }
+  cone(0, 13.5, 3, 3.1, 16.5); // central crossing spire, apex y=30
+  apse(0, 0, 13, 4.5, 9, 4);
+
+  const N = px.length;
+  const PX = Float32Array.from(px), PY = Float32Array.from(py), PZ = Float32Array.from(pz);
+  const NXA = Float32Array.from(nX), NYA = Float32Array.from(nY), NZA = Float32Array.from(nZ);
+  const BS = Float32Array.from(bst);
+  // per-point sketch dither, fixed so the texture doesn't flicker
+  const DI = new Float32Array(N), SKIP = new Uint8Array(N);
+  for (let i = 0; i < N; i++) {
+    let h = Math.imul(i, 2654435761) >>> 0; h = ((h ^ (h >>> 15)) * 2246822519) >>> 0;
+    const r = (h >>> 8) / 16777216 - 0.5;
+    SKIP[i] = r > 0.44 ? 1 : 0; // sketchy dropout
+    DI[i] = r * 0.15;
+  }
+
+  /* ── camera / projection ── */
+  const K2 = 110, CY = 14, PITCH = -0.07, MODEL_H = 30;
+  const L = [0.60, 0.42, -0.68];
+  { const l = Math.hypot(L[0], L[1], L[2]); L[0] /= l; L[1] /= l; L[2] /= l; }
+  const cosP = Math.cos(PITCH), sinP = Math.sin(PITCH);
+
+  let cols = 0, rows = 0, cell = 0.6, K1 = 0, xc = 0, yc = 0;
+  let grid = null, zb = null;
+  function measure() {
+    el.textContent = '@@@@@@@@@@';
+    const probe = el.getBoundingClientRect();
+    const charW = probe.width / 10 || 6.6;
+    const charH = probe.height || 11;
+    cell = charW / charH;
+    rows = Math.floor(window.innerHeight / charH);
+    cols = Math.min(700, Math.ceil(window.innerWidth / charW));
+    K1 = (rows * 0.82 * K2) / (cell * MODEL_H);
+    xc = cols * 0.68;                       // complex sits right, like before
+    yc = rows - 2 - (K1 * cell * CY) / K2;  // ground line near the bottom edge
+    grid = new Array(cols * rows);
+    zb = new Float32Array(cols * rows);
+  }
+
+  function render(yaw) {
+    const cosY = Math.cos(yaw), sinY = Math.sin(yaw);
+    grid.fill(' ');
+    zb.fill(0);
+    for (let i = 0; i < N; i++) {
+      if (SKIP[i]) continue;
+      const x0 = PX[i] * cosY + PZ[i] * sinY;
+      const z0 = -PX[i] * sinY + PZ[i] * cosY;
+      const y0 = PY[i] - CY;
+      const y1 = y0 * cosP - z0 * sinP;
+      const z1 = y0 * sinP + z0 * cosP + K2;
+      const ooz = 1 / z1;
+      const xp = Math.round(xc + K1 * ooz * x0);
+      const yp = Math.round(yc - K1 * cell * ooz * y1);
+      if (xp < 0 || xp >= cols || yp < 0 || yp >= rows) continue;
+      const idx = yp * cols + xp;
+      if (zb[idx] !== 0 && ooz <= zb[idx]) continue;
+      zb[idx] = ooz;
+      const nx0 = NXA[i] * cosY + NZA[i] * sinY;
+      const nz0 = -NXA[i] * sinY + NZA[i] * cosY;
+      const ny1 = NYA[i] * cosP - nz0 * sinP;
+      const nz1 = NYA[i] * sinP + nz0 * cosP;
+      const d = nx0 * L[0] + ny1 * L[1] + nz1 * L[2];
+      let lum = d > 0 ? 0.12 + 0.58 * d : 0.12 + 0.10 * d;
+      lum = Math.min(1, Math.max(0.02, lum + DI[i] + BS[i]));
+      grid[idx] = LUM[Math.min(LUM.length - 1, Math.floor(lum * LUM.length))];
+    }
+    const out = [];
+    for (let y = 0; y < rows; y++) out.push(grid.slice(y * cols, (y + 1) * cols).join(''));
+    el.textContent = out.join('\n');
+  }
+
+  /* ── slow turntable, static under reduced motion ── */
+  let yaw = 2.45, raf = 0, last = 0;
+  const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+  function tick(now) {
+    raf = requestAnimationFrame(tick);
+    if (now - last < 1000 / 24) return;
+    last = now;
+    render(yaw);
+    yaw += 0.004;
+  }
+  function start() {
+    cancelAnimationFrame(raf);
+    measure();
+    if (media.matches) { render(yaw); return; }
+    raf = requestAnimationFrame(tick);
+  }
+  media.addEventListener('change', start);
+  start();
+
+  let bkRto;
+  window.addEventListener('resize', () => {
+    clearTimeout(bkRto);
+    bkRto = setTimeout(start, 150);
+  });
+})();
 
 /* ── scroll-spy for the index ─────────────────────── */
 (function () {
